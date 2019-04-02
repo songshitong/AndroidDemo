@@ -3,12 +3,36 @@
           package="sst.example.androiddemo.feature">
 
     <application>
+        <activity android:name=".graphics.ParticleActivity">
+        </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".graphics.BitmapActivity">
+        </activity>
+        <activity android:name=".graphics.PictureDrawableActivity">
+        </activity>
+        <activity android:name=".graphics.CanvasActivity">
+        </activity>
+        <activity android:name=".graphics.PaintActivity">
+        </activity>
+        <activity android:name=".graphics.DrawableActivity">
+        </activity>
+        <activity android:name=".graphics.PathActivity">
+        </activity>
+        <activity android:name=".graphics.ShaderActivity">
+        </activity>
+        <activity android:name=".Animation.LayoutAnimationActivity">
+        </activity>
+        <activity android:name=".Animation.ViewGroupActivity">
+        </activity>
+        <activity android:name=".Animation.ViewPropertyAnimatorActivity">
+        </activity>
+        <activity android:name=".Animation.SupportAnimationActivity">
         </activity>
     </application>
 

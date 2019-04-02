@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle">
+    <gradient android:startColor="@color/colorAccent"
+              android:endColor="@color/colorPrimaryDark"
+              android:angle="45"
+             android:type="linear"/>
+    <corners  android:radius="5dp"/>
+    <padding android:top="10dp" android:left="-150dp" android:right="100dp"/>
+
+    <stroke android:color="@android:color/black" android:width="2dp" android:dashWidth="10dp" android:dashGap="5dp"/>
+    <size android:width="200dp" android:height="200dp"/>
+    <!--<solid android:color="@android:color/darker_gray"/>-->
+
+</shape>
+
+        <!--
+
+        android:innerRadius  圆环的半径   innerRadius优先级大于innerRadiusRatio
+android:innerRadiusRatio   内半径占整个Drawable宽度的比例，默认值为9.如果为n，那么半径=宽度/n
+android:thickness  圆环的厚度
+android：thicknessRatio  圆环厚度占整个Drawable宽度比例  thickness优先级大于thicknessRatio
+
+gradient设置颜色渐变与<solid>为互斥标签，因为solid表示纯色填充，而gradient表示渐变填充。
+android:gradientRadius	渐变的半径，当android:type=”radial”有效
+android:angle	渐变的角度，默认为0，其值务必为45°的倍数，0表示从左到右，90表示从下到上。
+android:centerX	渐变中心点的横坐标
+android:centerY	渐变的中心点的纵坐标，渐变中心点会影响渐变的具体效果。
+android:type	渐变类别，linear(线性)为默认值，radial（径内渐变），sweep（扫描渐变）
+
+padding
+表示内容或子标签边距，4个属性top、bottom、left、right，需要注意的是这个标签的作用是为内容设置与当前应用此shape的View的边距，而不是设置当前View与父元素的边距
+        -->

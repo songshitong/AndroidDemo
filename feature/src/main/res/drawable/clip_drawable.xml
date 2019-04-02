@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<clip xmlns:android="http://schemas.android.com/apk/res/android"
+      android:drawable="@drawable/dog"
+      android:gravity="center"
+      android:clipOrientation="horizontal"
+>
+
+</clip>
+
+        <!--clipOrientation表示裁剪的方向（水平和垂直两种），gravity比较复杂必须和clipOrientation一起才能起作用
+          top	将这个对象放在容器的顶部，不改变其大小。当clipOrientation 是”vertical”，裁剪从底部开始
+          bottom	将这个对象放在容器的底部，不改变其大小。当clipOrientation 是 “vertical”，裁剪从顶部（top）开始
+          left	将这个对象放在容器的左部，不改变其大小。当clipOrientation 是 “horizontal”，裁剪从drawable的右边（right）开始，默认值
+right	将这个对象放在容器的右部，不改变其大小。当clipOrientation 是 “horizontal”，裁剪从drawable的左边（left）开始
+center_vertical	将对象放在垂直中间，不改变其大小，如果clipOrientation 是 “vertical”，那么从上下同时开始裁剪
+fill_vertical	垂直方向上不发生裁剪。（除非drawable的level是 0，才会不可见，表示全部裁剪完）
+center_horizontal	将对象放在水平中间，不改变其大小，clipOrientation 是 “horizontal”，那么从左右两边开始裁剪
+fill_horizontal	水平方向上不发生裁剪。（除非drawable的level是 0，才会不可见，表示全部裁剪完）
+center	将这个对象放在水平垂直坐标的中间，不改变其大小。当clipOrientation 是 “horizontal”裁剪发生在左右。当clipOrientation是”vertical”,裁剪发生在上下。
+fill	填充整个容器，不会发生裁剪。(除非drawable的level是 0，才会不可见，表示全部裁剪完)。
+clip_vertical	附加选项，表示竖直方向的裁剪，很少使用
+clip_horizontal	附加选项，表示水平方向的裁剪，很少使用
+
+
+        -->

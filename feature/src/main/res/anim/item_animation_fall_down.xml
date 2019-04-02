@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+     android:duration="300">
+
+    <translate
+            android:fromYDelta="-20%"
+            android:toYDelta="0"
+            android:interpolator="@android:anim/decelerate_interpolator"
+    />
+
+    <alpha
+            android:fromAlpha="0"
+            android:toAlpha="1"
+            android:interpolator="@android:anim/decelerate_interpolator"
+    />
+
+    <scale
+            android:fromXScale="105%"
+            android:fromYScale="105%"
+            android:toXScale="100%"
+            android:toYScale="100%"
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:interpolator="@android:anim/decelerate_interpolator"
+    />
+
+</set>
+
+<!--
+Translate Y -20% to 0%
+在动画开始前，把view向上移动自身高度的20%，然后让他下降到自己最终的位置。
+
+Alpha 0 to 1
+从完全不可见慢慢过渡到完全可见。
+
+Scale X/Y 105% to 100%
+放大到105%，然后缩小的实际大小
+
+-->

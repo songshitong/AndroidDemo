@@ -1,1 +1,6 @@
-include ':feature', ':app', ':base', ':instantapp'
+include ':feature', ':app', ':base', ':instantapp', ':lib'
+setBinding(new Binding([gradle: this]))                                 // new
+evaluate(new File(                                                      // new
+        settingsDir,                                               // new
+        'my_flutter/.android/include_flutter.groovy'                          // new
+))                                                                            // new

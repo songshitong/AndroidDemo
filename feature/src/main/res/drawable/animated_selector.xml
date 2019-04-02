@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/from" android:state_selected="true"   android:drawable="@drawable/ic_android_black_24dp_green"/>
+    <item android:id="@+id/end" android:state_selected="false" android:drawable="@drawable/ic_android_black_24dp"/>
+    <transition android:fromId="@id/end" android:toId="@id/from" android:drawable="@drawable/ainmated_vector_drawable" android:reversible="true"/>
+
+</animated-selector>

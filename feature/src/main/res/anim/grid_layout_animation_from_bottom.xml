@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gridLayoutAnimation
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:animation="@anim/item_animation_from_bottom"
+        android:animationOrder="normal"
+        android:columnDelay="15%"
+        android:rowDelay="15%"
+        android:direction="top_to_bottom|left_to_right"
+/>
+
+<!--
+android:animationOrder="normal"
+可以选择三种类型：normal, reverse 以及 random。它控制内容动画的顺序。Normal：遵循direction和delay所定义的顺序；Reverse的顺序恰好跟Normal相反；Random为随机的顺序。
+android:columnDelay=”15%"
+应用到每列上的动画延迟，定义为item动画持续时间的百分比。
+
+android:rowDelay=”15%"
+应用到每行上的动画延迟，定义为item动画持续时间的百分比。
+
+android:direction=”top_to_bottom|left_to_right"
+定义动画执行的方向。这里动画将从左上角开始，移动到右下角。如果定义为top_to_bottom|right_to_left，那么将从右上角开始移动到左下角。
+-->

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+          android:enterFadeDuration="200"
+          android:exitFadeDuration="200"
+          android:constantSize="false"
+          android:variablePadding="false"
+          android:autoMirrored="false"
+>
+    <item android:state_pressed="true">
+        <animated-rotate android:drawable="@drawable/ic_launcher" android:pivotX="50%" android:pivotY="50%"/>
+    </item>
+    <item android:drawable="@drawable/ic_launcher"/>
+</selector>
+
+        <!--不写状态是默认状态-->
+        <!--
+                android:constantSize   StateListDrawable的固有大小是否随着其状态改变而改变，
+                因为在状态改变后，StateListDrawable会切换到别的Drawable，而不同的Drawable其大小可能不一样。
+                true表示大小不变，这时其固有大小是内容所有Drawable的固有大小的最大值。false则会随着状态改变而改变，默认值为false
+
+        android:state_hovered="true"   表示光标是否停留在View的自身大小范围内的状态  edittext
+        android:state_pressed	表示是否处于被按下状态
+        android:state_focused	表示是否已得到焦点状态
+        android:state_selected	表示是否处于被选中状态
+        android:state_checkable	表示是否处于可勾选状态
+        android:state_checked	表示是否处于已勾选状态，一般用于CheckBox
+        android:state_enabled	表示是否处于可用状态
+        android:state_active	表示是否处于激活状态
+        android:state_window_focused	表示是否窗口已得到焦点状态
+
+        android:variablePadding 表示 StateListDrawable的padding是否随状态的改变而改变，默认值为false，一般建议设置为false就行
+
+
+         android:enterFadeDuration="200"  android:exitFadeDuration="200"
+         进入新状态或退出旧状态时会有一个200毫秒的渐变动画。这两个属性使用的比较常见，可以使选择器的状态切换更加平滑。
+
+         android:autoMirrored 这个属性表示是否将drawable镜像显示，只有在从右往左布局的环境下才会生效。将此属性设置成true，并将语言调节成阿拉伯语便可以看到效果。
+                -->

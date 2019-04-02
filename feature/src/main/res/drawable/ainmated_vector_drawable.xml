@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" android:drawable="@drawable/ic_android_black_24dp" >
+    <target android:animation="@animator/vector_animator" android:name="v" />
+</animated-vector>
+
+
+<!--
+animated-vector 通过 android:drawable=”@drawable/triangle” 来指定要对那个 VectorDrawable 做动画,
+ 里面通过 target 元素来定义每个动画,
+ target 中通过 android:name 指定做动画的 group 或者 path ,  可以对vector的不同标签做动画，可同时定义多个target
+ android:animation为具体的 ObjectAnimator 或者 AnimatorSet 定义。
+-->

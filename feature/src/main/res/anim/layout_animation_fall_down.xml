@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layoutAnimation xmlns:android="http://schemas.android.com/apk/res/android"
+                 android:animation="@anim/item_animation_fall_down"
+                 android:delay="20%"
+                 android:animationOrder="normal"
+>
+
+</layoutAnimation>
+
+<!--
+android:delay=”15%"
+为每个item动画添加一个延时，基于item动画的duration。0%将导致所有item同步运行，100％则让前一个item的动画运行完了下一个item才开始动画。我们这里使用的是15%，表示item A的动画运行了15％之后才开始运行B的动画。
+
+android:animationOrder="normal"
+有三种选择：normal, reverse 和 random。它可以控制布局元素运行动画的顺序。Normal是按照布局的自然顺序（ vertical: top to bottom, horizontal: left to right），Reverse跟Normal是相反的，Random则按照随即的顺序
+
+-->

@@ -1,0 +1,63 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="24dp"
+        android:height="24dp"
+        android:viewportWidth="24.0"
+        android:viewportHeight="24.0">
+    <path android:name="v"
+          android:fillColor="#FF000000"
+          android:pathData="M6,18c0,0.55 0.45,1 1,1h1v3.5c0,0.83 0.67,1.5 1.5,1.5s1.5,-0.67 1.5,-1.5L11,19h2v3.5c0,0.83 0.67,1.5 1.5,1.5s1.5,-0.67 1.5,-1.5L16,19h1c0.55,0 1,-0.45 1,-1L18,8L6,8v10zM3.5,8C2.67,8 2,8.67 2,9.5v7c0,0.83 0.67,1.5 1.5,1.5S5,17.33 5,16.5v-7C5,8.67 4.33,8 3.5,8zM20.5,8c-0.83,0 -1.5,0.67 -1.5,1.5v7c0,0.83 0.67,1.5 1.5,1.5s1.5,-0.67 1.5,-1.5v-7c0,-0.83 -0.67,-1.5 -1.5,-1.5zM15.53,2.16l1.3,-1.3c0.2,-0.2 0.2,-0.51 0,-0.71 -0.2,-0.2 -0.51,-0.2 -0.71,0l-1.48,1.48C13.85,1.23 12.95,1 12,1c-0.96,0 -1.86,0.23 -2.66,0.63L7.85,0.15c-0.2,-0.2 -0.51,-0.2 -0.71,0 -0.2,0.2 -0.2,0.51 0,0.71l1.31,1.31C6.97,3.26 6,5.01 6,7h12c0,-1.99 -0.97,-3.75 -2.47,-4.84zM10,5L9,5L9,4h1v1zM15,5h-1L14,4h1v1z"/>
+
+</vector>
+
+        <!--
+        https://editor.method.ac/   svg在线编辑
+        android:viewportWidth 定义图像被划分的比例大小，对应将上面height width等分的份数。举例，可以想象将长宽都为24dp的正方形均分为24x24的网
+
+        SVG是前端的一套标准，Vector是在Android中使用，他只是实现了SVG语言的Path的标签
+        可缩放矢量图形（英语：Scalable Vector Graphics，SVG）是一种基于可扩展标记语言（XML），用于描述二维矢量图形的图形格式。SVG由W3C制定，是一个开放标准
+        省时间。图像与分辨率无关，收放自如，可缩放不失真；
+        省空间。体积小，一般复杂图像也能在数KB搞定，图标更不在话下。
+
+        Vector的常用语法
+          M： move to 移动绘制起点(Mx，y)
+            L：line to 直线画到点（Lx，y）
+            H：横向连线 （Hx）
+            V：纵向连线 （Vy）
+            Z：close 闭合首尾无参
+            C：cubic bezier 三次贝塞尔曲线 （x1，y1，x2，y2）
+            Q：quatratic bezier 二次贝塞尔曲线（x1，y1，x2，y2，x3，y3）
+            A： ellipse 圆弧
+
+          M6,18 移动到6,18
+
+        path
+          fillColor：填充颜色  最好直接在这里写明色值#xxxxxxxx，而不要用@color/some_color的形式，避免某些5.0以下机型可能会报错。
+          pathData：在2中描述的网格中作画的路径。路径信息
+          android:strokeColor 定义如何绘制路径边框，如果没有定义则不显示边框
+        android:strokeWidth 定义路径边框的粗细尺寸
+        android:strokeAlpha 定义路径边框的透明度
+        android:fillAlpha 定义填充路径颜色的透明度
+        android:trimPathStart 从路径起始位置截断路径的比率，取值范围从 0 到1
+        android:trimPathEnd 从路径结束位置截断路径的比率，取值范围从 0 到1
+        android:trimPathOffset 设置路径截取的范围，取值范围从 0 到1
+        android:strokeLineCap 设置路径线帽的形状，取值为 butt, round, square.
+        android:strokeLineJoin 设置路径交界处的连接方式，取值为 miter,round,bevel.
+        android:strokeMiterLimit 设置斜角的上限
+
+        group **：主要是用来设置路径做动画的关键属性的
+        android:name 定义 group 的名字
+        android:rotation 定义该 group 的路径旋转多少度
+        android:pivotX 定义缩放和旋转该 group 时候的 X 参考点。该值相对于 vector 的 viewport 值来指定的。
+        android:pivotY 定义缩放和旋转该 group 时候的 Y 参考点。该值相对于 vector 的 viewport 值来指定的。
+        android:scaleX 定义 X 轴的缩放倍数
+        android:scaleY 定义 Y 轴的缩放倍数
+        android:translateX 定义移动 X 轴的位移。相对于 vector 的 viewport 值来指定的。
+        android:translateY 定义移动 Y 轴的位移。相对于 vector 的 viewport 值来指定的。
+
+        clip-path：定义当前绘制的剪切路径。注意，clip-path 只对当前的 group 和子 group 有效
+        android:name 定义 clip path 的名字
+        android:pathData 和 android:pathData 的取值一样
+
+        <vector>	alpha
+
+        -->

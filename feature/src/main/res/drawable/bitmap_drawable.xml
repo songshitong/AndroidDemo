@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+  android:src="@mipmap/ic_launcher"
+        android:alpha="100"
+        android:dither="true"
+        android:gravity="left"
+        android:antialias="true"
+        android:mipMap="true"
+        android:tileMode="repeat"
+        android:tint="@color/colorAccent"
+        android:tintMode="add"
+
+        />
+        <!--mipMap纹理映射处理技术，默认为false-->
+        <!--tileMode 平铺模式 -->
+        <!--tintMode 着色模式 PorterDuff.Mode.ADD  查看bitmapdrawable.setTintMode-->

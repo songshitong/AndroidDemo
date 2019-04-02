@@ -4,3 +4,11 @@ dependencies {
     implementation project(':feature')
     implementation project(':base')
 }
+
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    compileSdkVersion 28
+}

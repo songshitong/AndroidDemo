@@ -148,8 +148,6 @@ public class CanvasView extends View {
 //        drawBitmapMesh() 方法改变图像的方式，就是通过改变这个 verts 数组里的元素的坐标值来重新定位对应的图像块的位置，从而达到图像效果处理的功能
 //        canvas.drawBitmapMesh(bitmapB, WIDTH, HEIGHT, verts, 100, null, 0, null);
 
-        BounceInterpolator
-
         // TODO: 2018/12/17
         //使用drawbitmapmesh绘制效果
 

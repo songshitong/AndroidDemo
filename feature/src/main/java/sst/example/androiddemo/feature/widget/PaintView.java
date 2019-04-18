@@ -55,8 +55,8 @@ public class PaintView extends View {
 
 //        STROKE //描边
 //                FILL //填充
-//        FILL_AND_STROKE //描边加填充
-        mPaint.setStyle(Paint.Style.STROKE);  //设置画笔模式为填充
+//        FILL_AND_STROKE //描边加填充  会有一个外轮廓的边和填充效果
+        mPaint.setStyle(Paint.Style.STROKE);  //设置画笔模式
         mPaint.setTypeface(Typeface.DEFAULT_BOLD);//设置字体
 //        Android系统默认支持三种字体，分别为：“sans”, “serif”, “monospace"
         Typeface.Builder builder = null;

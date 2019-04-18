@@ -26,6 +26,7 @@ public class ReflectTest extends ReflectBase implements  ReflectInterface{
     }
 
 
+    @MyAnnotation(name = "method annotation",value = "annotation of printMsg")
     public void printMsg(String msg) {
         System.out.println("msg is "+msg);
     }

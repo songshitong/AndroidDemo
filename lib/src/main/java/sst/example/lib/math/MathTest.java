@@ -6,7 +6,7 @@ public class MathTest {
         System.out.println("e "+Math.E);
         System.out.println("pi "+Math.PI);
 
-        //平方根
+        //平方根  开方
         System.out.println("Math.sqrt(4) "+Math.sqrt(4));
 
         //立方根

@@ -3,6 +3,8 @@
           package="sst.example.androiddemo.feature">
 
     <application>
+        <activity android:name=".graphics.QQDragBubbleActivity">
+        </activity>
         <activity android:name=".graphics.LoadingActivity">
         </activity>
         <activity android:name=".graphics.ParticleActivity">

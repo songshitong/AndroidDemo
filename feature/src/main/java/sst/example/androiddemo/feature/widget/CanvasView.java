@@ -93,6 +93,7 @@ public class CanvasView extends View {
         //        canvas 变化系列  改变之后，任何的后续操作都会受到影响
         //当缩放倍数为负数时，会先进行缩放，然后根据不同情况进行图形翻转
         canvas.scale(2f,2f);
+        //缩放点
         canvas.scale(1,-1,100,100);
         //平移
         canvas.translate(100,100);
@@ -109,9 +110,10 @@ public class CanvasView extends View {
 //          camera.rotateY(0); 绕Y轴旋转，屏幕里外左右
 
 
-        //draw 系列
+        //todo draw 系列
         mCanvas.drawColor(Color.RED);
-
+        //todo 画圆环  圆环的半径是内圆半径+环宽度的一半
+//        mCanvas.drawCircle();
 
         //裁剪功能canvas.clipRect()---Region.Op.INTERSECT交集    clipOutRect---Region.Op.DIFFERENCE差集  在AndroidP(28)及以上只有这两个是有效的参数
         // 这种情况可以用path替换 Op.UNION并集     XOR补集  REVERSE_DIFFERENCE差集  REPLACE 不论A和B的集合状况，B的范围将全部进行显示，如果和A有交集，则将覆盖A的交集范围；
@@ -137,7 +139,7 @@ public class CanvasView extends View {
 
         //定制bitmap
         canvas.drawBitmap(bitmap,0,0,mPaint);
-        //取源bitmap一部分绘制道目标路径
+        //取源bitmap一部分绘制道目标路径   src为null表示绘制整张图片    dst是目标绘制位置
         canvas.drawBitmap(bitmap,new Rect(100,100,50,50),new Rect(200,200,300,300),mPaint);
         canvas.restore();
         canvas.drawRect(0,0,50,50,mPaint);

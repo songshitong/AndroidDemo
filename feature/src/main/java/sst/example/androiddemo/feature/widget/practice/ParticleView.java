@@ -91,16 +91,20 @@ public class ParticleView extends View {
       return (int)(min + Math.ceil(Math.random()*(max -min)));
     }
 
-    private void updateBall() {
+    private   void updateBall() {
         for (Ball ball : balls) {
-            //距离=速度*t      0-1的变化即使速度累加
-            ball.x += ball.vx;
-            ball.y += ball.vy;
-
-            // 速度= 加速度的累加
-            ball.vx += ball.ax;
-            ball.vy += ball.ay;
+           changeBall(ball);
         }
+    }
+
+     static  void changeBall(Ball ball) {
+        //距离=速度*t      0-1的变化即使速度累加
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        // 速度= 加速度的累加
+        ball.vx += ball.ax;
+        ball.vy += ball.ay;
     }
 
     @Override

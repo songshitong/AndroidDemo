@@ -222,6 +222,7 @@ public class ReflectDemo {
         //获取自定义注解的定义的name和value
         System.out.println("annotation "+annotation + " name "+annotation.name()+" value "+annotation.value());
 
+        //todo 获取方法的注解
 
 
         //getter 和 setter

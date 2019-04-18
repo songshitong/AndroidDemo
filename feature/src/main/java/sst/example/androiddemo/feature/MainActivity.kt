@@ -2,6 +2,7 @@ package sst.example.androiddemo.feature
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import io.flutter.facade.Flutter
@@ -11,7 +12,7 @@ import sst.example.androiddemo.feature.R.id.sample_text
 import sst.example.androiddemo.feature.graphics.*
 
 class  MainActivity : AppCompatActivity() {
-
+    private val TAG ="MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -56,11 +57,34 @@ class  MainActivity : AppCompatActivity() {
             val intent = Intent(this,ParticleActivity::class.java)
             startActivity(intent)
         }
+        loadingActivity.setOnClickListener {
+            val intent = Intent(this,LoadingActivity::class.java)
+            startActivity(intent)
+        }
+        qqDragBubbleActivity.setOnClickListener {
+            val intent = Intent(this,QQDragBubbleActivity::class.java)
+            startActivity(intent)
+        }
+
+        shareBtn.setOnClickListener {
+            shareFile("这是内容")
+        }
         someContainer.setOnClickListener {
             val tx = supportFragmentManager.beginTransaction()
             tx.replace(R.id.someContainer, Flutter.createFragment("route1"))
             tx.commit()
         }
+
+
+        //测试手机1S计算的次数
+        val time = System.currentTimeMillis()
+        var index =0
+        Thread(Runnable {
+            do {
+                Log.d(TAG,"$index")
+                index++
+            }while (time+1000 >= System.currentTimeMillis())
+        }).start()
     }
 
 //    /**
@@ -76,4 +100,15 @@ class  MainActivity : AppCompatActivity() {
 //            System.loadLibrary("native-lib")
 //        }
 //    }
+
+
+
+    private fun shareFile(content: String) {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "这是标题")//添加分享内容标题
+        shareIntent.putExtra(Intent.EXTRA_TEXT,content)//添加分享内容
+        this.startActivity(Intent.createChooser(shareIntent, "分享title"))
+    }
+
 }

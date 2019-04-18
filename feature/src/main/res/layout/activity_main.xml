@@ -63,6 +63,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
     />
+    <TextView
+            android:text="LoadingActivity"
+            android:id="@+id/loadingActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    />
+    <TextView
+            android:text="QQDragBubbleActivity"
+            android:id="@+id/qqDragBubbleActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    />
+    <Button  android:id="@+id/shareBtn"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="share content"
+    />
+
     <FrameLayout
             android:id="@+id/someContainer"
             android:layout_width="match_parent" android:layout_height="match_parent">

@@ -1,8 +1,8 @@
 package sst.example.androiddemo.feature.graphics;
 
 import android.view.ViewGroup;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.widget.practice.QQDragBubbleView;

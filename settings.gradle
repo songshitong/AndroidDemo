@@ -1,4 +1,4 @@
-include ':feature', ':app', ':base', ':instantapp', ':lib'
+include ':feature', ':lib'
 setBinding(new Binding([gradle: this]))                                 // new
 evaluate(new File(                                                      // new
         settingsDir,                                               // new

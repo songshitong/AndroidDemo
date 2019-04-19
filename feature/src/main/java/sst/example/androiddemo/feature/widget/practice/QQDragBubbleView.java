@@ -91,7 +91,7 @@ public class QQDragBubbleView extends View {
         bubblePaint.setFilterBitmap(true);
 
         burstArray = new Bitmap[]{
-                BitmapActivity.getBitmap(getContext(),R.drawable.burst_1),
+                BitmapActivity.getBitmap(getContext(), R.drawable.burst_1),
                 BitmapActivity.getBitmap(getContext(),R.drawable.burst_2),
                 BitmapActivity.getBitmap(getContext(),R.drawable.burst_3),
                 BitmapActivity.getBitmap(getContext(),R.drawable.burst_4),

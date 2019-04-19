@@ -81,9 +81,9 @@ class  MainActivity : AppCompatActivity() {
         var index =0
         Thread(Runnable {
             do {
-                Log.d(TAG,"$index")
                 index++
             }while (time+1000 >= System.currentTimeMillis())
+            Log.d(TAG,"index value  $index")
         }).start()
     }
 

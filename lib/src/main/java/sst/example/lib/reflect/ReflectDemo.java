@@ -135,10 +135,10 @@ public class ReflectDemo {
             privateMethod.setAccessible(true);
             privateMethod.invoke(reflectTest2,"测试private method");
 
-            Method declaredMethod = reflectTest.getDeclaredMethod("printIn",null);
+            Method declaredMethod = reflectTest.getDeclaredMethod("printIn",new Class[]{});
             declaredMethod.setAccessible(true);
             System.out.println("获取私有方法 declaredMethod "+declaredMethod);
-            declaredMethod.invoke(reflectTest2,null);
+            declaredMethod.invoke(reflectTest2,new Object(){});
 
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

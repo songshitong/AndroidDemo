@@ -52,7 +52,7 @@ public class DrawableView extends View {
 
     public DrawableView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        Bitmap bitmap = BitmapActivity.getBitmap(context, sst.example.androiddemo.R.mipmap.ic_launcher);
+        Bitmap bitmap = BitmapActivity.getBitmap(context, R.mipmap.ic_launcher);
         bd = new BitmapDrawable(context.getResources(), bitmap);
         bd.setTintMode(PorterDuff.Mode.ADD);
         bd.setAlpha(100);

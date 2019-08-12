@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".video.VideoParserActivity"
+        android:background="@color/colorGrey500"
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+    <LinearLayout
+            android:id="@+id/videoViewLayout"
+            android:layout_width="match_parent" android:layout_height="200dp">
+        <!--videoview 放在外边，在clipChildren属性会有全屏的黑色背景，可能与解析有关-->
+        <VideoView
+                android:id="@+id/videoView"
+                android:layout_width="match_parent" android:layout_height="200dp"/>
+    </LinearLayout>
+
+    <!--展示第一帧-->
+    <ImageView
+            android:layout_alignTop="@id/videoViewLayout"
+            android:layout_alignBottom="@id/videoViewLayout"
+            android:id="@+id/showIv"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <!--播放-->
+    <ImageView
+            android:layout_centerHorizontal="true"
+            android:layout_alignTop="@id/videoViewLayout"
+            android:layout_alignBottom="@id/videoViewLayout"
+            android:id="@+id/stopIv"
+            android:src="@drawable/ic_play_stop"
+            android:visibility="gone"
+            android:layout_width="60dp" android:layout_height="60dp"/>
+    <TextView
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="280dp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/progressCurrent"
+            android:textColor="@android:color/white"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:visibility="gone"
+    />
+    <!--关键帧-->
+    <androidx.recyclerview.widget.RecyclerView
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="300dp"
+            android:id="@+id/frameRcy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    <sst.example.androiddemo.feature.video.ClipProgressBar
+            android:layout_alignTop="@id/frameRcy"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:id="@+id/clipProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:visibility="gone"
+    />
+    <Button
+            android:layout_marginBottom="50dp"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/clipVideo"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="截取视频"/>
+    <Button
+            android:layout_alignParentBottom="true"
+            android:id="@+id/shareVideo"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="分享视频到微信朋友"/>
+</RelativeLayout>

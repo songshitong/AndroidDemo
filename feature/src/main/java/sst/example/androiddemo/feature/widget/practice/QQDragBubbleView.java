@@ -50,7 +50,7 @@ public class QQDragBubbleView extends View {
 
     //拖动的最大距离
     final float MAX_DIST = bubbleFiexedRadius * 8;
-    //点击的有效距离
+    //点击的有效距离,方便点击
     final float MOIVE_OFFSET = MAX_DIST / 4;
 
     //贝塞尔path

@@ -68,9 +68,10 @@ public class PaintView extends View {
         mPaint.setTypeface(Typeface.create("sans",Typeface.BOLD));
 
         mPaint.setAlpha(0);//设置透明度
-        mPaint.setStrokeWidth(5);//设置画笔宽度
+
+        mPaint.setStrokeWidth(5);//设置画笔宽度 只有在style是Stroke或StrokeAndFill时生效
         mPaint.setAntiAlias(true);//设置画笔是否抗锯齿
-        mPaint.setColor(Color.RED);//设置画笔颜色
+        mPaint.setColor(Color.RED);//设置画笔颜色  颜色包含alpha，会覆盖setAlpha设置的值
         mPaint.setFakeBoldText(true);//是否使用伪粗体
         mPaint.setTextSkewX(-0.25f); //设置斜体
         mPaint.setUnderlineText(true);//设置下划线

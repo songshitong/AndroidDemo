@@ -1,0 +1,36 @@
+
+
+
+uint8_t\uint_16_t\uint32_t\uint64_t
+这些数据类型中都带有_t, _t 表示这些数据类型是通过typedef定义的，而不是新的数据类型。也就是说，它们其实是我们已知的类型的别名
+typedef用来定义关键字或标识符的别名，例如:
+typedef double wages;
+typedef wages salary;
+typedef unsigned char           uint8_t;
+typedef signed char             int8_t;
+
+typedef short int               int16_t;
+typedef unsigned short int      uint16_t;
+
+typedef int                     int32_t;
+typedef unsigned int            uint32_t;
+
+# if __WORDSIZE == 64
+typedef long int                int64_t;
+# else
+__extension__
+typedef long long int           int64_t;
+# endif
+
+#if __WORDSIZE == 64
+typedef unsigned long int       uint64_t;
+#else
+__extension__
+typedef unsigned long long int  uint64_t;
+#endif
+
+使用这些类型的原因：方便代码的维护。比如，在C中没有bool型，于是在一个软件中，一个程序员使用int，一个程序员使用short，会比较混乱。
+最好用一个typedef来定义一个统一的bool
+typedef char bool;
+在涉及到跨平台时，不同的平台会有不同的字长，所以利用预编译和typedef可以方便的维护代码
+在C99标准中定义了这些数据类型，具体定义在：/usr/include/stdint.hISO C99: 7.18 Integer types

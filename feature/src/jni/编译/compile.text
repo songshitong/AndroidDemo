@@ -1,0 +1,16 @@
+编译流程
+  编译分为四大过程：预处理，编译，汇编，链接
+
+  cat main.h / cat main.c 可以查看c的源文件
+  linux 环境 ldd命令用于打印程序或者库文件所依赖的共享库列表   ldd main
+     linux-vdso linux内核提供的虚拟so
+     libc.so    核心库，main中printf的实现
+     ld-linux.so  Linux下的动态库链接器
+  当静态库和动态库同名时，gcc会优先加载动态库
+
+  LD_LIBRARY_PATH=../main  指定链接库除默认地址外的路径
+
+  预处理：preprocessing
+    1.完成宏替换，文件引入，以及去除空行，注释等，为下一步的编译做准备
+    2.也就是对各种预处理命令进行处理，包括头文件的包含、宏定义的扩展、条件编译的选择等。
+

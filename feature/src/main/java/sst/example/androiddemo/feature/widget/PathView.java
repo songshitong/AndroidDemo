@@ -74,6 +74,10 @@ public class PathView extends View {
 //       画三次贝塞尔曲线
         pathA.cubicTo(400,400,500,410,600,420);
         pathA.rCubicTo(50,50,150,10,250,20);
+        //更高阶贝塞尔曲线降阶
+        // 1 分为一段一段的  sin函数与x轴的交点可以分为一段段二阶贝塞尔  设计师设计也是一段段设计的？
+        // 2 todo https://juejin.im/post/5c3988516fb9a049d1325c83
+           //  https://github.com/GcsSloop/AndroidNote/blob/master/CustomView/Advance/%5B06%5DPath_Bezier.md
         //移动坐标  可以通过 moveTo(x, y) 或 rMoveTo() 来改变当前位置，从而间接地设置这些方法的起点。
         pathA.moveTo(0,600);//
         pathA.lineTo(300,600);

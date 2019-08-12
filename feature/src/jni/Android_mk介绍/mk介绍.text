@@ -1,0 +1,30 @@
+每个模块调用 include $(CLEAR_VARS)
+
+Android so包需要重新编译才能运行？  利用jni编写供Java调用的c++程序
+Android 本身运行Linux之上，同样环境可以直接运行Linux程序的。只不过Android的标准C库是重写过，所以在Linux 下编译动态链接程序无法直接运行,
+ 但静态链接程序或者是在Android的环境重编译一次后是可以运行。比如说root后手机运行嵌入式shell解释器--busybox 。就是一个标准Linux C程序，只不过重编译一下。    Android 自己也带了大量小工具，比如手机上运行 setprop ,getevent 就是命令行工具。    并且程序还能跳开Android界面直接操作显存，这样就象粗暴把屏幕冲掉一样
+作者：蓝色鼓点
+链接：https://www.zhihu.com/question/20596433/answer/15599456
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+TODO jni 中类名含有数字123的情况
+
+APP_STL := gnustl_static  改为APP_STL := c++_static /  c++_shared
+
+
+mk以后被makelist替代，但要有能力替换mk为makelist
+gradle
+1配置，生成CPU架构
+android->defaultConfig下面
+externalNativeBuild {
+        ndkBuild {
+            abiFilters  "armeabi-v7a","x86"
+        }
+        }
+2 配置native的编译脚本路径
+android下面
+ externalNativeBuild {
+         ndkBuild {
+             path  "feature/src/jni/Android.mk"
+         }
+         }

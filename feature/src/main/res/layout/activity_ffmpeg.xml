@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ffmpeg.FFmpegActivity">
+    <SurfaceView
+            android:id="@+id/surfaceView"
+            android:layout_width="match_parent" android:layout_height="200dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+    />
+    <Button
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/surfaceView"
+            android:id="@+id/selectVideo"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="选择视频"/>
+    <Button
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/selectVideo"
+            android:id="@+id/playVideo"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="播放"/>
+    <Button
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/playVideo"
+            android:id="@+id/recordAudio"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="录制音频"/>
+    <Button
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recordAudio"
+            android:id="@+id/stopRecordAudio"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="停止录制音频"/>
+    <Button
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/stopRecordAudio"
+            android:id="@+id/replaceAudio"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="音频替换"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

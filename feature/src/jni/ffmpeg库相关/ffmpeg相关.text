@@ -1,0 +1,20 @@
+ffmpeg是什么
+稳定版4.0.2
+ndk 17版本
+
+NDK编译FFmpeg需要用到shell脚本，最好在Linux下编译，可以用云服务器
+下载 ndk官网 右键复制下载链接
+Linux下命令   wget 下载链接 即可以下载
+
+配置ndk 环境变量,将ndk目录填进环境变量
+
+ffmpeg/configure 是编译脚本    不能直接执行configure,编译不是Android环境的so，并且可能包含不需要的功能，编译时需要其他第三方库
+
+configure --help      toolchain options 编译器相关的配置   Configurations options 配置相关
+
+
+
+
+ffmpeg 函数
+将数字错误返回为string
+av_err2str(ret)

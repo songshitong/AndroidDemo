@@ -2,6 +2,7 @@ package sst.example.androiddemo.feature.test;
 
 public class Test {
 
+    //leetcode 1
     public static void main(String[] args) {
         int[] arry = new int[]{0,1,2,3,4};
         int[] result = twoSum(arry,7);

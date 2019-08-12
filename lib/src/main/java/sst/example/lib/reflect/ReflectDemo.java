@@ -135,10 +135,10 @@ public class ReflectDemo {
             privateMethod.setAccessible(true);
             privateMethod.invoke(reflectTest2,"测试private method");
 
-            Method declaredMethod = reflectTest.getDeclaredMethod("printIn",new Class[]{});
+            Method declaredMethod = reflectTest.getDeclaredMethod("printIn",null);
             declaredMethod.setAccessible(true);
             System.out.println("获取私有方法 declaredMethod "+declaredMethod);
-            declaredMethod.invoke(reflectTest2,new Object(){});
+            declaredMethod.invoke(reflectTest2,null);
 
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -222,7 +222,55 @@ public class ReflectDemo {
         //获取自定义注解的定义的name和value
         System.out.println("annotation "+annotation + " name "+annotation.name()+" value "+annotation.value());
 
-        //todo 获取方法的注解
+        // 获取方法的注解
+        try {
+            Method printMsgMethod = reflectTest.getMethod("printMsg",new Class[]{String.class});
+            System.out.println("printMsgMethod "+printMsgMethod);
+            Annotation[] printMsgAnnotations = printMsgMethod.getAnnotations();
+            for (int i = 0; i < printMsgAnnotations.length; i++) {
+                System.out.println(" printMsgAnnotations i "+i+" "+printMsgAnnotations[i]);
+            }
+
+            //获取方法的参数的注解
+            //1
+            Annotation[][] printMsgParamAnnotions = printMsgMethod.getParameterAnnotations();
+            Class[] parameterTypes = printMsgMethod.getParameterTypes();
+            int i=0;
+            for(Annotation[] paramAnnotations : printMsgParamAnnotions){
+                Class parameterType = parameterTypes[i++];
+                for(Annotation paramAnnotation : paramAnnotations){
+                    if(paramAnnotation instanceof MyAnnotation){
+                        MyAnnotation myAnnotation = (MyAnnotation) paramAnnotation;
+                        System.out.println("printMsgMethod annotation param: " + parameterType.getName());
+                        System.out.println("printMsgMethod annotation name : " + myAnnotation.name());
+                        System.out.println("printMsgMethod annotation value: " + myAnnotation.value());
+                    }
+                }
+            }
+            //2
+            // 获取方法的参数1
+            Parameter[] printMsgParms =  printMsgMethod.getParameters();
+            for (int i1 = 0; i1 < printMsgParms.length; i1++) {
+                Parameter printMsgParm = printMsgParms[i1];
+                Annotation[] printMsgParmAnnotations = printMsgParm.getAnnotations();
+                for (Annotation printMsgParmAnnotation : printMsgParmAnnotations) {
+                    System.out.println("printMsg method printMsgParm  "+printMsgParm+" annotation "+printMsgParmAnnotation );
+
+                }
+
+            }
+
+            //获取变量的注释
+            Field nameField = reflectTest.getField("name");
+            Annotation[] nameFieldAnnotations = nameField.getAnnotations();
+            for (Annotation nameFieldAnnotation : nameFieldAnnotations) {
+                System.out.println("nameFieldAnnotation "+nameFieldAnnotation);
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
 
 
         //getter 和 setter
@@ -239,8 +287,74 @@ public class ReflectDemo {
                 System.out.println("setter 方法 "+method);
             }
         }
+
+
+        //数组反射
+//        创建一个数组 Java 反射机制通过 java.lang.reflect.Array 类来创建数组
+          //创建一个长度为5，类型为int的数组
+         int[] arry1 = (int[]) Array.newInstance(int.class,5);
+         //改变数组元素
+         Array.set(arry1,0,0);
+         Array.set(arry1,1,11);
+         Array.set(arry1,2,22);
+         //获取数组元素
+        System.out.println("arry1[0] = " + Array.get(arry1, 0));
+        System.out.println("arry1[1] = " + Array.get(arry1, 1));
+        System.out.println("arry1[2] = " + Array.get(arry1, 2));
+        //获取数组的class对象
+        //1 不通过反射
+        Class stringArrayClass = String[].class;
+        //2 通过反射
+        try {
+            Class intArray = Class.forName("[I");
+            // 在 JVM 中字母 I 代表 int 类型，左边的‘[’代表我想要的是一个int类型的数组，这个规则同样适用于其他的原生数据类型。
+
+            //对于普通对象类型的数组有一点细微的不同
+            Class stringArrayClassss = Class.forName("[Ljava.lang.String;");
+//            注意‘[L’的右边是类名，类名的右边是一个‘;’符号。这个的含义是一个指定类型的数组。
+//            需要注意的是，你不能通过 Class.forName()方法获取一个原生数据类型的 Class 对象
+//            下面这两个例子都会报 ClassNotFoundException：
+//            Class intClass1 = Class.forName("I");
+//            Class intClass2 = Class.forName("int");
+//            通常会用下面这个方法[getClass]来获取普通对象以及原生对象的 Class 对象
+
+
+//            一旦你获取了类型的 Class 对象，你就有办法轻松的获取到它的数组的 Class 对象，你可以通过指定的类型创建一个空的数组，
+//            然后通过这个空的数组来获取数组的 Class 对象。这样做有点讨巧，不过很有效。如下例
+            Class theClass = getClass("String");
+            Class stringArrayClazz1 = Array.newInstance(theClass, 0).getClass();
+            System.out.println("is array: " + stringArrayClazz1.isArray()+" stringArrayClazz1 "+stringArrayClazz1);
+
+
+//            这是一个特别的方式来获取指定类型的指定数组的Class对象。无需使用类名或其他方式来获取这个 Class 对象。
+//            为了确保 Class 对象是不是代表一个数组，你可以使用 Class.isArray()方法来进行校验
+            Class stringArrayClazz2 = Array.newInstance(String.class, 0).getClass();
+            System.out.println("is array: " + stringArrayClazz2.isArray()+" stringArrayClazz2 "+stringArrayClazz2);
+
+//            获取数组的成员类型   通过Class.getComponentType()方法获取这个数组的成员类型。成员类型就是数组存储的数据类型
+            String[] strings = new String[3];
+            Class stringArrayClzz3 = strings.getClass();
+            Class stringArrayComponentType = stringArrayClzz3.getComponentType();
+            System.out.println("stringArrayComponentType "+stringArrayComponentType);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        //todo 动态代理，范型
+
     }
 
+    public static Class getClass(String className) throws ClassNotFoundException {
+        if("int" .equals(className)) return int .class;
+        if("long".equals(className)) return long.class;
+        if("String".equals(className)) return String.class;
+        if("double".equals(className)) return double.class;
+        if("float".equals(className)) return float.class;
+        if("boolean".equals(className)) return boolean.class;
+        if("byte".equals(className)) return byte.class;
+
+        return Class.forName(className);
+    }
 
 }
 

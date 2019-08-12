@@ -1,0 +1,7 @@
+jni的最佳实践，优化等
+https://www.ibm.com/developerworks/cn/java/j-jni/index.html
+
+NDK 目录下source.properties 有NDK的版本
+
+jni 接口
+JNI 全称是 Java Native Interface（Java 本地接口）单词首字母的缩写，本地接口就是指用 C 和 C++ 开发的接口

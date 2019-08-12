@@ -7,6 +7,7 @@ import java.lang.annotation.Documented;
 @SuppressWarnings("aaa")
 @MyAnnotation(name = "className",value = "ReflectTest")
 public class ReflectTest extends ReflectBase implements  ReflectInterface{
+    @MyAnnotation(name = "field annotation",value = "name")
     public  String name = "ReflectTest";
     public String age = "age";
     private  int id = 0;
@@ -27,7 +28,7 @@ public class ReflectTest extends ReflectBase implements  ReflectInterface{
 
 
     @MyAnnotation(name = "method annotation",value = "annotation of printMsg")
-    public void printMsg(String msg) {
+    public void printMsg(@MyAnnotation(name = "method param",value = " param msg") String msg) {
         System.out.println("msg is "+msg);
     }
 

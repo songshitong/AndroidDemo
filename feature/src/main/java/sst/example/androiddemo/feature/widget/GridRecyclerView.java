@@ -8,6 +8,7 @@ import android.view.animation.GridLayoutAnimationController;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+//解决GridLayoutManager 问题
 public class GridRecyclerView extends RecyclerView {
 
     /** @see View#View(Context) */

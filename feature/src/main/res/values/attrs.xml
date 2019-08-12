@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!--自定义环-->
+    <declare-styleable name="CircleBarView">
+        <!--环颜色-->
+        <attr name="cirleColor" format="color"/>
+        <!--环宽度-->
+        <attr name="circleBarWidth" format="dimension"/>
+        <!--环进度色-->
+        <attr name="circleProgressColor" format="color"/>
+        <!--环样式  环/填充-->
+        <attr name="circleStyle" format="enum">
+            <enum name="STROKE" value="0"/>
+            <enum name="FILL" value="1"/>
+        </attr>
+        <attr name="circleOrRect" format="enum">
+            <enum name="circle" value="0"/>
+            <enum name="rect" value="1"/>
+        </attr>
+        <!--环进度颜色样式   渐变/普通-->
+        <attr name="circleProgressColorSyle" format="enum">
+            <enum name="NORMAL" value="0"/>
+            <enum name="GRADIENT" value="1"/>
+        </attr>
+        <!--进度百分比-->
+        <attr name="circleProgressPercent" format="integer"/>
+
+        <!--是否显示百分比-->
+        <attr name="circleShowPercent" format="boolean"/>
+
+    </declare-styleable>
+</resources>

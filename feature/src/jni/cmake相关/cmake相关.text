@@ -1,0 +1,21 @@
+自定义函数中
+${ARGC} ARGC cmake内置变量---传入参数的个数
+        ARGV             ---所有参数列表  ARGV0 第一个参数  ARGV1 第二个参数  ARGVN 第N个参数
+
+函数有自己的作用域
+宏命令的作用域和调用者是一样的
+
+
+findlibrary 查找系统库   ndk->platform->android21->arch-arm->usr->lib->liblog.so
+
+
+fmod studio api 20000 android  游戏音效fmod
+
+日志打印
+mseeage("a = ${a}")
+
+
+include_directories  引入文件夹中头文件
+include              引入一个头文件
+
+使用AndroidStudio编译源文件为静态或动态库适用于少量文件，大量文件拖慢编译速度

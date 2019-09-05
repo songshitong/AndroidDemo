@@ -1,0 +1,69 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo",
+      "sdkFolder": "/Users/issmac/Library/Android/sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/build/intermediates",
+      "gradleModulePathName": ":feature",
+      "moduleRootFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature",
+      "makeFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/.cxx",
+      "cxxFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx",
+      "ndkFolder": "/Users/issmac/Library/Android/android-ndk-r17c",
+      "ndkVersion": "17.2.4988734",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [
+      ""
+    ],
+    "variantName": "debug",
+    "soFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/build/intermediates/cmake/debug/lib",
+    "objFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/build/intermediates/cmake/debug/obj",
+    "jsonFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug",
+    "gradleBuildOutputFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug",
+    "isDebuggableEnabled": true,
+    "validAbiList": [
+      "ARMEABI_V7A"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "ARMEABI_V7A",
+  "abiPlatformVersion": 19,
+  "cxxBuildFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a",
+  "jsonFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a/android_gradle_build.json",
+  "gradleBuildOutputFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug/armeabi-v7a",
+  "objFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/build/intermediates/cmake/debug/obj/armeabi-v7a",
+  "buildCommandFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a/build_command.txt",
+  "buildOutputFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a/build_output.txt",
+  "modelOutputFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a/build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug/armeabi-v7a/CMakeLists.txt",
+    "toolchainWrapperFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug/armeabi-v7a/android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug/armeabi-v7a/build_generation_state.json",
+    "cacheKeyFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug/armeabi-v7a/compiler_cache_key.json",
+    "compilerCacheUseFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug/armeabi-v7a/compiler_cache_use.json",
+    "compilerCacheWriteFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug/armeabi-v7a/compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cxx/debug/armeabi-v7a/compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a/json_generation_record.json",
+  "compileCommandsJsonFile": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a/compile_commands.json"
+}

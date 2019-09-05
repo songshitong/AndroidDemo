@@ -1,0 +1,14 @@
+<students>
+    <student>
+        <name sex="man">小明</name>
+        <nickName>明明</nickName>
+    </student>
+    <student>
+        <name sex="woman">小红</name>
+        <nickName>红红</nickName>
+    </student>
+    <student>
+        <name sex="man">小亮</name>
+        <nickName>亮亮</nickName>
+    </student>
+</students>

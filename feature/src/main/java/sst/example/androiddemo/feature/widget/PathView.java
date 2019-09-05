@@ -136,7 +136,10 @@ public class PathView extends View {
 //        2.任何两个顶点间的线段位于多边形的内部或边界上
 //        三角形是凸的，矩形也是凸的，但是五角星形就不是凸的
 //        手动绘制出 Outline 所需要的路径，这个路径是有要求的，必须是凸多边形
-        boolean isConvex = pathA.isConvex();
+        boolean isConvex = false;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            isConvex = pathA.isConvex();
+        }
         MyUtils.log("isConvex is "+isConvex);
 
 //        判断path中是否包含内容

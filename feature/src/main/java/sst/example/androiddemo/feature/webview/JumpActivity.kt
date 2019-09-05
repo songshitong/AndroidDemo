@@ -2,12 +2,11 @@ package sst.example.androiddemo.feature.webview
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_jump.*
 import sst.example.androiddemo.feature.R
-import java.lang.Exception
 
 class JumpActivity : AppCompatActivity() {
     val url = "sstdemo://www.sstdemo.com:80/mypath?key=mykey"
@@ -33,4 +32,8 @@ class JumpActivity : AppCompatActivity() {
             componentName != null && "{com.android.fallback/com.android.fallback.Fallback}" != componentName.toShortString()
         return canLaunch
     }
+
+    //本地起服务器，应对浏览器限制加载不了本地页面
+    //https://stackoverflow.com/questions/54697024/view-index-html-found-in-the-assets-folder-using-nanohttpd-server-embedded-withi
+    //http://programminglife.io/android-http-server-with-nanohttpd/
 }

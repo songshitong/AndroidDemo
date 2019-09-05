@@ -16,6 +16,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme.NoActionBar"
             tools:replace="android:allowBackup">
+        <activity android:name=".resources.XmlParserActivity">
+        </activity>
         <activity android:name=".graphics.GrowingTreeActivity">
         </activity>
         <activity android:name=".ffmpeg.CustomPlayerActivity">

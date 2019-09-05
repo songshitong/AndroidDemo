@@ -12,8 +12,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.Animation.LayoutAnimationActivity
 import sst.example.androiddemo.feature.Animation.dynamicanimation.DynamicAnimaitonActivity
 import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
-import sst.example.androiddemo.feature.ffmpeg.FFmpegCmd
 import sst.example.androiddemo.feature.graphics.*
+import sst.example.androiddemo.feature.resources.XmlParserActivity
 import sst.example.androiddemo.feature.webview.JumpActivity
 import java.io.File
 
@@ -80,13 +80,16 @@ class  MainActivity : AppCompatActivity() {
             val intent = Intent(this, DynamicAnimaitonActivity::class.java)
             startActivity(intent)
         }
-
         oscillationView.setOnClickListener {
             val intent = Intent(this, OscillationActivity::class.java)
             startActivity(intent)
         }
         growingTreeView.setOnClickListener {
             val intent = Intent(this, GrowingTreeActivity::class.java)
+            startActivity(intent)
+        }
+        xmlParserBtn.setOnClickListener {
+            val intent = Intent(this, XmlParserActivity::class.java)
             startActivity(intent)
         }
         jumpBtn.setOnClickListener {
@@ -107,7 +110,8 @@ class  MainActivity : AppCompatActivity() {
 
 
 
-        //测试手机1S计算的次数
+
+        //测试手机1S计算的次数  红米note大约20000次
         val time = System.currentTimeMillis()
         var index =0
         Thread(Runnable {
@@ -117,8 +121,9 @@ class  MainActivity : AppCompatActivity() {
             Log.d(TAG,"index value  $index")
         }).start();
         //todo 文字动画 https://github.com/aagarwal1012/Animated-Text-Kit
+        //todo AsyncTask  AsyncTaskLoader Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)  Android线程调度
 
-        //todo handler原理为什么顺序是021  runnable运行的线程不是主线程吗
+        //todo handler原理为什么顺序是021  runnable运行的线程不是主线程吗  线程的创建需要时间，handler的唤醒需要时间
         startHandler.setOnClickListener {
             val runnable = Runnable {
                 Log.d(TAG,"1 runnable")
@@ -134,6 +139,11 @@ class  MainActivity : AppCompatActivity() {
 
         //TODO docker  nginx(http://127.0.0.1/stat  nginx查看状态)
         // http://www.joshuachou.ink/archives/395/
+
+        //WindowManager.LayoutParams.FLAG_SECURE  禁止截屏
+        //安全 监听截屏事件的产生  系统源码 TakeScreenshotService  GlobalScreenshot
+        //  ContentObserver 监听图片的变化。。
+
 
     }
 

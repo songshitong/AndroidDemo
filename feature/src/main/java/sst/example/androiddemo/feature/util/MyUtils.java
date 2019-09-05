@@ -3,7 +3,6 @@ package sst.example.androiddemo.feature.util;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -11,12 +10,13 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
+
 import androidx.annotation.NonNull;
+
 import com.blankj.utilcode.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import static android.content.Intent.EXTRA_ALLOW_MULTIPLE;
 
@@ -178,6 +178,9 @@ public class MyUtils {
         return Intent.createChooser(data, "请选择发送方式");
     }
 
+    /**
+     * app详细设置
+     */
     public static final Intent getSystemAppDetailSetting(Context context) {
         Intent localIntent = new Intent();
         localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -185,6 +188,16 @@ public class MyUtils {
         localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
         localIntent.setData(Uri.fromParts("package", context.getPackageName(), null));
         return localIntent;
+    }
+
+    /**
+     * 打开应用市场
+     */
+    public static Intent getMarket(Context context){
+        Uri uri = Uri.parse("market://details?id="+context.getPackageName());
+        Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return Intent.createChooser(intent,"请选择应用市场");
     }
 
 

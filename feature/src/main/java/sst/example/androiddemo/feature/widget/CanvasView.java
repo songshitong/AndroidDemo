@@ -1,16 +1,23 @@
 package sst.example.androiddemo.feature.widget;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.Camera;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.os.Build;
-import android.view.animation.BounceInterpolator;
-import androidx.annotation.Nullable;
 import android.text.DynamicLayout;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.annotation.Nullable;
+
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.graphics.BitmapActivity;
 
@@ -45,11 +52,7 @@ public class CanvasView extends View {
     }
 
     public CanvasView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public CanvasView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);
         bitmapB = BitmapActivity.getBitmap(context,R.mipmap.ic_launcher_round);
         //以bitmap 作为参数的canvas，后续的绘制都将绘制在该bitmap上
@@ -61,6 +64,13 @@ public class CanvasView extends View {
         path.addCircle(50,50,50,Path.Direction.CW);
         mPaint.setColor(Color.RED);
         initView();
+    }
+
+    public CanvasView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        /**
+         * 构造器重写三个就行了，第四个实在API 21 才有的
+         */
 
     }
 

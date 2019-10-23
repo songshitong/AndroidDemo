@@ -14,6 +14,8 @@ import sst.example.androiddemo.feature.Animation.dynamicanimation.DynamicAnimait
 import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
+import sst.example.androiddemo.feature.util.MyUtils
+import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
 import java.io.File
 
@@ -92,6 +94,12 @@ class  MainActivity : AppCompatActivity() {
             val intent = Intent(this, XmlParserActivity::class.java)
             startActivity(intent)
         }
+        wallpaperBtn.setOnClickListener {
+//            val intent = Intent(this, SettingActivity::class.java)
+//            startActivity(intent)
+            startActivity(MyUtils.getWallPaper(this,NormalWallpaperService::class.java))
+
+        }
         jumpBtn.setOnClickListener {
             val intent = Intent(this, JumpActivity::class.java)
             startActivity(intent)
@@ -111,7 +119,7 @@ class  MainActivity : AppCompatActivity() {
 
 
 
-        //测试手机1S计算的次数  红米note大约20000次
+        //测试手机1S计算的次数  红米note4大约20000次
         val time = System.currentTimeMillis()
         var index =0
         Thread(Runnable {

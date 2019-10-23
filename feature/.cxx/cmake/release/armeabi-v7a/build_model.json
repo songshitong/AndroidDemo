@@ -13,8 +13,8 @@
       "buildSystem": "CMAKE",
       "compilerSettingsCacheFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/.cxx",
       "cxxFolder": "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx",
-      "ndkFolder": "/Users/issmac/Library/Android/android-ndk-r17c",
-      "ndkVersion": "17.2.4988734",
+      "ndkFolder": "/Users/issmac/Library/Android/sdk/ndk-bundle",
+      "ndkVersion": "20.0.5594570",
       "ndkSupportedAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",

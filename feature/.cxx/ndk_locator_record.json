@@ -1,5 +1,5 @@
 {
-  "ndkFolder": "/Users/issmac/Library/Android/android-ndk-r17c",
+  "ndkFolder": "/Users/issmac/Library/Android/sdk/ndk-bundle",
   "messages": [
     {
       "level": "INFO",
@@ -7,7 +7,7 @@
     },
     {
       "level": "INFO",
-      "message": "ndk.dir in local.properties is /Users/issmac/Library/Android/android-ndk-r17c"
+      "message": "ndk.dir in local.properties is /Users/issmac/Library/Android/sdk/ndk-bundle"
     },
     {
       "level": "INFO",
@@ -19,7 +19,7 @@
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/issmac/Library/Android/android-ndk-r17c by ndk.dir"
+      "message": "Considering /Users/issmac/Library/Android/sdk/ndk-bundle by ndk.dir"
     },
     {
       "level": "INFO",
@@ -27,7 +27,7 @@
     },
     {
       "level": "INFO",
-      "message": "Found requested ndk.dir (/Users/issmac/Library/Android/android-ndk-r17c) which has version 17.2.4988734"
+      "message": "Found requested ndk.dir (/Users/issmac/Library/Android/sdk/ndk-bundle) which has version 20.0.5594570"
     }
   ]
 }

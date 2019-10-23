@@ -2,6 +2,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 message("CMAKE_SOURCE_DIR ===  ${CMAKE_SOURCE_DIR}")
 message("CMAKE_CXX_FLAGS ===  ${CMAKE_CXX_FLAGS}")
+
 message("CMAKE_ANDROID_ARCH_ABI ===  ${CMAKE_ANDROID_ARCH_ABI}")
 
 #添加头文件

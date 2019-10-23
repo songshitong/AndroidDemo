@@ -41,11 +41,21 @@ include_directories(${CMAKE_SOURCE_DIR}/inc)
 #2 src/main/jinLibs 建立该文件夹，并拷贝lib库，带有CPU架构目录
 
 #3 设置build.gradle的CPU架构  android->defaultConfig下面
+   # Google cmake教程包括常用参数https://developer.android.com/ndk/guides/cmake
    externalNativeBuild{   #设置本地库的CPU架构
       cmake{
         cppFlags ""
         abiFilters "x86"
-      }
+         version "3.4.1"   #制定cmake版本
+# 也可以使用下面这种语法向变量传递参数：
+# arguments "-D变量名=参数".
+arguments "-DANDROID_ARM_NEON=TRUE",
+# 使用下面这种语法向变量传递多个参数（参数之间使用空格隔开）：
+# arguments "-D变量名=参数1 参数2"
+"-DANDROID_CPP_FEATURES=rtti exceptions"
+   #制定编译工具链 clang/gcc
+   arguments "-DANDROID_TOOLCHAIN=clang"
+   # NDK 所用的安卓平台的版本是多少arguments "-DANDROID_PLATFORM=android-21"
    }
    ndk{
      abiFilters "x86"    #指定第三方库的CPU架构

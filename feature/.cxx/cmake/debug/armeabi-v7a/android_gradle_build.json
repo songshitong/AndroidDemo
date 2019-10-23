@@ -21,27 +21,27 @@
 			[
 				
 				{
-					"flags" : "  --target=armv7-none-linux-androideabi --gcc-toolchain=/Users/issmac/Library/Android/android-ndk-r17c/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/issmac/Library/Android/android-ndk-r17c/sysroot  -Dnative_lib_EXPORTS -I../../../../src/main/cpp/include -isystem /Users/issmac/Library/Android/android-ndk-r17c/sources/cxx-stl/llvm-libc++/include -isystem /Users/issmac/Library/Android/android-ndk-r17c/sources/android/support/include -isystem /Users/issmac/Library/Android/android-ndk-r17c/sources/cxx-stl/llvm-libc++abi/include  -isystem /Users/issmac/Library/Android/android-ndk-r17c/sysroot/usr/include/arm-linux-androideabi -D__ANDROID_API__=19 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -std=c++11  -L/Users/issmac/androidstudio-workspace/AndroidDemo/feature/src/main/jniLibs/armeabi-v7a -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"flags" : "  --target=armv7-none-linux-androideabi19 --gcc-toolchain=/Users/issmac/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/issmac/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dnative_lib_EXPORTS -I../../../../src/main/cpp/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security   -L/Users/issmac/androidstudio-workspace/AndroidDemo/feature/src/main/jniLibs/armeabi-v7a -O0 -fno-limit-debug-info  -fPIC    -c ",
 					"src" : "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/src/main/cpp/native-lib.cpp",
 					"workingDirectory" : "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a"
 				},
 				
 				{
-					"flags" : "  --target=armv7-none-linux-androideabi --gcc-toolchain=/Users/issmac/Library/Android/android-ndk-r17c/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/issmac/Library/Android/android-ndk-r17c/sysroot  -Dnative_lib_EXPORTS -I../../../../src/main/cpp/include -isystem /Users/issmac/Library/Android/android-ndk-r17c/sources/cxx-stl/llvm-libc++/include -isystem /Users/issmac/Library/Android/android-ndk-r17c/sources/android/support/include -isystem /Users/issmac/Library/Android/android-ndk-r17c/sources/cxx-stl/llvm-libc++abi/include  -isystem /Users/issmac/Library/Android/android-ndk-r17c/sysroot/usr/include/arm-linux-androideabi -D__ANDROID_API__=19 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -std=c++11  -L/Users/issmac/androidstudio-workspace/AndroidDemo/feature/src/main/jniLibs/armeabi-v7a -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"flags" : "  --target=armv7-none-linux-androideabi19 --gcc-toolchain=/Users/issmac/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/issmac/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dnative_lib_EXPORTS -I../../../../src/main/cpp/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security   -L/Users/issmac/androidstudio-workspace/AndroidDemo/feature/src/main/jniLibs/armeabi-v7a -O0 -fno-limit-debug-info  -fPIC    -c ",
 					"src" : "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/src/main/cpp/audioPlayer.cpp",
 					"workingDirectory" : "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/.cxx/cmake/debug/armeabi-v7a"
 				}
 			],
 			"output" : "/Users/issmac/androidstudio-workspace/AndroidDemo/feature/build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so",
-			"toolchain" : "6816161170705366639"
+			"toolchain" : "15259882460489063565"
 		}
 	},
 	"toolchains" : 
 	{
-		"6816161170705366639" : 
+		"15259882460489063565" : 
 		{
-			"cCompilerExecutable" : "/Users/issmac/Library/Android/android-ndk-r17c/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
-			"cppCompilerExecutable" : "/Users/issmac/Library/Android/android-ndk-r17c/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
+			"cCompilerExecutable" : "/Users/issmac/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
+			"cppCompilerExecutable" : "/Users/issmac/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
 		}
 	}
 }

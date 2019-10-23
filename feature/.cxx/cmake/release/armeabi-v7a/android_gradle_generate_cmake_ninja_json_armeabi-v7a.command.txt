@@ -6,9 +6,9 @@ arguments :
 -DANDROID_PLATFORM=android-19
 -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/issmac/androidstudio-workspace/AndroidDemo/feature/build/intermediates/cmake/release/obj/armeabi-v7a
 -DCMAKE_BUILD_TYPE=Release
--DANDROID_NDK=/Users/issmac/Library/Android/android-ndk-r17c
+-DANDROID_NDK=/Users/issmac/Library/Android/sdk/ndk-bundle
 -DCMAKE_CXX_FLAGS=
--DCMAKE_TOOLCHAIN_FILE=/Users/issmac/Library/Android/android-ndk-r17c/build/cmake/android.toolchain.cmake
+-DCMAKE_TOOLCHAIN_FILE=/Users/issmac/Library/Android/sdk/ndk-bundle/build/cmake/android.toolchain.cmake
 -DCMAKE_MAKE_PROGRAM=/Users/issmac/Library/Android/sdk/cmake/3.6.4111459/bin/ninja
 -GAndroid Gradle - Ninja
 jvmArgs : 

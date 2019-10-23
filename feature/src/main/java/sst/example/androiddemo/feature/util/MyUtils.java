@@ -1,5 +1,7 @@
 package sst.example.androiddemo.feature.util;
 
+import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -198,6 +200,20 @@ public class MyUtils {
         Intent intent = new Intent(Intent.ACTION_VIEW,uri);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return Intent.createChooser(intent,"请选择应用市场");
+    }
+
+    /**
+     * 打开壁纸设定  并将wallPaperServiceClass类绘制的内容作为预览
+     * @param context
+     * @param wallPaperServiceClass
+     * @return
+     */
+    public static  Intent getWallPaper(Context context,Class wallPaperServiceClass){
+        Intent intent = new Intent(
+                WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+        intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                new ComponentName(context, wallPaperServiceClass));
+        return  intent;
     }
 
 

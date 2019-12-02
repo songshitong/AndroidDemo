@@ -12,7 +12,46 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
-
+    <Button
+            android:id="@+id/mainNormalActivity"
+            android:text="普通activity"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    <Button
+            android:id="@+id/launchActivity"
+            android:text="activity launch mode"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    <Button
+            android:id="@+id/main_dialog"
+            android:text="展示dialog"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    <Button
+            android:id="@+id/mainDialogActivity"
+            android:text="展示DialogActivity"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    <Button
+            android:id="@+id/go2Fragment"
+            android:text="展示fragment"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    <Button
+            android:id="@+id/go2Menu"
+            android:text="展示menu"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    <Button
+            android:id="@+id/go2Service"
+            android:text="展示service"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    <Button
+            android:id="@+id/layoutWeight"
+            android:text="layoutWeight"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
     <TextView
             android:gravity="center"
             android:id="@+id/sample_text"
@@ -125,5 +164,6 @@
              android:layout_width="wrap_content" android:layout_height="wrap_content"
              android:text="ffmpeg"
     />
+
 </LinearLayout>
 </ScrollView>

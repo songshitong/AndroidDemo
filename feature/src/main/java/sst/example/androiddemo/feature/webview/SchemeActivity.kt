@@ -1,15 +1,11 @@
 package sst.example.androiddemo.feature.webview
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import sst.example.androiddemo.feature.R
-import android.net.Proxy.getHost
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
-import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.view.marginTop
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_scheme.*
+import sst.example.androiddemo.feature.R
 
 
 //在Android平台而言，URI主要分三个部分：scheme, authority,path, queryString。其中authority又分为host和port。格式如下：
@@ -40,6 +36,7 @@ class SchemeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scheme)
+        Log.d(TAG," onCreate ==== ")
 
         //xml 中配置的scheme是sstdemo  host是www.sstdemo.com
         val intent = intent
@@ -52,5 +49,46 @@ class SchemeActivity : AppCompatActivity() {
         Log.d(TAG, "queryString: " + uri.query)
         Log.d(TAG, "queryParameter: " + uri.getQueryParameter("key"))
         schemeContent.text = "scheme ${uri.scheme} \n host  ${uri.host} \n port ${uri.port} \n path ${uri.path} \n queryString ${uri.query}"
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG," onStart ==== ")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG," onResume ==== ")
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG," onPause ==== ")
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG," onStop ==== ")
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG," onDestroy ==== ")
+
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d(TAG," onRestart ==== ")
+
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        Log.d(TAG," onNewIntent ==== ")
+
+        super.onNewIntent(intent)
     }
 }

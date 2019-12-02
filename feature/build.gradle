@@ -39,6 +39,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.google.android.material:material:1.1.0-alpha06'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
@@ -56,5 +57,25 @@ dependencies {
     //微信sdk
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
 
+
+}
+
+task getIPConfig(type: Exec) {
+    commandLine "java", "-version"
+    //store the output instead of printing to the console:
+    standardOutput = new ByteArrayOutputStream()
+
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+
+task emptyTask() {
+    println("emptyTask ===== ")
+}
+task getGitVersion(dependsOn: 'getIPConfig') {
+    def out = tasks.getIPConfig.output()
+    println("out is " + out)
 
 }

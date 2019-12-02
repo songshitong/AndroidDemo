@@ -10,8 +10,8 @@
 
     <uses-feature
             android:name="android.software.live_wallpaper"
-            android:required="true" >
-    </uses-feature>
+            android:required="true" />
+
     <application
             android:allowBackup="false"
             android:icon="@mipmap/ic_launcher"
@@ -20,13 +20,44 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme.NoActionBar"
             tools:replace="android:allowBackup">
-        <activity android:name=".resources.XmlParserActivity"></activity>
-        <activity android:name=".graphics.GrowingTreeActivity"></activity>
-        <activity android:name=".ffmpeg.CustomPlayerActivity"></activity>
-        <activity android:name=".graphics.OscillationActivity"></activity>
-        <activity android:name=".ffmpeg.FFmpegActivity"></activity>
-        <activity android:name=".video.VideoParserActivity"></activity>
-        <activity android:name=".webview.JumpActivity"></activity>
+        <activity android:name=".activity.LayoutActivity"></activity>
+        <activity android:name=".activity.launchmode.OtherActivity" />
+        <activity android:name=".activity.launchmode.LaunchActivity" />
+        <activity android:name=".activity.launchmode.StandardActivity" />
+        <activity
+                android:name=".activity.launchmode.SingleInstanceActivity"
+                android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="sst.example.androiddemo.feature.singleinstance" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+                android:name=".activity.launchmode.SingleTopActivity"
+                android:launchMode="singleTop" />
+        <activity
+                android:name=".activity.launchmode.SingleTaskActivity"
+                android:launchMode="singleTask"
+                android:taskAffinity="com.singleTask" />
+        <activity android:name=".activity.ServicesActivity" />
+        <activity
+                android:name=".activity.MenuActivity"
+                android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+        <activity android:name=".activity.FragmentActivity" />
+        <activity
+                android:name=".activity.NormalActivity"
+                android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+                android:name=".activity.DialogActivity"
+                android:theme="@style/Theme.AppCompat.Dialog" />
+        <activity android:name=".resources.XmlParserActivity" />
+        <activity android:name=".graphics.GrowingTreeActivity" />
+        <activity android:name=".ffmpeg.CustomPlayerActivity" />
+        <activity android:name=".graphics.OscillationActivity" />
+        <activity android:name=".ffmpeg.FFmpegActivity" />
+        <activity android:name=".video.VideoParserActivity" />
+        <activity android:name=".webview.JumpActivity" />
         <activity
                 android:name=".webview.SchemeActivity"
                 android:launchMode="singleTask">
@@ -43,14 +74,14 @@
                         android:scheme="sstdemo" />
             </intent-filter>
         </activity>
-        <activity android:name=".Animation.dynamicanimation.DynamicAnimaitonActivity"></activity>
+        <activity android:name=".Animation.dynamicanimation.DynamicAnimaitonActivity" />
         <activity
                 android:name=".graphics.StickyActivity"
                 android:label="@string/title_activity_sticky"
-                android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".graphics.QQDragBubbleActivity"></activity>
-        <activity android:name=".graphics.LoadingActivity"></activity>
-        <activity android:name=".graphics.ParticleActivity"></activity>
+                android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".graphics.QQDragBubbleActivity" />
+        <activity android:name=".graphics.LoadingActivity" />
+        <activity android:name=".graphics.ParticleActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,26 +89,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".graphics.BitmapActivity"></activity>
-        <activity android:name=".graphics.PictureDrawableActivity"></activity>
-        <activity android:name=".graphics.CanvasActivity"></activity>
-        <activity android:name=".graphics.PaintActivity"></activity>
-        <activity android:name=".graphics.DrawableActivity"></activity>
-        <activity android:name=".graphics.PathActivity"></activity>
-        <activity android:name=".graphics.ShaderActivity"></activity>
-        <activity android:name=".Animation.LayoutAnimationActivity"></activity>
-        <activity android:name=".Animation.ViewGroupActivity"></activity>
-        <activity android:name=".Animation.ViewPropertyAnimatorActivity"></activity>
-        <activity android:name=".Animation.SupportAnimationActivity"></activity>
-
-
-
-<!--        壁纸-->
+        <activity android:name=".graphics.BitmapActivity" />
+        <activity android:name=".graphics.PictureDrawableActivity" />
+        <activity android:name=".graphics.CanvasActivity" />
+        <activity android:name=".graphics.PaintActivity" />
+        <activity android:name=".graphics.DrawableActivity" />
+        <activity android:name=".graphics.PathActivity" />
+        <activity android:name=".graphics.ShaderActivity" />
+        <activity android:name=".Animation.LayoutAnimationActivity" />
+        <activity android:name=".Animation.ViewGroupActivity" />
+        <activity android:name=".Animation.ViewPropertyAnimatorActivity" />
+        <activity android:name=".Animation.SupportAnimationActivity" /> <!-- 壁纸 -->
         <activity
                 android:name=".wallpaper.SettingActivity"
                 android:exported="true"
-                android:label="@string/app_name">
-        </activity>
+                android:label="@string/app_name" />
 
         <service
                 android:name=".wallpaper.NormalWallpaperService"
@@ -87,9 +113,19 @@
             <intent-filter android:priority="1">
                 <action android:name="android.service.wallpaper.WallpaperService" />
             </intent-filter>
+
             <meta-data
                     android:name="android.service.wallpaper"
                     android:resource="@xml/normal_wallpaper" />
+        </service>
+        <service android:name=".service.StartService" />
+        <service
+                android:name=".service.AidlService"
+                android:enabled="true"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.aidlservice" />
+            </intent-filter>
         </service>
     </application>
 

@@ -1,16 +1,20 @@
 package sst.example.androiddemo.feature
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.blankj.utilcode.util.UriUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.Animation.LayoutAnimationActivity
 import sst.example.androiddemo.feature.Animation.dynamicanimation.DynamicAnimaitonActivity
+import sst.example.androiddemo.feature.activity.*
+import sst.example.androiddemo.feature.activity.launchmode.LaunchActivity
 import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
@@ -19,14 +23,53 @@ import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
 import java.io.File
 
-class  MainActivity : AppCompatActivity() {
+class  MainActivity : AppCompatActivity()  {
+
+
     private val TAG ="MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        Log.d(TAG," onCreate ==== ")
         // Example of a call to a native method
 //        sample_text.text = stringFromJNI()
+        mainNormalActivity.setOnClickListener {
+            val intent = Intent(this,NormalActivity::class.java)
+            startActivity(intent)
+        }
+        launchActivity.setOnClickListener {
+            val intent = Intent(this,LaunchActivity::class.java)
+            startActivity(intent)
+        }
+        main_dialog.setOnClickListener {
+           val dialog =  AlertDialog.Builder(this).create()
+            dialog.setTitle("dialog")
+            dialog.setButton(DialogInterface.BUTTON_POSITIVE,"确定") { dialogInterface, i -> dialog.dismiss()
+            }
+            dialog.show()
+        }
+        mainDialogActivity.setOnClickListener {
+            val intent = Intent(this,DialogActivity::class.java)
+            startActivity(intent)
+        }
+        go2Fragment.setOnClickListener {
+            val intent = Intent(this, FragmentActivity::class.java)
+            startActivity(intent)
+        }
+        go2Menu.setOnClickListener {
+            val intent = Intent(this, MenuActivity::class.java)
+            startActivity(intent)
+        }
+
+        go2Service.setOnClickListener {
+            val intent = Intent(this, ServicesActivity::class.java)
+            startActivity(intent)
+        }
+        layoutWeight.setOnClickListener {
+            val intent = Intent(this, LayoutActivity::class.java)
+            startActivity(intent)
+        }
+
         sample_text.text = "BitMap"
         sample_text.setOnClickListener {
             val intent = Intent(this,BitmapActivity::class.java)
@@ -199,6 +242,58 @@ class  MainActivity : AppCompatActivity() {
     //ndk 稳定版16b  aiqiyi xhook elf hook原理
 
     //GPU编程 GPU的io瓶颈，相关原理
+
+
+    //webview  好用的webview
+    //todo loadUrl   Refusing to load URL as it exceeds 2097152 characters.
+    //由loadUrl改为evaluateJavascript
+    //实例化webviewcontext必须是activity，内部弹出alert需要activity context
+    // Android webview无法全屏
+
+    //todo 打日志总结  方法的出入口，日志不能有相同的描述，方便定位到具体代码行，相当于唯一标识？，尤其是同一个方法里面的
+    //
+
+    //todo Android字体，苹果字体，字体压缩
+
+
+    //todo 游戏排行榜  1000个只有7个渲染，滚动7个，只是数据在滚动，实际的渲染并没有增加
+
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG," onStart ==== ")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG," onResume ==== ")
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG," onPause ==== ")
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG," onStop ==== ")
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG," onDestroy ==== ")
+
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d(TAG," onRestart ==== ")
+
+    }
+
 
 
 }

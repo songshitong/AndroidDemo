@@ -1,2 +1,2 @@
-include ':feature', ':lib'
+include ':feature', ':lib', ':associatedapp'
 // new

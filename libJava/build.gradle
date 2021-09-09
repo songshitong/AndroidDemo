@@ -1,0 +1,12 @@
+apply plugin: 'java-library'
+
+
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"
+

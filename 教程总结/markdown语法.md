@@ -15,7 +15,14 @@ http://xianbai.me/learn-md/article/syntax/links.html
    markdown语法
    1 生成目录树 想要给文档生成目录树，只需要在文档中增加[TOC]，目录树就会根据文档中的h1~h6标题自动生成了，[TOC]独占一行
    2 [名称](#id) id是锚点的ID 也可以使用html定义锚点，使用markdown增加跳转链接
-   
+
+文字折叠
+<details>
+<summary>Title</summary>
+<pre><code>
+content!!!
+</code></pre>
+</details>
    
    
 todo 寻找帮助写Markdown的脚本或工具

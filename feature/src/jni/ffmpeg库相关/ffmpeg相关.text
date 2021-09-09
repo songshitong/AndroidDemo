@@ -18,3 +18,6 @@ configure --help      toolchain options 编译器相关的配置   Configuration
 ffmpeg 函数
 将数字错误返回为string
 av_err2str(ret)
+
+
+ffprobe主要用来查看多媒体文件的信息

@@ -4,9 +4,9 @@ import java.util.LinkedHashMap;
 
 public class MyLRUCache {
 //    LinkedHashMap提供了按照访问顺序排序的方案，内部也是使用HashMap+双向链表
-    LinkedHashMap linkedHashMap;
+    LinkedHashMap<Integer, Integer> linkedHashMap;
     public MyLRUCache(int capacity) {
-        linkedHashMap = new LinkedHashMap(capacity){
+        linkedHashMap = new LinkedHashMap<Integer, Integer>(capacity){
             @Override
             protected boolean removeEldestEntry(Entry eldest) {
                 return size() > capacity;

@@ -30,5 +30,5 @@ public:
 };
 
 void getAudioPcm(void **pcm,size_t *pcmSize,AVFormatContext *formatContext,AVPacket *audioPacket,AVCodecContext *audioCodecContext,int audio_stream_index,SwrContext *swrContext,uint8_t *audio_outBuffer,int out_channel_nb,AVSampleFormat outAudioSampleFmt);
-void  initContext(char *path);
+void  initContext(char *path,JNIEnv *env,jobject surface);
 #endif //ANDROIDDEMO_AUDIOPLAYER_H

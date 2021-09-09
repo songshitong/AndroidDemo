@@ -164,6 +164,30 @@
              android:layout_width="wrap_content" android:layout_height="wrap_content"
              android:text="ffmpeg"
     />
+    <Button  android:id="@+id/ringtone"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="ringtone"
+            />
+    <Button  android:id="@+id/camera"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="camera"
+            />
+    <Button  android:id="@+id/whatsapp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="whatsapp"
+            />
+    <Button  android:id="@+id/startActivityForResult"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="startActivityForResult"
+            />
+<!--    符号兼容-->
+    <TextView android:text="测试符号 􀌌 􀱝 􀤆  􀨥"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
 
+    <Button  android:id="@+id/material"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="material"
+            />
 </LinearLayout>
 </ScrollView>

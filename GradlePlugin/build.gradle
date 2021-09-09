@@ -1,0 +1,37 @@
+apply plugin: 'groovy'
+//apply plugin: 'maven'
+
+dependencies {
+    //gradle sdk
+    implementation gradleApi()
+    //groovy sdk
+    implementation localGroovy()
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+//group和version在后面使用自定义插件的时候会用到
+def group='com.sst.plugin' //组
+def version='1.0.0' //版本
+def artifactId='MyPlugin' //唯一标示
+
+///上传到maven
+//gradle 执行uploadArchives的task即可上传
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            pom.groupId = group
+//            pom.artifactId = artifactId
+//            pom.version = version
+//            //提交到远程服务器： 自定义URL 或者 MAVEN_REPO_RELEASE_URL
+//            // repository(url: "http://www.xxx.com/repos") {
+//            //    authentication(userName: "admin", password: "admin")
+//            // }
+//            //指定本地maven的路径，在项目根目录下
+//            repository(url: uri('../repos'))
+//        }
+//    }
+//}

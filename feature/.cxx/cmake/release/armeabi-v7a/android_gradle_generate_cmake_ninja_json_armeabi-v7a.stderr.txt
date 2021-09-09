@@ -1,3 +1,0 @@
-CMAKE_SOURCE_DIR ===  /Users/issmac/androidstudio-workspace/AndroidDemo/feature
-CMAKE_CXX_FLAGS ===  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  
-CMAKE_ANDROID_ARCH_ABI ===  armeabi-v7a

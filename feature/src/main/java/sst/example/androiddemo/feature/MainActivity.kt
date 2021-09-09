@@ -3,13 +3,20 @@ package sst.example.androiddemo.feature
 import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.ResolveInfo
+import android.graphics.SurfaceTexture
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Debug
 import android.os.Handler
+import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.util.ObjectsCompat
 import com.blankj.utilcode.util.UriUtils
+import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.Animation.LayoutAnimationActivity
 import sst.example.androiddemo.feature.Animation.dynamicanimation.DynamicAnimaitonActivity
@@ -19,9 +26,14 @@ import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
 import sst.example.androiddemo.feature.util.MyUtils
+import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
 import java.io.File
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
+import java.util.concurrent.ForkJoinPool
+
 
 class  MainActivity : AppCompatActivity()  {
 
@@ -30,26 +42,28 @@ class  MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.d(TAG," onCreate ==== ")
+        Log.d(TAG,"java version ${getVersion()}")
+        Log.d(TAG,"java version ${Runtime::class.java.getPackage().implementationVersion}")
+        Log.d(TAG, " onCreate ==== ")
         // Example of a call to a native method
 //        sample_text.text = stringFromJNI()
         mainNormalActivity.setOnClickListener {
-            val intent = Intent(this,NormalActivity::class.java)
+            val intent = Intent(this, NormalActivity::class.java)
             startActivity(intent)
         }
         launchActivity.setOnClickListener {
-            val intent = Intent(this,LaunchActivity::class.java)
+            val intent = Intent(this, LaunchActivity::class.java)
             startActivity(intent)
         }
         main_dialog.setOnClickListener {
            val dialog =  AlertDialog.Builder(this).create()
             dialog.setTitle("dialog")
-            dialog.setButton(DialogInterface.BUTTON_POSITIVE,"确定") { dialogInterface, i -> dialog.dismiss()
+            dialog.setButton(DialogInterface.BUTTON_POSITIVE, "确定") { dialogInterface, i -> dialog.dismiss()
             }
             dialog.show()
         }
         mainDialogActivity.setOnClickListener {
-            val intent = Intent(this,DialogActivity::class.java)
+            val intent = Intent(this, DialogActivity::class.java)
             startActivity(intent)
         }
         go2Fragment.setOnClickListener {
@@ -72,52 +86,52 @@ class  MainActivity : AppCompatActivity()  {
 
         sample_text.text = "BitMap"
         sample_text.setOnClickListener {
-            val intent = Intent(this,BitmapActivity::class.java)
+            val intent = Intent(this, BitmapActivity::class.java)
             startActivity(intent)
         }
 
         pictureView.setOnClickListener {
-            val intent = Intent(this,PictureDrawableActivity::class.java)
+            val intent = Intent(this, PictureDrawableActivity::class.java)
             startActivity(intent)
         }
         canvasActivity.setOnClickListener {
-            val intent = Intent(this,CanvasActivity::class.java)
+            val intent = Intent(this, CanvasActivity::class.java)
             startActivity(intent)
         }
         paintActivity.setOnClickListener{
-            val intent = Intent(this,PaintActivity::class.java)
+            val intent = Intent(this, PaintActivity::class.java)
             startActivity(intent)
         }
         drawableActivity.setOnClickListener {
-            val intent = Intent(this,DrawableActivity::class.java)
+            val intent = Intent(this, DrawableActivity::class.java)
             startActivity(intent)
         }
         pathActivity.setOnClickListener {
-            val intent = Intent(this,PathActivity::class.java)
+            val intent = Intent(this, PathActivity::class.java)
             startActivity(intent)
         }
         shaderActivity.setOnClickListener {
-            val intent = Intent(this,ShaderActivity::class.java)
+            val intent = Intent(this, ShaderActivity::class.java)
             startActivity(intent)
         }
         layoutAnimationActivity.setOnClickListener {
-            val intent = Intent(this,LayoutAnimationActivity::class.java)
+            val intent = Intent(this, LayoutAnimationActivity::class.java)
             startActivity(intent)
         }
         particleActivity.setOnClickListener {
-            val intent = Intent(this,ParticleActivity::class.java)
+            val intent = Intent(this, ParticleActivity::class.java)
             startActivity(intent)
         }
         loadingActivity.setOnClickListener {
-            val intent = Intent(this,LoadingActivity::class.java)
+            val intent = Intent(this, LoadingActivity::class.java)
             startActivity(intent)
         }
         qqDragBubbleActivity.setOnClickListener {
-            val intent = Intent(this,QQDragBubbleActivity::class.java)
+            val intent = Intent(this, QQDragBubbleActivity::class.java)
             startActivity(intent)
         }
         stickyRecyclerviewAct.setOnClickListener {
-            val intent = Intent(this,StickyActivity::class.java)
+            val intent = Intent(this, StickyActivity::class.java)
             startActivity(intent)
         }
 
@@ -140,7 +154,7 @@ class  MainActivity : AppCompatActivity()  {
         wallpaperBtn.setOnClickListener {
 //            val intent = Intent(this, SettingActivity::class.java)
 //            startActivity(intent)
-            startActivity(MyUtils.getWallPaper(this,NormalWallpaperService::class.java))
+            startActivity(MyUtils.getWallPaper(this, NormalWallpaperService::class.java))
 
         }
         jumpBtn.setOnClickListener {
@@ -148,8 +162,8 @@ class  MainActivity : AppCompatActivity()  {
             startActivity(intent)
         }
         videoParser.setOnClickListener {
-//            val intent = Intent(this, VideoParserActivity::class.java)
-//            startActivity(intent)
+            val intent = Intent(this, VideoParserActivity::class.java)
+            startActivity(intent)
         }
         shareBtn.setOnClickListener {
             shareText("这是内容")
@@ -158,6 +172,97 @@ class  MainActivity : AppCompatActivity()  {
             val intent = Intent(this, FFmpegActivity::class.java)
             startActivity(intent)
         }
+
+        material.setOnClickListener {
+            val intent = Intent(this, BottomNavigationActivity::class.java)
+            startActivity(intent)
+
+        }
+
+
+
+
+//      系统铃声 RingtoneManager  https://blog.csdn.net/ch853199769/article/details/78721003
+        ringtone.setOnClickListener {
+            val player: MediaPlayer = MediaPlayer.create(
+                this,
+                ///系统铃声
+//                Settings.System.DEFAULT_RINGTONE_URI
+                ///系统通知  华为手机崩溃
+                Settings.System.DEFAULT_NOTIFICATION_URI
+            )
+            player.start()
+        }
+        startActivityForResult.setOnClickListener {
+            val intent = Intent(this, StartForResultActivity::class.java)
+            startActivity(intent)
+
+        }
+
+        whatsapp.setOnClickListener {
+            val intentShareList: MutableList<Intent> = ArrayList()
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.type = "text/plain"
+            //shareIntent.setType("image/*");
+            //shareIntent.setType("image/*");
+            val resolveInfoList: List<ResolveInfo> =
+                packageManager.queryIntentActivities(shareIntent, 0)
+
+            for (resInfo in resolveInfoList) {
+                val packageName: String = resInfo.activityInfo.packageName
+                val name: String = resInfo.activityInfo.name
+                Log.d("System Out", "Package Name : $packageName")
+                Log.d("System Out", "Name : $name")
+                if (packageName.contains("com.facebook") ||
+                    packageName.contains("com.whatsapp")
+                ) {
+                    Log.d("System Out", "Name : $name")
+
+//                    val intent = Intent()
+//                    intent.component = ComponentName(packageName, name)
+//                    intent.action = Intent.ACTION_SEND
+//                    intent.type = "text/plain"
+//                    intent.putExtra(Intent.EXTRA_SUBJECT, articleName)
+//                    intent.putExtra(
+//                        Intent.EXTRA_TEXT,
+//                        articleName.toString() + "\n" + articleContent
+//                    )
+//                    val dr: Drawable = ivArticleImage.getDrawable()
+//                    val bmp: Bitmap = (dr.getCurrent() as GlideBitmapDrawable).getBitmap()
+//                    intent.putExtra(Intent.EXTRA_STREAM, getLocalBitmapUri(bmp))
+//                    intent.type = "image/*"
+//                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//                    intentShareList.add(intent)
+                }
+            }
+                try {
+//                  //  https://faq.whatsapp.com/android/im-an-android-developer-how-can-i-integrate-whatsapp-with-my-app
+                    val vIt = Intent("android.intent.action.SEND")
+                    vIt.setPackage("com.whatsapp")
+                    vIt.type = "text/plain"
+                    vIt.putExtra(Intent.EXTRA_TEXT, "this is share")
+                    startActivity(vIt)
+                } catch (ex: Exception) {
+                    Log.e(TAG, "whatsAppShare:$ex")
+                }
+
+        }
+
+        //ExifInterface
+        // 从指定路径下读取图片，并获取其EXIF信息
+//        val exifInterface = ExifInterface(FileUtil.getPathFromUri(uri))
+//        // 获取图片的旋转信息
+//        // 获取图片的旋转信息
+//        val orientation: Int = exifInterface.getAttributeInt(
+//            ExifInterface.TAG_ORIENTATION,
+//            ExifInterface.ORIENTATION_NORMAL
+//        )
+//        when (orientation) {
+//            ExifInterface.ORIENTATION_ROTATE_90 -> degree = 90
+//            ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
+//            ExifInterface.ORIENTATION_ROTATE_270 -> degree = 270
+//        }
 
 
 
@@ -168,8 +273,8 @@ class  MainActivity : AppCompatActivity()  {
         Thread(Runnable {
             do {
                 index++
-            }while (time+1000 >= System.currentTimeMillis())
-            Log.d(TAG,"index value  $index")
+            } while (time + 1000 >= System.currentTimeMillis())
+            Log.d(TAG, "index value  $index")
         }).start();
         //todo 文字动画 https://github.com/aagarwal1012/Animated-Text-Kit
         //todo AsyncTask  AsyncTaskLoader Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)  Android线程调度
@@ -177,16 +282,22 @@ class  MainActivity : AppCompatActivity()  {
         //todo handler原理为什么顺序是021  runnable运行的线程不是主线程吗  线程的创建需要时间，handler的唤醒需要时间
         startHandler.setOnClickListener {
             val runnable = Runnable {
-                Log.d(TAG,"1 runnable")
+                Log.d(TAG, "1 runnable")
             }
             val handler = Handler()
-            Log.d(TAG,"0")
+            Log.d(TAG, "0")
             handler.post(runnable)
-            Log.d(TAG,"2")
+            Log.d(TAG, "2")
         }
-        val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO)
-        ActivityCompat.requestPermissions(this,
-            permissions, 0)
+        val permissions = arrayOf(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO
+        )
+        ActivityCompat.requestPermissions(
+            this,
+            permissions, 0
+        )
 
         //TODO docker  nginx(http://127.0.0.1/stat  nginx查看状态)
         // http://www.joshuachou.ink/archives/395/
@@ -194,6 +305,31 @@ class  MainActivity : AppCompatActivity()  {
         //WindowManager.LayoutParams.FLAG_SECURE  禁止截屏
         //安全 监听截屏事件的产生  系统源码 TakeScreenshotService  GlobalScreenshot
         //  ContentObserver 监听图片的变化。。
+
+
+
+//       todo  isFinishing()的含义 与调用时机，查看阿里规范
+        //todo ps grep liunx命令查看进程，Android适用
+
+        //todo 阿里规范 shareprefrence不适合进程通信，查看原理   支持进程通信的sp https://github.com/grandcentrix/tray
+
+        //imagecache 阿里规范  https://blog.csdn.net/xiaanming/article/details/41084843
+
+        //todo System.out.println 为什么不能用
+
+        //intentservice能接收几个intent
+
+        //方法论  结构化编程的经验显示，改进代码的一种主要方法即为将其分解为更小的片段
+
+//        这个例子创建了Integer类，其本身只定义了integer属性，然后增加了两个分类Arithmetic与Display以扩展类的功能。
+//        虽然分类可以访问类的私有成员，但通常利用属性的访问方法来访问是一种更好的做法，可以使得分类与原有类更加独立。
+//        这是分类的一种典型应用—另外的应用是利用分类来替换原有类中的方法，虽然用分类而不是继承来替换方法不被认为是一种好的做法
+
+
+        //重构方法，将方法和判空一起重构，
+        //方法的注释带例子，json,表结构，HTML实例等
+
+        //自定义相册 content provider 或其他？
 
 
     }
@@ -213,19 +349,23 @@ class  MainActivity : AppCompatActivity()  {
 //    }
 
 
+//    https://www.jianshu.com/p/e4ab065220a3
+//
+
+
 
     private fun shareText(content: String) {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "这是标题")//添加分享内容标题
-        shareIntent.putExtra(Intent.EXTRA_TEXT,content)//添加分享内容
+        shareIntent.putExtra(Intent.EXTRA_TEXT, content)//添加分享内容
         this.startActivity(Intent.createChooser(shareIntent, "分享title"))
     }
     private fun shareImg(content: String) {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "image/*"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "这是标题")//添加分享内容标题
-        shareIntent.putExtra(Intent.EXTRA_TEXT,content)//添加分享内容
+        shareIntent.putExtra(Intent.EXTRA_TEXT, content)//添加分享内容
         this.startActivity(Intent.createChooser(shareIntent, "分享title"))
     }
 
@@ -233,7 +373,7 @@ class  MainActivity : AppCompatActivity()  {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "video/*"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "这是标题")//添加分享内容标题
-        shareIntent.putExtra(Intent.EXTRA_STREAM,UriUtils.file2Uri(File(path)))//添加分享内容
+        shareIntent.putExtra(Intent.EXTRA_STREAM, UriUtils.file2Uri(File(path)))//添加分享内容
         this.startActivity(Intent.createChooser(shareIntent, "分享title"))
     }
     //todo lottie svga(yy ued 开源)
@@ -258,42 +398,116 @@ class  MainActivity : AppCompatActivity()  {
 
     //todo 游戏排行榜  1000个只有7个渲染，滚动7个，只是数据在滚动，实际的渲染并没有增加
 
+    //todo 混淆  https://developer.android.com/studio/build/shrink-code?hl=zh-cn#usage
+    ///release 可能移除有用的代码，需要自定义保留
+
+//    screenWidth = getResources().getDisplayMetrics().widthPixels
+
+    //项目根gradle
+//    buildscript {
+//        repositories {
+//            google()
+//            jcenter()
+//            maven {
+//                url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
+//            }
+//        }
+//
+//        apply from: 'thirdparty-lib/config.gradle'
+//
+//        dependencies {
+//            classpath externalAndroidBuildGradlePlugin
+//        }
+//    }
+//    在config.gradle 中抽离共用版本
+//    ext {
+//
+//        //==Android Third party,include Application Layer,SDK Layer==
+//
+//        //Build Gradle Plugin
+//        externalAndroidBuildGradlePlugin = 'com.android.tools.build:gradle:3.1.0'
+//
+//        //Android support Libraries
+//        externalAndroidAppCompatV7 = 'com.android.support:appcompat-v7:26.1.0'
+//        externalAndroidAppCompatV7ToSnapSvideo = 'com.android.support:appcompat-v7:24.2.1'
+//    }
+
+    ///module工程 :AliyunRecorder:record    AliyunRecorder目录下没有build.gradle,record目录下存在
+    ///依赖这种工程时，拷贝到主工程根目录下(区分此时是主工程还是module),在build.gradle目录下声明，setting中引入即可
+    ///使用import module方式出错
+
+
+//    MediaScannerConnection.scanFile
+
+    //视频大小窗播放 https://www.jianshu.com/p/420f7b14d6f6
+//    https://blog.csdn.net/u010072711/article/details/51517170
 
     override fun onStart() {
         super.onStart()
-        Log.d(TAG," onStart ==== ")
+        Log.d(TAG, " onStart ==== ")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG," onResume ==== ")
+        Log.d(TAG, " onResume ==== ")
 
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG," onPause ==== ")
+        Log.d(TAG, " onPause ==== ")
 
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG," onStop ==== ")
+        Log.d(TAG, " onStop ==== ")
 
     }
 
+    //应用退出可以调用
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG," onDestroy ==== ")
+        Log.d(TAG, " onDestroy ==== ")
 
     }
 
     override fun onRestart() {
         super.onRestart()
-        Log.d(TAG," onRestart ==== ")
+        Log.d(TAG, " onRestart ==== ")
 
     }
 
+    private fun getVersion(): Int {
+        var version = System.getProperty("java.version")
+        if (version!!.startsWith("1.")) {
+            version = version.substring(2, 3)
+        } else {
+            val dot = version.indexOf(".")
+            if (dot != -1) {
+                version = version.substring(0, dot)
+            }
+        }
+        return version.toInt()
+    }
 
-
+//     home 键禁用
+//    fun onAttachedToWindow() {
+//        println("Page01 -->onAttachedToWindow")
+//        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD)
+//        super.onAttachedToWindow()
+//    }
+//
+//    fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+//        println("Page01 -->onKeyDown: keyCode: $keyCode")
+//        if (KeyEvent.KEYCODE_HOME === keyCode) {
+//            println("HOME has been pressed yet ...")
+//            // android.os.Process.killProcess(android.os.Process.myPid());
+//            Toast.makeText(
+//                getApplicationContext(), "HOME 键已被禁用...",
+//                Toast.LENGTH_LONG
+//            ).show()
+//        }
+//        return super.onKeyDown(keyCode, event) // 不会回到 home 页面
+//    }
 }

@@ -49,7 +49,7 @@ void *buffer;
 //TODO 在多个文件引入相同的变量定义
 void getAudioPcm(void **pcm,size_t *pcmSize){
     int ret;
-    if (av_read_frame(formatContext, audioPacket) >= 0) {
+    while (av_read_frame(formatContext, audioPacket) >= 0) {
         avcodec_send_packet(audioCodecContext, audioPacket);
         //解压缩数据
         AVFrame *audioFrame = av_frame_alloc();
@@ -57,25 +57,25 @@ void getAudioPcm(void **pcm,size_t *pcmSize){
         ret = avcodec_receive_frame(audioCodecContext, audioFrame);
         if (ret == AVERROR(EAGAIN)) {
             __android_log_print(ANDROID_LOG_INFO, "FFmpegCmd", "当前输出不可用，请发送下一帧  %d", ret);
-//            continue;
-            return;
+            continue;
+//            return;
         } else if (ret < 0) {
             //读取完成/解析失败 没有调用avcodec_open2报错-22
             __android_log_print(ANDROID_LOG_INFO, "FFmpegCmd", "合法错误 avcodec_receive_frame  %d", ret);
-//            break;
+            break;
             return;
 
         } else if (ret == AVERROR_EOF) {
             __android_log_print(ANDROID_LOG_INFO, "FFmpegCmd", "没有更多frame avcodec_receive_frame  %d", ret);
-//            break;
-            return;
+            break;
+//            return;
 
         }
         if (audioPacket->stream_index != audio_stream_index) {
             __android_log_print(ANDROID_LOG_INFO, "FFmpegCmd", "当前不是音频流 %d", audioPacket->stream_index);
             //当前不是音频流
-//            continue;
-            return;
+            continue;
+//            return;
 
         }
         count++;
@@ -245,9 +245,9 @@ void createPlayer(int rate, int channels) {
 }
 
 
-void  initContext( char *path){
+void  initContext( char *path,JNIEnv *env,jobject surface){
     //底层操作绘制渲染通过ANativeWindow
-//    ANativeWindow *nativeWindow =  ANativeWindow_fromSurface(env,surface);
+    ANativeWindow *nativeWindow =  ANativeWindow_fromSurface(env,surface);
 
     //ffmpeg 音频绘制   视频绘制
     //初始化网络
@@ -287,96 +287,96 @@ void  initContext( char *path){
             continue;
         }
     }
-//    __android_log_print(ANDROID_LOG_INFO,"FFmpegCmd","视频解码开始=======》");
-//
-//    //视频流解码参数
-//    AVCodecParameters *codecParameters = formatContext->streams[video_stream_index]->codecpar;
-//
-//    //解码器 h264   codec_id编码类型
-//    AVCodec *avCodec = avcodec_find_decoder(codecParameters->codec_id);
-//
-//    //解码器上下文  ffmpeg升级优化，context的名称改变，context3当前最新
-//    AVCodecContext *avCodecContext =  avcodec_alloc_context3(avCodec);
-//    //将解码器参数copy到解码器上下文
-//    avcodec_parameters_to_context(avCodecContext,codecParameters);
-//    //初始化AVCodecContext以使用给定的AVCodec
-//    avcodec_open2(avCodecContext,avCodec,NULL);
-//    //解码 压缩数据生成YUV数据（很大）  跟YUV有关的都封装在AvPacket
-//    // 之前版本使用malloc 类似Java的new AVPacket,现在通过ffmpeg内部函数，方便维持队列
-//    AVPacket *avPacket = av_packet_alloc();
-//    //重视速度  fast_bilinear,point
-//    //重视质量  cubic,spline,lanczos
-//    //缩小
-//    // 重视速度 fast_bilinear ,point
-//    // 重视质量 gauss,fast_bilinear
-//    // 重视锐度  cubic,spline,lanczos
-//    //拿到视频转码上下文
-//   SwsContext *swsContext = sws_getContext(avCodecContext->width,avCodecContext->height,avCodecContext->pix_fmt,avCodecContext->width,avCodecContext->height,AV_PIX_FMT_RGBA,SWS_BILINEAR,0,0,0);
-//
-//   //设置NativeWindow的buffer大小 buffer数据绘制到屏幕     WINDOW_FORMAT_RGBA_8888窗体显示类型
-//    ANativeWindow_setBuffersGeometry(nativeWindow,avCodecContext->width,avCodecContext->height,WINDOW_FORMAT_RGBA_8888);
-//    ANativeWindow_Buffer outBuffer;
-//    if(ANativeWindow_lock(nativeWindow,&outBuffer,NULL)){
-//        ANativeWindow_release(nativeWindow);
-//        nativeWindow =0;
-//        return;
-//    }
-//    //接受的数组
-//    uint8_t *dst_data[4];
-//    //从视频流中读取数据包（仍为压缩数据）
-//    while (av_read_frame(formatContext,avPacket)>=0){
-//       avcodec_send_packet(avCodecContext,avPacket);
-//        AVFrame *avFrame = av_frame_alloc();
-//
-//        ret = avcodec_receive_frame(avCodecContext,avFrame);
-//       if(ret == AVERROR(EAGAIN)){
-//           //当前状态不可用，继续下一次输入
-//           continue;
-//       }else if(ret<0){
-//           __android_log_print(ANDROID_LOG_INFO,"FFmpegCmd","合法错误 avcodec_receive_frame  ");
-//           //读到视频末尾/解析失败
-//           break;
-//       }else if(ret == AVERROR_EOF ){
-//                __android_log_print(ANDROID_LOG_INFO,"FFmpegCmd","没有更多frame avcodec_receive_frame  %d",ret);
-//                break;
-//            }
-//       if(avPacket->stream_index!=video_stream_index){
-//           //不是视频流
-//           __android_log_print(ANDROID_LOG_INFO,"FFmpegCmd","当前不是音频流 %d",avPacket->stream_index);
-//
-//           continue;
-//       }
-//       //每一行首地址
-//       int dst_linesize[4];
-//       //确定容器大小    align 1左对齐
-//       av_image_alloc(dst_data,dst_linesize,avCodecContext->width,avCodecContext->height,AV_PIX_FMT_RGBA,1);
-////        将YUV转为rgb
-//       sws_scale(swsContext,avFrame->data,avFrame->linesize,0,avFrame->height,dst_data,dst_linesize);
-//
-//       //avframe yuv ----> iamge dst_data  ---> 渲染surfaceview
+    __android_log_print(ANDROID_LOG_INFO,"FFmpegCmd","视频解码开始=======》");
 
-//       //锁住buffer 防止其他线程同时写  inOutDirtyBounds对当前window加限制1
-//       ANativeWindow_lock(nativeWindow,&outBuffer,NULL);
-//        uint8_t *firstWindown = static_cast<uint8_t *>(outBuffer.bits);
-//        //输入源（RGB）的
-//        uint8_t *src_data = dst_data[0];
-//        //拿到一行有多少个字节RGBA  stride是一行多少像素
-//        int destStride = outBuffer.stride*4;
-//        int src_linesize = dst_linesize[0];
-//        //绘制  内存的拷贝 一行一行拷贝，从src_data拷贝到outBuffer,outBuffer固定大小，两个存在对齐
-//        for (int i = 0; i < outBuffer.height; ++i) {
-//            //注释查看memccpy
-//            memcpy(firstWindown+i*destStride,src_data+i*src_linesize,destStride);
-//        }
-//
-//       //解锁
-//       ANativeWindow_unlockAndPost(nativeWindow);
-//        usleep(1000 * 16);
-//        av_frame_free(&avFrame);
-//        //重置/擦拭avPacket
-////        av_packet_unref(avPacket);
-//    }
-//
+    //视频流解码参数
+    AVCodecParameters *codecParameters = formatContext->streams[video_stream_index]->codecpar;
+
+    //解码器 h264   codec_id编码类型
+    AVCodec *avCodec = avcodec_find_decoder(codecParameters->codec_id);
+
+    //解码器上下文  ffmpeg升级优化，context的名称改变，context3当前最新
+    AVCodecContext *avCodecContext =  avcodec_alloc_context3(avCodec);
+    //将解码器参数copy到解码器上下文
+    avcodec_parameters_to_context(avCodecContext,codecParameters);
+    //初始化AVCodecContext以使用给定的AVCodec
+    avcodec_open2(avCodecContext,avCodec,NULL);
+    //解码 压缩数据生成YUV数据（很大）  跟YUV有关的都封装在AvPacket
+    // 之前版本使用malloc 类似Java的new AVPacket,现在通过ffmpeg内部函数，方便维持队列
+    AVPacket *avPacket = av_packet_alloc();
+    //重视速度  fast_bilinear,point
+    //重视质量  cubic,spline,lanczos
+    //缩小
+    // 重视速度 fast_bilinear ,point
+    // 重视质量 gauss,fast_bilinear
+    // 重视锐度  cubic,spline,lanczos
+    //拿到视频转码上下文
+   SwsContext *swsContext = sws_getContext(avCodecContext->width,avCodecContext->height,avCodecContext->pix_fmt,avCodecContext->width,avCodecContext->height,AV_PIX_FMT_RGBA,SWS_BILINEAR,0,0,0);
+
+   //设置NativeWindow的buffer大小 buffer数据绘制到屏幕     WINDOW_FORMAT_RGBA_8888窗体显示类型
+    ANativeWindow_setBuffersGeometry(nativeWindow,avCodecContext->width,avCodecContext->height,WINDOW_FORMAT_RGBA_8888);
+    ANativeWindow_Buffer outBuffer;
+    if(ANativeWindow_lock(nativeWindow,&outBuffer,NULL)){
+        ANativeWindow_release(nativeWindow);
+        nativeWindow =0;
+        return;
+    }
+    //接受的数组
+    uint8_t *dst_data[4];
+    //从视频流中读取数据包（仍为压缩数据）
+    while (av_read_frame(formatContext,avPacket)>=0){
+       avcodec_send_packet(avCodecContext,avPacket);
+        AVFrame *avFrame = av_frame_alloc();
+
+        ret = avcodec_receive_frame(avCodecContext,avFrame);
+       if(ret == AVERROR(EAGAIN)){
+           //当前状态不可用，继续下一次输入
+           continue;
+       }else if(ret<0){
+           __android_log_print(ANDROID_LOG_INFO,"FFmpegCmd","合法错误 avcodec_receive_frame  ");
+           //读到视频末尾/解析失败
+           break;
+       }else if(ret == AVERROR_EOF ){
+                __android_log_print(ANDROID_LOG_INFO,"FFmpegCmd","没有更多frame avcodec_receive_frame  %d",ret);
+                break;
+            }
+       if(avPacket->stream_index!=video_stream_index){
+           //不是视频流
+           __android_log_print(ANDROID_LOG_INFO,"FFmpegCmd","当前不是音频流 %d",avPacket->stream_index);
+
+           continue;
+       }
+       //每一行首地址
+       int dst_linesize[4];
+       //确定容器大小    align 1左对齐
+       av_image_alloc(dst_data,dst_linesize,avCodecContext->width,avCodecContext->height,AV_PIX_FMT_RGBA,1);
+//        将YUV转为rgb
+       sws_scale(swsContext,avFrame->data,avFrame->linesize,0,avFrame->height,dst_data,dst_linesize);
+
+       //avframe yuv ----> iamge dst_data  ---> 渲染surfaceview
+
+       //锁住buffer 防止其他线程同时写  inOutDirtyBounds对当前window加限制1
+       ANativeWindow_lock(nativeWindow,&outBuffer,NULL);
+        uint8_t *firstWindown = static_cast<uint8_t *>(outBuffer.bits);
+        //输入源（RGB）的
+        uint8_t *src_data = dst_data[0];
+        //拿到一行有多少个字节RGBA  stride是一行多少像素
+        int destStride = outBuffer.stride*4;
+        int src_linesize = dst_linesize[0];
+        //绘制  内存的拷贝 一行一行拷贝，从src_data拷贝到outBuffer,outBuffer固定大小，两个存在对齐
+        for (int i = 0; i < outBuffer.height; ++i) {
+            //注释查看memccpy
+            memcpy(firstWindown+i*destStride,src_data+i*src_linesize,destStride);
+        }
+
+       //解锁
+       ANativeWindow_unlockAndPost(nativeWindow);
+        usleep(1000 * 16);
+        av_frame_free(&avFrame);
+        //重置/擦拭avPacket
+//        av_packet_unref(avPacket);
+    }
+
 
     if (audio_stream_index > -1) {
         __android_log_print(ANDROID_LOG_INFO, "FFmpegCmd", "音频解码开始=======》");
@@ -414,26 +414,26 @@ void  initContext( char *path){
         // 定义缓冲区
         audio_outBuffer = static_cast<uint8_t *>(av_malloc(2 * out_sample_rate));//初始化大小通道数*采样率
         count = 0;
-//    FILE *fc_pcm = fopen(path,"wb");//要写入的文件
+    FILE *fc_pcm = fopen(path,"wb");//要写入的文件
         createEngine();
         createMixVolume();
         //计算声道数
         out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
         createPlayer(audioSampleRate, out_channel_nb);
 
-//    fclose(fc_pcm);
-//        av_free(audio_outBuffer);
-//        swr_free(&swrContext);
+    fclose(fc_pcm);
+        av_free(audio_outBuffer);
+        swr_free(&swrContext);
 
     }
 
 
-//    ANativeWindow_release(nativeWindow);
-//    av_freep(&dst_data[0]);
-    //关闭解码器
-//    avcodec_close(avCodecContext);
-    //关闭视频文件
-//    avformat_close_input(&formatContext);
+    ANativeWindow_release(nativeWindow);
+    av_freep(&dst_data[0]);
+//    关闭解码器
+    avcodec_close(avCodecContext);
+//    关闭视频文件
+    avformat_close_input(&formatContext);
 
 
     //TODO 第二次播放视频，重启APP error  阻塞时队列？

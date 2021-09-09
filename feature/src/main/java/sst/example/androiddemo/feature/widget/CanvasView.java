@@ -109,8 +109,12 @@ public class CanvasView extends View {
         canvas.translate(100,100);
         //旋转
         canvas.rotate(90);
+        // 改变旋转点
+        canvas.rotate(90,10,10);
         //// 参数 sx = tan a ，sx>0时表示向X正方向倾斜（即向左）
         //// 参数 sy = tan b ，sy>0时表示向Y正方向倾斜（即向下）
+        // 1 45度
+        // 3 (float) Math.sqrt(3) 60度
         canvas.skew(1,-1);
 
         //todo 3d旋转

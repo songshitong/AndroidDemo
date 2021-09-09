@@ -1,16 +1,50 @@
 package sst.example.androiddemo.feature.widget;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.BlurMaskFilter;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.ComposePathEffect;
+import android.graphics.ComposeShader;
+import android.graphics.CornerPathEffect;
+import android.graphics.DashPathEffect;
+import android.graphics.DiscretePathEffect;
+import android.graphics.EmbossMaskFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.LinearGradient;
+import android.graphics.MaskFilter;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathDashPathEffect;
+import android.graphics.PathEffect;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RadialGradient;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.SumPathEffect;
+import android.graphics.SweepGradient;
+import android.graphics.Typeface;
+import android.graphics.Xfermode;
 import android.os.Build;
-import androidx.annotation.Nullable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
-import sst.example.androiddemo.feature.R;
-import sst.example.androiddemo.feature.graphics.BitmapActivity;
+
+import androidx.annotation.Nullable;
 
 import java.util.Locale;
+
+import sst.example.androiddemo.feature.R;
+import sst.example.androiddemo.feature.graphics.BitmapActivity;
 
 public class PaintView extends View {
     Paint mPaint = new Paint();
@@ -80,6 +114,8 @@ public class PaintView extends View {
         mPaint.setTextScaleX(1.5f);//设置文字横向放缩。也就是文字变胖变瘦
         mPaint.setLetterSpacing(0.05f);//设置字符间距。默认值是 0
         mPaint.setFontFeatureSettings("smcp");//设置 "small caps" 用 CSS 的 font-feature-settings 的方式来设置文字
+
+        ///drawText时对origin的对齐方式
         mPaint.setTextAlign(Paint.Align.CENTER);//设置文字的对齐方式。一共有三个值：LEFT CETNER 和 RIGHT。默认值为 LEFT
         mPaint.setTextLocale(Locale.CHINA);//设置绘制所使用的 Locale  Locale 直译是「地域」，其实就是你在系统里设置的「语言」或「语言区域」（具体名称取决于你用的是什么手机
 //        不过在现在（ 2017 年），手机屏幕的像素密度已经非常高，几乎不会再出现字体尺寸小到需要靠 hinting 来修正的情况，所以这个方法其实……没啥用了
@@ -135,6 +171,7 @@ public class PaintView extends View {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {//api 23 (android6.0)
             boolean isHasGlyph = mPaint.hasGlyph("hh");
         }
+
 
         canvas.drawText("h h h h 和", 500, 100, mPaint);
 //        Cap.ROUND(圆形线冒)、  在原先基础上加上半圆

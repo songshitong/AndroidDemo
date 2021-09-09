@@ -5,15 +5,17 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Environment;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
+
 import com.blankj.utilcode.util.UriUtils;
+
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.util.MyUtils;
 
@@ -96,7 +98,7 @@ public class FFmpegActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                native_replaceAudio(pcmDatas);
+                native_replaceAudio(pcmDatas,pcmDatas.length);
             }
 
 
@@ -121,5 +123,5 @@ public class FFmpegActivity extends AppCompatActivity {
 
     }
 
-    private  native  void native_replaceAudio(byte[] pcmDatas) ;
+    private  native  void native_replaceAudio(byte[] pcmDatas,int len) ;
 }

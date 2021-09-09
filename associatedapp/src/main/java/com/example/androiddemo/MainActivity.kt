@@ -5,6 +5,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androiddemo.aidl.AidlActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import kotlin.concurrent.thread
 
 
 //todo 判断asset文件是否可读写
@@ -20,6 +23,20 @@ class MainActivity : AppCompatActivity() {
         aidlActivity.setOnClickListener {
           startActivity(Intent(this,AidlActivity::class.java))
         }
+
+        val client = OkHttpClient()
+        val ENDPOINT = "https://api.github.com/repos/square/okhttp/contributors"
+
+        // Create request for remote resource.
+
+        // Create request for remote resource.
+        val request: Request = Request.Builder()
+            .url(ENDPOINT)
+            .build()
+        thread {
+            client.newCall(request).execute()
+        }
+
         sameTaskAffinityActivity.setOnClickListener {
             startActivity(Intent(this,SameTaskAffinityActivity::class.java))
         }
@@ -31,6 +48,5 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-
 
 }

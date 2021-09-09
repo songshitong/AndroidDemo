@@ -20,7 +20,10 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme.NoActionBar"
             tools:replace="android:allowBackup">
-        <activity android:name=".activity.LayoutActivity"></activity>
+        <activity android:name=".activity.StartForResultActivity"></activity>
+        <activity android:name=".widget.ViewOutlineProvider" />
+        <activity android:name=".camera.CameraActivity" />
+        <activity android:name=".activity.LayoutActivity" />
         <activity android:name=".activity.launchmode.OtherActivity" />
         <activity android:name=".activity.launchmode.LaunchActivity" />
         <activity android:name=".activity.launchmode.StandardActivity" />

@@ -31,7 +31,7 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nStartPlay(JNIEnv *env, jc
                                                                  jobject surface) {
     const char *path = env->GetStringUTFChars(path_, 0);
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "StartPlay %s", path);
-    initContext(const_cast<char *>(path));
+    initContext(const_cast<char *>(path),env,surface);
     env->ReleaseStringUTFChars(path_, path);
 
 }

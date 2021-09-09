@@ -78,10 +78,10 @@ target_link_libraries(
   #引入头文件 .hpp是既有函数的声明还有函数的实现和定义
    #include <fmod.hpp>
    #include <android/log.h>  //引入Android log库的头文件
-   using namepace FMOD;
-   System *system;          //创建系统变量  System应该是fmod的类
-   System_Create(&system); //传入二级指针
-   unsigned int version;
-   system->getVersion(&version); //拿到当前SDK的版本
+   #using namepace FMOD;
+   #System *system;          //创建系统变量  System应该是fmod的类
+   #System_Create(&system); //传入二级指针
+   #unsigned int version;
+   #system->getVersion(&version); //拿到当前SDK的版本
    #开头是两个_
-   __android_log_print(ANDROID_LOG_ERROR,"TEST","FMOD version %08x",version)
+   #__android_log_print(ANDROID_LOG_ERROR,"TEST","FMOD version %08x",version)

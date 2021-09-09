@@ -1,2 +1,6 @@
-include ':feature', ':lib', ':associatedapp'
+include ':Material'
+include ':libkotlin'
+include ':BuildSrc'
+include ':GradlePlugin'
+include ':feature', ':libJava', ':associatedapp'
 // new

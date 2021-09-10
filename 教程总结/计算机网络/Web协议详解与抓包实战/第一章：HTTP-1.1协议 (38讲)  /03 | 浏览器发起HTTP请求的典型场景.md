@@ -4,7 +4,9 @@
 时序图
 展示了浏览器请求的细节
 
-Hypertext Transfer Protocol (HTTP) 协议  超文本传输协议
+Hypertext Transfer Protocol (HTTP) 协议  超文本传输协议   transfer转义  
+//todo 为啥是传输协议
+https://www.cnblogs.com/gudi/p/6959715.html
 a stateless application-level request/response protocol that uses extensible semantics and 
 self-descriptive message payloads for flexible interaction with network-based hypertext information 
 systems （RFC7230 2014.6）

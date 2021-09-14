@@ -5,6 +5,7 @@ import kotlin.collections.ArrayList
 println("start ====")
 
 val renameList = arrayListOf("教程总结","libJava/src/main/java/sst/example/lib/IO","libJava/src/main/java/sst/example/lib/NIO")
+val specialList = arrayListOf(":","：","|","|")
 checkStandard(renameList)
 
 fun checkStandard(renameList: List<String>) {
@@ -19,7 +20,6 @@ fun checkStandard(renameList: List<String>) {
 
 fun checkFileName(file: File) {
     println("checkFileName $file")
-    val specialList = arrayListOf(":","：")
     specialList.forEach {
         if (file.name.contains(it)){
             renameFile(file,it)
@@ -32,7 +32,6 @@ fun checkFileName(file: File) {
 fun renameFile(file: File,specialStr:String) {
     val filePath = file.path
     val newName = filePath.replace(specialStr,"_")
-    file.canonicalPath
     println("renameFile $filePath to $newName ")
     file.renameTo(File(newName));
 }

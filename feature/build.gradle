@@ -4,9 +4,9 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 //自定义项目内插件
-apply plugin: 'com.sst.projectplugin'
+//apply plugin: 'com.sst.projectplugin'
 ///自定义插件
-apply plugin: 'com.sst.plugin'
+//apply plugin: 'com.sst.plugin'
 
 android {
     compileSdkVersion 30

@@ -7,9 +7,9 @@ buildscript {
         jcenter()
         maven { url 'https://jitpack.io' }
 //        自定义插件
-        maven {
-            url uri('./repos') //指定本地maven的路径，在项目根目录下
-        }
+//        maven {
+//            url uri('./repos') //指定本地maven的路径，在项目根目录下
+//        }
         mavenCentral()
     }
     dependencies {
@@ -19,7 +19,7 @@ buildscript {
         // in the individual module build.gradle files
 
 //        添加自定义插件  classpath '[groupId]:[artifactId]:[version]'
-        classpath 'com.sst.plugin:MyPlugin:1.0.0'
+//        classpath 'com.sst.plugin:MyPlugin:1.0.0'
     }
 }
 

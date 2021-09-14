@@ -1,0 +1,7 @@
+Executable : /home/tong/Android/Sdk/cmake/3.10.2.4988404/bin/ninja
+arguments : 
+-C
+/home/tong/Android-Workspace/AndroidDemo/feature/.cxx/Debug/4dk5z202/armeabi-v7a
+native-lib
+jvmArgs : 
+

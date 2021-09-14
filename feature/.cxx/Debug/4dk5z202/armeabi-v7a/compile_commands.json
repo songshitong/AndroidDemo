@@ -1,0 +1,13 @@
+[
+{
+  "directory": "/home/tong/Android-Workspace/AndroidDemo/feature/.cxx/Debug/4dk5z202/armeabi-v7a",
+  "command": "/home/tong/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=armv7-none-linux-androideabi21 --gcc-toolchain=/home/tong/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/home/tong/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot  -Dnative_lib_EXPORTS -I../../../../src/main/cpp/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security   -L/home/tong/Android-Workspace/AndroidDemo/feature/src/main/jniLibs/armeabi-v7a -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o -c /home/tong/Android-Workspace/AndroidDemo/feature/src/main/cpp/native-lib.cpp",
+  "file": "/home/tong/Android-Workspace/AndroidDemo/feature/src/main/cpp/native-lib.cpp"
+},
+
+{
+  "directory": "/home/tong/Android-Workspace/AndroidDemo/feature/.cxx/Debug/4dk5z202/armeabi-v7a",
+  "command": "/home/tong/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=armv7-none-linux-androideabi21 --gcc-toolchain=/home/tong/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/home/tong/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot  -Dnative_lib_EXPORTS -I../../../../src/main/cpp/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security   -L/home/tong/Android-Workspace/AndroidDemo/feature/src/main/jniLibs/armeabi-v7a -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles/native-lib.dir/src/main/cpp/audioPlayer.cpp.o -c /home/tong/Android-Workspace/AndroidDemo/feature/src/main/cpp/audioPlayer.cpp",
+  "file": "/home/tong/Android-Workspace/AndroidDemo/feature/src/main/cpp/audioPlayer.cpp"
+}
+]

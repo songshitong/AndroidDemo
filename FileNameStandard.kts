@@ -5,7 +5,7 @@ import kotlin.collections.ArrayList
 println("start ====")
 
 val renameList = arrayListOf("教程总结","libJava/src/main/java/sst/example/lib/IO","libJava/src/main/java/sst/example/lib/NIO")
-val specialList = arrayListOf(":","：","|",)
+val specialList = arrayListOf(":","：","|","(",")","（","）")
 checkStandard(renameList)
 
 fun checkStandard(renameList: List<String>) {

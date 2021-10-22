@@ -3,12 +3,11 @@ package sst.example.androiddemo.feature
 import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
-import android.os.Bundle
-import android.os.Debug
-import android.os.Handler
+import android.os.*
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
@@ -42,6 +41,7 @@ class  MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //android jvm不跟随Java jvm版本 所以无法获得具体的Java Version
         Log.d(TAG,"java version ${getVersion()}")
         Log.d(TAG,"java version ${Runtime::class.java.getPackage().implementationVersion}")
         Log.d(TAG, " onCreate ==== ")

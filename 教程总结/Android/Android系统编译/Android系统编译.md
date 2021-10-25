@@ -108,6 +108,8 @@ cd goldfish
 #git branch -a
 git checkout remotes/origin/android-goldfish-3.4
 
+aosp与内核的关系
+https://zhuanlan.zhihu.com/p/245131105
 
 
 lunch命令是envsetup.sh里定义的一个命令，用来让用户选择编译目标

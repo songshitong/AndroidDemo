@@ -188,16 +188,40 @@ sp<IBinder> ProcessState::getStrongProxyForHandle(int32_t handle)
 }
 
 ```
-
+//todo  BpBinder::create(handle)
 getContextObject函数中直接调用了getStrongProxyForHandle函数，注意它的参数的值为0，那么handle的值就为0，handle是一个资源标识。
 注释1处查询这个资源标识对应的资源（handle_entry）是否存在，如果不存在就会在注释2处新建BpBinder，并在注释3处赋值给 handle_entry的binder。
   最终返回的result的值为BpBinder
 
-BpBinder和BBinder
+BpBinder和BBinder    bp代表binderproxy  b代表binder
 说到BpBinder，不得不提到BBinder，它们是Binder通信的“双子星”，都继承了IBinder。BpBinder是Client端与Server交互的代理类，
 而BBinder则代表了Server端。BpBinder和BBinder是一一对应的，BpBinder会通过handle来找到对应的BBinder。
 我们知道在ServiceManager中创建了BpBinder，通过handle(值为0)可以找到对应的BBinder
 BpBinder和BBinder.png
+
+bbinder的使用
+1 BBinder 在03 executeCommand 出现
+2 服务端
+```
+status_t BnMediaPlayerService::onTransact(
+      uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+  {
+      switch (code) {
+          case CREATE: {
+              CHECK_INTERFACE(IMediaPlayerService, data, reply);
+              sp<IMediaPlayerClient> client =
+                  interface_cast<IMediaPlayerClient>(data.readStrongBinder());
+              audio_session_t audioSessionId = (audio_session_t) data.readInt32();
+              sp<IMediaPlayer> player = create(client, audioSessionId);
+              reply->writeStrongBinder(IInterface::asBinder(player));
+              return NO_ERROR;
+          } break;
+          ...
+          default:
+             return BBinder::onTransact(code, data, reply, flags);
+      }
+  }    
+```
 
 分析完了ProcessState的getContextObject函数，回到interface_cast函数：
 ```

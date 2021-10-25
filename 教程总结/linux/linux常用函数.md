@@ -111,3 +111,6 @@ __system_property_update
 
 
 strncmp
+
+
+pthread_key_t  线程相关

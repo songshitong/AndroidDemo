@@ -80,7 +80,7 @@ virtual box 存储挂载addition.iso,设备-》安装增强功能，ubuntu文件
 
 系统下载脚本
 将export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/' 添加到~/.bashrc
-export REPO_URL='https://mirrors.bfsu.edu.cn/git/git-repo'
+#export REPO_URL='https://mirrors.bfsu.edu.cn/git/git-repo'
 
 sudo apt-get update
 sudo apt-get install git
@@ -90,15 +90,31 @@ sudo apt-get install curl
 curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo > ~/bin/repo
 curl https://mirrors.bfsu.edu.cn/git/git-repo  > ~/bin/repo
 chmod a+x ~/bin/repo
+#到Android11  aosp使用的Python脚本为python2   python3需要单独安装
 sudo apt-get install python
 mkdir aosp
 cd aosp
 git config --global user.email "1295208856@qq.com"
 git config --global user.name "songshitong"
 repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-8.0.0_r36  #不指定版本，默认最新  android-11.0.0_r1
-repo init -u https://mirrors.bfsu.edu.cn/git/AOSP/platform/manifest -b android-8.0.0_r36 
+#repo init -u https://mirrors.bfsu.edu.cn/git/AOSP/platform/manifest -b android-8.0.0_r36 
 
 repo sync
+#可以写个脚本循环下载，容易因为网络失败
+#!/bin/bash
+#repo sync -j4
+#while [ $? -ne 0 ]
+#do
+#echo "======sync failed ,re-sync again======"
+#sleep 3
+#repo sync -j4
+#done
+#也可以使用echo 优化写文件的过程
+#touch repo.sh  # 1. 创建 repo.sh 文件
+#vim repo.sh # 2. 复制上面的脚本内容到 repo.sh 里面，这里你可以使用你自己喜欢的方法打开并修改文件，比如 vscode
+#chmod a+x repo.sh #3. 修改权限
+#./repo.sh # 4. 运行脚本，万事大吉
+
 #开始下载内核
 mkdir kernel
 cd kernel
@@ -108,8 +124,7 @@ cd goldfish
 #git branch -a
 git checkout remotes/origin/android-goldfish-3.4
 
-aosp与内核的关系
-https://zhuanlan.zhihu.com/p/245131105
+
 
 
 lunch命令是envsetup.sh里定义的一个命令，用来让用户选择编译目标
@@ -191,6 +206,7 @@ docker build --network host -t aosp_builder:V1.0 .
 docker run -it --network host  --name aosp_builder -v /c/develop/aosp/source:/home/builder/source -u builder aosp_builder:V1.0 /bin/bash
 -v文件映射  /c/develop/aosp/source宿主机   /home/builder/source镜像目录  
 -u 以builder身份登录
+docker run -it --network host  --name aosp_builder -v \\wsl.localhost\Ubuntu\home\song\aosp:/home/builder/source -u builder aosp_builder:V1.0 /bin/bash
 
 启动镜像
 docker start aosp_builder

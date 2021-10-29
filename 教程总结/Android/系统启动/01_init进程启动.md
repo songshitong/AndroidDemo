@@ -120,6 +120,7 @@ service zygote /system/bin/app_process64 -Xzygote /system/bin --zygote --start-s
 
 
 5.解析service
+/system/core/init/init.cpp
 ```
 Parser& parser = Parser::GetInstance();
 691      parser.AddSectionParser("service",std::make_unique<ServiceParser>());

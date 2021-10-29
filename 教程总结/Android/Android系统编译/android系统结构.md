@@ -134,3 +134,8 @@ external/sqlite	轻量型关系数据库SQLite的C++实现
 这一部分是手机厂商改动最大的一部分，根据手机终端所采用的硬件平台会有不同的实现
 
 
+aosp与内核的关系
+https://zhuanlan.zhihu.com/p/245131105
+
+GKI 通用内核Generic Kernel Image  为了解决碎片化和Android升级慢的问题
+https://source.android.com/devices/architecture/kernel/generic-kernel-image

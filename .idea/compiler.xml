@@ -7,7 +7,6 @@
     <bytecodeTargetLevel target="1.8">
       <module name="AndroidDemo.associatedapp" target="11" />
       <module name="AndroidDemo.buildSrc" target="11" />
-      <module name="AndroidDemo.BuildSrc" target="11" />
       <module name="AndroidDemo.feature" target="11" />
       <module name="AndroidDemo.GradlePlugin" target="11" />
       <module name="AndroidDemo.Material" target="11" />

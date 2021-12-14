@@ -83,6 +83,9 @@ sudo chmod 777 android.ipr
 manifest file:  /frameworks/base/core/res/AndroidManifest.xml 
 resources directory :  /frameworks/base/core/res/res/
 assets  directory   :  /frameworks/base/core/res/assets/
+建立依赖  Project Structure -> Modules -> android -> Dependencies: 先删除对应Android API Platform之外的所有依赖,
+然后点击下图绿色的+号来选择Jars or directories，将frameworks添加进来, 也可添加其他所关注的源码；
+Android API Platform一般在最后一个  可以点住第一个，拉倒最后，按住shift点击最后一个，然后删除
 
 
 Edit Configurations

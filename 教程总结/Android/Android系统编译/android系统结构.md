@@ -134,6 +134,14 @@ external/sqlite	轻量型关系数据库SQLite的C++实现
 这一部分是手机厂商改动最大的一部分，根据手机终端所采用的硬件平台会有不同的实现
 
 
+jdk在AOSP中的定义
+android6.0路径libcore/libart/src/main/java/java/lang/Thread.java
+Google后来迁移到了OpenJDK   ojluni是OpenJDK,java.lang/java.util/java.net/java.io OpenJDK核心库的意思
+/libcore/ojluni/src/main/java/java/lang/Thread.java
+https://www.zhihu.com/question/39010777
+
+
+
 aosp与内核的关系
 https://zhuanlan.zhihu.com/p/245131105
 

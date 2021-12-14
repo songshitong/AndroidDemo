@@ -37,3 +37,32 @@ __android_log_print(ANDROID_LOG_ERROR,"FFmpegCmd","av_version_info %s",av_versio
 
 
 //宏定义 #define if
+
+
+goto关键字
+goto 语句允许把控制无条件转移到同一函数内的被标记的语句。
+
+注意：在任何编程语言中，都不建议使用 goto 语句。因为它使得程序的控制流难以跟踪，使程序难以理解和难以修改。
+任何使用 goto 语句的程序可以改写成不需要使用 goto 语句的写法。
+goto label;        //label可以在goto下面也可以在上面
+..
+.
+label: statement;
+实例  输出10-19，跳过15
+/*
+// 局部变量声明
+   int a = 10;
+
+   // do 循环执行
+   LOOP:do
+   {
+       if( a == 15)
+       {
+          // 跳过迭代
+          a = a + 1;
+          goto LOOP;
+       }
+       cout << "a 的值：" << a << endl;
+       a = a + 1;
+   }while( a < 20 );
+*/

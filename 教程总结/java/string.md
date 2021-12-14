@@ -6,6 +6,8 @@
   ISO-8859-1 是latin1或者西欧语言
   对于char数组 如果我们要存储字符A，则为0x00 0x41，此时前面的一个字节空间浪费了。但如果保存中文字符则不存在浪费的情况，
   也就是说如果保存 ISO-8859-1 编码内的字符则浪费，之外的字符则不会浪费
+
+//todo string的实现
  
 2.String类为什么是final的   https://www.jianshu.com/p/9c7f5daac283
   1.为了实现字符串池
@@ -200,4 +202,46 @@
                  return n1 - n2;
              }
   }                                         
-                                             
+
+
+截取字符串  前闭后开
+substring
+```
+public String substring(int beginIndex, int endIndex) {
+        return ((beginIndex == 0) && (endIndex == value.length)) ? this
+                : new String(value, beginIndex, subLen);
+    }
+   //只有开始 
+   public String substring(int beginIndex) {
+
+        int subLen = value.length - beginIndex;
+        return (beginIndex == 0) ? this : new String(value, beginIndex, subLen);
+    }    
+```
+
+
+返回指定index的字符
+```
+  public char charAt(int index) {
+        return value[index];
+    }
+```
+
+长度函数
+```
+public int length() {
+        return value.length;
+    }
+```
+
+toLowerCase
+```
+ public String toLowerCase() {
+        return toLowerCase(Locale.getDefault());
+    }
+```
+
+split 方法
+```
+public String[] split(String regex, int limit) {
+```

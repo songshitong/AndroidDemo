@@ -1,5 +1,5 @@
 http://liuwangshu.cn/framework/component/2-service-start.html  android 7.0
-
+//todo service 是另一个进程吗
 1.ContextImpl到ActivityManageService的调用过程
 要启动Service，我们会调用startService方法，它的实现在ContextWrapper中，代码如下所示。
 frameworks/base/core/java/android/content/ContextWrapper.java

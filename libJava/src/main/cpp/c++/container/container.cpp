@@ -32,6 +32,8 @@ int main(){
    vec_4.front();
    vec_4.back();
 
+   //删除最后一个
+   vec_4.pop_back();
    //清楚向量容器
    vec_4.clear();
 

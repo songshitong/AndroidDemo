@@ -1,5 +1,5 @@
 zygote  ˈzaɪɡəʊt
-
+//todo android新的启动流程 https://juejin.cn/post/6922704248195153927
 
 http://liuwangshu.cn/framework/booting/1-init.html   android7.0
 1.init简介

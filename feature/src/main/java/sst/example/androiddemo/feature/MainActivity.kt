@@ -1,8 +1,10 @@
 package sst.example.androiddemo.feature
 
 import android.Manifest
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.SurfaceTexture
@@ -10,6 +12,7 @@ import android.media.MediaPlayer
 import android.os.*
 import android.provider.Settings
 import android.util.Log
+import android.util.Xml
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -41,6 +44,11 @@ class  MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        var startTime = System.currentTimeMillis()
+        val sp: SharedPreferences = getSharedPreferences("sp", Context.MODE_PRIVATE)
+        sp.edit().putString("a","11111").apply();
+        val value: String? = sp.getString("a", "")
+        Log.e(TAG, "func1  :  ${System.currentTimeMillis() - startTime}")
         //android jvm不跟随Java jvm版本 所以无法获得具体的Java Version
         Log.d(TAG,"java version ${getVersion()}")
         Log.d(TAG,"java version ${Runtime::class.java.getPackage().implementationVersion}")
@@ -263,8 +271,6 @@ class  MainActivity : AppCompatActivity()  {
 //            ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
 //            ExifInterface.ORIENTATION_ROTATE_270 -> degree = 270
 //        }
-
-
 
 
         //测试手机1S计算的次数  红米note4大约20000次

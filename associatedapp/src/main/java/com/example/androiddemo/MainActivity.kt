@@ -7,6 +7,7 @@ import com.example.androiddemo.aidl.AidlActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.util.*
 import kotlin.concurrent.thread
 
 
@@ -23,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         aidlActivity.setOnClickListener {
           startActivity(Intent(this,AidlActivity::class.java))
         }
-
         val client = OkHttpClient()
         val ENDPOINT = "https://api.github.com/repos/square/okhttp/contributors"
 

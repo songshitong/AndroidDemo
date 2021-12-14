@@ -99,7 +99,7 @@ git config --global user.name "songshitong"
 repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-8.0.0_r36  #不指定版本，默认最新  android-11.0.0_r1
 #repo init -u https://mirrors.bfsu.edu.cn/git/AOSP/platform/manifest -b android-8.0.0_r36 
 
-repo sync
+repo sync -j4  #不要过大，清华镜像限制了速度
 #可以写个脚本循环下载，容易因为网络失败
 #!/bin/bash
 #repo sync -j4

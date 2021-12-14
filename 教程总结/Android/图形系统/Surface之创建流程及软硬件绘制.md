@@ -552,7 +552,7 @@ static void drawPoint(JNIEnv*, jobject, jlong canvasHandle, jfloat x, jfloat y,
       get_canvas(canvasHandle)->drawPoint(x, y, *paint);
   }
  
-
+//todo 怎么到的skia_canvas canvas的初始化
 /frameworks/base/libs/hwui/SkiaCanvas.cpp
 // {"nDrawLines", "(J[FIIJ)V", (void*) CanvasJNI::drawLines}
 // nDrawLines 方法对应 SkiaCanvas::drawLines
@@ -737,7 +737,7 @@ private void updateRootDisplayList(View view, DrawCallbacks callbacks) {
     // 通过 RenderNode 获取 DisplayListCanvas
     DisplayListCanvas canvas = mRootNode.start(mSurfaceWidth, mSurfaceHeight);
     try {
-        // ...
+        // ...  
         // 利用 DisplayListCanvas 构建并缓存所有的 DrawOp
         canvas.drawRenderNode(view.updateDisplayListIfDirty());
         // ...
@@ -793,7 +793,7 @@ public final void drawLines(@Size(multiple = 4) @NonNull float[] pts, int offset
 external/skqp/src/gpu/SkGpuDevice.cpp
 void SkGpuDevice::drawPoints(SkCanvas::PointMode mode, size_t count, const SkPoint pts[], const SkPaint& paint) {
     // ...
-    // 从 fRenderTargetContext 中的源码可以看出来这里面会构建 DrawOp
+    // 从 fRenderTargetContext 中的源码可以看出来这里面会构建 DrawOp   //todo drawop??
     fRenderTargetContext->drawPath(this->clip(), std::move(grPaint), GrAA(paint.isAntiAlias()), this->ctm(), path, style);
 }
 

@@ -1,3 +1,4 @@
+linux system programming
 文件打开open函数
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -114,3 +115,6 @@ strncmp
 
 
 pthread_key_t  线程相关
+
+
+inotify 监控文件系统操作，比如读取、写入和创建

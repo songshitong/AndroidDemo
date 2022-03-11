@@ -22,7 +22,7 @@ AQS与其子类配合，子类负责加锁，解锁，AQS负责将锁分配给�
 例如JUC中，如CountDownLatch、Semaphore、ReentrantLock、ReentrantReadWriteLock等并发工具，均是借助AQS完成他们的
   所需要的锁分配问题
 
-
+AQS基于CAS和Volatile
 
 基于CAS的状态更新
 AQS要把锁正确地分配给请求者，就需要其他的属性来维护信息，那么自身也要面对并发问题，因为信息将会被更改，而且可能来源于任意线程。

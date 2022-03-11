@@ -17,22 +17,22 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-                abiFilters "armeabi-v7a","x86_64"
-            }
-        }
-        ndk {
-            abiFilters "armeabi-v7a","x86_64"
-        }
+//        externalNativeBuild {
+//            cmake {
+//                cppFlags ""
+//                abiFilters "armeabi-v7a","x86_64"
+//            }
+//        }
+//        ndk {
+//            abiFilters "armeabi-v7a","x86_64"
+//        }
     }
 
-    externalNativeBuild {
-        cmake {
-            path "CMakeLists.txt"
-        }
-    }
+//    externalNativeBuild {
+//        cmake {
+//            path "CMakeLists.txt"
+//        }
+//    }
 
 
     compileOptions {
@@ -73,7 +73,7 @@ dependencies {
     api 'androidx.appcompat:appcompat:1.2.0'
     implementation "androidx.lifecycle:lifecycle-runtime:2.3.1"
     api 'androidx.constraintlayout:constraintlayout:2.0.4'
-    api 'androidx.recyclerview:recyclerview:1.2.0-alpha04'
+    api 'androidx.recyclerview:recyclerview:1.2.0'
     api 'androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03'
     api 'androidx.core:core-ktx:1.7.0-alpha01'
     //    视频编辑
@@ -86,7 +86,7 @@ dependencies {
 
 
     // CameraX core library using the camera2 implementation
-    def camerax_version = "1.0.0-beta10"
+    def camerax_version = "1.1.0-alpha03"
     // The following line is optional, as the core library is included indirectly by camera-camera2
     implementation "androidx.camera:camera-core:${camerax_version}"
     implementation "androidx.camera:camera-camera2:${camerax_version}"
@@ -98,7 +98,6 @@ dependencies {
     implementation "androidx.camera:camera-extensions:1.0.0-alpha17"
 
     implementation 'com.airbnb.android:lottie:3.6.0'
-
 
 }
 

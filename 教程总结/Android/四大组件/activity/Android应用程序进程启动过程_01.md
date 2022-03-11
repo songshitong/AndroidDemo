@@ -6,7 +6,7 @@ http://liuwangshu.cn/framework/applicationprocess/1.html   android7.0
 要想启动一个应用程序，首先要保证这个应用程序所需要的应用程序进程已经被启动。ActivityManagerService在启动应用程序时会检查这个应用程序需要的应用程序进程是否存在，
 不存在就会请求Zygote进程将需要的应用程序进程启动。在Android系统启动流程（二）解析Zygote进程启动过程这篇文章中，我提到了Zygote的Java框架层中，
 会创建一个Server端的Socket，这个Socket用来等待ActivityManagerService来请求Zygote来创建新的应用程序进程的。
-我们知道Zygote进程通过fock自身创建的应用程序进程，这样应用程序程序进程就会获得Zygote进程在启动时创建的虚拟机实例。
+我们知道Zygote进程通过fork自身创建的应用程序进程，这样应用程序程序进程就会获得Zygote进程在启动时创建的虚拟机实例。
 当然，在应用程序创建过程中除了获取虚拟机实例，还可以获得Binder线程池和消息循环，这样运行在应用进程中应用程序就可以方便的使用Binder进行进程间通信以及消息处理机制了。
 关于Binder线程池和消息循环是如何启动或者创建的会在下一篇文章给出答案。先给出应用程序进程启动过程的时序图，然后对每一个步骤进行详细分析，如下图所示
 应用程序进程启动过程.png
@@ -182,7 +182,38 @@ private static ProcessStartResult zygoteSendArgsAndGetResult(
       }
   }
 ```
-//todo ZygoteState的socket
+ZygoteState
+frameworks/base/core/java/android/os/Process.java
+```
+   public static class ZygoteState {
+        final LocalSocket socket;
+        final DataInputStream inputStream;
+        final BufferedWriter writer;
+        final List<String> abiList;
+   //socket连接     
+   public static ZygoteState connect(String socketAddress) throws IOException {
+            DataInputStream zygoteInputStream = null;
+            BufferedWriter zygoteWriter = null;
+            final LocalSocket zygoteSocket = new LocalSocket();
+
+            try {
+                zygoteSocket.connect(new LocalSocketAddress(socketAddress,
+                        LocalSocketAddress.Namespace.RESERVED));
+
+                zygoteInputStream = new DataInputStream(zygoteSocket.getInputStream());
+
+                zygoteWriter = new BufferedWriter(new OutputStreamWriter(
+                        zygoteSocket.getOutputStream()), 256);
+            } catch (IOException ex) {
+              ...
+            }
+
+            String abiListString = getAbiList(zygoteWriter, zygoteInputStream);
+            return new ZygoteState(zygoteSocket, zygoteInputStream, zygoteWriter,
+                    Arrays.asList(abiListString.split(",")));
+        }      
+}
+```
 zygoteSendArgsAndGetResult函数主要做的就是将传入的应用进程的启动参数argsForZygote，写入到ZygoteState中，
 结合上文我们知道ZygoteState其实是由openZygoteSocketIfNeeded函数返回的，那么我们接着来看openZygoteSocketIfNeeded函数，代码如下所示。
 frameworks/base/core/java/android/os/Process.java
@@ -213,7 +244,6 @@ private static ZygoteState openZygoteSocketIfNeeded(String abi) throws ZygoteSta
 
     throw new ZygoteStartFailedEx("Unsupported zygote ABI: " + abi);
 ```
-//todo 查看connect函数
 在讲到Zygote进程启动过程时我们得知，在Zygote的main函数中会创建name为“zygote”的Server端Socket。
 在注释1处会调用ZygoteState的connect函数与名称为ZYGOTE_SOCKET的Socket建立连接，这里ZYGOTE_SOCKET的值为“zygote”。
 注释2处如果连接name为“zygote”的Socket返回的primaryZygoteState与当前的abi不匹配，则会在注释3处连接name为“zygote_secondary”的Socket。
@@ -337,7 +367,49 @@ frameworks/base/core/java/com/android/internal/os/ZygoteConnection.java
         }
     }
 ```
-//todo forkAndSpecialize
+frameworks/base/core/java/com/android/internal/os/Zygote.java
+```
+public static int forkAndSpecialize(int uid, int gid, int[] gids, int debugFlags,
+          int[][] rlimits, int mountExternal, String seInfo, String niceName, int[] fdsToClose,
+          String instructionSet, String appDataDir) {
+        VM_HOOKS.preFork();
+        int pid = nativeForkAndSpecialize(
+                  uid, gid, gids, debugFlags, rlimits, mountExternal, seInfo, niceName, fdsToClose,
+                  instructionSet, appDataDir);
+        // Enable tracing as soon as possible for the child process.
+       ...
+        return pid;
+    }
+
+    native private static int nativeForkAndSpecialize(int uid, int gid, int[] gids,int debugFlags,
+          int[][] rlimits, int mountExternal, String seInfo, String niceName, int[] fdsToClose,
+          String instructionSet, String appDataDir);
+```
+frameworks/base/core/jni/com_android_internal_os_Zygote.cpp
+```
+static jint com_android_internal_os_Zygote_nativeForkAndSpecialize(
+        JNIEnv* env, jclass, jint uid, jint gid, jintArray gids,
+        jint debug_flags, jobjectArray rlimits,
+        jint mount_external, jstring se_info, jstring se_name,
+        jintArray fdsToClose, jstring instructionSet, jstring appDataDir) {
+  ....      
+  return ForkAndSpecializeCommon(env, uid, gid, gids, debug_flags,
+            rlimits, capabilities, capabilities, mount_external, se_info,
+            se_name, false, fdsToClose, instructionSet, appDataDir);       
+ }
+ 
+static pid_t ForkAndSpecializeCommon(JNIEnv* env, uid_t uid, gid_t gid, jintArray javaGids,
+                                     jint debug_flags, jobjectArray javaRlimits,
+                                     jlong permittedCapabilities, jlong effectiveCapabilities,
+                                     jint mount_external,
+                                     jstring java_se_info, jstring java_se_name,
+                                     bool is_system_server, jintArray fdsToClose,
+                                     jstring instructionSet, jstring dataDir) {
+ pid_t pid = fork();
+ ....                                  
+ return pid;                                     
+} 
+```
 在注释1处调用readArgumentList函数来获取应用程序进程的启动参数，并在注释2处将readArgumentList函数返回的字符串封装到Arguments对象parsedArgs中。
 注释3处调用Zygote的forkAndSpecialize函数来创建应用程序进程，参数为parsedArgs中存储的应用进程启动参数，返回值为pid。
 forkAndSpecialize函数主要是通过fork当前进程来创建一个子进程的，如果pid等于0，则说明是在新创建的子进程中执行的，
@@ -413,4 +485,5 @@ private static void invokeStaticMain(String className, String[] argv, ClassLoade
 ```
 可以看到注释1处通过反射来获得android.app.ActivityThread类，接下来在注释2处来获得ActivityThread的main函数，
   并将main函数传入到注释3处的ZygoteInit中的MethodAndArgsCaller类的构造函数中，
-  MethodAndArgsCaller类内部会通过反射调用ActivityThread的main函数，讲到这里，应用程序进程就创建完成了并且运行了代表主线程的实例ActivityThread
+  MethodAndArgsCaller类内部会通过反射调用ActivityThread的main函数，讲到这里，
+   应用程序进程就创建完成了并且运行了代表主线程的实例ActivityThread

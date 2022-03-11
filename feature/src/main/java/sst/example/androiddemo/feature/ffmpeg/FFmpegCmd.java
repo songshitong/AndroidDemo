@@ -10,9 +10,9 @@ import com.blankj.utilcode.util.StringUtils;
 
 public class FFmpegCmd implements SurfaceHolder.Callback {
    private SurfaceHolder surfaceHolder;
-   static {
-      System.loadLibrary("native-lib");
-   }
+//   static {
+//      System.loadLibrary("native-lib");
+//   }
    public static int run(String[] cmd){
       return run(cmd.length,cmd);
    }
@@ -21,7 +21,7 @@ public class FFmpegCmd implements SurfaceHolder.Callback {
           Log.e("startPlay","path is null");
           return;
        }
-      nStartPlay(path,surfaceHolder.getSurface());
+//      nStartPlay(path,surfaceHolder.getSurface());
    }
 
 

@@ -3,7 +3,6 @@ http://liuwangshu.cn/framework/context/1-application-context.html android7.0
 前言
 Context也就是上下文对象，是Android较为常用的类，但是对于Context，很多人都停留在会用的阶段，这个系列会带大家从源码角度来分析Context，
 从而更加深入的理解它。
-//todo systemserver.getservice
 
 
 1.Context概述
@@ -27,7 +26,8 @@ ContextThemeWrapper、Service和Application都继承自ContextWrapper，这样�
 同时它们也是装饰类，在ContextWrapper的基础上又添加了不同的功能。
 ContextThemeWrapper中包含和主题相关的方法（比如： getTheme方法），因此，需要主题的Activity继承ContextThemeWrapper，
 而不需要主题的Service则继承ContextWrapper
-//todo context相关类的主要内容
+//todo server  application提供了什么额外的功能
+
 
 
 Application Context的创建过程

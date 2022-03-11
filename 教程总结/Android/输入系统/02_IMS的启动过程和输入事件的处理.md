@@ -79,7 +79,7 @@ status_t InputManager::start() {
 可以看到InputManager的start函数运行了InputReaderThread和InputDispatcherThread，
 这两个线程在Android输入系统（一）输入事件传递流程和InputManagerService的诞生提到过，
 它们在InputManager的构造函数中被创建，其中InputReaderThread中运行了InputReader，
-InputDispatcherThread中运行了InputDispatche
+InputDispatcherThread中运行了InputDispatcher
 
 
 2.InputDispatcher的启动过程
@@ -112,7 +112,7 @@ private:
 };
 }
 ```
-//todo threadLoop
+//todo threadLoop native线程
 InputDispatcher.h中定义了threadLoop纯虚函数，InputDispatcher继承了Thread。native的Thread内部有一个循环，
 当线程运行时，会调用threadLoop函数，如果它返回true并且没有调用requestExit函数，就会接着循环调用threadLoop函数。
 查看InputDispatcherThread的threadLoop函数是如何实现的。
@@ -141,10 +141,11 @@ void InputDispatcher::dispatchOnce() {
     } // release lock
     nsecs_t currentTime = now();//3
     int timeoutMillis = toMillisecondTimeoutDelay(currentTime, nextWakeupTime);//4
+    //利用epoll阻塞线程，就是handler的native Looper
     mLooper->pollOnce(timeoutMillis);
 }
 ```
-//todo pollOnce  native的线程机制
+//todo   native的线程机制
 注释1处用于检查InputDispatcher的缓存队列中是否有等待处理 的命令，如果没有就会执行注释2处的dispatchOnceInnerLocked函数，
   用来将输入事件分发给合适的Window。
 注释3处获取当前的时间，结合注释4处，得出InputDispatcherThread需要睡眠的时间为timeoutMillis。
@@ -341,11 +342,11 @@ void InputDispatcher::notifyKey(const NotifyKeyArgs* args) {
         mLock.unlock();
     } // release lock
     if (needWake) {
+        //唤醒looper，查看handler的native looper
         mLooper->wake();
     }
 }
 ```
-//todo mLooper->wake();
 代码块中采用Mutex互斥锁的形式，在注释1处根据NotifyKeyArgs，重新封装一个KeyEntry对象，代表一次按键数据。
 注释2处根据KeyEntry，来判断是否需要将睡眠中的InputDispatcherThread唤醒，如果需要，就调用Looper的wake函数进行唤醒，
   InputDispatcherThread被唤醒后就会重新对输入事件的分发，具体的回头查看第2小节
@@ -361,6 +362,5 @@ InputReader通过EventHub的getEvents函数获取事件信息，如果是原始�
    最终交由InputDispatcher来进行分发。
 InputDispatcher的notifyKey函数中会根据按键数据来判断InputDispatcher是否要被唤醒，InputDispatcher被唤醒后，
    会重新调用dispatchOnceInnerLocked函数将输入事件分发给合适的Window。
-//todo dispatchOnceInnerLocked与window
 
 IMS输入事件处理.md

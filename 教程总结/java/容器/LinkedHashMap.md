@@ -7,7 +7,7 @@ HashMap 并不保证元素的存储顺序和迭代顺序能够和存入顺序保
 类声明
 LinkedHashMap 是 HashMap 的子类，它保留了元素的插入顺序，其内部维护着一个按照元素插入顺序或者元素访问顺序来排列的链表，
   默认是按照元素的插入顺序来排列，就像使用 ArrayList 一样；如果是按照元素的访问顺序来排列，那么每次访问元素后该元素将移至链表的尾部，
- 可以靠此来实现 LRUcache 缓存算法
+ 可以靠此来实现 LRUCache 缓存算法
 ```
     public class LinkedHashMap<K,V> extends HashMap<K,V> 
         implements Map<K,V>
@@ -69,7 +69,7 @@ Entry 类在 Node 类的基础上扩展了两个新的成员变量：before 和 
 ```
 
 构造函数
-默认情况下 LinkedHashMap 都是按照元素插入顺序来排序
+默认情况下 LinkedHashMap 都是按照元素插入顺序来排序   accessOrder为true按照访问顺序排序
 ```
     public LinkedHashMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
@@ -109,7 +109,9 @@ Entry 类在 Node 类的基础上扩展了两个新的成员变量：before 和 
 accessOrder在构造器中置为true，将保留访问顺序
 当 HashMap 中的某个结点被访问了（例如调用了 get 方法）且 accessOrder 为 true，那么afterNodeAccess 方法就会被调用，
  该方法用于将最新访问的键值对移至链表的尾部，由于链表内结点位置的改变仅仅是修改几个引用即可，所以这个操作还是非常轻量级的
+LinkedHashMap
 ```
+    //重写父类的get方法
     public V get(Object key) {
         Node<K,V> e;
         if ((e = getNode(hash(key), key)) == null)

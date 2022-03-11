@@ -1,6 +1,25 @@
 android8.1
 https://sharrychoo.github.io/blog/android-source/dc-handler#%E5%89%8D%E8%A8%80
 
+handler的默认构造Looper
+```
+public Handler() {
+        this(null, false);
+    }
+    public Handler(@Nullable Callback callback, boolean async) {
+       ...
+        mLooper = Looper.myLooper();
+        if (mLooper == null) {
+            throw new RuntimeException(
+                "Can't create handler inside thread " + Thread.currentThread()
+                        + " that has not called Looper.prepare()");
+        }
+        mQueue = mLooper.mQueue;
+        mCallback = callback;
+        mAsynchronous = async;
+    }    
+```
+
 应用进程主线程初始化的入口是在 ActivityThread.main() 中, 我们看看他是如何构建消息队列的
 /frameworks/base/core/java/android/app/ActivityThread.java
 ```
@@ -256,6 +275,7 @@ Message next() {
             synchronized (this) {
                 final long now = SystemClock.uptimeMillis(); // 获取当前时刻
                 Message prevMsg = null;
+                //mMessages是队首消息
                 Message msg = mMessages;
                 // 2.1 若有同步屏障消息, 找寻第一个异步的消息执行
                 // msg.target 为 null, 则说明队首是同步屏障消息
@@ -269,7 +289,7 @@ Message next() {
                 }
                 // 2.2 直接找寻队首消息执行
                 if (msg != null) {
-                    // 2.2.1 若当前的时刻 早于 消息的执行时刻
+                    // 2.2.1 若当前的时刻 早于 消息的执行时刻  还不到消息执行的时刻
                     if (now < msg.when) {
                         // 给 nextPollTimeoutMillis 赋值, 表示当前线程, 可睡眠的时间
                         nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);
@@ -309,6 +329,8 @@ Message next() {
     // native 方法
     private native void nativePollOnce(long ptr, int timeoutMillis); 
 ```
+Asynchronous  [eɪˈsɪŋkrənəs] 异步;非同步;异步的;非同步的;异步方式
+
 提问MessageQueue用的什么数据结构来存储数据
 答：基于链表实现的队列
 队列的特点是什么？先进先出，一般在队尾增加数据，在队首进行取数据或者删除数据。
@@ -318,8 +340,8 @@ MessageQueue的消息是按时间进行排序的(异步消息除外)
 
 1调用 nativePollOnce 根据 nextPollTimeoutMillis 时长, 执行当前线程的睡眠操作
 2睡眠结束后, 取队列中可执行的 Msg 返回给 Looper 分发
-  若有同步屏障消息, 找寻第一个异步的消息执行
-  若未找到, 则找寻队首消息直接执行
+  若有同步屏障消息, 找寻第一个异步的消息执行  异步消息不需要按时间
+  若未找到, 则找寻队首消息
      若当前的时刻 < 第一个同步的消息的执行时刻
          则更新 nextPollTimeoutMillis, 下次进行 for 循环时, 会进行睡眠操作
      若当前的时刻 >= 第一个同步的消息的执行时刻
@@ -346,7 +368,7 @@ void NativeMessageQueue::pollOnce(JNIEnv* env, jobject pollObj, int timeoutMilli
     ......
 }
 
-// system/core/libutils/Looper.cpp
+// system/core/libutils/Looper.cpp  休眠直到有消息
 int Looper::pollOnce(int timeoutMillis, int* outFd, int* outEvents, void** outData) {
     int result = 0;
     for (;;) {   //死循环  不断执行pollInner，直到result不为0

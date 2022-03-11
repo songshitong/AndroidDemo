@@ -207,7 +207,7 @@ class Singleton{
   getInstance() {
     //第一次检查
     if(singleton==null){
-      synchronize(Singleton.class){
+       synchronized(Singleton.class){
         //获取锁后二次检查
         if(singleton==null){
           singleton=new Singleton();

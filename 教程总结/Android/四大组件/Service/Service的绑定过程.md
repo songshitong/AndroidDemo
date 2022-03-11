@@ -1,7 +1,7 @@
 http://liuwangshu.cn/framework/component/3-service-bind.html   android7.0
 我们可以通过调用Context的startService来启动Service，也可以通过Context的bindService来绑定Service，
 建议阅读此篇文章前请阅读Android深入四大组件（二）Service的启动过程这篇文章，知识点重叠的部分，本篇文章将不再赘述
-//todo 查看进程切换
+
 ContextImpl到ActivityManageService的调用过程
 我们可以用bindService方法来绑定Service，它的实现在ContextWrapper中，代码如下所示。
 frameworks/base/core/java/android/content/ContextWrapper.java
@@ -215,7 +215,7 @@ private void handleBindService(BindServiceData data) {
        }
    }
 ```
-//todo onbind干了啥
+// onbind是service的onBind回调
 注释1处获取要绑定的Service 。注释2处的BindServiceData的成员变量rebind的值为false，这样会调用注释3处的代码来调用Service的onBind方法，
 这样Service处于绑定状态了。如果rebind的值为true就会调用注释5处的Service的onRebind方法，结合前文的bindServiceLocked方法的注释4处，
 我们得知如果当前应用程序进程的Client端第一次与Service进行绑定，并且Service已经调用过onUnBind方法，则会调用Service的onRebind方法。
@@ -337,7 +337,7 @@ public void doConnected(ComponentName name, IBinder service) {
     }
 }
 ```
-//todo mConnection
+//回调ServiceConnection的onServiceDisconnected
 在注释1处调用了ServiceConnection类型的对象mConnection的onServiceConnected方法，
   这样在客户端中实现了ServiceConnection接口的类的onServiceConnected方法就会被执行。至此，Service的绑定过程就分析到这。
 最后给出剩余部分的代码时序图

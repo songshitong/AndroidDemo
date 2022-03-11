@@ -120,7 +120,6 @@ public InputManagerService(Context context) {
         Slog.i(TAG, "Initializing input manager, mUseDevInputEventForAudioJack="
                 + mUseDevInputEventForAudioJack);
         mPtr = nativeInit(this, mContext, mHandler.getLooper().getQueue());//2
-
         ...
     }
 ```
@@ -158,7 +157,8 @@ NativeInputManager::NativeInputManager(jobject contextObj,
 }
 ```
 
-NativeInputManager构造函数中创建了EventHub和InputManager，EventHub通过Linux内核的INotify与Epoll机制监听设备节点，
+NativeInputManager构造函数中创建了EventHub和InputManager，
+EventHub通过Linux内核的INotify与Epoll机制监听设备节点，
 通过EventHub的getEvent函数读取设备节点的增删事件和原始输入事件，本系列后续文章会详细介绍EventHub。InputManager的构造函数如下所示。
 frameworks/native/services/inputflinger/InputManager.cpp
 ```
@@ -185,5 +185,19 @@ InputManagerService构造方法描绘了如下的IMS简图
 IMS简图.png
 
 从上面的简图可以看出来，IMS主要的工作都在Native层中，这些内容会在本系列的后续文章进行介绍。
+
+
+总结
+EventHub
+EventHub通过Linux内核的INotify与Epoll机制监听设备节点，通过EventHub的getEvent函数读取设备节点的增删事件和原始输入事件
+InputManager{
+  InputReader   工作在InputReaderThread线程
+     InputReader会不断循环读取EventHub中的原始输入事件，将这些原始输入事件进行加工后交由InputDispatcher
+     线程不断执行threadLoop，事件读取后交由InputDispatcher，用epoll阻塞looper,就是handler的native looper
+  InputDispatcher  工作在InputDispatcherThread线程
+     InputDispatcher中保存了WMS中的所有Window信息，（WMS会将窗口的信息实时的更新到InputDispatcher中），
+        这样InputDispatcher就可以将输入事件派发给合适的Window  通过InputChannel发送
+}
+InputManagerService   运行在SystemServer进程，里面的mHandler运行在android.display线程
 
 

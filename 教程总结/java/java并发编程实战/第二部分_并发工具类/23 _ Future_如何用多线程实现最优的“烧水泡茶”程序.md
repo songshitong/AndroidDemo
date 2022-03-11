@@ -77,6 +77,7 @@ FutureTask(Runnable runnable, V result);
 那如何使用 FutureTask 呢？其实很简单，FutureTask 实现了 Runnable 和 Future 接口，由于实现了 Runnable 接口，所以可以将
  FutureTask 对象作为任务提交给 ThreadPoolExecutor 去执行，也可以直接被 Thread 执行；又因为实现了 Future 接口，
  所以也能用来获得任务的执行结果。下面的示例代码是将 FutureTask 对象提交给 ThreadPoolExecutor 去执行
+FutureTask 也支持获取任务结果，任务的取消
  
 // 创建FutureTask
 FutureTask<Integer> futureTask = new FutureTask<>(()-> 1+2);
@@ -221,7 +222,7 @@ for (int i=0; i<3; i++) {
 }  
 
 
-aroll
+aroll   //todo
 建议并发编程课程中的Demo代码，尽量少使用System.out.println, 因为其实现有使用隐式锁，一些情况还会有锁粗化产生
 作者回复: 好建议
 

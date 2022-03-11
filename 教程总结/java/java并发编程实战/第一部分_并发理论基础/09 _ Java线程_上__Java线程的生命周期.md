@@ -62,10 +62,11 @@ JVM 层面并不关心操作系统调度相关的状态，因为在 JVM 看来�
 第二种场景，调用无参数的 Thread.join() 方法。其中的 join() 是一种线程同步方法，例如有一个线程对象 thread A，当调用 A.join() 的时候，
    执行这条语句的线程会等待 thread A 执行完，而等待中的这个线程，其状态会从 RUNNABLE 转换到 WAITING。当线程 thread A 执行完，
    原来等待它的线程又会从 WAITING 状态转换到 RUNNABLE。
+   调用线程不会释放已经持有的对象锁 
 第三种场景，调用 LockSupport.park() 方法。其中的 LockSupport 对象，也许你有点陌生，其实 Java 并发包中的锁，都是基于它实现的。
   调用 LockSupport.park() 方法，当前线程会阻塞，线程的状态会从 RUNNABLE 转换到 WAITING。调用 LockSupport.unpark(Thread thread) 
   可唤醒目标线程，目标线程的状态又会从 WAITING 状态转换到 RUNNABLE。 
-  
+  todo LockSupport相关的
   
 3. RUNNABLE 与 TIMED_WAITING 的状态转换
 有五种场景会触发这种转换：
@@ -140,6 +141,10 @@ stop() 方法会真的杀死线程，不给线程喘息的机会，如果线程�
 上面这两种情况属于被中断的线程通过异常的方式获得了通知。还有一种是主动检测，如果线程处于 RUNNABLE 状态，并且没有阻塞在某个 I/O 操作上，
 例如中断计算圆周率的线程 A，这时就得依赖线程 A 主动检测中断状态了。如果其他线程调用线程 A 的 interrupt() 方法，
 那么线程 A 可以通过 isInterrupted() 方法，检测是不是自己被中断了。
+
+Thread.yield
+yield  动词：屈服;出产(作物);产生(收益、效益等);提供;让步;放弃;缴出;（受压）活动，变形，弯曲，折断;给（大路上的车辆）让路  名词：产量;产出;利润
+让掉当前线程 CPU 的时间片，使正在运行中的线程重新变成就绪状态，并重新竞争 CPU 的调度权。它可能会获取到，也有可能被其他线程获取到
 
 
 总结

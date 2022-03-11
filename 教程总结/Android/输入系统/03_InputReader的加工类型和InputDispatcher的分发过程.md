@@ -48,7 +48,7 @@ struct NotifyKeyArgs : public NotifyArgs {
 输入系统_NotifyArgs体系.png
 
 NotifyArgs有三个子类，分别是NotifyKeyArgs、NotifyMotionArgs和NotifySwichArgs，这说明InputReader对原始输入事件加工后，
-最终会得出三种事件类型，分别是key事件、Motion事件和Swich事件，这些事件会交由InputDispatcher来进行分发，如下图所示。
+最终会得出三种事件类型，分别是key事件、Motion事件和Switch事件，这些事件会交由InputDispatcher来进行分发，如下图所示。
 InputDispatcher对NotifyArgs的分发.png
 
 
@@ -153,7 +153,6 @@ void InputDispatcher::dispatchOnce() {
     mLooper->pollOnce(timeoutMillis);
 }
 ```
-//todo pollOnce
 注释1处用于检查InputDispatcher的缓存队列中是否有等待处理的命令，如果没有就会执行注释2处的dispatchOnceInnerLocked函数，
   用来将输入事件分发给合适的。
 注释3处获取当前的时间，结合注释4处，得出InputDispatcherThread需要睡眠的时间为timeoutMillis。
@@ -234,6 +233,42 @@ void InputDispatcher::dispatchOnceInnerLocked(nsecs_t* nextWakeupTime) {
         //使得InputDispatcher能够快速处理下一个分发事件
         *nextWakeupTime = LONG_LONG_MIN;//7
 }
+```
+dropInboundEventLocked 事件丢弃的原因
+```
+void InputDispatcher::dropInboundEventLocked(EventEntry* entry, DropReason dropReason) {
+    const char* reason;
+    switch (dropReason) {
+    case DROP_REASON_POLICY:
+#if DEBUG_INBOUND_EVENT_DETAILS
+        ALOGD("Dropped event because policy consumed it.");
+#endif
+        reason = "inbound event was dropped because the policy consumed it";
+        break;
+    case DROP_REASON_DISABLED:
+        if (mLastDropReason != DROP_REASON_DISABLED) {
+            ALOGI("Dropped event because input dispatch is disabled.");
+        }
+        reason = "inbound event was dropped because input dispatch is disabled";
+        break;
+    case DROP_REASON_APP_SWITCH:
+        ALOGI("Dropped event because of pending overdue app switch.");
+        reason = "inbound event was dropped because of pending overdue app switch";
+        break;
+    case DROP_REASON_BLOCKED:
+        ALOGI("Dropped event because the current application is not responding and the user "
+                "has started interacting with a different application.");
+        reason = "inbound event was dropped because the current application is not responding "
+                "and the user has started interacting with a different application";
+        break;
+    case DROP_REASON_STALE:
+        ALOGI("Dropped event because it is stale.");
+        reason = "inbound event was dropped because it is stale";
+        break;
+    default:
+        ALOG_ASSERT(false);
+        return;
+    }
 ```
 
 InputDispatcher的dispatchOnceInnerLocked函数的代码比较长，这里截取了和Motion事件的分发相关的主要源码。主要做了以下几件事。

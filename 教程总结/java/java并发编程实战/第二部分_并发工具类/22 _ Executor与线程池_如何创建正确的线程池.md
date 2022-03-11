@@ -218,3 +218,56 @@ static class DIYThreadFactory implements ThreadFactory {
 ExecutorService executor = Executors.newFixedThreadPool(4,new DIYThreadFactory("xxx"));
 
 自己 DefaultThreadFactory 在Executors中
+
+
+
+
+自定义线程池 来自Executors注释
+直接运行
+```
+class DirectExecutor implements Executor {
+   public void execute(Runnable r) {
+     r.run();
+   }
+ }
+```
+每个任务一个线程
+```
+class ThreadPerTaskExecutor implements Executor {
+   public void execute(Runnable r) {
+     new Thread(r).start();
+   }
+ }
+```
+并行转串行   多发转顺序   通过队列和另一个并发的Executor   SerialExecutor负责顺序入队和出队
+```
+class SerialExecutor implements Executor {
+   final Queue<Runnable> tasks = new ArrayDeque<>();
+   final Executor executor;
+   Runnable active;
+
+   SerialExecutor(Executor executor) {
+     this.executor = executor;
+   }
+   public synchronized void execute(final Runnable r) {
+     tasks.add(new Runnable() {
+       public void run() {
+         try {
+           r.run();
+         } finally {
+           scheduleNext();
+         }
+       }
+     });
+     if (active == null) {
+       scheduleNext();
+     }
+   }
+
+   protected synchronized void scheduleNext() {
+     if ((active = tasks.poll()) != null) {
+       executor.execute(active);
+     }
+   }
+ }
+```

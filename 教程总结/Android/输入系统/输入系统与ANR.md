@@ -1,6 +1,6 @@
 Android 8.1  深入理解Android 卷三
 
-//todo 5.3.1查找窗口的流程
+//todo 5.3.1查找窗口的流程   这是派发到目标窗口 还是寻找焦点窗口？？
 目标窗口查找时，作为派发目标的窗口必须已经准备好接收新的输入事件，否则判定窗口处于未响应状态，终止事件的派发过程，并在一段
 时间后重试。倘若5S后窗口仍然未准备好接收输入事件，将导致ANR。直接引发ANR的原因有很多，例如Activity生命周期函数调用超时，
 服务启动超时，输入事件处理超时等
@@ -27,8 +27,26 @@ int32_t InputDispatcher::findFocusedWindowTargetsLocked(nsecs_t currentTime,
  String8 InputDispatcher::checkWindowReadyForMoreInputLocked(nsecs_t currentTime,
            const sp<InputWindowHandle>& windowHandle, const EventEntry* eventEntry,
            const char* targetType) {
-  ssize_t connectionIndex = getConnectionIndexLocked(windowHandle->getInputChannel());
-  sp<Connection> connection = mConnectionsByFd.valueAt(connectionIndex);
+    // If the window is paused then keep waiting.
+    if (windowHandle->getInfo()->paused) {
+        return String8::format("Waiting because the %s window is paused.", targetType);
+    }
+
+    // If the window's connection is not registered then keep waiting.
+    ssize_t connectionIndex = getConnectionIndexLocked(windowHandle->getInputChannel());
+    if (connectionIndex < 0) {
+        return String8::format("Waiting because the %s window's input channel is not "
+                "registered with the input dispatcher.  The window may be in the process "
+                "of being removed.", targetType);
+    }
+
+    // If the connection is dead then keep waiting.
+    sp<Connection> connection = mConnectionsByFd.valueAt(connectionIndex);
+    if (connection->status != Connection::STATUS_NORMAL) {
+        return String8::format("Waiting because the %s window's input connection is %s."
+                "The window may be in the process of being removed.", targetType,
+                connection->getStatusLabel());
+    }
   // 共通原因 inputPublisher被阻塞
   if (connection->inputPublisherBlocked) {
             return String8::format("Waiting because the %s window's input channel is full.  "

@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import androidx.annotation.Nullable;

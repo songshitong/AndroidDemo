@@ -85,8 +85,8 @@ onStartCommand()和onStart()也执行了三次,关键是onHandleIntent()也执�
 
 //todo 多次调用startService service的onCreate只执行了一次  为什么是这样
 //任务是耗时的，连续启动三次service,执行了三次onStart,handler的MessageQueue存在三条消息，(任务的耗时要超过service的创建耗时)
-//onHandleIntent执行了三次，由于任务的耗时是一样的，执行完service就Destroy了
-//todo 如果任务的时间不一样，会不会有的没有执行完就退出了
+//onHandleIntent执行了三次
+//todo 如果任务的时间不一样  stopSelf(msg.arg1);应该执行了三次，为什么onDestroy执行了一次
 
 
 
@@ -122,6 +122,7 @@ public void onCreate() {
 @Override
 public void onStart(@Nullable Intent intent, int startId) {
     Message msg = mServiceHandler.obtainMessage();
+    //传递参数 startId用于关闭服务，Intent接收启动参数并回调给onHandleIntent
     msg.arg1 = startId;
     msg.obj = intent;
     mServiceHandler.sendMessage(msg);

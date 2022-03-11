@@ -9,7 +9,7 @@ import com.example.androiddemo.IMyBinder
 
 //didl 原理，传参   官方文档关于binder和message接口的区别
 //为什么aidl复杂，涉及到进程间通信，序列化
-//Android的IPC机制  进程间通信总结，线程间通信总结
+//Android的IPC机制  进程间通信总结
 
 //todo 崩溃课后进程号是否改变，Androidstudio拿不到以前日志，只有全局过滤？？？
 class AidlService : Service() {

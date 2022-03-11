@@ -34,9 +34,6 @@ TLS1.3 的 0RTT 握手  第二次握手才可以完成，使用上一次的缓�
 
 
 
-
-
-
 一步
 
 TLS1.3的 0RTT, 和 session 都需要服务器端为每个连接缓存一些信息，当连接数量级非常大的时候，需要消耗的服务端资源就非常多了
@@ -49,7 +46,8 @@ TLS1.3的 0RTT, 和 session 都需要服务器端为每个连接缓存一些信�
 session tiket 没听明白，服务端和客户端如何得到对称密钥？使用什么解密的？谢谢
 作者回复: 1、首次握手正常生成对称密钥，server将其放入ticket中，加密后发给client，client解密后保存。
 2、后续握手时，client将加密ticket发给server，server解密后获得对称密钥。此时双方都有对称密钥，可以通讯。
-3、为防止client恶意修改ticket信息，实际server还有一个加密hash，防止client延长ticket超时时间。具体参见https://tools.ietf.org/html/rfc5077第4部分。
+3、为防止client恶意修改ticket信息，实际server还有一个加密hash，防止client延长ticket超时时间。
+具体参见https://tools.ietf.org/html/rfc5077第4部分。
 
 
 ray

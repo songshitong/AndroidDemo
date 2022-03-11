@@ -5,25 +5,26 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.os.*
 import android.provider.Settings
 import android.util.Log
-import android.util.Xml
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.util.ObjectsCompat
 import com.blankj.utilcode.util.UriUtils
 import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.Animation.LayoutAnimationActivity
 import sst.example.androiddemo.feature.Animation.dynamicanimation.DynamicAnimaitonActivity
+import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
 import sst.example.androiddemo.feature.activity.launchmode.LaunchActivity
+import sst.example.androiddemo.feature.activity.scrollNested.ScrollNestedActivity
+import sst.example.androiddemo.feature.activity.testAnr.TestAnrActivity
 import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
@@ -31,14 +32,14 @@ import sst.example.androiddemo.feature.util.MyUtils
 import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
+import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
+import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
 import java.io.File
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
-import java.util.concurrent.ForkJoinPool
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class  MainActivity : AppCompatActivity()  {
-
 
     private val TAG ="MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -189,7 +190,6 @@ class  MainActivity : AppCompatActivity()  {
 
 
 
-
 //      系统铃声 RingtoneManager  https://blog.csdn.net/ch853199769/article/details/78721003
         ringtone.setOnClickListener {
             val player: MediaPlayer = MediaPlayer.create(
@@ -315,15 +315,11 @@ class  MainActivity : AppCompatActivity()  {
 
 
 //       todo  isFinishing()的含义 与调用时机，查看阿里规范
-        //todo ps grep liunx命令查看进程，Android适用
 
         //todo 阿里规范 shareprefrence不适合进程通信，查看原理   支持进程通信的sp https://github.com/grandcentrix/tray
 
-        //imagecache 阿里规范  https://blog.csdn.net/xiaanming/article/details/41084843
 
-        //todo System.out.println 为什么不能用
 
-        //intentservice能接收几个intent
 
         //方法论  结构化编程的经验显示，改进代码的一种主要方法即为将其分解为更小的片段
 
@@ -336,9 +332,37 @@ class  MainActivity : AppCompatActivity()  {
         //方法的注释带例子，json,表结构，HTML实例等
 
         //自定义相册 content provider 或其他？
+        testAnrActivity.setOnClickListener {
+            startActivity(Intent(this,TestAnrActivity::class.java))
+        }
+        measureTestActivity.setOnClickListener {
+            startActivity(Intent(this, MeasureTestActivity::class.java))
+        }
+        customLMActivity.setOnClickListener {
+            startActivity(Intent(this,RVCutsomLayoutManagerActivity::class.java))
+        }
+        scrollNestedActivity.setOnClickListener {
+            startActivity(Intent(this,
+                ScrollNestedActivity::class.java))
+        }
 
+        toastBugActivity.setOnClickListener {
+            startActivity(Intent(this,
+                ToastBugActivity::class.java))
+        }
+
+        bigPictureActivity.setOnClickListener {
+            startActivity(Intent(this,
+                BigPictureActivity::class.java))
+        }
+
+        IntentServiceActivity.setOnClickListener {
+            startActivity(Intent(this,
+                IntentServiceActivity::class.java))
+        }
 
     }
+
 
 //    /**
 //     * A native method that is implemented by the 'native-lib' native library,
@@ -402,7 +426,7 @@ class  MainActivity : AppCompatActivity()  {
     //todo Android字体，苹果字体，字体压缩
 
 
-    //todo 游戏排行榜  1000个只有7个渲染，滚动7个，只是数据在滚动，实际的渲染并没有增加
+    //todo 游戏排行榜  1000个只有7个渲染，滚动7个，只是数据在滚动，实际的渲染并没有增加   这不就recyclerview。。。
 
     //todo 混淆  https://developer.android.com/studio/build/shrink-code?hl=zh-cn#usage
     ///release 可能移除有用的代码，需要自定义保留

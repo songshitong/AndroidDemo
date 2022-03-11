@@ -9,26 +9,64 @@ androidx.activity:activity:1.0.0
 androidx.lifecycle:lifecycle-runtime:2.1.0
 androidx.lifecycle:lifecycle-runtime:2.3.1
 
+总结  
+LifecycleRegistry使用WeakReference保存LifecycleOwner，
+LifecycleOwner是有生命周期的，一般是activity,fragment
+ComponentActivity里面存在LifecycleRegistry，ReportFragment通过向activity添加一个空的fragment进行感知生命周期，
+  生命周期改变时通过LifecycleRegistry进行事件分发
+
+
 使用
+```
+new 组件(lifecycle) 组件可以处理自己的生命周期了   组件->lifecycle->WeakReference lifecycleOwner(activity,fragment)
 getLifecycle().addObserver(new LifecycleEventObserver() {
             @Override
             public void onStateChanged(@NonNull @NotNull LifecycleOwner source, @NonNull @NotNull Lifecycle.Event event) {       
             }
         });
+//kotlin        
+lifecycle.addObserver(object : DefaultLifecycleObserver {
+        override fun onCreate(owner: LifecycleOwner) {
+
+        }
+
+        override fun onResume(owner: LifecycleOwner) {
+
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+
+        }
+    })        
+```
+
 
 优点
 context不具备生命周期，使用Lifecycle可以让组件具备生命周期感知的能力，自动销毁   
 简化activity和fragment的生命周期事件的复杂度，组件自己处理
-减少activity泄漏， LifecycleRegistry与activity是弱依赖，发送泄漏的一般是当前组件了
+减少activity泄漏， LifecycleRegistry与activity是弱依赖，发生泄漏的一般是当前组件了  
+
+Lifecycle 是 Jetpack 整个家族体系内最为基础的组件之一，正是因为有了 Lifecycle 的存在，使得如今开发者搭建依赖于生命周期变化的业务逻辑变得简单高效了许多，
+使得我们可以用一种统一的方式来监听 Activity、Fragment、Service、甚至是 Process 的生命周期变化，且大大减少了业务代码发生内存泄漏和 NPE 的风险
+
 
 原理
-getLifecycle 返回的是LifecycleRegistry
+getLifecycle 返回的是Lifecycle，实际是LifecycleRegistry
+```
+public abstract class Lifecycle {
+    AtomicReference<Object> mInternalScopeRef = new AtomicReference<>();
+    public abstract void addObserver(@NonNull LifecycleObserver observer);
+    public abstract void removeObserver(@NonNull LifecycleObserver observer);
+    public abstract State getCurrentState();
+    }
+```
 
 activity中初始化LifecycleRegistry
 ComponentActivity{
  LifecycleRegistry mLifecycleRegistry = new LifecycleRegistry(this)
  
  onCreate(){
+    //生命周期感知
    ReportFragment.injectIfNeededIn(this);
  }
 }
@@ -39,7 +77,7 @@ public interface LifecycleOwner {
 } 
 
 
-LifecycleRegistry{
+LifecycleRegistry extends Lifecycle{
  ///注册具备Android生命周期的类，弱引用持有，减少泄漏
  WeakReference<LifecycleOwner> mLifecycleOwner;
  ///初始化时 注册LifecycleOwner
@@ -47,7 +85,7 @@ LifecycleRegistry{
          mLifecycleOwner = new WeakReference<>(provider);
      }
      
- ///生命周期观察者类
+ ///生命周期观察者类  todo FastSafeIterableMap
  FastSafeIterableMap<LifecycleObserver, ObserverWithState> mObserverMap  
  public void addObserver(@NonNull LifecycleObserver observer) {
       ...
@@ -102,7 +140,7 @@ ReportFragment{
         
         
 LifecycleRegistry的内部类  将LifecycleObserver转为LifecycleEventObserver  dispatchEvent进行事件触发
-'''    
+```
 static class ObserverWithState {
         State mState;
         LifecycleEventObserver mLifecycleObserver;
@@ -119,4 +157,4 @@ static class ObserverWithState {
             mState = newState;
         }
     }
-'''            
+```         

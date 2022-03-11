@@ -14,7 +14,7 @@ SurfaceFlinger 用来管理消费当前可见的 Surface, 所有被渲染的可�
 WindowManager 提供的信息合成(使用 OpenGL 和 HardWare Composer)提交到屏幕的后缓冲区，
 等待屏幕的下一个 Vsync 信号到来，再显示到屏幕上。SufaceFlinger 通过屏幕后缓冲区与屏幕建立联系，
 同时通过 Surface 与上层建立联系，起到了一个承上启下的作用
-//todo layer相关是啥 这个注释的流程呢
+// layer向上对应surface   Surface之创建流程及软硬件绘制.md createSurface
 
 
 启动
@@ -833,7 +833,7 @@ void MessageQueue::waitMessage() {
 ```
 可以看到 SurfaceFlinger 主线程通过死循环执行 MessageQueue.waitMessage 方法等待消息的到来，
 其内部调用的便是上面看过的 Looper.pollOnce 方法。
-//todo looper的使用
+//todo looper的使用  flushCommands
 
 
 
@@ -1045,7 +1045,7 @@ SF.handleMessageInvalidate
 bool SurfaceFlinger::handleMessageInvalidate() {
     ATRACE_CALL();
     // Store the set of layers that need updates -- mLayersWithQueuedFrames.
-    // 存储需要更新的 layers
+    // 存储需要更新的 layers   //todo 完善后面具体的layer处理
     return handlePageFlip();
 }
 
@@ -1056,7 +1056,7 @@ SF.handleMessageRefresh
 ```
 void SurfaceFlinger::handleMessageRefresh() {
     nsecs_t refreshStartTime = systemTime(SYSTEM_TIME_MONOTONIC);
-    // 如果图层有更新则执行 invalidate 过程
+    // 如果图层有更新则执行 invalidate 过程，请求下一次Vsync信号
     preComposition(refreshStartTime);
     // 重建每个显示屏的所有可见的 Layer 列表
     rebuildLayerStacks();
@@ -1070,19 +1070,68 @@ void SurfaceFlinger::handleMessageRefresh() {
     mLayersWithQueuedFrames.clear();
 }
 
+void SurfaceFlinger::preComposition(nsecs_t refreshStartTime)
+{
+    bool needExtraInvalidate = false;
+    mDrawingState.traverseInZOrder([&](Layer* layer) {
+        if (layer->onPreComposition(refreshStartTime)) {
+            needExtraInvalidate = true;
+        }
+    });
+
+    if (needExtraInvalidate) {
+        signalLayerUpdate();
+    }
+}
+
+void SurfaceFlinger::doComposition() {
+    const bool repaintEverything = android_atomic_and(0, &mRepaintEverything);
+    for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++) {
+        const sp<DisplayDevice>& hw(mDisplays[dpy]);
+        if (hw->isDisplayOn()) {
+            // transform the dirty region into this screen's coordinate space
+            const Region dirtyRegion(hw->getDirtyRegion(repaintEverything));
+
+            // repaint the framebuffer (if needed)
+            doDisplayComposition(hw, dirtyRegion);
+
+            hw->dirtyRegion.clear();
+            hw->flip();
+        }
+    }
+    postFramebuffer();
+}
+
+void SurfaceFlinger::postComposition(nsecs_t refreshStartTime)
+{
+   ....
+    mDrawingState.traverseInZOrder([&](Layer* layer) {
+        //layer回调
+        bool frameLatched = layer->onPostComposition(glCompositionDoneFenceTime,
+                presentFenceTime, compositorTiming);
+        if (frameLatched) {
+            recordBufferingStats(layer->getName().string(),
+                    layer->getOccupancyHistory(false));
+        }
+    });
+   ...
+}
 ```
 
 
 
 总结
 在 SurfaceFlinger 的启动流程中：
-
 1 首先会创建 SurfaceFlinger 对象，在构造器中创建了 DispSync 同步模型对象；
 2 然后执行初始化 SurfaceFlinger 的逻辑：
 注册监听，接收 HWC 的相关事件。
-启动 APP 和 SF 的 EventThread 线程，用来管理基于 DispSync 创建的两个 DispSyncSource 延时源对象，分别是用于绘制(app--mEventThreadSource)和合成(SurfaceFlinger--mSfEventThreadSource)。启动了 EventThread 线程后，会一直阻塞在 waitForEventLocked 方法中(期间会根据需要设置监听器)，直到接收到 Vsync 信号且至少有一个连接正在等待 Vsync 信号才会继续执行线程逻辑，即通知监听者；
+启动 APP 和 SF 的 EventThread 线程，用来管理基于 DispSync 创建的两个 DispSyncSource 延时源对象，
+  分别是用于绘制(app--mEventThreadSource)和合成(SurfaceFlinger--mSfEventThreadSource)。启动了 EventThread 线程后，
+  会一直阻塞在 waitForEventLocked 方法中(期间会根据需要设置监听器)，直到接收到 Vsync 信号且至少有一个连接正在等待 Vsync 信号
+  才会继续执行线程逻辑，即通知监听者；
 通过 MessageQueue.setEventThread 方法创建了一个连接，并通过 Looper.addFd 方法监听 BitTube 数据。
-创建 HWComposer 对象(通过 HAL 层的 HWComposer 硬件模块 或 软件模拟产生 Vsync 信号)，现在的 Android 系统基本上都可以看成是通过硬件 HWComposer 产生 Vsync 信号，而不使用软件模拟，所以下面解析都只谈及硬件 HWComposer 的 Vsync 信号；
+创建 HWComposer 对象(通过 HAL 层的 HWComposer 硬件模块 或 软件模拟产生 Vsync 信号)，现在的 Android 系统基本上
+   都可以看成是通过硬件 HWComposer 产生 Vsync 信号，而不使用软件模拟，所以下面解析都只谈及硬件 HWComposer 的 Vsync 信号；
 初始化非虚拟的显示屏；
 启动开机动画服务；
 3 最后执行 SurfaceFlinger.run 逻辑，该方法会在 SurfaceFlinger 主线程通过死循环执行 MessageQueue.waitMessage 
@@ -1090,7 +1139,6 @@ void SurfaceFlinger::handleMessageRefresh() {
 当有数据到来时执行对应的回调方法。
 
 当硬件或软件模拟发出 Vsync 信号时：
-
 回调 SF 相关方法，SF 调用 DispSync 同步模型的方法处理 Vsync 信号(统计和计算模型的偏移和周期)，并根据返回值判断是否使能/关闭 HWC Vsync 信号的发出。
 DispSync 根据计算的偏移和周期计算下次 Vsync 信号发生时间，并通知监听者 Vsync 信号到达的事件，传递给 DispSyncSource 延时源，
    延时源通过 EventThread 来管理 Vsync 信号的收发。

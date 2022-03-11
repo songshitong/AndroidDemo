@@ -159,7 +159,19 @@ getSharedPreferences("sp", Context.MODE_MULTI_PROCESS)
 如果要跨进程通信，需要在sp外面包裹一层ContentProvider，当然用mmkv性能上更佳。
 比如使用文件锁，保证每次只有一个进程在访问这个文件；或者对于Android开发而言，ContentProvider作为官方倡导的跨进程组件，
   其它进程通过定制的ContentProvider用于访问SharedPreferences，同样可以保证SharedPreferences的进程安全，等等。
-//todo 文件锁
+文件锁的使用
+```
+try {
+            FileInputStream fis = new FileInputStream("");
+            //通过FileChannel获取FileLock
+            FileLock fl = fis.getChannel().tryLock();
+            fl.release();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+```
 
 
 

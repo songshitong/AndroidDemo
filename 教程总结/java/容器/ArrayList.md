@@ -1,6 +1,23 @@
 jdk 1.8  android sdk 30(与Java open jdk部分代码不同)  
 https://juejin.cn/post/6930632285301669895#heading-1
 
+
+ArrayList总结
+1. ArrayList默认大小为0,最好初始化时设置初始大小，防止后续的多次扩容和空间浪费
+2. 获取元素，通过坐标值来获取元素，无需从头遍历
+3. 添加元素，先进行是否扩容判断，扩容操作会创建一个新的符合大小的数组，并将原数组中的数据迁移到新数组中，然后让 elementData 指向新数组
+   如果直接向集合尾端添加数据，那么直接在该位置进行赋值
+   如果向集合的中间位置 index 插入数据，则需要将数组中索引 index 后的所有数据向后推移一位，然后将数据插入到空出的位置上
+
+   扩容相关： 添加元素数量超过数组容器大小开始扩容，扩容后的大小不能小于10，扩容倍数按1.5计算
+   扩容会构建出一个新的符合大小的数组后，就将原数组中的元素复制到新数组中，元素移动使用System.arraycopy
+
+4. 删除元素
+   删除包含两步
+   1 移动元素 将index后面的元素向前移动一位，最后一位是重复的的
+   2 将数组最后元素置为null，数组大小-1
+   
+
 ArrayList 应该是大多数开发者使用得最为频繁的集合容器了，ArrayList 实现了 List 接口，是一个有序容器，即元素的存放顺序
 与添加顺序保持一致，允许添加相同元素，包括 null 。ArrayList 底层通过数组来进行数据存储，当向 ArrayList 中添加元素时
 如果发现数组空间不足，ArrayList 会自动对底层数组进行扩容并迁移现有数据
@@ -151,8 +168,8 @@ ArrayList 添加元素的操作就不是那么理想了。如果是直接向集�
 移除元素
 因为数组是一种内存地址连续的数据结构，所以移除某个元素同样可能导致大量元素移动
 删除包含两步
-1 移动元素
-2 将数组对应index元素置为null，数组大小-1
+1 移动元素 将index后面的元素向前移动一位，最后一位是重复的的
+2 将数组最后元素置为null，数组大小-1
 ```
     //移除指定索引处的元素值，并返回该值
     public E remove(int index) {
@@ -251,8 +268,18 @@ Capacity   [kəˈpæsəti] n.容量;容积;容纳能力;领悟(或理解、办�
             newCapacity = hugeCapacity(minCapacity);
         elementData = Arrays.copyOf(elementData, newCapacity);
     }
+  private static int hugeCapacity(int minCapacity) {
+        if (minCapacity < 0) // overflow
+            throw new OutOfMemoryError();
+        return (minCapacity > MAX_ARRAY_SIZE) ?
+            Integer.MAX_VALUE :
+            MAX_ARRAY_SIZE;
+    }    
 ```
 //todo 位运算
+
+
+
 扩容测试
 ```
     public static void main(String[] args) {

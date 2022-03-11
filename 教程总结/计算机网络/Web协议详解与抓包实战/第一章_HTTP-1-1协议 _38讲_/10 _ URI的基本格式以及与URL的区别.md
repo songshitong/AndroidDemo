@@ -51,6 +51,7 @@ Uniform Resource Identifier 统一资源标识符
   hierarchical part{authority,path}
   例子：
   https://tools.ietf.org/html/rfc7231?test=1#page-7
+  Username, password and port are optional 是可选的  host是必选的
   
   
   
@@ -86,6 +87,17 @@ URI 格式（一） abnf的定义
 
 示例：https://tools.ietf.org/html/rfc7231?test=1#page-7  
 
+
+fragment   https://www.jianshu.com/p/2c07fbb52b45
+主要资源是由 URI 进行标识，URI 中的 fragment 用来标识次级资源。我理解看来，fragment 主要是用来标识 URI 所标识资源里的某个资源。
+在 URI 的末尾通过 hash mark（#）作为 fragment 的开头，其中 # 不属于 fragment 的值。
+https://domain/index#L18
+这个 URI 中 L18 就是 fragment 的值。这有哪些特殊的地方呢？
+# 有别于 ?，? 后面的查询字符串会被网络请求带上服务器，而 fragment 不会被发送的服务器；
+fragment 的改变不会触发浏览器刷新页面，但是会生成浏览历史；
+fragment 会被浏览器根据文件媒体类型（MIME type）进行对应的处理；
+Google 的搜索引擎会忽略 # 及其后面的字符串。
+//todo fragment的应用
 
 
 

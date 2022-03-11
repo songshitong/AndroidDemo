@@ -1,3 +1,18 @@
+https://juejin.cn/post/6931007634028003341#heading-19
+
+总结
+HashSet
+HashSet 实现了 Set 接口，不允许插入重复的元素，允许包含 null 元素，且不保证元素的迭代顺序
+HashSet内部通过HashMap实现元素不重复，HashMap的key是不能重复的，向 HashSet 添加的值都会被包装为一个键值对保存到 HashMap 中，
+key 即外部传入的值，value 则由 HashSet 来提供一个常量，当添加重复元素时，key与value会覆盖旧值
+```
+private static final Object PRESENT = new Object();
+```
+
+LinkedHashSet
+LinkedHashSet是HashSet的子类，构造器执行父类HashSet的逻辑，此时的Map是LinkedHashMap  即实现了元素不可以重复，有记录了添加顺序
+
+
 HashSet 实现了 Set 接口，不允许插入重复的元素，允许包含 null 元素，且不保证元素的迭代顺序，源码十分简单，去掉注释后不到两百行，
 因为其底层也是通过 HashMap 来实现的，看了上面关于 HashMap 源码的解析后再来看 HashSet 就会有一种“不过如此”的感觉了
 我们知道，当向 HashMap 中插入一个存在相同 key 的键值对时，HashMap 中旧 key 不会被改动到，但旧 value 可能会被新 value 所覆盖，

@@ -120,3 +120,41 @@ IdleHandler就是当消息队列里面没有当前要处理的消息了，需要
  其原因就在于onDraw方法中执行invalidate，会添加一个同步屏障消息，在等到异步消息之前，会阻塞在next方法，
  而等到FrameDisplayEventReceiver异步任务之后又会执行onDraw方法，从而无限循环。
 //todo https://mp.weixin.qq.com/s/dh_71i8J5ShpgxgWN5SPEw
+
+IdleHandler具有一定的不可控特性,例如UI线程的任务一直不执行完
+
+IdleHandler的任务队列
+https://mp.weixin.qq.com/s/pXabtyyg9JhbQY1ZA7Mu6w
+```
+public class DelayInitDispatcher {
+
+    private Queue<Task> mDelayTasks = new LinkedList<>();
+
+    private MessageQueue.IdleHandler mIdleHandler = new MessageQueue.IdleHandler() {
+        @Override
+        public boolean queueIdle() {
+            if(mDelayTasks.size()>0){
+                Task task = mDelayTasks.poll();
+                new DispatchRunnable(task).run();
+            }
+            //返回true时会继续监听，返回false结束监听
+            return !mDelayTasks.isEmpty();
+        }
+    };
+
+    public DelayInitDispatcher addTask(Task task){
+        mDelayTasks.add(task);
+        return this;
+    }
+
+    public void start(){
+        Looper.myQueue().addIdleHandler(mIdleHandler);
+    }
+
+}
+//调用
+DelayInitDispatcher delayInitDispatcher = new DelayInitDispatcher();
+delayInitDispatcher.addTask(new DelayInitTaskA())
+        .addTask(new DelayInitTaskB())
+        .start();
+```

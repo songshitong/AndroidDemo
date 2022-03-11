@@ -21,7 +21,7 @@ UDP没有拥塞控制，因此网络出现拥塞不会使源主机的发送速�
 4、每一条TCP连接只能是点到点的;UDP支持一对一，一对多，多对一和多对多的交互通信
 5、TCP首部开销20字节;UDP的首部开销小，只有8个字节
 6、TCP的逻辑通信信道是全双工的可靠信道，UDP则是不可靠信道
-udp没有分片，很容易造成IP的MTU分片
+7.udp没有分片，很容易造成IP的MTU分片
 
 
 如何看待TCP面向字节，udp面向报文    https://www.nowcoder.com/questionTerminal/b44462e37ee74efc8cdbaf52aed7692b

@@ -4,9 +4,23 @@ ActivityThread启动Activity的过程
 通过前篇的介绍，我们知道目前的代码逻辑运行在应用程序进程中。先来查看ActivityThread启动Activity的过程的时序图。
 
 我们接着来查看ApplicationThread的scheduleLaunchActivity方法，其中ApplicationThread是ActivityThread的内部类，
-应用程序进程创建后会运行代表主线程的实例ActivityThread，它管理着当前应用程序进程的线程。ApplicationThread的scheduleLaunchActivity方法如下所示。
-
+应用程序进程创建后会运行代表主线程的实例ActivityThread，它管理着当前应用程序进程的线程。
 frameworks/base/core/java/android/app/ActivityThread.java
+```
+public final class ActivityThread {
+  //H extends Handler
+  final H mH = new H();
+  //sMainThreadHandler最终赋值为mH，内部使用mH，对外暴露sMainThreadHandler
+  static volatile Handler sMainThreadHandler;
+  //IApplicationThread定义的是binder接口，用于进程通信   public interface IApplicationThread extends android.os.IInterface
+  private class ApplicationThread extends IApplicationThread.Stub{}
+}
+
+```
+
+ApplicationThread的scheduleLaunchActivity方法如下所示。
+
+
 ```
 @Override
 public final void scheduleLaunchActivity(Intent intent, IBinder token, int ident,
@@ -204,7 +218,7 @@ final void performCreate(Bundle icicle, PersistableBundle persistentState) {
 performCreate方法中会调用Activity的onCreate方法，讲到这里，根Activity就启动了，即应用程序就启动了。
 根Activity启动过程就讲到这里，下面我们来学习根Activity启动过程中涉及到的进程。
 
-根Activity启动过程中涉及的进程  //todo systemserver getservice
+根Activity启动过程中涉及的进程  
 在应用程序进程没有创建的情况下，根Activity启动过程中会涉及到4个进程，分别是Zygote进程、Launcher进程、AMS所在进程（SyetemServer进程）、
 应用程序进程。它们之间的关系如下图所示。
 根Activity启动过程中涉及的进程.png
@@ -217,7 +231,7 @@ performCreate方法中会调用Activity的onCreate方法，讲到这里，根Act
 
 根Activity启动过程中涉及的进程时序图.png
 
-如果是普通Activity启动过程会涉及到几个进程呢？答案是两个，AMS所在进程和应用程序进程。实际上理解了根Activity的启动过程（根Activity的onCreate过程），
+如果是普通Activity启动过程会涉及到几个进程呢？答案是两个，AMS所在进程和应用程序进程。 实际上理解了根Activity的启动过程（根Activity的onCreate过程），
 根Activity和普通Activity其他生命周期状态比如onStart、onResume等过程也会很轻松的掌握，这些知识点都是触类旁通的，
 想要具体了解这些知识点的同学可以自行阅读源码
 //todo 普通启动的流程

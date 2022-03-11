@@ -1,5 +1,19 @@
 android sdk 30   jdk1.8    
 https://juejin.cn/post/6930632285301669895#heading-1
+
+总结
+LinkedList 内部通过双向链表的数据结构来实现的
+不需要去请求一片连续的内存空间来存储数据，而是在每次有新的元素需要添加时再来动态请求内存空间，没有扩容
+
+元素访问
+对于双向链表可以先判断元素靠近头节点还尾节点，从而决定从头遍历还是从尾遍历
+
+LinkedList与ArrayList对比
+ArrayList 适合频繁访问，少量增删的
+LinkedList适合频繁增删的，少量访问的
+
+
+
 类声明
 从 LinkedList 实现的几个接口可以看出来，LinkedList 是支持快速访问，可克隆，可序列化的，而且可以将之看成一个支持有序访问的队列或者栈
 ```
@@ -308,7 +322,7 @@ remove() 方法有两种重载形式，其内部都是通过调用 unlink(Node<E
 ```
 
 
-原文链接：https://blog.csdn.net/devnn/article/details/82716447
+原文链接：https://blog.csdn.net/devnn/article/details/82716447    todo容器接口单独放
 Deque是一个双端队列接口，继承自Queue接口，Deque的实现类是LinkedList、ArrayDeque、LinkedBlockingDeque，
 其中LinkedList是最常用的
 Deque有三种用途：

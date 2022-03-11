@@ -52,7 +52,7 @@ void doTraversal() {
 保证 VSync 信号到来后立即执行绘制，而不是要等前面的同步消息。调用 mChoreographer.postCallback() 方法发送了一个会在下一帧执行的回调，
 即在下一个 VSync 信号到来时会执行TraversalRunnable-->doTraversal()-->performTraversals()-->绘制流程。
 同步屏障可以参考 Android消息机制。
-//todo https://link.juejin.cn/?target=https%3A%2F%2Fljd1996.github.io%2F2020%2F01%2F06%2FAndroid%25E6%25B6%2588%25E6%2581%25AF%25E6%259C%25BA%25E5%2588%25B6%2F%23postSyncBarrier
+// https://link.juejin.cn/?target=https%3A%2F%2Fljd1996.github.io%2F2020%2F01%2F06%2FAndroid%25E6%25B6%2588%25E6%2581%25AF%25E6%259C%25BA%25E5%2588%25B6%2F%23postSyncBarrier
 
 
 Choreographer实例化
@@ -217,9 +217,16 @@ mLooper->addFd(mReceiver.getFd(), 0, Looper::EVENT_INPUT, this, NULL) 用来监�
 mChoreographer.postCallback(Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, null)，
 它的调用链是: Choreographer.postCallback -> Choreographer.postCallbackDelayedInternal -> 
 Choreographer.scheduleFrameLocked -> Choreographer.scheduleVsyncLocked 方法，
-节省篇幅，具体代码不贴出了：
-需要关注的
 ```
+//RootViewImpl传入的token为null
+public void postCallback(int callbackType, Runnable action, Object token) {
+        postCallbackDelayed(callbackType, action, token, 0);
+    }
+public void postCallbackDelayed(int callbackType,
+        Runnable action, Object token, long delayMillis) {
+    postCallbackDelayedInternal(callbackType, action, token, delayMillis);
+}    
+    
 /frameworks/base/core/java/android/view/Choreographer.java
 private void postCallbackDelayedInternal(int callbackType, Object action, Object token, long delayMillis) {
     synchronized (mLock) {
@@ -228,9 +235,68 @@ private void postCallbackDelayedInternal(int callbackType, Object action, Object
         // 对应类型的 CallbackQueue 添加 Callback
         mCallbackQueues[callbackType].addCallbackLocked(dueTime, action, token);
         // ...
+        
+        if (dueTime <= now) {
+                //立即执行
+                scheduleFrameLocked(now);
+            } else {
+                //延迟运行，最终也会走到scheduleFrameLocked()
+                Message msg = mHandler.obtainMessage(MSG_DO_SCHEDULE_CALLBACK, action);
+                msg.arg1 = callbackType;
+                msg.setAsynchronous(true);
+                mHandler.sendMessageAtTime(msg, dueTime);
+            }
     }
 }
-
+```
+如果没有延迟会执行scheduleFrameLocked()方法，有延迟就会使用 mHandler发送MSG_DO_SCHEDULE_CALLBACK消息，
+并且注意到 使用msg.setAsynchronous(true)把消息设置成异步，这是因为前面设置了同步屏障，只有异步消息才会执行。
+我们看下mHandler的对这个消息的处理
+```
+ private final class FrameHandler extends Handler {
+         public FrameHandler(Looper looper) {
+             super(looper);
+         }
+         @Override
+         public void handleMessage(Message msg) {
+             switch (msg.what) {
+                 case MSG_DO_FRAME:
+                     // 执行doFrame,即绘制过程
+                    doFrame(System.nanoTime(), 0);
+                    break;
+                case MSG_DO_SCHEDULE_VSYNC:
+                    //申请VSYNC信号，例如当前需要绘制任务时
+                    doScheduleVsync();
+                    break;
+                case MSG_DO_SCHEDULE_CALLBACK:
+                    //需要延迟的任务，最终还是执行上述两个事件
+                    doScheduleCallback(msg.arg1);
+                    break;
+            }
+        }
+    }
+    
+   void doScheduleCallback(int callbackType) {
+         synchronized (mLock) {
+             if (!mFrameScheduled) {
+                 final long now = SystemClock.uptimeMillis();
+                 if (mCallbackQueues[callbackType].hasDueCallbacksLocked(now)) {
+                     scheduleFrameLocked(now);
+                 }
+             }
+         }
+    }    
+```
+延迟运行最终也会走到scheduleFrameLocked()
+如果系统未开启 VSYNC 机制，此时直接发送 MSG_DO_FRAME 消息到 FrameHandler。注意查看上面贴出的 FrameHandler 代码，
+   此时直接执行 doFrame 方法。
+Android 4.1 之后系统默认开启 VSYNC，在 Choreographer 的构造方法会创建一个 FrameDisplayEventReceiver，
+  scheduleVsyncLocked 方法将会通过它申请 VSYNC 信号。
+isRunningOnLooperThreadLocked 方法，其内部根据 Looper 判断是否在原线程，否则发送消息到 FrameHandler。
+  最终还是会调用 scheduleVsyncLocked 方法申请 VSYNC 信号。
+到这里，FrameHandler的作用很明显里了：发送异步消息（因为前面设置了同步屏障）。
+  有延迟的任务发延迟消息、不在原线程的发到原线程、没开启VSYNC的直接走 doFrame 方法取执行绘制。
+```
 private void scheduleVsyncLocked() {
     mDisplayEventReceiver.scheduleVsync();
 }
@@ -244,7 +310,6 @@ public void scheduleVsync() {
         nativeScheduleVsync(mReceiverPtr);
     }
 }
-
 ```
 
 接着就到了 native 层代码：
@@ -381,7 +446,7 @@ private final class FrameDisplayEventReceiver extends DisplayEventReceiver imple
 }
 
 ```
-//todo 为什么会执行run方法
+
 
 Choreographer.doFrame
 于是接收到 Vsync 信号后，又执行回到了 Choreographer:
@@ -431,7 +496,7 @@ void doFrame(long frameTimeNanos, int frame) {
     }
 
     try {
-        // 按类型执行，Choreographer中有四种类型
+        // 按类型执行，Choreographer中有四种类型 Input,animation,traversal,commit
         AnimationUtils.lockAnimationClock(frameTimeNanos / TimeUtils.NANOS_PER_MS);
 
         mFrameInfo.markInputHandlingStart();
@@ -448,8 +513,10 @@ void doFrame(long frameTimeNanos, int frame) {
         AnimationUtils.unlockAnimationClock();
     }
 }
-
 ```
+五种类型任务对应存入对应的CallbackQueue中，每当收到 VSYNC 信号时，Choreographer 将首先处理 INPUT 类型的任务，
+   然后是 ANIMATION 类型，最后才是 TRAVERSAL 类型
+
 
 Choreographer.doCallbacks
 ```
@@ -475,6 +542,7 @@ private static final class CallbackRecord {
 
     public void run(long frameTimeNanos) {
         if (token == FRAME_CALLBACK_TOKEN) {
+           //通过postFrameCallback 或 postFrameCallbackDelayed，会执行这里
             ((FrameCallback)action).doFrame(frameTimeNanos);
         } else { // 直接调用 Runnable 的 run 方法
             ((Runnable)action).run();
@@ -485,6 +553,29 @@ private static final class CallbackRecord {
 ```
 
 于是到这里就可以开始执行真正的绘制操作了。
+mChoreographer.postCallback传的token是null，所以取出action，就是Runnable，执行run()，
+  这里的action就是 ViewRootImpl 发起的绘制任务mTraversalRunnable了，那么这样整个逻辑就闭环了
+
+啥时候 token == FRAME_CALLBACK_TOKEN 呢？答案是Choreographer的postFrameCallback()方法
+```
+public void postFrameCallback(FrameCallback callback) {
+         postFrameCallbackDelayed(callback, 0);
+     }
+ 
+     public void postFrameCallbackDelayed(FrameCallback callback, long delayMillis) {
+         ...
+        //也是走到是postCallbackDelayedInternal，并且注意是CALLBACK_ANIMATION类型，
+        //token是FRAME_CALLBACK_TOKEN，action就是FrameCallback
+        postCallbackDelayedInternal(CALLBACK_ANIMATION,
+                callback, FRAME_CALLBACK_TOKEN, delayMillis);
+    }
+
+    public interface FrameCallback {
+        public void doFrame(long frameTimeNanos);
+    }
+```
+可以看到postFrameCallback()传入的是FrameCallback实例，接口FrameCallback只有一个doFrame()方法。并且也是走到postCallbackDelayedInternal，
+FrameCallback实例作为action传入，token则是FRAME_CALLBACK_TOKEN，并且任务是CALLBACK_ANIMATION类型。
 
 总结
 //todo 这个总结好多没有体现出来
@@ -498,7 +589,26 @@ Choreographer: 使 CPU/GPU 的绘制是在 VSYNC 到来时开始。Choreographer
 造成丢帧主要有两个原因：一是遍历绘制 View 树以及计算屏幕数据超过了16.6ms；二是主线程一直在处理其他耗时消息，
   导致绘制任务迟迟不能开始(同步屏障不能完全解决这个问题)。
 可通过Choreographer.getInstance().postFrameCallback()来监听帧率情况，其用法和原理参考 postFrameCallback用法。
-
+https://mp.weixin.qq.com/s/cg8cpnejCBXNBxKBC7P5iQ
+疑问解答
+1 丢帧(掉帧) ，是说 这一帧延迟显示 还是丢弃不再显示 ？
+答：延迟显示，因为缓存交换的时机只能等下一个VSync了
+2 布局层级较多/主线程耗时 是如何造成 丢帧的呢？
+答：布局层级较多/主线程耗时 会影响CPU/GPU的执行时间，大于16.6ms时只能等下一个VSync了
+3 16.6ms刷新一次 是啥意思？是每16.6ms都走一次 measure/layout/draw ？
+答：屏幕的固定刷新频率是60Hz，即16.6ms。不是每16.6ms都走一次 measure/layout/draw，而是有绘制任务才会走，
+  并且绘制时间间隔是取决于布局复杂度及主线程耗时
+4 measure/layout/draw 走完，界面就立刻刷新了吗?
+答：不是。measure/layout/draw 走完后 会在VSync到来时进行缓存交换和刷新
+5 如果界面没动静止了，还会刷新吗？
+答：屏幕会固定没16.6ms刷新，但CPU/GPU不走绘制流程。
+6 可能你知道VSYNC，这个具体指啥？在屏幕刷新中如何工作的？
+答：当扫描完一个屏幕后，设备需要重新回到第一行以进入下一次的循环，此时会出现的vertical sync pulse（垂直同步脉冲）
+  来保证双缓冲在最佳时间点才进行交换。并且Android4.1后 CPU/GPU的绘制是在VSYNC到来时开始
+7 可能你还听过神秘的Choreographer，这又是干啥的？
+答：用于实现——"CPU/GPU的绘制是在VSYNC到来时开始"
+8 可能你还听过屏幕刷新使用 双缓存、三缓存，这又是啥意思呢？   todo
+答：双缓存是Back buffer、Frame buffer，用于解决画面撕裂。三缓存增加一个Back buffer，用于减少Jank
 
 阅读这篇文章建议先阅读 SurfaceFlinger 启动与工作流程 这篇文章，然后结合 Choreographer 的工作流程，
 可以对 Vsync 信号是怎么协调 App 端的绘制任务以及 SurfaceFlinger 的合成任务有一个比较清晰的认识
@@ -506,3 +616,49 @@ Choreographer: 使 CPU/GPU 的绘制是在 VSYNC 到来时开始。Choreographer
 
 //todo  http://gityuan.com/2017/02/25/choreographer/
 WMS调用scheduleAnimationLocked()方法来设置mFrameScheduled=true来触发动画
+
+
+
+Choreographer的postFrameCallback()通常用来计算丢帧情况，使用方式如下：
+```
+    //Application.java
+         public void onCreate() {
+             super.onCreate();
+             //在Application中使用postFrameCallback
+             Choreographer.getInstance().postFrameCallback(new FPSFrameCallback(System.nanoTime()));
+         }
+
+
+    public class FPSFrameCallback implements Choreographer.FrameCallback {
+
+      private static final String TAG = "FPS_TEST";
+      private long mLastFrameTimeNanos = 0;
+      private long mFrameIntervalNanos;
+
+      public FPSFrameCallback(long lastFrameTimeNanos) {
+          mLastFrameTimeNanos = lastFrameTimeNanos;
+          mFrameIntervalNanos = (long)(1000000000 / 60.0);
+      }
+
+      @Override
+      public void doFrame(long frameTimeNanos) {
+
+          //初始化时间
+          if (mLastFrameTimeNanos == 0) {
+              mLastFrameTimeNanos = frameTimeNanos;
+          }
+          final long jitterNanos = frameTimeNanos - mLastFrameTimeNanos;
+          if (jitterNanos >= mFrameIntervalNanos) {
+              final long skippedFrames = jitterNanos / mFrameIntervalNanos;
+              if(skippedFrames>30){
+                  //丢帧30以上打印日志
+                  Log.i(TAG, "Skipped " + skippedFrames + " frames!  "
+                          + "The application may be doing too much work on its main thread.");
+              }
+          }
+          mLastFrameTimeNanos=frameTimeNanos;
+          //注册下一帧回调
+          Choreographer.getInstance().postFrameCallback(this);
+      }
+  }
+```

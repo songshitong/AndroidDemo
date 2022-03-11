@@ -35,7 +35,7 @@ public class ReflectDemo {
 
 //        在你想检查一个类的信息之前，你首先需要获取类的 Class 对象
         //获取class 对象
-        //1  直接获取某一个对象的 class
+        //1  直接获取某一个类的 class
         Class intClass = int.class;
         Class integerClass = Integer.TYPE;
         Class strClass = String.class;

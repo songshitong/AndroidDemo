@@ -83,7 +83,7 @@ public void startActivityForResult(@RequiresPermission Intent intent, int reques
        }
    }
 ```
-//todo  Instrumentation
+
 注释1处的mParent是Activity类型的，表示当前Activity的父类。因为目前根Activity还没有创建出来，因此，mParent == null成立。
 接着调用Instrumentation的execStartActivity方法，Instrumentation主要用来监控应用程序和系统的交互，execStartActivity方法的代码如下所示。
 frameworks/base/core/java/android/app/Instrumentation.java
@@ -455,8 +455,9 @@ final boolean realStartActivityLocked(ActivityRecord r, ProcessRecord app,
 这里的 app.thread指的是IApplicationThread，它的实现是ActivityThread的内部类ApplicationThread，
 其中ApplicationThread继承了IApplicationThread.Stub。app指的是传入的要启动的Activity的所在的应用程序进程，
 因此，注释1处的代码指的就是要在目标应用程序进程启动Activity。当前代码逻辑运行在AMS所在的进程（SyetemServer进程），
-通过ApplicationThread来与应用程序进程进行Binder通信，换句话说，ApplicationThread是AMS所在进程（SyetemServer进程）和应用程序进程的通信桥梁，如下图所示
-//todo 各个service是运行在SystemServer进程的吗
+通过ApplicationThread来与应用程序进程进行Binder通信，换句话说，ApplicationThread是AMS所在进程（SyetemServer进程）
+ 和应用程序进程的通信桥梁，如下图所示
+
 
 
 本文我们学习了根Activity的启动过程的前两个部分，分别是Launcher请求AMS过程、 AMS到ApplicationThread的调用过程，

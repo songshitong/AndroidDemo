@@ -28,7 +28,7 @@ Handler.getLooper == Looper.myLooper()   看handler的创建线程
 Looper.getMainLooper() 获取主线程的looper
 ```
 
-Handler泄露的原因及正确写法?
+Handler泄露的原因及正确写法?  看一下android常见内存泄露.md
 
 
 Handler被设计出来的原因？有什么用？
@@ -50,7 +50,9 @@ Handler被设计出来的原因？有什么用？
        最终反应到用户端就是这个手机有点卡。
    太复杂了。本身UI访问时一个比较简单的操作逻辑，直接创建UI，修改UI即可。如果加锁之后就让这个UI访问的逻辑变得很复杂，
       没必要。    自己：复杂也意味着稳定性下降，容易出现问题，例如死锁，编程的难度也上升了
+     //对于多线程设计，不是加一个，是每层都要加锁（用户代码→GUI顶层→GUI底层…），这样也以为着 耗时，UI更新效率变低；如果每层共用同一把锁，那就是 单线程 了
 所以，Android设计出了 单线程模型 来处理UI操作，再搭配上Handler，是一个比较合适的解决方案
+    采用「单线程消息队列机制」，实现一个「伪锁」，使用队列产生先后顺序，没有并发的前提
 
 
 同一线程的不同handler对应一个looper?
@@ -102,13 +104,20 @@ Looper.loop方法是死循环，为什么不会卡死（ANR）？  //todo anr
 https://www.zhihu.com/question/34652589
 大致总结下：
 1、主线程本身就是需要一直运行的，因为要处理各个View，界面变化。所以需要这个死循环来保证主线程一直执行下去，不会被退出。
-2、真正会卡死的操作是在某个消息处理的时候操作时间过长，导致掉帧、ANR，而不是loop方法本身。
+2、真正会卡死的操作是在某个消息处理的时候操作时间过长(dispatchMessage)，导致掉帧、ANR，而不是loop方法本身。
 3、在主线程以外，会有其他的线程来处理接受其他进程的事件，比如Binder线程（ApplicationThread），会接受AMS发送来的事件。
 4、在收到跨进程消息后，会交给主线程的Hanlder再进行消息分发。所以Activity的生命周期都是依靠主线程的Looper.loop，当
-   收到不同Message时则采用相应措施，比如收到msg=H.LAUNCH_ACTIVITY，则调用ActivityThread.handleLaunchActivity()方法，最终执行到onCreate方法。
+   收到不同Message时则采用相应措施，比如收到msg=H.LAUNCH_ACTIVITY，则调用ActivityThread.handleLaunchActivity()方法，
+   最终执行到onCreate方法。
 5、当没有消息的时候，会阻塞在loop的queue.next()中的nativePollOnce()方法里，此时主线程会释放CPU资源进入休眠状态，
- 直到下个消息到达或者有事务发生。所以死循环也不会特别消耗CPU资源。
+  直到下个消息到达或者有事务发生。所以死循环也不会特别消耗CPU资源。
 
+application启动时，可不止一个main线程，还有其他两个Binder线程：ApplicationThread 和 ActivityManagerProxy，
+  用来和系统进程进行通信操作，接收系统进程发送的通知
+1 当系统受到因用户操作产生的通知时，会通过 Binder 方式跨进程通知 ApplicationThread;    //todo ApplicationThread是啥
+2 它通过Handler机制，往 ActivityThread 的 MessageQueue 中插入消息，唤醒了主线程；
+3 queue.next() 能拿到消息了,然后 dispatchMessage 完成事件分发；
+PS：ActivityThread 中的内部类H中有具体实现
 
 
 消息的类型

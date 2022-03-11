@@ -178,7 +178,7 @@ getContentProviderImpl方法的代码很多，这里截取了关键的部分。
 如果该应用进程已经启动就会调用注释2处的代码，否则就会调用注释3的startProcessLocked方法来启动进程。
 这里我们假设ContentProvider的应用进程还没有启动，
 关于应用进程启动过程，我在Android应用程序进程启动过程（前篇）已经讲过，最终会调用ActivityThread的main方法，代码如下所示。
-//todo 进程启动
+ //关于新建进程，最终通过AMS向zygote创建新进程
 
 frameworks/base/core/java/android/app/ActivityThread.java
 ```
@@ -269,6 +269,7 @@ class ApplicationThreadProxy implements IApplicationThread {
             boolean persistent, Configuration config, CompatibilityInfo compatInfo,
             Map<String, IBinder> services, Bundle coreSettings) throws RemoteException {
       ...
+        //private final IBinder mRemote;
         mRemote.transact(BIND_APPLICATION_TRANSACTION, data, null,
                 IBinder.FLAG_ONEWAY);
         data.recycle();
@@ -371,7 +372,7 @@ private void installContentProviders(
 ```
 /frameworks/base/core/java/android/app/IActivityManager.java
 String descriptor = "android.app.IActivityManager";
-//todo ams有无ActivityManagerNative的介绍，有就把这删了
+//android7.0
 ActivityManagerNative
  /frameworks/base/core/java/android/app/ActivityManagerNative.java
 ```

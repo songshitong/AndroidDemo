@@ -118,6 +118,13 @@ telephony	电话通讯管理	            test-runner	测试工具相关
 tests	测试相关                   	tools	工具
 wifi	wifi无线网络
 
+/frameworks/base/libs目录
+hwui  硬件加速的UI   https://blog.csdn.net/wind_hzx/article/details/20307093
+hwui主要是android用于2d硬件绘图而加入的一个模块，在hwui之前，android主要是用skia来进行软件绘制，后由于绘制性能等问题，
+现在android的绘图几乎都是使用了hwui硬件加速绘图。hwui主要则是使用opengles来进行gpu硬件绘图，提升整个系统的绘制性能，
+主要有以下方式：直接渲染，显示列表渲染，延时渲染列表，分别代表的类为：OpenGLRenderer，DisplayListRenderer，DeferredDisplayList。
+
+
 
 C/C++程序库部分
 系统运行库层（Native)中的 C/C++程序库的类型繁多，功能强大，C/C++程序库并不完全在一个目录中，这里给出几个常用且比较重要的C/C++程序库所在的目录位置
@@ -147,3 +154,10 @@ https://zhuanlan.zhihu.com/p/245131105
 
 GKI 通用内核Generic Kernel Image  为了解决碎片化和Android升级慢的问题
 https://source.android.com/devices/architecture/kernel/generic-kernel-image
+
+Android 通用内核
+common-android-mainline
+https://source.android.google.cn/devices/architecture/kernel/android-common
+
+goldfish地址在线地址
+https://android.googlesource.com/kernel/goldfish/+/refs/heads/android-goldfish-3.4/drivers/staging/android/binder.c

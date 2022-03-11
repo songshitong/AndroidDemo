@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureLinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/measureLinear1"
+        tools:context=".widget.layout.repeatMeasure.MeasureTestActivity">
+    <sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureLinearLayout
+            android:id="@+id/measureLinear2"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureLinearLayout
+                android:id="@+id/measureLinear3"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureView
+                    android:id="@+id/measureView0"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"/>
+            <sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureView
+                    android:id="@+id/measureView1"
+                    android:layout_width="140dp"
+                    android:layout_height="48dp"/>
+
+            <sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureView
+                    android:id="@+id/measureView2"
+                    android:layout_width="160dp"
+                    android:layout_height="48dp"/>
+        </sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureLinearLayout>
+       <View android:layout_width="150dp"
+               android:layout_height="50dp"/>
+    </sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureLinearLayout>
+
+    <View
+            android:layout_width="160dp"
+            android:layout_height="50dp"/>
+
+</sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureLinearLayout>

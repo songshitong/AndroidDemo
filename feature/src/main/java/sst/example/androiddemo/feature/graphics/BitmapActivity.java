@@ -1,8 +1,10 @@
 package sst.example.androiddemo.feature.graphics;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -20,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.widget.MatrixView;

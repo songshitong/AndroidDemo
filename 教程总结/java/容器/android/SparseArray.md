@@ -127,7 +127,13 @@ put 方法从 mKeys 查找 key 用的是 ContainerHelpers 类提供的二分查�
 因为当不存在目标 key 时，将计算出的索引值进行 ~ 运算后返回值一定是负数，从而与“找得到目标 key 的情况（返回值大于等于0）”的情况
 区分开。从这里可以看出该方法的巧妙之处，单纯的一个返回值就可以区分出多种情况，且通过这种方式来存放数据可以使得 mKeys 的内部值
 一直是按照值递增的方式来排序的
+
 再来具体看看 put 方法的逻辑
+1. 根据二分超找key在keys数组的位置index，如果不存在返回比key大的第一个位置的index的反码
+2. 如果查到key的index，直接覆盖原值mValues[i] = value
+3. 反码取反得到index，如果Values[i]没有元素，将key和value分别存入keys数组和value数组
+4. 如果存在冗余数据，那么就先进行 GC
+5. 索引 i 位置已经用于存储其它数据，将i 开始的所有数据都需要向后移动一位，并将 key 存到 mKeys[i]  这个期间可能存在扩容
 ```
     public void put(int key, E value) {
         //用二分查找法查找指定 key 在 mKeys 中的索引值
@@ -191,6 +197,8 @@ put 方法从 mKeys 查找 key 用的是 ContainerHelpers 类提供的二分查�
 上文说了，布尔变量 mGarbage 用于标记当前是否有待垃圾回收(GC)的元素，当该值被置为 true 时，即意味着当前状态需要进行垃圾回收，
 但回收操作并不马上进行，而是在后续操作中再完成
 以下几个方法在移除元素时，都只是切断了 mValues 对 value 的引用，而 mKeys 并没有进行回收，这个操作会留到 gc() 进行处理
+1.用二分查找法查找指定 key 在 mKeys 中的索引值
+2. index>0代表元素找到了，mValues[i] = DELETED，标记当前需要垃圾回收mGarbage=true
 ```
     public void delete(int key) {
         //用二分查找法查找指定 key 在 mKeys 中的索引值
@@ -259,6 +267,8 @@ put 方法从 mKeys 查找 key 用的是 ContainerHelpers 类提供的二分查�
 
 7、查找元素
 查找元素的方法较多，逻辑都挺简单的
+1. 二分查找法查找指定 key 在 mKeys 中的索引值
+2. index<0没找到返回null，index>0找到了，返回mValues[i]
 ```    //根据 key 查找相应的元素值，查找不到则返回默认值
     @SuppressWarnings("unchecked")
     public E get(int key, E valueIfKeyNotFound) {
@@ -368,6 +378,13 @@ put 方法从 mKeys 查找 key 用的是 ContainerHelpers 类提供的二分查�
         mSize = o;
     }
 ```
+http://gityuan.com/2019/01/13/arraymap/
+延迟回收机制的好处在于首先删除方法效率更高，同时减少数组数据来回拷贝的次数，比如删除某个数据后被标记删除，接着又需要在相同位置插入数据，
+则不需要任何数组元素的来回移动操作。可见，对于SparseArray适合频繁删除和插入来回执行的场景，性能很好
+调用时机：
+1. put  setValueAt  append
+2.size()
+3.keyAt  valueAt    indexOfKey  indexOfValue  indexOfValueByValue
 
 9、优劣势总结
 从上文的介绍来看，SparseArray 的主要优势有以下几点：
@@ -375,12 +392,11 @@ put 方法从 mKeys 查找 key 用的是 ContainerHelpers 类提供的二分查�
 2 和 HashMap 中每个存储结点都是一个类对象不同，SparseArray 不需要用于包装 key 的结构体，单个元素的存储成本更加低廉
 3 在数据量不大的情况下，查找效率较高（二分查找法）
 4 延迟了垃圾回收的时机，只在需要的时候才一次性进行
-内存申请比较克制，默认申请数组大小是10
-
+5 内存申请比较克制，默认申请数组大小是10
 
 劣势有以下几点：
 1 具有特定的适用范围，key 只能是 int 类型
-2 插入键值对时可能需要移动大量的数组元素
+2 插入键值对时可能需要移动大量的数组元素，key和value数组都需要移动
 3 数据量较大时，查找效率（二分查找法）会明显降低，需要经过多次折半查找才能定位到目标数据。而 HashMap 在没有哈希冲突的情况下
   只需要进行一次哈希计算即可定位到目标元素，有哈希冲突时也只需要对比链表或者红黑树上的元素即可
 

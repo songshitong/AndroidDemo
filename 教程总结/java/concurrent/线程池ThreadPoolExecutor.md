@@ -2,6 +2,7 @@
 jdk1.8
 https://juejin.cn/post/6983213662383112206#heading-1
 
+
 一、线程池基础知识
 在Java语言中，虽然创建并启动一个线程非常方便，但是由于创建线程需要占用一定的操作系统资源，在高并发的情况下，频繁的创建和销毁线程
 会大量消耗CPU和内存资源，对程序性能造成很大的影响。为了避免这一问题，Java给我们提供了线程池。
@@ -34,6 +35,8 @@ ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
 ExecutorService fixedExecutor = Executors.newFixedThreadPool(10);
 // 创建一个可重用固定线程数的线程池
 ExecutorService executorService2 = Executors.newCachedThreadPool();
+创建一个定长线程池，支持定时及周期性任务执行
+ExecutorService scheduledExecutor  = Executors.newScheduledThreadPool(10);
 ```
 但是，通常来说在实际开发中并不推荐直接使用Executors来创建线程池，而是需要根据项目实际情况配置适合自己项目的线程池，
 关于如何配置合适的线程池这是后话，需要我们理解线程池的各个参数以及线程池的工作原理之后才能有答案
@@ -42,7 +45,6 @@ ExecutorService executorService2 = Executors.newCachedThreadPool();
 
 2.线程池的生命周期
 线程池从诞生到死亡，中间会经历RUNNING、SHUTDOWN、STOP、TIDYING、TERMINATED五个生命周期状态。
-
 RUNNING 表示线程池处于运行状态，能够接受新提交的任务且能对已添加的任务进行处理。RUNNING状态是线程池的初始化状态，线程池一旦被创建
   就处于RUNNING状态。
 SHUTDOWN 线程处于关闭状态，不接受新任务，但可以处理已添加的任务。RUNNING状态的线程池调用shutdown后会进入SHUTDOWN状态。
@@ -120,7 +122,7 @@ RejectedExecutionHandler接口来执行拒绝操作。实现RejectedExecutionHan
 一个AtomicInteger类型的整数ctl来表示这两个参数，代码如下：
 ```
 public class ThreadPoolExecutor extends AbstractExecutorService {
-    // Integer.SIZE = 32.所以 COUNT_BITS= 29
+    // Integer.SIZE = 32.所以 COUNT_BITS= 29   5个状态需要3位存储
     private static final int COUNT_BITS = Integer.SIZE - 3;
     // 00011111 11111111 11111111 11111111 这个值可以表示线程池的最大线程容量
     private static final int COUNT_MASK = (1 << COUNT_BITS) - 1;
@@ -354,6 +356,7 @@ execute方法中的逻辑可以分为三部分：
 这部分逻辑其实比较容易理解，就是创建Worker并开启线程执行任务的过程，Worker是对线程的封装，创建的worker会被添加到ThreadPoolExecutor中的
   HashSet中。也就是线程池中的线程都维护在这个名为workers的HashSet中并被ThreadPoolExecutor所管理，HashSet中的线程可能处于正在工作的状态，
   也可能处于空闲状态，一旦达到指定的空闲时间，则会根据条件进行回收线程。
+
 我们知道，线程调用start后就会开始执行线程的逻辑代码，执行完后线程的生命周期就结束了，那么线程池是如何保证Worker执行完任务后仍然不结束的呢？
   当线程空闲超时或者关闭线程池又是怎样进行线程回收的呢？这个实现逻辑其实就在Worker中。看下Worker的代码：
 ```

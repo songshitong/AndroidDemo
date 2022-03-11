@@ -1,5 +1,5 @@
 http://liuwangshu.cn/framework/component/2-service-start.html  android 7.0
-//todo service 是另一个进程吗
+
 1.ContextImpl到ActivityManageService的调用过程
 要启动Service，我们会调用startService方法，它的实现在ContextWrapper中，代码如下所示。
 frameworks/base/core/java/android/content/ContextWrapper.java
@@ -15,7 +15,7 @@ public class ContextWrapper extends Context {
 }
 ```
 
-在startService方法中会调用mBase的startService方法，Context类型的mBase对象具体指的是什么呢？在Android深入四大组件（一）应用程序启动过程（后篇）//todo
+在startService方法中会调用mBase的startService方法，Context类型的mBase对象具体指的是什么呢？在Android深入四大组件（一）应用程序启动过程（后篇）
 这篇文章中我们讲过ActivityThread启动Activity时会调用如下代码创建Activity的上下文环境。
 frameworks/base/core/java/android/app/ActivityThread.java
 ```
@@ -51,7 +51,7 @@ private Context createBaseContextForActivity(ActivityClientRecord r, final Activ
 }
 ```
 这里可以得出结论，上下文对象appContext 的具体类型就是ContextImpl 。Activity的attach方法中将ContextImpl赋值给ContextWrapper的成员变量mBase中，
-因此，mBase具体指向就是ContextImpl 。 //todo attach方法
+因此，mBase具体指向就是ContextImpl 。 
 那么，我们紧接着来查看ContextImpl的startService方法，代码如下所示。
 frameworks/base/core/java/android/app/ContextImpl.java
 ```
@@ -80,7 +80,7 @@ public ComponentName startService(Intent service) {
 
 startService方法中会return startServiceCommon方法，在startServiceCommon方法中会在注释1处调用
 ActivityManageService（AMS）的代理对象ActivityManagerProxy（AMP）的startService方法，最终会调用AMS的startService方法。
-至于注释1处的代码为何会调用AMS的startService方法，在Android深入四大组件（一）应用程序启动过程（前篇）这篇文章中已经讲过，这里不再赘述。//todo
+至于注释1处的代码为何会调用AMS的startService方法，在Android深入四大组件（一）应用程序启动过程（前篇）这篇文章中已经讲过，这里不再赘述。
 ContextImpl到ActivityManageService的调用过程如下面的时序图所示
 ContextImpl到ActivityManageService的调用过程.png
 
@@ -152,7 +152,7 @@ frameworks/base/services/core/java/com/android/server/am/ActiveServices.java
         } else {
             app = r.isolatedProc;
         }
-
+ //新建service进程，查询不到对应的ProcessRecord
  if (app == null && !permissionsReviewRequired) {//5
             if ((app=mAm.startProcessLocked(procName, r.appInfo, true, intentFlags,
                     "service", r.name, false, isolated, false)) == null) {//6
@@ -169,16 +169,20 @@ frameworks/base/services/core/java/com/android/server/am/ActiveServices.java
 
 在注释1处得到ServiceRecord的processName的值赋值给procName ，其中processName用来描述Service想要在哪个进程运行，默认是当前进程，
 我们也可以在AndroidManifes配置文件中设置android:process属性来新开启一个进程运行Service。
+
 注释2处将procName和Service的uid传入到AMS的getProcessRecordLocked方法中，来查询是否存在一个与Service对应的ProcessRecord类型的对象app，
   ProcessRecord主要用来记录运行的应用程序进程的信息。
 注释5处需要判断两个条件，一个是用来运行Service的应用程序进程不存在，另一个是应用程序之间的组件调用不需要检查权限，
-  满足这两个条件则调用注释6处的AMS的startProcessLocked方法来创建对应的应用程序进程。
-关于创建应用程序进程请查看Android应用程序进程启动过程（前篇） 和Android应用程序进程启动过程（后篇）这两篇文章。//todo
+  满足这两个条件则调用注释6处的AMS的startProcessLocked方法来创建对应的应用程序进程。  
+  //新建进程的service，最终通过AMS向zygote创建新进程
+  关于创建应用程序进程请查看Android应用程序进程启动过程（前篇） 和Android应用程序进程启动过程（后篇）这两篇文章。
 注释3处判断如果用来运行Service的应用程序进程存在，则调用注释4处的realStartServiceLocked方法：
 frameworks/base/services/core/java/com/android/server/am/ActiveServices.java
 ```
 private final void realStartServiceLocked(ServiceRecord r,
         ProcessRecord app, boolean execInFg) throws RemoteException {
+   ... //anr的埋炸弹      
+    bumpServiceExecutingLocked(r, execInFg, "create");     
    ...
     try {
        ...
@@ -273,4 +277,3 @@ private void handleCreateService(CreateServiceData data) {
 最后给出这一节的时序图
 ActivityManagerService启动service过程.png
 
-//todo service是怎么新建进程的

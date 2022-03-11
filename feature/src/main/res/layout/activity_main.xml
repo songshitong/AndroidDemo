@@ -189,5 +189,35 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="material"
             />
+    <Button  android:id="@+id/testAnrActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Test Anr"
+            />
+    <Button  android:id="@+id/measureTestActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Measure Test"
+            />
+    <Button  android:id="@+id/customLMActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="custom Layout Manager"
+            />
+    <Button  android:id="@+id/scrollNestedActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Scroll Nested Activity"
+            />
+    <Button  android:id="@+id/toastBugActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Toast Bug Activity"
+            />
+
+    <Button  android:id="@+id/bigPictureActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Big Picture Activity"
+            />
+
+    <Button  android:id="@+id/IntentServiceActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Intent Service Activity"
+            />
 </LinearLayout>
 </ScrollView>

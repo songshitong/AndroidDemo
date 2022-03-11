@@ -1,7 +1,7 @@
 jdk 1.8   android sdk 30
 https://juejin.cn/post/6975435256111300621#heading-2
 可重入锁  内部通过AQS实现
-1.ReentrantLock使用
+1.ReentrantLock使用         todo 总结 Java并发编程提到了原理
 上篇文章介绍的synchronized关键字是一种隐式锁，即它的加锁与释放是自动的，无需我们关心。而ReentrantLock是一种显式锁，
 需要我们手动编写加锁和释放锁的代码。下面我们来看下ReentrantLock的使用方法。
 ```

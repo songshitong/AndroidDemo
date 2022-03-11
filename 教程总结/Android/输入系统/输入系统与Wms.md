@@ -57,7 +57,7 @@ public class WindowManagerService extends IWindowManager.Stub{
   }
 }
 
-
+//todo InputWindowHandle
 ```
 openInputChannel的过程
 /frameworks/base/services/core/java/com/android/server/wm/WindowState.java
@@ -344,7 +344,6 @@ NativeInputEventReceiver::NativeInputEventReceiver(JNIEnv* env,
       }
   }
 ```
-//todo looper callback
 InputConsumer与InputPublisher一样，封装了InputChannel，负责对其进行写入和读取操作，也负责InputMessage的封装与解析，
 不过他们的功能相反，InputConsumer接受的是输入事件，发送的是反馈
 
@@ -362,4 +361,3 @@ setFdEvents
 InputDispatcher与窗口连接的总结
  通过输入系统_Connection工作原理.png和窗口端的连接.png，便构成了InputDispatcher到窗口的发送循环
 
-//todo 事件的发送

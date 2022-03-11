@@ -74,6 +74,8 @@ T1:泡茶...
 上茶:龙井
 
 
+CompletableFuture.get()获取结果 阻塞方法
+
 领略 CompletableFuture 异步编程的优势之后，下面我们详细介绍 CompletableFuture 的使用，首先是如何创建 CompletableFuture 对象。
 创建 CompletableFuture 对象
 创建 CompletableFuture 对象主要靠下面代码中展示的这 4 个静态方法，我们先看前两个。在烧水泡茶的例子中，
@@ -233,6 +235,8 @@ System.out.println(f0.join());
 Java 语言也开始官方支持异步编程：在 1.8 版本提供了 CompletableFuture，在 Java 9 版本则提供了更加完备的 Flow API，
 异步编程目前已经完全工业化。因此，学好异步编程还是很有必要的。
 http://reactivex.io/intro.html
+
+//todo Rxjava  java9 flow
 
 CompletableFuture 已经能够满足简单的异步编程需求，如果你对异步编程感兴趣，可以重点关注 RxJava 这个项目，利用 RxJava，
 即便在 Java 1.6 版本也能享受异步编程的乐趣。

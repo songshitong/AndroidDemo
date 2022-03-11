@@ -1,3 +1,4 @@
+//todo lock及其子类
 ```
 public interface Lock {
     // 获取锁  获取不到会阻塞

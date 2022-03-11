@@ -50,6 +50,7 @@ static jlong nativeCreate(JNIEnv* env, jclass clazz) {
 ```
 /frameworks/native/libs/gui/SurfaceComposerClient.cpp
 void SurfaceComposerClient::onFirstRef() {
+    sp<ISurfaceComposer> sf(ComposerService::getComposerService());
     sp<ISurfaceComposerClient> conn = (rootProducer != nullptr) ? sf->createScopedConnection(rootProducer) : sf->createConnection();
     if (conn != 0) {
         mClient = conn;
@@ -176,11 +177,14 @@ status_t SurfaceComposerClient::createSurfaceChecked(..., sp<SurfaceControl>* ou
 }
 
 /frameworks/native/services/surfaceflinger/Client.cpp
-status_t Client::createSurface(...) {
+status_t Client::createSurface(const String8& name,
+        uint32_t w, uint32_t h, PixelFormat format, uint32_t flags,
+        const sp<IBinder>& parentHandle, int32_t windowType, int32_t ownerUid,
+        sp<IBinder>* handle,
+        sp<IGraphicBufferProducer>* gbp) {
     // ...
     flinger->createLayer(name, client, w, h, format, flags, windowType, ownerUid, handle, gbp, parent);
 }
-
 ```
 
 Surface 在 SurfaceFlinger 中对应的实体是 Layer 对象，在 createLayer 方法中会创建好几种 Layer。
@@ -240,7 +244,7 @@ sp<Surface> SurfaceControl::getSurface() const
 
 sp<Surface> SurfaceControl::generateSurfaceLocked() const
 {
-    // mGraphicBufferProducer 是上面创建的 gbp 对象
+    // mGraphicBufferProducer 是上面创建的 gbp 对象，下面有从SurfaceFlinger的创建过程
     mSurfaceData = new Surface(mGraphicBufferProducer, false);
     return mSurfaceData;
 }
@@ -278,6 +282,10 @@ status_t SurfaceFlinger::createBufferLayer(const sp<Client>& client,
     return err;
 }
 
+//BufferLayer是SurfaceFlinger中Layer的一种实现
+frameworks/native/services/surfaceflinger/BufferLayer.h
+class BufferLayer : public Layer, public BufferLayerConsumer::ContentsChangedListener {}
+
 /frameworks/native/services/surfaceflinger/BufferLayer.cpp
 sp<IGraphicBufferProducer> BufferLayer::getProducer() const {
     return mProducer;
@@ -287,9 +295,17 @@ void BufferLayer::onFirstRef() {
     // Creates a custom BufferQueue for SurfaceFlingerConsumer to use
     sp<IGraphicBufferProducer> producer;
     sp<IGraphicBufferConsumer> consumer;
+    //创建BufferQueue及其对应的produer和consumer
     BufferQueue::createBufferQueue(&producer, &consumer, true);
     mProducer = new MonitoredProducer(producer, mFlinger, this);
-    mConsumer = new BufferLayerConsumer(consumer, mFlinger->getRenderEngine(), mTextureName, this);
+    mConsumer = new BufferLayerConsumer(consumer, mFlinger->getRenderEngine(), mTextureName, this);   
+    mConsumer->setConsumerUsageBits(getEffectiveUsage(0));
+    mConsumer->setContentsChangedListener(this);
+    mConsumer->setName(mName);
+    //不支持三重缓冲的设置为2
+    if (mFlinger->isLayerTripleBufferingDisabled()) {
+        mProducer->setMaxDequeuedBufferCount(2);
+    }
     // ...
 }
 ```
@@ -307,7 +323,7 @@ status_t MonitoredProducer::requestBuffer(int slot, sp<GraphicBuffer>* buf) {
       return mProducer->requestBuffer(slot, buf);
   }     
 ```
-mProducer 是 MonitoredProducer 实例，它是一个装饰类，实际功能都委托给了其 producer 属性:
+mProducer 是 MonitoredProducer 实例，它是一个装饰类，实际功能都委托给了其 producer 属性
 /frameworks/native/libs/gui/BufferQueue.cpp
 ```
 void BufferQueue::createBufferQueue(sp<IGraphicBufferProducer>* outProducer,
@@ -320,12 +336,99 @@ void BufferQueue::createBufferQueue(sp<IGraphicBufferProducer>* outProducer,
 }
 ```
 
+BufferLayerConsumer的创建  通过producer在BufferQueue中产生图像数据GraphicBuffer，然后交给BufferLayerConsumer消费
+frameworks/native/services/surfaceflinger/BufferLayerConsumer.cpp
+```
+BufferLayerConsumer::BufferLayerConsumer(const sp<IGraphicBufferConsumer>& bq,
+                                         RE::RenderEngine& engine, uint32_t tex, Layer* layer)
+      : ConsumerBase(bq, false),
+        ....
+        mCurrentTexture(BufferQueue::INVALID_BUFFER_SLOT) {
+    memcpy(mCurrentTransformMatrix, mtxIdentity.asArray(), sizeof(mCurrentTransformMatrix));
+    mConsumer->setConsumerUsageBits(DEFAULT_USAGE_FLAGS);
+}
+```
+消费过程   
+调用流程SurfaceFlinger.handleMessageInvalidate->sf.handlePageFlip->layer.latchBuffer->BufferLayer.latchBuffer->BufferLayerConsumer.updateTexImage
+frameworks/native/services/surfaceflinger/BufferLayerConsumer.cpp
+```
+status_t BufferLayerConsumer::updateTexImage(BufferRejecter* rejecter, const DispSync& dispSync,
+                                             bool* autoRefresh, bool* queuedBuffer,
+                                             uint64_t maxFrameNumber) {
+   ...                                          
+  BufferItem item;
+  // 1. 调用acquireBufferLocked获取一个Slot
+    // Acquire the next buffer.
+    // In asynchronous mode the list is guaranteed to be one buffer
+    // deep, while in synchronous mode we use the oldest buffer.
+    status_t err = acquireBufferLocked(&item, computeExpectedPresent(dispSync), maxFrameNumber);    
+   ...
+   /2. 消费完毕，释放Slot
+   // Release the previous buffer.
+    err = updateAndReleaseLocked(item, &mPendingRelease);
+    if (err != NO_ERROR) {
+        return err;
+    }                                           
+}
+```
+acquireBufferLocked的实现如下：
+```
+frameworks/native/services/surfaceflinger/BufferLayerConsumer.cpp
+status_t BufferLayerConsumer::acquireBufferLocked(BufferItem* item, nsecs_t presentWhen,
+                                                  uint64_t maxFrameNumber) {
+    status_t err = ConsumerBase::acquireBufferLocked(item, presentWhen, maxFrameNumber);
+    ...
+    return NO_ERROR;
+}
+
+frameworks/native/libs/gui/ConsumerBase.cpp
+status_t ConsumerBase::acquireBufferLocked(BufferItem *item,
+        nsecs_t presentWhen, uint64_t maxFrameNumber) {
+  //mConsumer就是IGraphicBufferConsumer，BufferQueue的consumer      
+  status_t err = mConsumer->acquireBuffer(item, presentWhen, maxFrameNumber);  
+  ...
+  return OK;     
+}
+```
+updateAndReleaseLocked方法的流程如下：
+```
+status_t BufferLayerConsumer::updateAndReleaseLocked(const BufferItem& item,
+      status_t err = NO_ERROR;
+
+    int slot = item.mSlot;
+
+    // Do whatever sync ops we need to do before releasing the old slot.
+    if (slot != mCurrentTexture) {
+        err = syncForReleaseLocked();
+        if (err != NO_ERROR) {
+            // Release the buffer we just acquired.  It's not safe to
+            // release the old buffer, so instead we just drop the new frame.
+            // As we are still under lock since acquireBuffer, it is safe to
+            // release by slot.
+            releaseBufferLocked(slot, mSlots[slot].mGraphicBuffer);
+            return err;
+        }
+    }  
+  ....                        
+}
+
+frameworks/native/libs/gui/ConsumerBase.cpp
+status_t ConsumerBase::releaseBufferLocked(
+        int slot, const sp<GraphicBuffer> graphicBuffer,
+        EGLDisplay display, EGLSyncKHR eglFence) {
+   //调用BufferQueueConsumer的releaseBuffer方法     
+   status_t err = mConsumer->releaseBuffer(slot, mSlots[slot].mFrameNumber,
+            display, eglFence, mSlots[slot].mFence);
+    ....          
+ }
+```
+
 小结
 在 Java 层中 ViewRootImpl 实例中持有一个 Surface 对象，该 Surface 对象中的 mNativeObject 属性指向 native 层中创建的 Surface 对象，
 native 层的 Surface 对应 SurfaceFlinger 中的 Layer 对象，它持有 Layer 中的 BufferQueueProducer 生产者指针，
 在后面的绘制过程中 Surface 会通过这个生产者来请求图形缓存区，在 Surface 上绘制的内容就是存入到这个缓存区里的，
 最终再交由 SurfaceFlinger 通过 BufferQueueConsumer 消费者取出这些缓存数据，并合成渲染送到显示器显示
-//todo BufferQueueProducer BufferQueueConsumer  
+ 
 
 
 硬件加速&软件绘制
@@ -535,7 +638,6 @@ mGraphicBufferProducer 是 Layer 中的 BufferQueueProducer -- graph buffer 的�
 GraphicBuffer(用来创建 Canvas 中的 Bitmap 对象) 并锁定该 Surface，然后将 Surface 的地址返回给 Java 层 Surface 中的 mLockedObject 属性
 
 
-
 View.draw
 见 Android-View绘制原理, 以 drawLines 为例
 /frameworks/base/graphics/java/android/graphics/BaseCanvas.java
@@ -666,7 +768,6 @@ int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
 
 ```
 
-//todo mGraphicBufferProducer的queueBuffer
 上面 mGraphicBufferProducer->queueBuffer 的具体代码就不看了，其逻辑是通过 mGraphicBufferProducer 生产者
 将填充了绘制数据的图形缓存区入 BufferQueue 队列，在 queueBuffer 调用后，会调用到 SF.signalLayerUpdate 方法
 ```
@@ -775,10 +876,9 @@ public RenderNode updateDisplayListIfDirty() {
     }
     return renderNode;
 }
-
 ```
+todo  drawRenderNode做了什么
 
-//todo
 这里我们创建的 Canvas 是 DisplayListCanvas 类型实例，在调用 View.draw 方法后，使用 DisplayListCanvas 来绘图，
 以 drawLines 为例：
 /frameworks/base/core/java/android/view/DisplayListCanvas.java
@@ -889,11 +989,10 @@ void RenderProxy::initialize(const sp<Surface>& surface) {
     // 向 Render 线程发送消息，执行 CanvasContext->setSurface 方法
     mRenderThread.queue().post([ this, surf = surface ]() mutable { mContext->setSurface(std::move(surf)); });
 }
-
 ```
 
-
 上面初始化时 CanvasContext 上下文通过 setSurface 方法将当前要渲染的 Surface 绑定到了 Render 线程中。
+
 渲染
 当渲染线程绑定了 Surface，且 Surface 内存分配以及 DrawOp 树构建完成后，便可以看一下渲染流程，
 从上面的 nSyncAndDrawFrame 方法开始，其实现在 Native 层
@@ -932,10 +1031,30 @@ void DrawFrameTask::run() {
         context->waitOnFences();
     }
 }
-
 ```
 接下来所有的 DrawOp 都会通过 OpenGL 被绘制到 GraphicBuffer 中，然后通知 SurfaceFlinger 进行合成，具体源码不贴了，因为看不大懂
 //todo ??
+/frameworks/base/libs/hwui/renderthread/CanvasContext.cpp
+```
+void CanvasContext::draw() {
+    SkRect dirty;
+    mDamageAccumulator.finish(&dirty);
+    Frame frame = mRenderPipeline->getFrame();
+    // 计算脏区
+    SkRect windowDirty = computeDirtyRect(frame, &dirty);
+    // 渲染
+    bool drew = mRenderPipeline->draw(frame, windowDirty, dirty, mLightGeometry, &mLayerUpdateQueue,
+                                      mContentDrawBounds, mOpaque, mWideColorGamut, mLightInfo,
+                                      mRenderNodes, &(profiler()));
+    // 交换缓存区
+    bool didSwap = mRenderPipeline->swapBuffers(frame, drew, windowDirty, mCurrentFrameInfo, &requireSwap);
+    // ...
+}
+```
+可以看到最终的绘制操作是在 CanvasContext 中交由渲染管线去执行的, 这里主要有两个步骤
+1 通过 mRenderPipeline->draw, 将 RenderNode 中的 DisplayList 记录的数据绘制到 Surface 的缓冲区
+2 通过 mRenderPipeline->swapBuffers 将缓冲区的数据推送到 Surface 的缓冲区中, 等待 SurfaceFlinger 的合成操作
+todo surface缓冲区？？mGraphicBufferProducer
 
 小结
 硬件加速可以从两个阶段来看：
@@ -960,9 +1079,9 @@ SurfaceFlinger 通过 BufferQueueConsumer 消费者从 BufferQueue 中取出 Gra
 
 
 软件绘制
-软件绘制可能会绘制到不需要重绘的视图，且其绘制过程在主线程进行的，可能会造成卡顿等情况。它把要绘制的内容写进一个 Bitmap 位图，其实就是填充到了 Surface 申请的图形缓存区里。
+软件绘制可能会绘制到不需要重绘的视图，且其绘制过程在主线程进行的，可能会造成卡顿等情况。它把要绘制的内容写进一个 Bitmap 位图，
+   其实就是填充到了 Surface 申请的图形缓存区里。
 软件绘制可分为三个步骤：
-
 Surface.lockCanvas -- dequeueBuffer 从 BufferQueue 中出队列一块缓存区。
 View.draw -- 绘制内容。
 Surface.unlockCanvasAndPost -- queueBuffer 将填充了数据的缓存区存入 BufferQueue 队列中，
@@ -973,7 +1092,6 @@ Surface.unlockCanvasAndPost -- queueBuffer 将填充了数据的缓存区存入 
 硬件绘制会将绘制函数作为绘制指令(DrawOp)记录在一个列表(DisplayList)中，然后交给单独的 Render 线程使用 GPU 进行硬件加速渲染。
   它只需要针对需要更新的 View 对象的脏区进行记录或更新，无需更新的 View 对象则能重用先前 DisplayList 中记录的指令。
 硬件绘制可分为两个阶段：
-
 构建阶段：将 View 的绘制操作(drawLine...)抽象成 DrawOp 操作并存入 DisplayList 中。
 绘制阶段：首先分配缓存区(同软件绘制)，然后将 Surface 绑定到 Render 线程，最后通过 GPU 渲染 DrawOp 数据。
 

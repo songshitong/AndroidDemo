@@ -8,7 +8,7 @@ Android 4.1 配合 Choreographer 引入
       通过postSyncBarrier方法添加的消息，特点是target为空，也就是没有对应的handler
   异步消息: 用于和同步区分, 并非多线程异步执行的意思  
 
-消息的发送
+消息的发送   其他线程唤醒阻塞的主线程
 /frameworks/base/core/java/android/os/Handler.java
 ```
 public class Handler {
@@ -135,7 +135,7 @@ void NativeMessageQueue::wake() {
 
 // system/core/libutils/Looper.cpp
 void Looper::wake() {
-    // 向 Looper 绑定的线程 mWakeEventFd 中写入一个新的数据   
+    // 向 Looper 绑定的线程 mWakeEventFd 中写入一个新的数据   唤醒线程
     uint64_t inc = 1;
     ssize_t nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &inc, sizeof(uint64_t)));
     ....
@@ -350,8 +350,22 @@ void Looper::sendMessageAtTime(nsecs_t uptime, const sp<MessageHandler>& handler
 native层类结构   ident ['aɪdent] 识别，标记短片
 /system/core/libutils/include/utils/Looper.h
 ```
+//looper对fd的监控类型
+enum {
+    //read操作
+    ALOOPER_EVENT_INPUT = 1 << 0,
+   //write操作
+    ALOOPER_EVENT_OUTPUT = 1 << 1,
+    //fd出错
+    ALOOPER_EVENT_ERROR = 1 << 2,
+    //fd hung up  例如pipe的远端close了
+    ALOOPER_EVENT_HANGUP = 1 << 3,
+    //fd INVALID     例如fd过早无效
+    ALOOPER_EVENT_INVALID = 1 << 4,
+    
+//ALooper_pollOnce() and ALooper_pollAll()的返回结果
 enum{
-POLL_WAKE = -1,POLL_CALLBACK = -2,POLL_TIMEOUT = -3,POLL_ERROR = -4,
+    POLL_WAKE = -1,POLL_CALLBACK = -2,POLL_TIMEOUT = -3,POLL_ERROR = -4,
 }
 struct Request { //请求结构体
     int fd;
@@ -415,6 +429,34 @@ handler的Java层与native层对照.png
 WeakMessageHandler继承于MessageHandler类，NativeMessageQueue继承于MessageQueue类
 另外，消息处理流程是先处理Native Message，再处理Native Request，最后处理Java Message。理解了该流程，
   也就明白有时上层消息很少，但响应时间却较长的真正原因。
+
+native Looper的常用方法
+addFd  向Looper添加一个fd, 使用 epoll 监听fd, 用于线程唤醒
+```
+int Looper::addFd(int fd, int ident, int events, Looper_callbackFunc callback, void* data) {
+    return addFd(fd, ident, events, callback ? new SimpleLooperCallback(callback) : NULL, data);
+}
+
+int Looper::addFd(int fd, int ident, int events, const sp<LooperCallback>& callback, void* data) {
+    ...
+    int epollResult = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, fd, & eventItem);
+    ...
+    return 1;
+}
+```
+
+removeFd 方法  移除对fd的监听
+```
+int Looper::removeFd(int fd) {
+    return removeFd(fd, -1);
+}
+
+int Looper::removeFd(int fd, int seq) {
+    ...
+    int epollResult = epoll_ctl(mEpollFd, EPOLL_CTL_DEL, fd, NULL);
+    ...
+}
+```
 
 
 

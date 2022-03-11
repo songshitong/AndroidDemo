@@ -8,6 +8,26 @@
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
     </configurations>
   </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="feature/src/main/res/drawable/animation_drawable.xml" value="0.2255" />
+        <entry key="feature/src/main/res/layout/activity_anr.xml" value="0.22916666666666666" />
+        <entry key="feature/src/main/res/layout/activity_big_picture.xml" value="0.21979166666666666" />
+        <entry key="feature/src/main/res/layout/activity_canvas.xml" value="0.1" />
+        <entry key="feature/src/main/res/layout/activity_drawable.xml" value="0.240625" />
+        <entry key="feature/src/main/res/layout/activity_intent_service.xml" value="0.2390625" />
+        <entry key="feature/src/main/res/layout/activity_layout_animation.xml" value="0.2390625" />
+        <entry key="feature/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="feature/src/main/res/layout/activity_measure_test.xml" value="0.240625" />
+        <entry key="feature/src/main/res/layout/activity_rvcutsom_layout_manager.xml" value="0.1" />
+        <entry key="feature/src/main/res/layout/activity_scroll_nested.xml" value="0.240625" />
+        <entry key="feature/src/main/res/layout/activity_test_anr.xml" value="0.1" />
+        <entry key="feature/src/main/res/layout/activity_toast_bug.xml" value="0.2390625" />
+        <entry key="feature/src/main/res/layout/rv_custom_layout_manager.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
   <component name="Kotlin2JsCompilerArguments">
     <option name="sourceMapEmbedSources" />
     <option name="sourceMapPrefix" />

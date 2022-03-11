@@ -90,6 +90,7 @@ while(存在未对账订单){
 下面的代码示例中，在 while 循环里面，我们首先创建了一个 CountDownLatch，计数器的初始值等于 2，之后在pos = getPOrders();
 和dos = getDOrders();两条语句的后面对计数器执行减 1 操作，这个对计数器减 1 的操作是通过调用 latch.countDown(); 来实现的。
 在主线程中，我们通过调用 latch.await() 来实现对计数器等于 0 的等待。
+CancelableCountDownLatch  支持取消的  执行cancel后，计数会被置为0
 
 Latch  锁上,门闩
 

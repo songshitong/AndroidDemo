@@ -34,7 +34,7 @@ Dalvik执行的是dex字节码，依靠JIT编译器去解释执行，运行时�
 所以在安装应用的时候，dex中的字节码将被编译成本地机器码，之后每次打开应用，执行的都是本地机器码。移除了运行时的解释执行，效率更高，
 启动更快。（安卓在4.4中发布了ART运行时）
 
-https://juejin.cn/post/6844903748058218509
+https://juejin.cn/post/6844903748058218509  
 相比于 Dalvik，ART 对 Garbage Collection（GC）过程的也进行了改进：
 1 只有一次 GC 暂停（Dalvik 需要两次）
 2 在 GC 保持暂停状态期间并行处理
@@ -51,11 +51,6 @@ Android 7.0 —— JIT 回归
 应用在运行时 dex 文件先通过解析器（Interpreter）后会被直接执行（这一步骤跟 Android 2.2 - Android 4.4之前的行为一致），
     与此同时，热点函数（Hot Code）会被识别并被 JIT 编译后存储在 jit code cache 中并生成 profile 文件以记录热点函数的信息。
 手机进入 IDLE（空闲） 或者 Charging（充电） 状态的时候，系统会扫描 App 目录下的 profile 文件并执行 AOT 过程进行编译。
-
-作者：guanpj
-链接：https://juejin.cn/post/6844903748058218509
-来源：稀土掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 ART优点：
 ①系统性能显著提升

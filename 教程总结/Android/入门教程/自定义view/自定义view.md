@@ -109,8 +109,61 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     }
 ```
 
+http://liuwangshu.cn/application/view/9-custom-view.html
+自定义属性
+values目录下创建 attrs.xml：
+```
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RectView">
+        <attr name="rect_color" format="color" />
+    </declare-styleable>
+</resources>
+```
+代码加载
+```
+TypedArray mTypedArray=context.obtainStyledAttributes(attrs,R.styleable.RectView);
+//提取RectView属性集合的rect_color属性，如果没设置默认值为Color.RED
+mColor=mTypedArray.getColor(R.styleable.RectView_rect_color,Color.RED);
+//获取资源后要及时回收
+mTypedArray.recycle();
+```
+自定义属性使用
+```
+<com.example.liuwangshu.mooncustomview.RectView
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      ...
+      app:rect_color="@android:color/holo_blue_light"
+      />
+```
+使用自定义属性需要添加schemas： xmlns:app=”http://schemas.android.com/apk/res-auto"，其中app是 我们自定义的名字，
+最后我们配置新定义的app:rect_color属性为android:color/holo_blue_light
+
+
+自定义组合控件  主要用于复用
+1 新建view_customtitle.xml，添加多个控件和布局
+2 构造器中使用 LayoutInflater.from(context).inflate(R.layout.view_customtitle, this, true);解析布局
+3 findViewById修改子控件属性，然后可以使用了
+
+
+常用方法  https://www.jianshu.com/p/5ec0f278e0a3
+invalidate
+invalidate：
+view的invalidate不会导致ViewRootImpl的invalidate被调用，而是递归调用父view的invalidateChildInParent，
+直到ViewRootImpl的invalidateChildInParent，然后触发performTraversals，会导致当前view被重绘,由于mLayoutRequested为false，
+不会导致onMeasure和onLayout被调用，而OnDraw会被调用
+
+requestLayout
+requestLayout会直接递归调用父窗口的requestLayout，直到ViewRootImpl,然后触发performTraversals，由于mLayoutRequested为true，
+会导致onMeasure和onLayout被调用。不一定会触发OnDraw。requestLayout触发onDraw可能是因为在在layout过程中发现l,t,r,b和以前不一样，
+那就会触发一次invalidate，所以触发了onDraw，也可能是因为别的原因导致mDirty非空（比如在跑动画）
+只要刷新的时候就调用invalidate，需要重新measure就调用requestLayout，后面再跟个invalidate（为了保证重绘）
+
+invalidate(Rect dirty)/invalidate(int l, int t, int r, int b)  限定刷新范围，逐渐被废弃
+在API 14中切换到硬件加速渲染降低了脏矩形的重要性。在API 21中，给定的矩形被完全忽略，取而代之的是内部计算的面积。因此，
+鼓励client直接调用invalidate（）。
+
 https://blog.csdn.net/weixin_30321709/article/details/94861044
-常用方法
 获取屏幕的高度和宽度
 WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
 //WindowManager wm = this.getWindowManager();
@@ -123,6 +176,19 @@ view.getLocationOnScreen(location);
 这样就可以得到该视图在全局坐标系中的x，y值，（注意这个值是要从屏幕顶端算起，也就是索包括了通知栏的高度）//获取在当前屏幕内的绝对坐标
 数组中location[0]代表的是x坐标，location[1]代表的是y坐标
 
+获取View到其父控件的距离
+View到其父控件（ViewGroup）的距离：
+getTop()：获取View自身顶边到其父布局顶边的距离
+getLeft()：获取View自身左边到其父布局左边的距离
+getRight()：获取View自身右边到其父布局左边的距离
+getBottom()：获取View自身底边到其父布局顶边的距离
+
+MotionEvent提供的方法
+getX()：获取点击事件距离控件左边的距离，即视图坐标
+getY()：获取点击事件距离控件顶边的距离，即视图坐标
+getRawX()：获取点击事件距离整个屏幕左边距离，即绝对坐标
+getRawY()：获取点击事件距离整个屏幕顶边的的距离，即绝对坐标
+
 
 获得当前view的高度和宽度
 //获取控件的高度
@@ -130,6 +196,25 @@ int height = imageView.getMeasuredHeight();
 //获取控件的宽度
 int width = imageView.getMeasuredWidth();
 转载于:https://www.cnblogs.com/butterfly-clover/p/3382296.html
+
+getMeasuredWidth与 getWidth
+```
+  public final int getMeasuredWidth() {
+      return mMeasuredWidth & MEASURED_SIZE_MASK;
+  }
+```
+mMeasuredWidth这个值在setMeasuredDimensionRaw中被设置，而此方法会在setMeasuredDimension中被调用。
+ onMeasure最后会调用此方法设置View的测量宽高
+
+getWidth方法实际上由mRight与mLeft相减而来，而mRight与其他三点顶点的坐标在setFrame中被设置。
+setFrame方法最后又在View#layout方法中间接或直接调用
+```
+  public final int getWidth() {
+      return mRight - mLeft;
+  }
+```
+getWidth与getMeasuredWidth大部分情况下都是相等的，也有一些特殊情况会不相等。这些特殊情况就是在measure过程完成之后，
+   在父布局的onLayout或者自身的onDraw方法中调用measure方法导致
 
 
 获取content：

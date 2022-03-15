@@ -15,9 +15,14 @@ version: 4.9.3
    这里简单介绍2种,GET和POST.推荐让 OkHttpClient 保持单例，用同一个 OkHttpClient 实例来执行你的所有请求，
    因为每一个 OkHttpClient 实例都拥有自己的连接池和线程池，重用这些资源可以减少延时和节省资源，如果为每个请求创建一个 OkHttpClient实例，
    显然就是一种资源的浪费。
-//todo 如何hook三方SDK的线程池
+   
 
 1. 使用GET方式请求
+同步call  线程会进行阻塞，直到响应回调
+```
+Response response = client.newCall(request).execute()
+```
+异步call
 ```
 public static final String URL = "http://www.baidu.com";
 private OkHttpClient mOkHttpClient = new OkHttpClient();
@@ -900,8 +905,44 @@ override fun intercept(chain: Interceptor.Chain): Response {
 ```
 
 
-
 这是链中最后一个拦截器，它向 服务器 发起了一次网络访问.负责向服务器发送请求数据、从服务器读取响应数据.拿到数据之后再沿着链返回.
 4. 总结
    OkHttp的拦截器链设计得非常巧妙,是典型的责任链模式.并最终由最后一个链处理了网络请求,并拿到结果.本文主要是对OkHttp主流程进行了梳理,
    通过本文能对OkHttp有一个整体的了解.
+
+
+同步流程补充 
+1.构建RealCall
+2.添加到Dispatcher的runningSyncCalls同步请求队列    
+   由于是阻塞的添加进runningSyncCalls，完成后移除，它的作用是什么？  
+    多个同步请求添加后，可以使用Dispatcher.runningCalls获取所有的call以及Dispatcher.runningCallsCount判断是否存在未完成的任务
+3.根据RealCall开始拦截器调用链开始请求，成功后移除RealCall
+```
+Response response = client.newCall(request).execute()
+```
+
+RealCall.kt
+```
+  override fun execute(): Response {
+    ...
+    //回调事件 callStart
+    callStart()
+    try {
+      //添加到Dispatcher的runningSyncCalls
+      client.dispatcher.executed(this)
+      return getResponseWithInterceptorChain()
+    } finally {
+      //完成后移除请求
+      client.dispatcher.finished(this)
+    }
+  }
+  
+  //Dispatcher.kt
+ @Synchronized internal fun executed(call: RealCall) {
+    runningSyncCalls.add(call)
+  }
+  
+  internal fun getResponseWithInterceptorChain(): Response {
+   ... 调用链开始请求，查看上面的分析
+  }
+```

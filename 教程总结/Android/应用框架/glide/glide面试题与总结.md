@@ -38,7 +38,7 @@ Glide的缓存机制，主要分为2种缓存，一种是内存缓存，一种�
 ActiveResources 就是一个弱引用的 HashMap ，用来缓存正在使用中的图片,使用 ActiveResources 来缓存正在使用中的图片，
    可以保护这些图片不会被 LruCache 算法回收掉
 内存缓存加载顺序如下：                    //todo  流程顺序，活动资源的大小限制
-1.根据图片地址，宽高，变换，签名等生成key
+1.根据图片地址，宽高，变换，签名等生成key   //todo signature的作用   //ActiveResource的回收过程在后台线程
 2.第一次加载没有获取到活动缓存。
 3.接着加载内存资源缓存，先清理掉内存缓存，在添加进行活动缓存。
 4.第二次加载活动缓存已经存在。
@@ -77,7 +77,8 @@ DataCacheKey newOriginalKey = new DataCacheKey(loadData.sourceKey, helper.getSig
 ```
 
 DiskLruCache   DiskLruCacheWrapper是glide对DiskLruCache包装
-DiskLruCache会对操作保存到journal文件 文件主要保存四种操作  journal文件记录超过2000会进行重建，只记录DIRTY和CLEAN
+使用LinkedHashMap实现LRU缓存，
+DiskLruCache会对操作保存到journal文件 文件主要保存四种操作和对应的文件key，key一般是url的md5，缓存文件的名字
  DIRTY：第六行以DIRTY前缀开始，后面跟着缓存文件的key，表示一个entry正在被写入。   edit()方法
  CLEAN：当写入成功，就会写入一条CLEAN记录，后面的数字记录文件的长度，如果一个key可以对应多个文件，那么就会有多个数字   
      调用edit()之后进行commit()
@@ -86,6 +87,12 @@ DiskLruCache会对操作保存到journal文件 文件主要保存四种操作  j
 存储文件目录名image_manager_disk_cache，默认大小250M
   超过250M，后台线程glide-disk-lru-cache-thread会根据journal文件的记录生成的LinkedHashMap<String, Entry>lruEntries
      按照LRU淘汰链表头部也就是最老的。每次访问文件都会把对应的entry移动到链表尾部
+journal文件记录超过2000会进行重建，只记录DIRTY和CLEAN
+触发时机：
+remove(String key)  写入一条REMOVE，删除LinkedHashMap中的entry，开始触发后台清理 
+setMaxSize(long maxSize)   
+get(String key)   新增一条read记录，判断是否journal超出，开始触发后台清理
+提交修改commit()   如果成功，写入一条CLEAN记录,否则，写入一条REMOVE记录，判断是否journal超出，开始触发后台清理
 
 
 Glide做了哪些内存优化
@@ -380,7 +387,6 @@ public enum Priority {
   LOW,
 }
 ```
-
 
 开发者实现图片的优先级加载
 ```

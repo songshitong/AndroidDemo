@@ -58,7 +58,36 @@ animatorSet.play(squashAnim1).with(squashAnim2);
 animatorSet.play(bounceBackAnim).after(stretchAnim2);
 animatorSet.start();
 ```
-
+PropertyValuesHolder
+PropertyValuesHolder类只能多个动画一起执行
+```
+PropertyValuesHolder valuesHolder1 = PropertyValuesHolder.ofFloat('scaleX', 1.0f, 1.5f);
+PropertyValuesHolder valuesHolder2 = PropertyValuesHolder.ofFloat('rotationX', 0.0f, 90.0f, 0.0F);
+PropertyValuesHolder valuesHolder3 = PropertyValuesHolder.ofFloat('alpha', 1.0f, 0.3f, 1.0F);
+ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(imageView,  valuesHolder1, valuesHolder2, valuesHolder3);
+objectAnimator.setDuration(2000).start();
+```
+xml中使用属性动画
+res/animator文件夹下，新建scale.xml  
+```
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:duration="1000"
+    android:propertyName="scaleX"
+    android:valueFrom="1.0"
+    android:valueTo="2.0"
+    android:valueType="floatType"
+    >
+</objectAnimator>
+```
+程序加载
+```
+Animator animator=AnimatorInflater.loadAnimator(this,R.animator.scale);
+animator.setTarget(view);
+animator.start();
+```
 
 https://blog.51cto.com/u_15127637/4623018
 Android Tween Animation ( 补间动画 ) 只需指定 动画开始 ，以及 动画结束 "关键帧"， 而动画变化的 "中间帧" 则由系统计算并补齐
@@ -120,5 +149,9 @@ IntEvaluator：针对整型属性
 FloatEvaluator：
 针对浮点型属性
 ArgbEvaluator：针对Color属性
+
+
+
+
 
 

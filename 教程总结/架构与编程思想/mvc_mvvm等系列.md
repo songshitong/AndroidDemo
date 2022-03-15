@@ -4,10 +4,11 @@ https://www.ruanyifeng.com/blog/2015/02/mvcmvp_mvvm.html
 MVC
 MVC架构主要分为以下几部分
 视图层（View）：对应于xml布局文件和java代码动态view部分
-控制层（Controller）：主要负责业务逻辑，在android中由Activity承担，同时因为XML视图功能太弱，所以Activity既要负责视图的显示又要加入控制逻辑，
-     承担的功能过多。
+控制层（Controller）：主要负责业务逻辑，在android中由Activity承担，同时因为XML视图功能太弱，
+   所以Activity既要负责视图的显示又要加入控制逻辑，承担的功能过多。
 模型层（Model）：主要负责网络请求，数据库处理，I/O的操作，即页面的数据来源
 架构设计_mvc.webp   todo mvc有两种方式
+view->controller->model->view
 1 View 传送指令到 Controller
 2 Controller 完成业务逻辑后，要求 Model 改变状态
 3 Model 将新的数据发送到 View，用户得到反馈
@@ -42,8 +43,11 @@ MVVM 模式将 Presenter 改名为 ViewModel，基本上与 MVP 模式完全一�
 唯一的区别是，它采用双向数据绑定（data-binding）：View的变动，自动反映在 ViewModel，反之亦然  
 MVVM架构图如下所示：
 架构设计_mvvm.webp
+view->viewModel->model->viewModel->view
 可以看出MVVM与MVP的主要区别在于,你不用去主动去刷新UI了，只要Model数据变了，会自动反映到UI上。换句话说，MVVM更像是自动化的MVP
   解决了MVP中Presenter与View耦合的问题，降低了接口数量
+使用场景：
+1. 数据驱动视图，状态多复杂的页面可以使用
 
 MVVM架构有什么不足
 相信使用MVVM架构的同学都有如下经验，为了保证数据流的单向流动，LiveData向外暴露时需要转化成immutable的，这需要添加不少模板代码并且容易遗忘，

@@ -2,10 +2,23 @@
 https://zhuanlan.zhihu.com/p/46664887
 DiskLruCache 遵从 LRU 算法，当缓存数据达到设定的极限值时将会后台自动按照 LRU 算法移除缓存直到满足存下新的缓存不超过极限值
     一条缓存记录一次只能有一个 editor ，如果值不可编辑将会返回一个空值
+    使用LinkedHashMap<String, Entry> lruEntries实现LRU
 DiskLruCache 的数据是缓存在文件系统的某一目录中的，这个目录必须是唯一对应某一条缓存的，缓存可能会重写和删除目录中的文件。
   多个进程同一时间使用同一个缓存目录会出错。
 存储文件目录名image_manager_disk_cache，默认大小250M
 后台线程glide-disk-lru-cache-thread，超过250M后按LRU淘汰最少使用的，journal文件超过2000条也会重建该文件
+  触发时机：
+remove(String key)  写入一条REMOVE，删除LinkedHashMap中的entry，开始触发后台清理
+setMaxSize(long maxSize)   
+get(String key)   新增一条read记录，判断是否journal超出，开始触发后台清理
+提交修改commit()   如果成功，写入一条CLEAN记录,否则，写入一条REMOVE记录，判断是否journal超出，开始触发后台清理
+```
+ public synchronized void setMaxSize(long maxSize) {
+    this.maxSize = maxSize;
+    executorService.submit(cleanupCallable);
+  }
+```
+
 
 DiskLruCache的使用
 打开缓存
@@ -65,7 +78,7 @@ journal文件头
 第四行：指每个key对应几个文件，一般为1个
 第五行：空行
 
-journal文件内容     key一般是外部传入的，可以是url的md5
+journal文件内容     key一般是外部传入的，可以是url的md5，缓存文件的名字
 DIRTY：第六行以DIRTY前缀开始，后面跟着缓存文件的key，表示一个entry正在被写入。   edit()方法
 CLEAN：当写入成功，就会写入一条CLEAN记录，后面的数字记录文件的长度，如果一个key可以对应多个文件，那么就会有多个数字   
    调用edit()之后进行commit()
@@ -96,7 +109,7 @@ public final class DiskLruCache implements Closeable {
   //利用LinkedHashMap实现LRU  key为string，value为entry  true代表按访问顺序排序，每次访问元素后该元素将移至链表的尾部
   private final LinkedHashMap<String, Entry> lruEntries = new LinkedHashMap<String, Entry>(0, 0.75f, true);
   
-  //建立一个线程池后台线程  名字为glide-disk-lru-cache-thread
+  //建立一个线程池后台线程  名字为glide-disk-lru-cache-thread 空闲线程最多存活60秒
   final ThreadPoolExecutor executorService =
       new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
           new DiskLruCacheThreadFactory());
@@ -112,6 +125,7 @@ public final class DiskLruCache implements Closeable {
         if (journalRebuildRequired()) {
           //重建journal
           rebuildJournal();
+          //多余的行
           redundantOpCount = 0;
         }
       }
@@ -120,6 +134,7 @@ public final class DiskLruCache implements Closeable {
   };
 }
 ```
+redundant  [rɪˈdʌndənt]  冗余的;多余的;被裁减的;不需要的
 文件操作使用Editor，LRU更新基于entry
 ```
  //编辑器

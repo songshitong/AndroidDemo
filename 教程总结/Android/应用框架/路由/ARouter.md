@@ -132,13 +132,26 @@ class GsonSerializationServiceImpl : SerializationService {
 ```
 
 
+路由中的分组概念
+SDK中针对所有的路径(/test/1 /test/2)进行分组，分组只有在分组中的某一个路径第一次被访问的时候，该分组才会被初始化
+可以通过 @Route 注解主动指定分组，否则使用路径中第一段字符串(/*/)作为分组
+注意：一旦主动指定分组之后，应用内路由需要使用 ARouter.getInstance().build(path, group) 进行跳转，手动指定分组，否则无法找到
+@Route(path = "/test/1", group = "app")
+
+截器和服务的异同
+拦截器和服务所需要实现的接口不同，但是结构类似，都存在 init(Context context) 方法，但是两者的调用时机不同
+拦截器因为其特殊性，会被任何一次路由所触发，拦截器会在ARouter初始化的时候异步初始化，如果第一次路由的时候拦截器还没有初始化结束，
+  路由会等待，直到初始化完成。
+服务没有该限制，某一服务可能在App整个生命周期中都不会用到，所以服务只有被调用的时候才会触发初始化操作
 
 路由原理
 主要是通过编译的时候通过APT扫描注解，并进行相应处理，通过javapoet库生成Java代码;
 
 主要步骤如下：
-1 调用ARouter.init方法,在LogisticsCenter中生成三个文件,Group(IRouteGroup),Providers(IProviderGroup),Root(IRouteRoot),
-  使用Warehouse将文件保存到三个不同的HashMap中, Warehouse就相当于路由表, 保存着全部模块的跳转关系;
+1 调用ARouter.init方法,在LogisticsCenter中利用DexFile扫描class文件,搜索以"com.alibaba.android.arouter.routes"的文件，
+  找到Group(IRouteGroup),Providers(IProviderGroup),Root(IRouteRoot),
+  使用Warehouse将其保存到三个不同的HashMap中, Warehouse就相当于路由表, 保存着全部模块的跳转关系;
+  Interceptors拦截器，Providers是定义的服务，Root路由Group
 2 通过ARouter.navigation封装postcard对象;
 3 通过ARouter索引传递到LogisticsCenter(路由中转站),询问是否存在跳转对象;
 4 判断是否绿色通行和是否能通过拦截服务;

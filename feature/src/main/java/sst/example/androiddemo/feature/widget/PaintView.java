@@ -211,6 +211,8 @@ public class PaintView extends View {
 
 
         mPaint.setStyle(Paint.Style.FILL);
+
+        //todo 实现这个效果
         //设置着色器Shader.TileMode.CLAMP 夹子  Shader.TileMode.repeat 重复    MIRROR镜像
 //        BitmapShader：实现圆形图像
 //        LinearGradient：实现渐变文字

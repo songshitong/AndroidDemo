@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.text.PrecomputedTextCompat
 import com.blankj.utilcode.util.UriUtils
 import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -119,10 +120,7 @@ class  MainActivity : AppCompatActivity()  {
             val intent = Intent(this, PathActivity::class.java)
             startActivity(intent)
         }
-        shaderActivity.setOnClickListener {
-            val intent = Intent(this, ShaderActivity::class.java)
-            startActivity(intent)
-        }
+
         layoutAnimationActivity.setOnClickListener {
             val intent = Intent(this, LayoutAnimationActivity::class.java)
             startActivity(intent)

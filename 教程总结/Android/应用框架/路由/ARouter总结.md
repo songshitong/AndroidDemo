@@ -7,8 +7,9 @@ com.alibaba.android.arouter.routes.ARouter$$Interceptors
 com.alibaba.android.arouter.routes.ARouter$$Providers
 
 主要步骤如下：
-1 调用ARouter.init方法,在LogisticsCenter中生成三个文件,Group(IRouteGroup),Providers(IProviderGroup),Root(IRouteRoot),
-使用Warehouse将文件保存到三个不同的HashMap中, Warehouse就相当于路由表, 保存着全部模块的跳转关系;
+1 调用ARouter.init方法,在LogisticsCenter中利用DexFile扫描class文件,搜索以"com.alibaba.android.arouter.routes"的文件，
+  找到Group(IRouteGroup),Providers(IProviderGroup),Root(IRouteRoot),
+  使用Warehouse将其保存到三个不同的HashMap中, Warehouse就相当于路由表, 保存着全部模块的跳转关系;
   通过DexFile扫描安装包获取APT生成的路由信息，然后使用SharePreference保存，在debug模式或新版本会重新扫描
 ```
 class Warehouse {

@@ -21,7 +21,7 @@ draw 方法的调度流程大致是这样的：
 绘制背景。对应 drawBackground(Canvas)方法。
 绘制主体。对应 onDraw(Canvas)方法。
 绘制子View。 对应 dispatchDraw(Canvas)方法。     ViewGroup重写了该方法，调用drawChild->child.draw
-绘制滑动相关和前景。 对应 onDrawForeground(Canvas)      //todo view的绘制流程  measure与onMeasure
+绘制滑动相关和前景。 对应 onDrawForeground(Canvas)      
 
 
 

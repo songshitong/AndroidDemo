@@ -1,4 +1,4 @@
-
+                        
 AMS activity启动过程
 1. Launcher startActivity   通过binder向AMS发送START_ACTIVITY_TRANSACTION
 2. AMS startActivity   AMS通过socket(名字为zygote)向zygote发送应用进程的启动参数，包括uid,gid等
@@ -6,12 +6,13 @@ AMS activity启动过程
 4. ActivityThread main()     启动binder线程池，通过反射创建ActivityThread类，然后调用main方法
    4.1. ActivityThread attach    Looper.prepareMainLooper;ActivityThread.attach;Looper.loop()启动主线程looper
    4.2. handleBindApplication    创建Application
-   4.3  attachBaseContext
+   4.3  attachBaseContext          Application.attachBaseContext
    4.4. installContentProviders    安装ContentProvider
    4.5. Application onCreate
 5. ActivityThread 进入loop循环
-6. ActivityThread通过反射创建Activity performLaunchActivity
+6. ActivityThread通过反射创建Activity    performLaunchActivity
    Activity生命周期回调，onCreate、onStart、onResume... 
+//todo 增加activity stack   
 
 
 //todo BadTokenException   为什么Application的Context不能show dialog
@@ -45,7 +46,7 @@ WindowToken会将相同组件（比如Activity）的窗口（WindowState）集�
 Apk安装过程
 PackageInstaller初始化的过程：
 1 根据Uri的Scheme协议不同，跳转到不同的界面，content协议跳转到InstallStart，其他的跳转到PackageInstallerActivity。
-本文应用场景中，如果是Android7.0以及更高版本会跳转到InstallStart。
+    如果是Android7.0以及更高版本会跳转到InstallStart。
 2 InstallStart将content协议的Uri转换为File协议，然后跳转到PackageInstallerActivity。
 3 PackageInstallerActivity会分别对package协议和file协议的Uri进行处理，如果是file协议会解析APK文件得到包信息PackageInfo。
 4 根据获取的包信息，PackageInstallerActivity中会对未知来源进行处理，如果允许安装未知来源或者根据Intent判断得出该APK不是未知来源，
@@ -88,6 +89,15 @@ InputManager{
      这样InputDispatcher就可以将输入事件派发给合适的Window  通过InputChannel发送
 }
 InputManagerService   运行在SystemServer进程，里面的mHandler运行在android.display线程
+//todo InputManagerService跟inputManager的关系
+
+IMS启动了InputDispatcherThread和InputReaderThread，分别用来运行InputDispatcher和InputReader。
+InputDispatcher先于InputReader被创建，InputDispatcher的dispatchOnceInnerLocked函数用来将事件分发给合适的Window。
+   InputDispatcher没有输入事件处理时会进入睡眠状态，等待InputReader通知唤醒。
+InputReader通过EventHub的getEvents函数获取事件信息，如果是原始输入事件，就将这些原始输入事件交由不同的InputMapper来处理，
+  最终交由InputDispatcher来进行分发。
+InputDispatcher的notifyKey函数中会根据按键数据来判断InputDispatcher是否要被唤醒，InputDispatcher被唤醒后，
+   会重新调用dispatchOnceInnerLocked函数将输入事件分发给合适的Window。
 
 
 

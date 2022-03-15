@@ -22,8 +22,10 @@
         <entry key="feature/src/main/res/layout/activity_measure_test.xml" value="0.240625" />
         <entry key="feature/src/main/res/layout/activity_rvcutsom_layout_manager.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/activity_scroll_nested.xml" value="0.240625" />
+        <entry key="feature/src/main/res/layout/activity_shader.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/activity_test_anr.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/activity_toast_bug.xml" value="0.2390625" />
+        <entry key="feature/src/main/res/layout/activity_view_outline_provider.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/rv_custom_layout_manager.xml" value="0.1" />
       </map>
     </option>

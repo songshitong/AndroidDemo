@@ -8,12 +8,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import sst.example.lib.metadata.MyAnnotation;
 ///修改类的属性的访问限制，继承重写，反射+包装类  todo json序列化原理  私有属性没有getset方法，没法序列化，通过反射获取然后在进行序列化
 
 ///todo 默认default方法是否可以被子类调用，重写 几种访问权限
 
+//https://wiki.jikexueyuan.com/project/java-reflection/java-classes.html
 //反射是指计算机程序在运行时可以访问、检测和修改它本身状态或行为的一种能力
 //反射机制直接创建对象即使这个对象在编译期是未知的，
 //        反射的核心：是 JVM 在运行时 才动态加载的类或调用方法或属性，他不需要事先（写代码的时候或编译期）知道运行对象是谁
@@ -31,7 +36,7 @@ import sst.example.lib.metadata.MyAnnotation;
 //        注解
 //全部的信息你可以查看相应的文档 JavaDoc for java.lang.Class 里面有详尽的描述。
 public class ReflectDemo {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchMethodException, NoSuchFieldException {
 
 //        在你想检查一个类的信息之前，你首先需要获取类的 Class 对象
         //获取class 对象
@@ -151,7 +156,7 @@ public class ReflectDemo {
             declaredMethod.invoke(reflectTest2,void.class);
 
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            System.out.println("class not found "+e.toString());
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -351,8 +356,79 @@ public class ReflectDemo {
             e.printStackTrace();
         }
 
-        //todo 动态代理，范型
+        //范型
+        //在一些文章以及论坛中读到说 Java 泛型信息在编译期被擦除（erased）所以你无法在运行期获得有关泛型的信息。其实这种说法并不完全正确的，
+        //在一些情况下是可以在运行期获取到泛型的信息。这些情况其实覆盖了一些我们需要泛型信息的需求
+        //当你想在运行期参数化类型本身，比如你想检查 java.util.List 类的参数化类型，你是没有办法能知道他具体的参数化类型是什么。
+        //这样一来这个类型就可以是一个应用中所有的类型。但是，当你检查一个使用了被参数化的类型的变量或者方法，
+        //你可以获得这个被参数化类型的具体参数。总之：
+        //你不能在运行期获知一个被参数化的类型的具体参数类型是什么，但是你可以在用到这个被参数化类型的方法以及变量中找到他们，
+        //换句话说就是获知他们具体的参数化类型。
+        // 获取泛型方法返回类型  List<String>
+        Method method = ReflectDemo.class.getMethod("getStringList");
+        Type returnType = method.getGenericReturnType();
+        if(returnType instanceof ParameterizedType){
+            ParameterizedType type = (ParameterizedType) returnType;
+            Type[] typeArguments = type.getActualTypeArguments();
+            for(Type typeArgument : typeArguments){
+                Class typeArgClass = (Class) typeArgument;
+                System.out.println("泛型获取-----");
+                System.out.println("typeArgClass = " + typeArgClass);
+            }
+        }
+       //泛型方法参数类型  List<String>
+        method = ReflectDemo.class.getMethod("setStringList", List.class);
+        Type[] genericParameterTypes = method.getGenericParameterTypes();
+        for(Type genericParameterType : genericParameterTypes){
+            if(genericParameterType instanceof ParameterizedType){
+                ParameterizedType aType = (ParameterizedType) genericParameterType;
+                Type[] parameterArgTypes = aType.getActualTypeArguments();
+                for(Type parameterArgType : parameterArgTypes){
+                    Class parameterArgClass = (Class) parameterArgType;
+                    System.out.println("parameterArgClass = " + parameterArgClass);
+                }
+            }
+        }
+        //泛型变量类型  List<String>
+        Field field = ReflectDemo.class.getField("stringList");
+        Type genericFieldType = field.getGenericType();
+        if(genericFieldType instanceof ParameterizedType){
+            ParameterizedType aType = (ParameterizedType) genericFieldType;
+            Type[] fieldArgTypes = aType.getActualTypeArguments();
+            for(Type fieldArgType : fieldArgTypes){
+                Class fieldArgClass = (Class) fieldArgType;
+                System.out.println("fieldArgClass = " + fieldArgClass);
+            }
+        }
 
+
+        //动态代理
+//        InvocationHandler handler = new MyInvocationHandler();
+//        MyInterface proxy = (MyInterface) Proxy.newProxyInstance(
+//                MyInterface.class.getClassLoader(),
+//                new Class[] { MyInterface.class },
+//                handler);
+//        public class MyInvocationHandler implements InvocationHandler{
+//
+//            public Object invoke(Object proxy, Method method, Object[] args)
+//                    throws Throwable {
+//                //do something "dynamic"
+//            }
+//        }
+
+
+        //动态类加载
+        //Java 允许你在运行期动态加载和重载类，但是这个功能并没有像人们希望的那么简单直接。这篇文章将阐述在 Java 中如何加载以及重载类。
+        // 你可能会质疑为什么 Java 动态类加载特性是 Java 反射机制的一部分而不是 Java 核心平台的一部分。不管怎样，
+        // 这篇文章被放到了 Java 反射系列里面而且也没有更好的系列来包含它了
+        ClassLoader classLoader = ReflectDemo.class.getClassLoader();
+        //动态加载一个类
+        try {
+            Class aClass = classLoader.loadClass("com.jenkov.MyClass");
+            System.out.println("aClass.getName() = " + aClass.getName());
+        } catch (ClassNotFoundException e) {
+            System.out.println("class not found "+e.toString());
+        }
     }
 
     public static Class getClass(String className) throws ClassNotFoundException {
@@ -367,6 +443,15 @@ public class ReflectDemo {
         return Class.forName(className);
     }
 
+    public List<String> stringList = new ArrayList<>();
+
+    public List<String> getStringList(){
+        return this.stringList;
+    }
+
+    public void setStringList(List<String> list){
+        this.stringList = list;
+    }
 }
 
 

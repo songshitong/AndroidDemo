@@ -25,12 +25,16 @@ ATRACE_CALL();
 python systrace.py --list-categories   //列举可用类型，对缩写有解释 例如，wm是WindowManager,
 python systrace.py --help
 python systrace.py gfx view wm am pm ss dalvik  sched -b 90960 -a com.sample.systrace  -o test.log.html
-  //-b 是设定buffer 
+  //-b 是设定buffer   buffer不要过大，可能oom
   // -a APP_NAME, --app=APP_NAME   
   //-o输出
   //-t N, –time=N	执行时间，默认5s
   //-k <KFUNCS>，–ktrace=<KFUNCS>	追踪kernel函数，用逗号分隔
+
+//输出全部trace信息
+python systrace.py -b 32768 -t 5 -o mytrace.html gfx input view webview wm am sm audio video camera hal app res dalvik rs bionic power sched irq freq idle disk mmc load sync workq memreclaim regulators  
 ```
+
 
 查看报告
 使用chrome打开test.log.html

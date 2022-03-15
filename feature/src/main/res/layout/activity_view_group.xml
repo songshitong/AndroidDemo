@@ -6,12 +6,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".Animation.ViewGroupActivity">
-    <sst.example.androiddemo.feature.widget.GridRecyclerView
+    <sst.example.androiddemo.feature.widget.practice.GridRecyclerView
             android:layoutAnimation="@anim/layout_animation_fall_down"
             android:id="@+id/viewGroupRecyView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-    </sst.example.androiddemo.feature.widget.GridRecyclerView>
+    </sst.example.androiddemo.feature.widget.practice.GridRecyclerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ public void invalidate() {
           invalidate(true);
  }
   public void invalidate(boolean invalidateCache) {
+          //传入当前view的范围
           invalidateInternal(0, 0, mRight - mLeft, mBottom - mTop, invalidateCache, true);
       }
   
@@ -20,7 +21,7 @@ void invalidateInternal(int l, int t, int r, int b, boolean invalidateCache,
           mLastIsOpaque = isOpaque();
           mPrivateFlags &= ~PFLAG_DRAWN;
       }
-      //添加脏标记
+      //给当前view 添加脏标记
       mPrivateFlags |= PFLAG_DIRTY;
       final AttachInfo ai = mAttachInfo;
       final ViewParent p = mParent;
@@ -65,6 +66,7 @@ public ViewParent invalidateChildInParent(final int[] location, final Rect dir
 
 ```
 DecorView的parent是RootViewImpl
+/frameworks/base/core/java/android/view/ViewRootImpl.java
 ```
 public ViewParent invalidateChildInParent(int[] location, Rect dirty) {
     checkThread();//划重点...这里检查线程。子线程不能更新UI
@@ -82,7 +84,7 @@ invalidateRectOnScreen(dirty);
  private void invalidateRectOnScreen(Rect dirty) {
           final Rect localDirty = mDirty;
           if (!localDirty.isEmpty() && !localDirty.contains(dirty)) {
-          // 将dirty加入localDirty中
+          // 将dirty加入localDirty中  view的重绘范围
           localDirty.union(dirty.left, dirty.top, dirty.right, dirty.bottom);
           final float appScale = mAttachInfo.mApplicationScale;
           final boolean intersected = localDirty.intersect(0, 0,
@@ -122,10 +124,16 @@ invalidateRectOnScreen(dirty);
               mHandler.getLooper().getQueue().removeSyncBarrier(mTraversalBarrier);
               performTraversals();
           }
-      }        
+      }   
+      
+ private void performTraversals() {
+    ...
+    performDraw();
+    ...
+ }          
 ```
 有个dirty区域，重绘dirty区域，而且invalidate并不会引起measure，layout，draw的全流程，需要调用requestLayout才行 
-//todo 具体  android重绘流程
+
 
 
 postInvalidate 相关
@@ -469,7 +477,31 @@ ViewRootImpl.requestLayout
       scheduleTraversals();
   }
 }  
+private void performTraversals() {
+    //layoutRequested为true可能会触发layout
+    boolean layoutRequested = mLayoutRequested && (!mStopped || mReportNextDraw);
+    if (layoutRequested) {
+      measureHierarchy
+    }
+    ...
+    final boolean didLayout = layoutRequested && (!mStopped || mReportNextDraw);
+    ...
+    if (didLayout) {
+       //performLayout会触发measureHierarchy
+       performLayout(lp, mWidth, mHeight);}
+    ...    
+}
+ measureHierarchy{
+     performMeasure
+ }
 ```
+https://www.jianshu.com/p/5ec0f278e0a3
+requestLayout会直接递归调用父窗口的requestLayout，直到ViewRootImpl,然后触发performTraversals，由于mLayoutRequested为true，
+会导致onMeasure和onLayout被调用。不一定会触发OnDraw。requestLayout触发onDraw可能是因为在在layout过程中发现l,t,r,b和以前不一样，
+那就会触发一次invalidate，所以触发了onDraw，也可能是因为别的原因导致mDirty非空（比如在跑动画）
+https://cloud.tencent.com/developer/article/1684404
+需要频繁更新内容的View来说，则可以通过固定宽高等方式来避免一直触发requestLayout
+
 
 
 

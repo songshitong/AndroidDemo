@@ -122,7 +122,6 @@
         <activity android:name=".graphics.PaintActivity" />
         <activity android:name=".graphics.DrawableActivity" />
         <activity android:name=".graphics.PathActivity" />
-        <activity android:name=".graphics.ShaderActivity" />
         <activity android:name=".Animation.LayoutAnimationActivity" />
         <activity android:name=".Animation.ViewGroupActivity" />
         <activity android:name=".Animation.ViewPropertyAnimatorActivity" />

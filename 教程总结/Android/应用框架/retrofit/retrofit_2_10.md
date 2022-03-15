@@ -405,6 +405,7 @@ static boolean hasUnresolvableType(@Nullable Type type) {
       return false;
     }
     if (type instanceof ParameterizedType) {
+      //获取泛型的实际类型
       ParameterizedType parameterizedType = (ParameterizedType) type;
       for (Type typeArgument : parameterizedType.getActualTypeArguments()) {
         if (hasUnresolvableType(typeArgument)) {

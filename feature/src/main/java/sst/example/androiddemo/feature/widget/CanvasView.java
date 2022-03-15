@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Build;
 import android.text.DynamicLayout;
 import android.text.Layout;
@@ -17,6 +18,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.graphics.BitmapActivity;
@@ -123,6 +125,12 @@ public class CanvasView extends View {
 //          camera.rotateX(0); 绕x轴旋转，屏幕里外上下
 //          camera.rotateY(0); 绕Y轴旋转，屏幕里外左右
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            //判断和某个矩形相交
+            //若判断与矩形相交，则可跳过相交的区域，从而减少过度绘制
+            canvas.quickReject(new RectF(0,0,0,0));
+        }
+
 
         //todo draw 系列
         mCanvas.drawColor(Color.RED);
@@ -130,7 +138,8 @@ public class CanvasView extends View {
 //        mCanvas.drawCircle();
 
         //裁剪功能canvas.clipRect()---Region.Op.INTERSECT交集    clipOutRect---Region.Op.DIFFERENCE差集  在AndroidP(28)及以上只有这两个是有效的参数
-        // 这种情况可以用path替换 Op.UNION并集     XOR补集  REVERSE_DIFFERENCE差集  REPLACE 不论A和B的集合状况，B的范围将全部进行显示，如果和A有交集，则将覆盖A的交集范围；
+        // 这种情况可以用path替换 Op.UNION并集     XOR补集  REVERSE_DIFFERENCE差集
+        // REPLACE 不论A和B的集合状况，B的范围将全部进行显示，如果和A有交集，则将覆盖A的交集范围；
 
         //canvas区域与rect的交集
         canvas.clipRect(rect);
@@ -158,7 +167,7 @@ public class CanvasView extends View {
         canvas.restore();
         canvas.drawRect(0,0,50,50,mPaint);
 
-//https://www.jianshu.com/p/51d8dd99d27d
+       //https://www.jianshu.com/p/51d8dd99d27d
         //网格交叉点坐标数组，长度为(meshWidth + 1) * (meshHeight + 1) * 2
 //        vertOffset：控制verts数组中从第几个数组元素开始才对bitmap进行扭曲
 //        drawBitmapMesh() 方法改变图像的方式，就是通过改变这个 verts 数组里的元素的坐标值来重新定位对应的图像块的位置，从而达到图像效果处理的功能
@@ -172,7 +181,7 @@ public class CanvasView extends View {
         //绘制系列
 //        canvas.drawTextRun();   //加入了两项额外的设置——上下文和文字方向——用于辅助一些文字结构比较特殊的语言的绘制。
 
-//        StaticLayout   对文字自动换行  文字不改变
+//        StaticLayout   对文字自动换行  创建后文字不改变
 //        width 是文字区域的宽度，文字到达这个宽度后就会自动换行；
 //        align 是文字的对齐方向；
 //        spacingmult 是行间距的倍数，通常情况下填 1 就好；
@@ -180,8 +189,9 @@ public class CanvasView extends View {
 //        includeadd 是指是否在文字上下添加额外的空间，来避免某些过高的字符的绘制出现越界。
         StaticLayout staticLayout1 = new StaticLayout("text1", new TextPaint(), 600,
                 Layout.Alignment.ALIGN_NORMAL, 1, 0, true);
+         staticLayout1.draw(canvas);
 
-//        DynamicLayout  文字改变 api 28加入
+//        DynamicLayout  创建后文字改变 api 28加入
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             DynamicLayout dl = DynamicLayout.Builder.obtain("",new TextPaint(),0).build();
         }

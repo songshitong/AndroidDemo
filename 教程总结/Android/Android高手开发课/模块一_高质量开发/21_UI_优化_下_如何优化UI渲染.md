@@ -229,10 +229,12 @@ android高手_UI优化_View重用.webp
    这里我推荐使用 ConstraintLayout 替代 RelativeLayout 或者 weighted LinearLayout。  //todo layout的原理
 背景优化。尽量不要重复去设置背景，这里需要注意的是主题背景（theme)， theme 默认会是一个纯色背景，如果我们自定义了界面的背景，
    那么主题的背景我们来说是无用的。但是由于主题背景是设置在 DecorView 中，所以这里会带来重复绘制，也会带来绘制性能损耗。
+   window的背景
 
 对于 measure 和 layout，我们能不能像 Create View 一样实现线程的预布局呢？这样可以大大地提升首次显示的性能。
 Textview 是系统控件中非常强大也非常重要的一个控件，强大的背后就代表着需要做很多计算。在 2018 年的 Google I/O 大会，
   发布了PrecomputedText并已经集成在 Jetpack 中，它给我们提供了接口，可以异步进行 measure 和 layout，不必在主线程中执行。
+//使用时，使用兼容包PrecomputedTextCompat
 https://developer.android.com/reference/android/text/PrecomputedText
 //https://weilu.blog.csdn.net/article/details/89282221 todo
 
@@ -250,7 +252,7 @@ Google 开源的 Flutter。
    android高手_UI优化_异步布局.webp
 
 Litho 如我前面提到的 PrecomputedText 一样，把 measure 和 layout 都放到了后台线程，只留下了必须要在主线程完成的 draw，
-  这大大降低了 UI 线程的负载。它的渲染流水线如下：
+  这大大降低了 UI 线程的负载。它的渲染流水线如下：  //todo
 android高手_UI优化_litho的异步布局.webp
 
 界面扁平化
@@ -307,7 +309,7 @@ Flutter 也采用了类似 Litho、React 属性不可变，单向数据流的方
 
 3. RenderThread 与 RenderScript
    在 Android 5.0，系统增加了 RenderThread，对于 ViewPropertyAnimator 和 CircularReveal 动画，
-   我们可以使用RenderThead 实现动画的异步渲染。当主线程阻塞的时候，普通动画会出现明显的丢帧卡顿，
+   我们可以使用RenderThread 实现动画的异步渲染。当主线程阻塞的时候，普通动画会出现明显的丢帧卡顿，
    而使用 RenderThread 渲染的动画即使阻塞了主线程仍不受影响。
  https://mp.weixin.qq.com/s?__biz=MzUyMDAxMjQ3Ng==&mid=2247489230&idx=1&sn=adc193e35903ab90a4c966059933a35a&source=41#wechat_redirect
  //todo 动画的原理 与所在的线程

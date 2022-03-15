@@ -40,9 +40,11 @@ HTTP1.1 新增了六种请求方法：OPTIONS、PUT、PATCH、DELETE、TRACE 和
 
 常见方法（RFC7231）
 • GET：主要的获取信息方法，大量的性能优化都针对该方法，幂等方法    幂等，调用一次多次结果是相同的，对于分布式设计是有意义的
-• HEAD：类似 GET 方法，但服务器不发送 BODY，用以获取 HEAD 元数据，幂等方法
+• HEAD：类似 GET 方法，但服务器不发送 BODY，用以获取 HEAD 元数据，幂等方法    
+   该请求方法的一个使用场景是在下载一个大文件前先获取其大小再决定是否要下载, 以此可以节约带宽资源.
 • POST：常用于提交 HTML FORM 表单、新增资源等
 • PUT：更新资源，带条件时是幂等方法
+• PATCH:对资源进行部分修改，PATCH 不是幂等的
 • DELETE：删除资源，幂等方法
 • CONNECT：建立 tunnel 隧道
 • OPTIONS：显示服务器对访问资源支持的方法，幂等方法   跨域访问，判断新的域支持什么方法
@@ -54,6 +56,15 @@ HTTP1.1 新增了六种请求方法：OPTIONS、PUT、PATCH、DELETE、TRACE 和
 curl baidu.com -X OPTIONS -I
 Allow:GET,HEAD,PUT ...  
 
+
+https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods/HEAD
+HTTP HEAD 方法 请求资源的头部信息, 并且这些头部与 HTTP GET 方法请求时返回的一致. 该请求方法的一个使用场景是在
+  下载一个大文件前先获取其大小再决定是否要下载, 以此可以节约带宽资源.
+
+HEAD 方法的响应不应包含响应正文. 即使包含了正文也必须忽略掉. 虽然描述正文信息的 entity headers, 例如 Content-Length 可能会包含在响应中,
+  但它们并不是用来描述 HEAD 响应本身的, 而是用来描述同样情况下的 GET 请求应该返回的响应.
+
+如果 HEAD 请求的结果显示在上一次 GET 请求后缓存的资源已经过期了, 即使没有发出GET请求，缓存也会失效
 
 
 

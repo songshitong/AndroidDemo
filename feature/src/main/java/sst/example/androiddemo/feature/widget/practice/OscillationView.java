@@ -1,8 +1,5 @@
 package sst.example.androiddemo.feature.widget.practice;
 
-//振荡曲线  Oscillation 振荡，波动，波荡
-//阻尼正弦波
-//TODO 抛物线公式
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -18,7 +15,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.animation.*;
 
-import java.util.regex.Pattern;
+
+//振荡曲线  Oscillation 振荡，波动，波荡
+//阻尼正弦波
+//TODO 抛物线公式
 
 // 1 小球在线上下移
 // 2 小球在线上 上移
@@ -203,7 +203,6 @@ public class OscillationView extends SurfaceView implements SurfaceHolder.Callba
     private void drawView() {
         try {
            if(surfaceHolder != null){
-               //TODO surface缓存机制
                mCanvas = surfaceHolder.lockCanvas();
 
                //清屏

@@ -122,7 +122,7 @@ Bitmap Memory = widthPix * scale * heightPix * scale * 一个像素大小
 inSampleSize在BitmapFactory最终设置为2的整次幂,文档注释有写
 下采样  如果设定了inSampleSize，后续的内存发生变化    算上inSampleSize是原来的1/inSampleSize平方
 ```
-inSampleSize = ？？
+inSampleSize = ？？   增加inSampleSize后的计算   一般是图片大小/view大小
 
 scale = targetDensity / density
 

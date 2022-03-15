@@ -953,7 +953,68 @@ Layout()方法主要做了三件事情:
 2 调用onLayout()方法，使子类得到布局变更的通知。如果此类是一个ViewGroup，则需要在onLayout()方法中依次调用每一个子控件
   的layout()方法使其得到布局。切记不能调用子控件的onLayout()方法，这会导致子控件没有机会调用setFrame，从而使得此控件的
   坐标信息无法得到更新。
-3 通知每一个对此控件的布局变化感兴趣的监听者。可以通过调用View.addOnLayoutChangeListener0加入对此控件的监听
+3 通知每一个对此控件的布局变化感兴趣的监听者。可以通过调用View.addOnLayoutChangeListener加入对此控件的监听
+View的setFrame
+```
+protected boolean setFrame(int left, int top, int right, int bottom) {
+        boolean changed = false;
+        ...
+        if (mLeft != left || mRight != right || mTop != top || mBottom != bottom) {
+            changed = true;
+
+            // Remember our drawn bit
+            int drawn = mPrivateFlags & PFLAG_DRAWN;
+
+            int oldWidth = mRight - mLeft;
+            int oldHeight = mBottom - mTop;
+            int newWidth = right - left;
+            int newHeight = bottom - top;
+            boolean sizeChanged = (newWidth != oldWidth) || (newHeight != oldHeight);
+
+            // Invalidate our old position
+            invalidate(sizeChanged);
+            //保存坐标
+            mLeft = left;
+            mTop = top;
+            mRight = right;
+            mBottom = bottom;
+            mRenderNode.setLeftTopRightBottom(mLeft, mTop, mRight, mBottom);
+
+            mPrivateFlags |= PFLAG_HAS_BOUNDS;
+
+
+            if (sizeChanged) {
+                sizeChange(newWidth, newHeight, oldWidth, oldHeight);
+            }
+
+            if ((mViewFlags & VISIBILITY_MASK) == VISIBLE || mGhostView != null) {
+                // If we are visible, force the DRAWN bit to on so that
+                // this invalidate will go through (at least to our parent).
+                // This is because someone may have invalidated this view
+                // before this call to setFrame came in, thereby clearing
+                // the DRAWN bit.
+                mPrivateFlags |= PFLAG_DRAWN;
+                invalidate(sizeChanged);
+                // parent display list may need to be recreated based on a change in the bounds
+                // of any child
+                invalidateParentCaches();
+            }
+
+            // Reset drawn bit to original value (invalidate turns it off)
+            mPrivateFlags |= drawn;
+
+            mBackgroundSizeChanged = true;
+            mDefaultFocusHighlightSizeChanged = true;
+            if (mForegroundInfo != null) {
+                mForegroundInfo.mBoundsChanged = true;
+            }
+
+            notifySubtreeAccessibilityStateChangedIfNeeded();
+        }
+        return changed;
+    }
+```
+
 
 -
 注意
@@ -1051,7 +1112,7 @@ onLayout()有它的局限性，即只能在类内部访问，因此它更适合�
  可见，绘制阶段的限制条件相对于前4个阶段来说要宽松得多，在常态下只要per-
  formTraversals()被调用，则一定会执行绘制阶段。
  performDraw()方法就是控件树的绘制人口。由于控件树的绘制十分复杂，因此，perform-
- Draw0方法的工作原理将在6.4节中单独介绍。
+ Draw()方法的工作原理将在6.4节中单独介绍。
 
 performTraversals 方法总结
 performTraversals_5个工作阶段的工作流程.png

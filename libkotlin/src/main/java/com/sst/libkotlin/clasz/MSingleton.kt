@@ -1,10 +1,23 @@
 package com.sst.libkotlin
 
-import java.net.HttpURLConnection
 
-//饿汉模式???  查看kotlin bytecode 使用的是Java 静态内部类实现
+//饿汉模式
 object  MSingleton {
 }
+//编译为 Java 饿汉模式
+//public final class MSingleton {
+//    @NotNull
+//    public static final MSingleton INSTANCE;
+//
+//    private MSingleton() {
+//    }
+//
+//    static {
+//        MSingleton var0 = new MSingleton();
+//        INSTANCE = var0;
+//    }
+//}
+
 
 //懒汉模式
 class SingletonDemo private constructor() {

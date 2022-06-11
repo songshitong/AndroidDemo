@@ -15,18 +15,27 @@
         <entry key="feature/src/main/res/layout/activity_anr.xml" value="0.22916666666666666" />
         <entry key="feature/src/main/res/layout/activity_big_picture.xml" value="0.21979166666666666" />
         <entry key="feature/src/main/res/layout/activity_canvas.xml" value="0.1" />
+        <entry key="feature/src/main/res/layout/activity_constrain_layout.xml" value="0.25" />
         <entry key="feature/src/main/res/layout/activity_drawable.xml" value="0.240625" />
         <entry key="feature/src/main/res/layout/activity_intent_service.xml" value="0.2390625" />
+        <entry key="feature/src/main/res/layout/activity_layout.xml" value="0.23177083333333334" />
         <entry key="feature/src/main/res/layout/activity_layout_animation.xml" value="0.2390625" />
         <entry key="feature/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/activity_measure_test.xml" value="0.240625" />
+        <entry key="feature/src/main/res/layout/activity_reveal_animator.xml" value="0.23177083333333334" />
         <entry key="feature/src/main/res/layout/activity_rvcutsom_layout_manager.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/activity_scroll_nested.xml" value="0.240625" />
         <entry key="feature/src/main/res/layout/activity_shader.xml" value="0.1" />
+        <entry key="feature/src/main/res/layout/activity_support_animation.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/activity_test_anr.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/activity_toast_bug.xml" value="0.2390625" />
+        <entry key="feature/src/main/res/layout/activity_transition.xml" value="0.19927536231884058" />
+        <entry key="feature/src/main/res/layout/activity_transition2.xml" value="0.11175288799598192" />
+        <entry key="feature/src/main/res/layout/activity_transition3.xml" value="0.20885416666666667" />
+        <entry key="feature/src/main/res/layout/activity_type_evaluator.xml" value="0.23177083333333334" />
         <entry key="feature/src/main/res/layout/activity_view_outline_provider.xml" value="0.1" />
         <entry key="feature/src/main/res/layout/rv_custom_layout_manager.xml" value="0.1" />
+        <entry key="feature/src/main/res/layout/transition_scene.xml" value="0.10296333500753391" />
       </map>
     </option>
   </component>

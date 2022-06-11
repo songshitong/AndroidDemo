@@ -28,7 +28,7 @@ android_渲染机制_BufferQueue的数据流动.awebp
 而是直接返回-1）
 
 同时使用BufferQueue的生产者和消费者往往处在不同的进程，BufferQueue内部使用共享内存和Binder在不同的进程传递数据，减少数据拷贝提高效率。
-
+//todo 共享内存和binder在哪
 
 和BufferQueue有关的几个类分别是：
 1 BufferBufferCore：BufferQueue的实际实现

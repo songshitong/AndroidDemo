@@ -1,7 +1,18 @@
 jdk 1.8   android sdk 30
 https://juejin.cn/post/6975435256111300621#heading-2
 可重入锁  内部通过AQS实现
-1.ReentrantLock使用         todo 总结 Java并发编程提到了原理
+
+总结：
+1 ReentrantLock独占锁拿锁和排队的流程：ReentrantLock内部通过FairSync和NonfairSync来实现公平锁和非公平锁。它们都是继承自AQS实现，
+在AQS内部通过state来标记同步状态，如果state为0，线程可以直接获取锁，如果state大于0，则线程会被封装成Node节点进入CLH队列并阻塞线程。
+AQS的CLH队列是一个双向的链表结构，头结点是一个空的Node节点。新来的node节点会被插入队尾并开启自旋去判断它的前驱节点是不是头结点。
+如果是头结点则尝试获取锁，如果不是头结点，则根据条件进行挂起操作
+2 使用state标识当前是否有线程获得锁，0没有，1有，>1是多次获得锁，>=1的情况线程获锁失败需要等待特定线程释放锁，此时state归0,其他线程才可以获得锁
+//公平锁，等待队列中没有排在自己前面的线程，尝试获得锁
+//非公平锁，不管等待队列的线程，都尝试获得锁，谁抢到就是谁的
+3 ReentrantLock默认是非公平锁
+
+1.ReentrantLock使用         
 上篇文章介绍的synchronized关键字是一种隐式锁，即它的加锁与释放是自动的，无需我们关心。而ReentrantLock是一种显式锁，
 需要我们手动编写加锁和释放锁的代码。下面我们来看下ReentrantLock的使用方法。
 ```
@@ -29,6 +40,24 @@ public class ReentrantLockDemo {
 ```
 
 2 源码解析
+lock接口
+```
+public interface Lock {
+    // 获取锁  获取不到会阻塞
+    void lock();
+    // 获取可中断锁，即在拿锁过程中可中断，synchronized是不可中断锁。
+    void lockInterruptibly() throws InterruptedException;
+    // 尝试获取锁，成功返回true，失败返回false
+    boolean tryLock();
+    // 在给定时间内尝试获取锁，成功返回true，失败返回false
+    boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
+    // 释放锁
+    void unlock();
+    // 等待与唤醒机制
+    Condition newCondition();
+}
+
+```
 ReentrantLock类的代码结构
 ```
 public class ReentrantLock implements Lock, java.io.Serializable {
@@ -91,14 +120,14 @@ Sync是ReentrantLock中的一个抽象内部类，它的源码如下：
             int c = getState();
             // 未上锁状态
             if (c == 0) {
-                // 通过CAS尝试拿锁
+                // 通过CAS尝试拿锁，不管排队的其他线程，谁抢到就是谁的
                 if (compareAndSetState(0, acquires)) {                    
                     // 设置持有排他锁的线程
                     setExclusiveOwnerThread(current);
                     return true;
                 }
             }
-            // 如果是已上锁状态，判断持有锁的线程是不是自己，这里即可重入锁的实现
+            //c!=0 如果是已上锁状态，并且持有锁的线程是自己，这里即可重入锁的实现
             else if (current == getExclusiveOwnerThread()) {
                 int nextc = c + acquires;
                 if (nextc < 0) // overflow
@@ -111,11 +140,13 @@ Sync是ReentrantLock中的一个抽象内部类，它的源码如下：
         // 释放锁
         protected final boolean tryRelease(int releases) {
             int c = getState() - releases;
+            //线程校验，防止特殊线程恶意释放锁
             if (Thread.currentThread() != getExclusiveOwnerThread())
                 throw new IllegalMonitorStateException();
             boolean free = false;
             if (c == 0) {
                 free = true;
+                //清空独占锁的线程
                 setExclusiveOwnerThread(null);
             }
             setState(c);
@@ -199,8 +230,5 @@ static final class FairSync extends Sync {
 可以看到在tryAcquire中实现了公平锁的操作，这段代码与与非公平锁的实现其实只有一句之差。
 即公平锁先去判断了同步队列中是否有在等待的线程，如果没有才会去进行拿锁操作。而非公平锁不会管是否有同步队列，先去拿了再说
 
-ReentrantLock独占锁拿锁和排队的流程：ReentrantLock内部通过FairSync和NonfairSync来实现公平锁和非公平锁。它们都是继承自AQS实现，
-在AQS内部通过state来标记同步状态，如果state为0，线程可以直接获取锁，如果state大于0，则线程会被封装成Node节点进入CLH队列并阻塞线程。
-AQS的CLH队列是一个双向的链表结构，头结点是一个空的Node节点。新来的node节点会被插入队尾并开启自旋去判断它的前驱节点是不是头结点。
-如果是头结点则尝试获取锁，如果不是头结点，则根据条件进行挂起操作
+
 

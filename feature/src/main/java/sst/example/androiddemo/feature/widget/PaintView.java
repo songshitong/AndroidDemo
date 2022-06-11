@@ -251,7 +251,6 @@ public class PaintView extends View {
         cf = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.SRC_OVER);
 
 //       ColorMatrixColorFilter 使用一个 ColorMatrix 来对颜色进行处理
-        // TODO: 2018/12/11 效果没出来 ？？
         cf = new ColorMatrixColorFilter(new ColorMatrix());
         mPaint.setColorFilter(cf);
         canvas.drawBitmap(bitmapB, new Rect(100, 500, 100 + bitmapB.getWidth(), 500 + bitmapB.getHeight()), new Rect(100, 500, 100 + bitmapB.getWidth(), 500 + bitmapB.getHeight()), mPaint);
@@ -261,6 +260,23 @@ public class PaintView extends View {
 //        但通俗地说，其实就是要你以绘制的内容作为源图像，以 View 中已有的内容作为目标图像，选取一个  PorterDuff.Mode 作为绘制内容的颜色处理方案
 //        要想使用 setXfermode() 正常绘制，必须使用离屏缓存 (Off-screen Buffer)(savelayer和restorecount) 把内容绘制在额外的层上，再把绘制好的内容贴回 View 中
         int saved = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);
+//        PorterDuff.Mode.SRC 只保留src
+//          PorterDuff.Mode.DST 只保留DST
+//          PorterDuff.Mode.SRC_OVER SRC在DST上面
+//        PorterDuff.Mode.DST_OVER  DST在SRC上面
+//        PorterDuff.Mode.SRC_IN  重合部分，只保留SRC
+//        PorterDuff.Mode.DST_IN  重合部分，只保留DST
+//        PorterDuff.Mode.SRC_OUT  SRC减去重合部分
+//        PorterDuff.Mode.DST_OUT   DST减去重合部分
+//        PorterDuff.Mode.SRC_ATOP  保留DST，重合部分是SRC的颜色
+//        PorterDuff.Mode.DST_ATOP    保留SRC，重合部分是DST的颜色
+//        PorterDuff.Mode.XOR         移除重合部分，保留SRC和DST
+//        PorterDuff.Mode.DARKEN      全部保留，重合部分的颜色计算 保留源和目标像素的最小分量
+//        PorterDuff.Mode.LIGHTEN       全部保留，重合部分的颜色计算 保留源和目标像素的最大分量
+//        PorterDuff.Mode.MULTIPLY      全部保留，重合部分的颜色计算 源和目标像素的相乘
+//        PorterDuff.Mode.SCREEN   全部保留，重合部分的颜色计算 将源像素和目标像素相加，然后减去源像素与目标像素的乘积
+//        PorterDuff.Mode.ADD        全部保留，重合部分的颜色计算  将源像素添加到目标像素
+//        PorterDuff.Mode.OVERLAY    全部保留，重合部分的颜色计算 根据目标颜色倍增或屏蔽源和目标
         Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
         canvas.drawBitmap(bitmapB, 0, 0, mPaint); // 画方
         mPaint.setXfermode(xfermode); // 设置 Xfermode

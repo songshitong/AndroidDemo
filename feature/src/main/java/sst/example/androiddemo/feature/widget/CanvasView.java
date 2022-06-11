@@ -15,10 +15,18 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.graphics.BitmapActivity;
@@ -170,16 +178,29 @@ public class CanvasView extends View {
        //https://www.jianshu.com/p/51d8dd99d27d
         //网格交叉点坐标数组，长度为(meshWidth + 1) * (meshHeight + 1) * 2
 //        vertOffset：控制verts数组中从第几个数组元素开始才对bitmap进行扭曲
-//        drawBitmapMesh() 方法改变图像的方式，就是通过改变这个 verts 数组里的元素的坐标值来重新定位对应的图像块的位置，从而达到图像效果处理的功能
+//        drawBitmapMesh() 方法改变图像的方式，就是通过改变这个 verts 数组里的元素的坐标值来重新定位对应的图像块的位置，
+//           从而达到图像效果处理的功能
 //        canvas.drawBitmapMesh(bitmapB, WIDTH, HEIGHT, verts, 100, null, 0, null);
+       //可以用来模拟风吹，波浪，吸入等效果
 
-        // TODO: 2018/12/17
-        //使用drawbitmapmesh绘制效果
+
 
 
 
         //绘制系列
 //        canvas.drawTextRun();   //加入了两项额外的设置——上下文和文字方向——用于辅助一些文字结构比较特殊的语言的绘制。
+        mPaint.setTextSize(40);
+//        canvas.drawTextOnPath(); //在路径上绘制
+        //在x,y绘制
+        String text = "11111";
+        mPaint.setColor(Color.BLUE);
+        canvas.drawRect(new Rect(100,100,400,200),mPaint);
+        TextPoint tp = getTextPoint(text);
+        tp.text=text;
+        tp.rect.set(100,100,400,200);
+        mPaint.setColor(Color.RED);
+        canvas.drawText(text,150,150,mPaint);
+
 
 //        StaticLayout   对文字自动换行  创建后文字不改变
 //        width 是文字区域的宽度，文字到达这个宽度后就会自动换行；
@@ -187,15 +208,57 @@ public class CanvasView extends View {
 //        spacingmult 是行间距的倍数，通常情况下填 1 就好；
 //        spacingadd 是行间距的额外增加值，通常情况下填 0 就好；
 //        includeadd 是指是否在文字上下添加额外的空间，来避免某些过高的字符的绘制出现越界。
-        StaticLayout staticLayout1 = new StaticLayout("text1", new TextPaint(), 600,
+        canvas.save();
+        canvas.translate(200,300);
+
+        TextPaint textPaint = new TextPaint();
+        textPaint.setTextSize(50);
+        StaticLayout staticLayout1 = new StaticLayout("text1", textPaint, 600,
                 Layout.Alignment.ALIGN_NORMAL, 1, 0, true);
          staticLayout1.draw(canvas);
+         canvas.restore();
+
 
 //        DynamicLayout  创建后文字改变 api 28加入
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            DynamicLayout dl = DynamicLayout.Builder.obtain("",new TextPaint(),0).build();
+            DynamicLayout dl = DynamicLayout.Builder.obtain("1234",textPaint,500).build();
+            dl.draw(canvas);
         }
 
     }
 
+
+    Map<String,TextPoint> textPoints = new HashMap();
+    //自定义view的文字点击，存储文字及文字的点击区域
+    //如果canvas进行转换了需要进行坐标系转换
+    //同一平面的任意两个坐标系都可以通过,旋转,缩放,平移进行变换进行重合
+    //可以将view坐标系和移动后的canvas坐标系进行映射
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        Log.d("CanvasView","x "+x+" y "+y);
+        for (Map.Entry<String, TextPoint> entry : textPoints.entrySet()) {
+           if(entry.getValue().rect.contains(x,y)){
+               Toast.makeText(this.getContext(),entry.getKey(),Toast.LENGTH_SHORT).show();
+           }
+        }
+
+        return super.onTouchEvent(event);
+    }
+
+    TextPoint getTextPoint(String key){
+        TextPoint tp =textPoints.get(key);
+        if(tp == null){
+            tp = new TextPoint();
+            textPoints.put(key,tp);
+        }
+        return tp;
+    }
+
+    //文字及它的点击范围
+    class TextPoint{
+        String text;
+        Rect rect = new Rect();
+    }
 }

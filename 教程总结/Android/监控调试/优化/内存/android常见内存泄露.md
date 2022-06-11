@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 也许有人会说，mHandler并未作为静态变量持有Activity引用，生命周期可能不会比Activity长，应该不一定会导致内存泄露呢，显然不是这样的！
 
+//引用链 activity->handler->msg->MessageQueue->Looper  关键通过msg，MessageQueue持有了Handler,如果msg的生命周期超过activity就会发生问题
 熟悉Handler消息机制的都知道，mHandler会作为成员变量保存在发送的消息msg中，即msg持有mHandler的引用，而mHandler是Activity的非静态内部类实例，
  即mHandler持有Activity的引用，那么我们就可以理解为msg间接持有Activity的引用。msg被发送后先放到消息队列MessageQueue中，
 然后等待Looper的轮询处理（MessageQueue和Looper都是与线程相关联的，MessageQueue是Looper引用的成员变量，

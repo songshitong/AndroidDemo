@@ -63,6 +63,7 @@ pop 指令则常用于舍弃调用指令的返回结果。例如在下面这段�
   也可以通过 bipush、sipush 加载一个字节、两个字节所能代表的 int 值
 
 Java 虚拟机还可以通过 ldc 加载常量池中的常量值，例如 ldc #18 将加载常量池中的第 18 项。
+//查看string是否加载到常量池
 
 这些常量包括 int 类型、long 类型、float 类型、double 类型、String 类型以及 Class 类型的常量
 常量字节码加载指令.png

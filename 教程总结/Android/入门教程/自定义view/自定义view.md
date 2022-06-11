@@ -170,6 +170,20 @@ WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_
 int width = wm.getDefaultDisplay().getWidth();
 int height = wm.getDefaultDisplay().getHeight();
 
+从父view中移除，加入到父view的顶端，最后一个绘制
+View.bringToFront
+
+afterDescendants 在所有子view不需要焦点时获得
+descendantFocusAbility  父子焦点顺序放在根布局
+setDuplicateParentStateEnabled  子view是否跟随父view的焦点状态
+
+
+
+获取可见区域
+View.getGlobalVisibleRect(Rect);
+View.getLocationOnScreen(Rect);
+返回值true 全部或部分可见     false全部不可见
+
 获得当前view在屏幕中的坐标
 int[] location = new int[2];
 view.getLocationOnScreen(location);
@@ -219,9 +233,23 @@ getWidth与getMeasuredWidth大部分情况下都是相等的，也有一些特�
 
 获取content：
 ViewGroup content = (ViewGroup)findViewById(android.R.id.content);
+DecorView获取 Activity.getWindow().getDecorView()
 获取设置的View：
 content.getChildAt(0);
 
+给View添加额外信息，存储一些View的数据
+View.setTag()
+
+ViewGroup.getChildCount 获取显示的View的数量
+ViewGroup.getChildAt    获取第index的view
+ViewGroup.indexOfChild  获取view的index
+RecyclerView查找
+RecyclerView.getLayoutManager.findViewByPosition
+    findFirstVisibleItemPosition 第一个显示的index
+    findFirstCompletelyVisibleItemPosition  第一个完全露出来的view   同理，可以查找最后一个显示的
+
+坐标系转换
+ViewGroup.offsetDescendantRectToMyCoords
  
 setWillNotDraw的作用  ViewGroup需要开启后才能进行绘制
 ```
@@ -259,7 +287,6 @@ view.post(runnable)
 protected void onStart() {
     super.onStart();
     view.post(new Runnable() {
-
         @Override
         public void run() {
             int width = view.getMeasuredWidth();
@@ -308,3 +335,15 @@ public int getMinimumWidth() {
 ```
 如果View没有设置背景，那么返回android:minWidth这个属性所指定的值，这个值可以为0；如果View设置了背景，
   则返回android:minWidth和背景的最小宽度这两者中的最大值
+
+
+ViewGroup.getChildDrawingOrder
+```
+protected int getChildDrawingOrder(int childCount, int drawingPosition) {
+        return drawingPosition;
+    }
+```
+ViewGroup允许子view自定义绘制顺序，可以解决GridView,RecyclerView中前不遮挡后遮挡的问题
+调用顺序ViewGroup.dispatchDraw->buildOrderedChildList->getAndVerifyPreorderedIndex->getChildDrawingOrder
+
+

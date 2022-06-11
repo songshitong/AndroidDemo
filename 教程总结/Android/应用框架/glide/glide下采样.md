@@ -359,7 +359,6 @@ ImageHeaderParserUtils.java
     }
 
     if (!is.markSupported()) {
-     //todo markSupported  RecyclableBufferedInputStream
       is = new RecyclableBufferedInputStream(is, byteArrayPool);
     }
 
@@ -373,7 +372,6 @@ ImageHeaderParserUtils.java
             try {
               return parser.getType(finalIs);
             } finally {
-              //todo 这是不是重置流的位置
               finalIs.reset();
             }
           }
@@ -491,7 +489,7 @@ private static void calculateScaling(
      //根据整型缩放因子, 计算采样率(即将 scaleFactor 转为 2 的幂次)
     int powerOfTwoSampleSize;
     // BitmapFactory does not support downsampling wbmp files on platforms <= M. See b/27305903.
-    //Android 7.0 以下不支持缩放 webp, 缩放因子置为 1    image/vnd.wap.wbmp,image/x-ico两种类型
+    //Android 6.0 及以下不支持缩放 webp, 缩放因子置为 1    image/vnd.wap.wbmp,image/x-ico两种类型
     if (Build.VERSION.SDK_INT <= 23
         && NO_DOWNSAMPLE_PRE_N_MIME_TYPES.contains(options.outMimeType)) {
       powerOfTwoSampleSize = 1;

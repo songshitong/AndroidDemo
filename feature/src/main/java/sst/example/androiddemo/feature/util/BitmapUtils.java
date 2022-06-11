@@ -5,9 +5,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
-import com.blankj.utilcode.util.FileIOUtils;
-import com.blankj.utilcode.util.UriUtils;
-import com.blankj.utilcode.util.Utils;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,10 +50,11 @@ public class BitmapUtils {
      */
     public static void readImgUri2File(Uri uri, String file){
         try {
-            //todo  去除第三方包影响
+
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             //不断把stream的数据写文件输出流中去
-            fileOutputStream.write(FileIOUtils.readFile2BytesByStream(UriUtils.uri2File(uri)));
+            //todo  去除第三方包影响
+//            fileOutputStream.write(FileIOUtils.readFile2BytesByStream(UriUtils.uri2File(uri)));
             fileOutputStream.flush();
             fileOutputStream.close();
         } catch (Exception e) {
@@ -72,7 +71,8 @@ public class BitmapUtils {
      */
     public static Bitmap getBitmapFromUri(Uri uri) throws FileNotFoundException {
         //todo  去除第三方包影响   ContentResolver可以读取那些文件，都有什么用
-        return BitmapFactory.decodeStream(Utils.getApp().getContentResolver().openInputStream(uri));
+//        return BitmapFactory.decodeStream(Utils.getApp().getContentResolver().openInputStream(uri));
+        return null;
     }
 
     /**

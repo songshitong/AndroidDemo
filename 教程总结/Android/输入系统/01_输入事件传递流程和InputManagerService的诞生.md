@@ -143,7 +143,7 @@ static jlong nativeInit(JNIEnv* env, jclass /* clazz */,
 }
 ```
 
-//todo reinterpret_cast
+
 注释1处创建了NativeInputManager，最后会调用reinterpret_cast运算符将NativeInputManager指针强制转换并返回（重新解释比特位）。
 NativeInputManager的构造函数如下所示。
 frameworks/base/services/core/jni/com_android_server_input_InputManagerService.cpp

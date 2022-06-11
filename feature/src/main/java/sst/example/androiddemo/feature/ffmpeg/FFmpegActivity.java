@@ -14,8 +14,6 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.blankj.utilcode.util.UriUtils;
-
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.util.MyUtils;
 
@@ -116,7 +114,8 @@ public class FFmpegActivity extends AppCompatActivity {
                 if (uri == null) {
                     Log.w(TAG, "图片选择完成" + "uri is null ");
                 }
-                filePath = UriUtils.uri2File(uri).getAbsolutePath();
+                //todo UriUtils移除
+//                filePath = UriUtils.uri2File(uri).getAbsolutePath();
             }
 
         }

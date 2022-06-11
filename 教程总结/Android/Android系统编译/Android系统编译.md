@@ -3,10 +3,15 @@ https://www.bilibili.com/video/BV1Yr4y1c7o5?spm_id_from=333.999.0.0
 能拧螺丝的不一定造不了飞机，造的了飞机一定能拧螺丝
 http://liuwangshu.cn/batcoder/aosp/2-download-aosp.html
 
+源码网站
+https://www.yuque.com/beesx/beesandroid/vggvzg
+https://github.com/BeesX/BeesAndroid
+
 工具  sourceinsight   在线网站
 https://cs.android.com/
 http://aospxref.com/
 https://github.com/aosp-mirror
+https://github.com/aosp-mirror/platform_frameworks_base
 
 代码搜索技巧https://developers.google.com/code-search/user/getting-started
 使用AndroidStudio 可以调试
@@ -123,8 +128,17 @@ cd goldfish
 #查看可以使用的分支
 #git branch -a
 git checkout remotes/origin/android-goldfish-3.4
+模拟器内核查看  点Setting -> Android version 查看内核版本信息
+kernel version
+内核编译  https://blog.csdn.net/feit2417/article/details/105213616
 
-
+aosp查看linux version   可以根据version确定goldfish
+```
+cd prebuilts/qemu-kernel/arm/
+dd if=kernel-qemu bs=1 skip=$(LC_ALL=C grep -a -b -o $'\x1f\x8b\x08\x00\x00\x00\x00\x00' kernel-qemu | cut -d ':' -f 1) | zgrep -a 'Linux version'
+结果://
+Linux version 3.4.67-01422-gd3ffcc7-dirty (digit@tyrion.par.corp.google.com) (gcc version 4.8 (GCC) ) #2 PREEMPT Tue Sep 16 19:38:10 CEST 2014
+```
 
 
 lunch命令是envsetup.sh里定义的一个命令，用来让用户选择编译目标
@@ -211,3 +225,32 @@ docker run -it --network host  --name aosp_builder -v \\wsl.localhost\Ubuntu\hom
 启动镜像
 docker start aosp_builder
 docker exec -it aosp_builder /bin/bash
+
+
+AVD镜像 模拟器
+```
+lunch sdk_phone_x86_64
+make -j32
+emulator
+```
+
+刷机
+亲儿子Pixel或Nexus
+下载驱动   对应机型和版本号
+https://developers.google.com/android/drivers
+解压
+```
+./extract-qcom-sargo.sh
+./extract-google_devices-sargo.sh
+```
+进入bootloader，执行烧写命令(-w代表清空数据)
+
+```
+adb reboot bootloader
+fastboot flashall -w
+```
+
+其他手机
+不是亲儿子，驱动啊、厂商库啥的，只能找第三方ROM进行二次开发咯，以前最出名的就是CM (CyanogenMod) 了，不过好像凉凉了，可以试试 LineageOS
+https://download.lineageos.org/chiron
+可以参考 https://www.cnblogs.com/luoyesiqiu/p/10701419.html

@@ -213,5 +213,25 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="Intent Service Activity"
             />
+    <Button  android:id="@+id/IntentConstrainLayoutActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Intent ConstrainLayout Activity"
+            />
+    <Button  android:id="@+id/IntentRevealAnimatorActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Reveal Animator Activity"
+            />
+    <Button  android:id="@+id/IntentTypeEvaluatorActivity"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Type Evaluator Activity"
+            />
+    <Button  android:id="@+id/IntentActivityAnimation"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Activity Animation"
+            />
+    <Button  android:id="@+id/IntentActivityTransition"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Activity Transition"
+            />
 </LinearLayout>
 </ScrollView>

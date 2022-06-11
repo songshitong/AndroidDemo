@@ -142,16 +142,22 @@ LinearInterpolator（线性插值器）：匀速动画。
 AccelerateDecelerateInterpolator（加速减速插值器）：动画两头慢，中间快。
 DecelerateInterpolator（减速插值器）：动画越来越慢。
 
-TypeEvaluator（类型估值算法，即估值器）：    //todo   完善常用动画
+TypeEvaluator（类型估值算法，即估值器）：    
 作用：根据当前属性改变的百分比来计算改变后的属性值。
 系统已有的估值器：
 IntEvaluator：针对整型属性
 FloatEvaluator：
 针对浮点型属性
 ArgbEvaluator：针对Color属性
+针对坐标的
+PointFEvaluator  更改point坐标的
+RectEvaluator    更改rect的
 
 
-
-
+对于PopupWindow和AlertDialog设置属性动画
+PopupWindow pw;
+//        pw.setAnimationStyle();
+AlertDialog ad;
+//Dialog的动画 重写或者拿到dialog的window，设置给window
 
 

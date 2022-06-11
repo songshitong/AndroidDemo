@@ -235,7 +235,8 @@ public class LruBitmapPool implements BitmapPool {
   }
 }
 ```
-其中操作缓存的核心方法在strategy中，LruPoolStrategy也是一个策略接口，真正策略的实现类是SizeConfigStrategy(4.4之上)和AttributeStrategy;
+其中操作缓存的核心方法在strategy中，LruPoolStrategy也是一个策略接口，真正策略的实现类是SizeConfigStrategy(4.4之上)
+和AttributeStrategy;
 LruPoolStrategy.java
 ```
 interface LruPoolStrategy {

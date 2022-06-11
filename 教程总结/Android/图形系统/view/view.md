@@ -552,3 +552,29 @@ view.postAnimation
 
 //todo ViewTreeObserver
 https://ljd1996.github.io/2020/09/11/Android-View%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/
+
+
+
+View.bringToFront
+从父ViewGroup移除，重新添加到最后一个绘制
+View.java
+```
+public void bringToFront() {
+        if (mParent != null) {
+            mParent.bringChildToFront(this);
+        }
+    }
+```
+ViewGroup.java
+```
+  public void bringChildToFront(View child) {
+        final int index = indexOfChild(child);
+        if (index >= 0) {
+            removeFromArray(index);
+            addInArray(child, mChildrenCount);
+            child.mParent = this;
+            requestLayout();
+            invalidate();
+        }
+    }
+```

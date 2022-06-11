@@ -2,11 +2,10 @@ package sst.example.androiddemo.feature.widget.layout.repeatMeasure;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
-
-import com.tencent.mm.opensdk.utils.Log;
 
 public class MeasureLinearLayout extends LinearLayout {
     public String tag="";

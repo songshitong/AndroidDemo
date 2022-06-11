@@ -85,9 +85,9 @@ public void apply() {
 ```
 apply把写入文件的任务放入一个队列中，在QueuedWork内部会通过HandlerThread串行的执行。
 到这里，看上去还没有问题，在子线程写文件并不会造成UI线程卡顿，但是我们来看一下ActivityThread的handleStopActivity方法
-//todo ActivityThread 是主线程吗
 ```
 frameworks/base/core/java/android/app/ActivityThread.java
+//activity stop时调用
 public void handleStopActivity(IBinder token, boolean show, int configChanges,
             PendingTransactionActions pendingActions, boolean finalStateRequest, String reason) {
       ...省略无关代码
@@ -97,6 +97,7 @@ public void handleStopActivity(IBinder token, boolean show, int configChanges,
             QueuedWork.waitToFinish();
         }
     }
+ //service stop时调用   
 private void handleStopService(IBinder token) {
    ...
     QueuedWork.waitToFinish();
@@ -121,17 +122,34 @@ public static void waitToFinish() {
  写入文件的线程执行完毕的。现在试想一下，在onPause之后，如果因为你多次使用了apply，那就意味着写入任务会在这里排队，
  但是写入文件那里只有一个HandlerThread在串行的执行，那是不是就卡顿了？
 
+还可能造成ANR https://www.jianshu.com/p/ca1a2129523b
+当我们的SP写入耗时过大，就会造成Activity 暂停时候卡住，从而导致AMS服务那边的倒计时超时爆了ANR。而这种情况可能很会见的不少，
+因为SP本身就全量写
+
 Google为何这么设计呢？字节跳动技术团队的这篇文章中做出了如下猜测：  https://mp.weixin.qq.com/s/qAHburd-_S8ZJsr69kAtcA
 无论是 commit 还是 apply 都会产生 ANR，但从 Android 之初到目前 Android8.0，Google 一直没有修复此 bug，我们贸然处理会产生什么问题呢。
   Google 在 Activity 和 Service 调用 onStop 之前阻塞主线程来处理 SP，我们能猜到的唯一原因是尽可能的保证数据的持久化。
   因为如果在运行过程中产生了 crash，也会导致 SP 未持久化，持久化本身是 IO 操作，也会失败。
 
-字节的解决策略  清空等待队列
+字节的解决策略  清空等待队列,不进行序列化
 //todo hook技术
-Activity 的 onStop，以及 Service 的 onStop 和 onStartCommand 都是通过 ActivityThread 触发的，ActivityThread 中有一个 Handler 变量，
-我们通过 Hook 拿到此变量，给此 Handler 设置一个 callback，Handler 的 dispatchMessage 中会先处理 callback。
+SP 操作仅仅把 commit 替换为 apply 不是万能的，apply 调用次数过多容易引起 ANR。所有此类 ANR 都是经由 QueuedWork.waitToFinish() 触发的，
+如果在调用此函数之前，将其中保存的队列手动清空，那么是不是能解决问题呢，答案是肯定的。
+Activity 的 onStop，以及 Service 的 onStop 和 onStartCommand 都是通过 ActivityThread 触发的，
+ActivityThread 中有一个 Handler 变量，我们通过 Hook 拿到此变量，给此 Handler 设置一个 callback，
+Handler 的 dispatchMessage 中会先处理 callback。
+在 Callback 中调用队列的清理工作 
 https://mp.weixin.qq.com/s?__biz=MzI1MzYzMjE0MQ==&mid=2247484387&idx=1&sn=e3c8d6ef52520c51b5e07306d9750e70&scene=21#wechat_redirect
-
+实验验证
+我们清理了等待锁队列，会对数据持久化造成什么影响呢，下面我们通过一组实验来验证。
+进程启动的时候，产生一个随机数字。用 commit 和 apply 两种方式来存此变量。第二次进程启动，获取以两种方式存取的值并做比较，
+如果相同表示 apply 持久化成功，如果不相同表示 apply 持久化失败。
+实验一：开启等待锁队列的清理。
+实验二：关闭等待锁队列的清理。
+线上同时开启两个实验，在实验规模相同的情况下，统计 apply 失败率。
+实验一，失败率为 1.84%。
+实验二，失败率为为 1.79%
+可见，apply 机制本身的失败率就比较高，清理等待锁队列对持久化造成的影响不大
 
 如何解决sp造成的界面卡顿、掉帧问题？ 如何正确的使用sp
 1.初始化sp放在application；
@@ -172,14 +190,6 @@ try {
             e.printStackTrace();
         }
 ```
-
-
-
-
-
-
-
-
 
 
 

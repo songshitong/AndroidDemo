@@ -8,3 +8,7 @@ binder常用命令
 ipcSetDataReference  https://juejin.cn/post/6868901776368926734
 
 bbinder到Java层  https://juejin.cn/post/6890088205916307469#heading-3
+
+
+https://weishu.me/2016/01/12/binder-index-for-newer/
+https://github.com/xfhy/Android-Notes/tree/499b9832a344aff12c9976922da7860058204dd1/Blogs/Android/%E5%A4%9A%E8%BF%9B%E7%A8%8B

@@ -1,24 +1,34 @@
 package sst.example.androiddemo.feature;
 
+import android.app.Activity;
 import android.app.Application;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.BaseBundle;
 import android.os.Debug;
 import android.os.Handler;
+import android.text.PrecomputedText;
 import android.util.ArrayMap;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import androidx.activity.ComponentActivity;
 import androidx.annotation.IntDef;
 import androidx.annotation.Keep;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -53,19 +63,6 @@ public class MApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        //判断是否是主进程 阿里规范
-//        if (mainProcess) {
-//
-//...
-//
-//        }
-//
-////仅在后台进程中初始化
-//
-//        if (bgProcess) {
-//
-//...
-//
-//        }
+
     }
 }

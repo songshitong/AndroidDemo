@@ -61,6 +61,10 @@ static void nativeStart(JNIEnv* env, jclass /* clazz */, jlong ptr) {
 注释1处会调用InputManager的start函数。
 frameworks/native/services/inputflinger/InputManager.cpp
 ```
+void InputManager::initialize() {
+    mReaderThread = new InputReaderThread(mReader);
+    mDispatcherThread = new InputDispatcherThread(mDispatcher);
+}
 status_t InputManager::start() {
     status_t result = mDispatcherThread->run("InputDispatcher", PRIORITY_URGENT_DISPLAY);
     if (result) {
@@ -112,7 +116,7 @@ private:
 };
 }
 ```
-//todo threadLoop native线程
+
 InputDispatcher.h中定义了threadLoop纯虚函数，InputDispatcher继承了Thread。native的Thread内部有一个循环，
 当线程运行时，会调用threadLoop函数，如果它返回true并且没有调用requestExit函数，就会接着循环调用threadLoop函数。
 查看InputDispatcherThread的threadLoop函数是如何实现的。
@@ -145,7 +149,7 @@ void InputDispatcher::dispatchOnce() {
     mLooper->pollOnce(timeoutMillis);
 }
 ```
-//todo   native的线程机制
+
 注释1处用于检查InputDispatcher的缓存队列中是否有等待处理 的命令，如果没有就会执行注释2处的dispatchOnceInnerLocked函数，
   用来将输入事件分发给合适的Window。
 注释3处获取当前的时间，结合注释4处，得出InputDispatcherThread需要睡眠的时间为timeoutMillis。

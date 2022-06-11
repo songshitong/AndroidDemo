@@ -10,7 +10,7 @@ object MObjectSingleton{
 class MObject {
 //    https://www.bilibili.com/video/BV1Yq4y1U7rS?p=2
     //伴生对象 --类内部的对象声明
-    //可以忽略名称
+    //可以忽略名称  忽略名称后的方法调用 MObject.create()  忽略名称后默认编译的名字为Companion
     //每一个类只能有一个伴生对象
     //不能用在object关键字里面
     //
@@ -21,6 +21,7 @@ class MObject {
     //都需要用到static关键字修饰
     //Kotlin之所以能够抛弃静态成员，主要原因在于它允许包级属性和函数的存在
     //经典做法：kotlin允许在类中使用compainon object创建伴生对象，用伴生对象的成员来代替静态成员
+    //@JvmStatic编译为Java的静态方法static method
     companion object Factory {
         //定义Java中的静态方法
         fun create(): MObject = MObject()
@@ -31,6 +32,31 @@ class MObject {
             MObject.Factory.create()
         }
     }
+    //代码编译
+//    public final class MObject {
+//        public static final MObject.Factory Factory = new MObject.Factory((DefaultConstructorMarker)null);
+//        @JvmStatic
+//        public static final void main(@NotNull String[] args) {
+//            Factory.main(args);
+//        }
+//        public static final class Factory {
+//            @NotNull
+//            public final MObject create() {
+//                return new MObject();
+//            }
+//            @JvmStatic
+//            public final void main(@NotNull String[] args) {
+//                Intrinsics.checkNotNullParameter(args, "args");
+//                MObject.Factory.create();
+//            }
+//            private Factory() {
+//            }
+//            // $FF: synthetic method
+//            public Factory(DefaultConstructorMarker $constructor_marker) {
+//                this();
+//            }
+//        }
+//    }
 }
 
 class  MObject1{

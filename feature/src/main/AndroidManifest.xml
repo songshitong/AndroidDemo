@@ -21,6 +21,27 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:replace="android:allowBackup">
         <activity
+                android:name=".Animation.activity.ActivityTransition3"
+                android:exported="false" />
+        <activity
+                android:name=".Animation.activity.ActivityTransition2"
+                android:exported="false" />
+        <activity
+                android:name=".Animation.activity.ActivityTransition"
+                android:exported="false" />
+        <activity
+                android:name=".Animation.activity.ActivityAnimation"
+                android:exported="false" />
+        <activity
+                android:name=".Animation.evaluator.TypeEvaluatorActivity"
+                android:exported="false" />
+        <activity
+                android:name=".Animation.RevealAnimatorActivity"
+                android:exported="false" />
+        <activity
+                android:name=".widget.layout.ConstrainLayoutActivity"
+                android:exported="false" />
+        <activity
                 android:name=".service.IntentServiceActivity"
                 android:exported="false" />
         <activity
@@ -47,7 +68,7 @@
         <activity android:name=".activity.StartForResultActivity" />
         <activity android:name=".widget.ViewOutlineProvider" />
         <activity android:name=".camera.CameraActivity" />
-        <activity android:name=".activity.LayoutActivity" />
+        <activity android:name=".activity.LinearLayoutActivity" />
         <activity android:name=".activity.launchmode.OtherActivity" />
         <activity android:name=".activity.launchmode.LaunchActivity" />
         <activity android:name=".activity.launchmode.StandardActivity" />

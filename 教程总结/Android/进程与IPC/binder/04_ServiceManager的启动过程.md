@@ -153,7 +153,7 @@ static int binder_open(struct inode *nodp, struct file *filp)
 	struct binder_proc *proc;//1
 	binder_debug(BINDER_DEBUG_OPEN_CLOSE, "binder_open: %d:%d\n",
 		     current->group_leader->pid, current->pid);
-    //分配内存空间
+    //分配内存空间 todo
 	proc = kzalloc(sizeof(*proc), GFP_KERNEL);//2
 	if (proc == NULL)
 		return -ENOMEM;
@@ -162,7 +162,7 @@ static int binder_open(struct inode *nodp, struct file *filp)
 	INIT_LIST_HEAD(&proc->todo);
 	init_waitqueue_head(&proc->wait);
 	proc->default_priority = task_nice(current);
-    //binder同步锁
+    //binder同步锁   todo
 	binder_lock(__func__);
 
 	binder_stats_created(BINDER_STAT_PROC);

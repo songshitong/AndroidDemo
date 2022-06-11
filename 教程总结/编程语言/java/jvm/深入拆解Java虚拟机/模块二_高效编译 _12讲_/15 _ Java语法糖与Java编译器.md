@@ -1,4 +1,5 @@
-在前面的篇章中，我们多次提到了 Java 语法和 Java 字节码的差异之处。这些差异之处都是通过 Java 编译器来协调的。今天我们便来列举一下 Java 编译器的协调工作
+在前面的篇章中，我们多次提到了 Java 语法和 Java 字节码的差异之处。这些差异之处都是通过 Java 编译器来协调的。
+今天我们便来列举一下 Java 编译器的协调工作
 
 自动装箱与自动拆箱
 首先要提到的便是 Java 的自动装箱（auto-boxing）和自动拆箱（auto-unboxing）。
@@ -7,7 +8,8 @@
 之所以需要包装类型，是因为许多 Java 核心类库的 API 都是面向对象的。举个例子，Java 核心类库中的容器类，就只支持引用类型
 
 当需要一个能够存储数值的容器类时，我们往往定义一个存储包装类对象的容器。
-对于基本类型的数值来说，我们需要先将其转换为对应的包装类，再存入容器之中。在 Java 程序中，这个转换可以是显式，也可以是隐式的，后者正是 Java 中的自动装箱。
+对于基本类型的数值来说，我们需要先将其转换为对应的包装类，再存入容器之中。在 Java 程序中，这个转换可以是显式，也可以是隐式的，
+后者正是 Java 中的自动装箱。
 ```
 public int foo() {
   ArrayList<Integer> list = new ArrayList<>();
@@ -75,7 +77,7 @@ public static Integer valueOf(int i) {
 22: checkcast java/lang/Integer
 ```
 之所以会出现这种情况，是因为 Java 泛型的类型擦除。这是个什么概念呢？简单地说，那便是 Java 程序里的泛型信息，在 Java 虚拟机里全部都丢失了。
-  这么做主要是为了兼容引入泛型之前的代码。
+  这么做主要是为了兼容引入泛型之前的代码。 //jvm低版本不支持泛型,java在1.5才引入泛型
 
 当然，并不是每一个泛型参数被擦除类型后都会变成 Object 类。对于限定了继承类的泛型参数，经过类型擦除后，所有的泛型参数都将变成所限定的继承类。
   也就是说，Java 编译器将选取该泛型所能指代的所有类中层次最高的那个，作为替换泛型的类
@@ -158,6 +160,8 @@ public double actionPrice(Customer customer) {
   return actionPrice((VIP) customer);
 }
 ```
+//查看idea编译输出路径out/VIPOnlyMerchant.class里面没有这个方法，只有字节码有
+//所有类放在一个文件，也就是内部类时，会生成多个class文件，注意内部类文件名带有$,idea不可见，需要进行转义\$
 
 在我们的例子中，VIPOnlyMerchant 类将包含一个桥接方法 actionPrice(Customer)，它重写了父类的同名同方法描述符的方法。该桥接方法将传入的 
   Customer 参数强制转换为 VIP 类型，再调用原本的 actionPrice(VIP) 方法。
@@ -189,7 +193,8 @@ class NaiveMerchant extends Merchant {
 }
 ```
 
-除了前面介绍的泛型重写会生成桥接方法之外，如果子类定义了一个与父类参数类型相同的方法，其返回类型为父类方法返回类型的子类，那么 Java 编译器也会为其生成桥接方法
+除了前面介绍的泛型重写会生成桥接方法之外，如果子类定义了一个与父类参数类型相同的方法，其返回类型为父类方法返回类型的子类，
+那么 Java 编译器也会为其生成桥接方法
 ```
 class NaiveMerchant extends Merchant
   public java.lang.Double actionPrice(Customer);
@@ -215,6 +220,7 @@ class NaiveMerchant extends Merchant
 我之前曾提到过，class 文件里允许出现两个同名、同参数类型但是不同返回类型的方法。这里的原方法和桥接方法便是其中一个例子。
   由于该桥接方法同样标注了 ACC_SYNTHETIC，因此，当在 Java 程序中调用 NaiveMerchant.actionPrice 时，我们只会调用到原方法
 SYNTHETIC 合成的
+//还有一种 $FF: synthetic class
 
 其他语法糖
 在前面的篇章中，我已经介绍过了变长参数、try-with-resources 以及在同一 catch 代码块中捕获多种异常等语法糖。

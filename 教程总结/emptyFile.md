@@ -1,27 +1,8 @@
-DNS管理 支持DNS缓存，支持对 接 支持 DNS 缓存 ， 支 持 对 接 “支持 DNS 缓存 ， 支 持 对
-自己 的 HTTPDNS 自己 的 HTTPDNS 接 自己 的 HTTPDNS
-连接 管理 。 对 于 HTTP 连 接 ， 每 个 域 “ 对 于 HTTP 和 连接 ， 每 个 域 支持 复合 连接 ， 没 有 连
-名 最 多 缓存 5 个 连接 ， 默 名 最 多 缓存 6 个 连接 。 BEE
-认 Keep time 是 5 分 钟 。
-对 于 HTTP/2 连 接 ， 每 个
-对 于 HTTP/2 和 连接 ， 每 个 “域名 都 共用 一 个 H2 连 接
-域名 都 共用 一 个 H2 连 接
-并 发 模型 使 用 多 线程 实现 并 发 ， 实 “每 个 Host 对 应 一 条 线 ”每 个 短 连 都 是 一 个 线
-际 执行 线程 数 受 队列 机 制程， 每 个 线程 可 创建 6 个 程 ， 没 有 线程 限制 。
-控制 ， 最 大 64， 单 个 非 阻塞 Socket 请 求 网
-Host 限 制 5 个 。 络 。
-同一 时 间 最 多 16 个 线 各
-VO 模 型 阻塞 Socket ， 使 用 Okio 。 epoll + 非 阻 塞 Socket epoll + 非 阻塞 Socket
-包装 Socket 进 行 流 读 写
-协议 支持 HTTP/1.1, HTTP/20 HTTP/1.1、 信 令 网 络 ， 只 支持 TCP
-TLS 1.1、TLS 1.2 HTTP/20、QUIC、TLS
-1.1、TLS 12、TLS 1.3
-网 络 质量 监 ，< 默 认 不 支持 ， 有 一 些 第 三 ”Predictor 用 于 收集 使 用 。 SDT 模块 支持 网 络 侦 测
-控 方 的 插件 数据 并 预测 网 络 行为 ，。 与 诊断
-NQE 提 供 当前 网 络 质量 评
-估
-KEE 默认 不 支持 默认 不 支持 Buzs
-跨 平台 Jave 实 现 ， 无 法 路 平台 。 C++ 实现 ， 可 以 跨 平 台 。 C++ 实现 ， 可 以 跨 平 台
-二 次 开发 难 “容易 实现 复杂 ， 不 容易 扩展 。 实现 复杂 ， 不 容易 扩
-度 展 。 相 比 Cronet 要 简单
-一 些
+原著 名 称 中 文 译名 总 词 数 ” 首 万 词 不 重复 词 数 蓝 思 值 L
+Magic tree house 3 Mummies in the Morning 神奇 树 屋 3 : 木乃伊 之 迹 5904 1287 230
+Magic tree house 4 pirates Past Noon 神奇 树 屋 4 : 海盗 的 藏 宝 图 5546 1287
+Magic tree house 1 Dinosaurs before Dark 神奇 树 屋 1 : 恐龙 谷 历险 记 4771 1327 240
+Magic tree house 2 The Knight at Dawn 神奇 树 屋 2 : 迷雾 中 的 骑士 5298 1327 310
+Winnie-the-Pooh 小 能 维尼 22752 1180 790
+The Perks of Being a Wallflower 壁 花 少 年 63220 1338 720
+Who moved my cheese? 谁 动 了 我 的 奶 酷 ? 10886 1396 900

@@ -31,8 +31,9 @@ sudo chmod 777 android.ipr
 由于要将所有源码导入AS会导致第一次加载很慢，可以在android.iml中修改excludeFolder配置，将不需要看的源码排除掉。
 等源码项目加载完成后，还可以通过AS对Exclude的Module进行调整。如果你的电脑的性能很好，可以不用进行配置。
 在android.iml中搜索excludeFolder，在下面加入这些配置
-```
 <excludeFolder url="file://$MODULE_DIR$/bionic" />
+<excludeFolder url="file://$MODULE_DIR$/kernel" />
+```
 <excludeFolder url="file://$MODULE_DIR$/bootable" />
 <excludeFolder url="file://$MODULE_DIR$/build" />
 <excludeFolder url="file://$MODULE_DIR$/cts" />
@@ -43,7 +44,6 @@ sudo chmod 777 android.ipr
 <excludeFolder url="file://$MODULE_DIR$/docs" />
 <excludeFolder url="file://$MODULE_DIR$/external" />
 <excludeFolder url="file://$MODULE_DIR$/hardware" />
-<excludeFolder url="file://$MODULE_DIR$/kernel" />
 <excludeFolder url="file://$MODULE_DIR$/out" />
 <excludeFolder url="file://$MODULE_DIR$/pdk" />
 <excludeFolder url="file://$MODULE_DIR$/platform_testing" />

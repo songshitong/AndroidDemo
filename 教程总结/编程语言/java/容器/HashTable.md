@@ -6,6 +6,8 @@ HashTable的定位就很尴尬。。。  所以这个类就简单看一下
 
 HashTable的数据结构是table[]+链表
 线程安全靠对公开方法加锁synchronized实现，同一时刻只有一个现场能访问HashTable对象，效率不高
+HashTable的key,value都不能为null   
+   value进行了校验，为null抛出异常  对于key，取hash的时候int hash = key.hashCode()，如果key为null直接出错
 
 HashTable实现了Map接口，是一个线程安全的map
 ```

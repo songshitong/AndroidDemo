@@ -154,10 +154,12 @@ public void onTrimMemory(int level) {
     // have the most benefit.
     synchronized (managers) {
       for (RequestManager manager : managers) {
+        //暂停请求
         manager.onTrimMemory(level);
       }
     }
     // memory cache needs to be trimmed before bitmap pool to trim re-pooled Bitmaps too. See #687.
+    //减少或者清空LruResourceCache
     memoryCache.trimMemory(level);
     bitmapPool.trimMemory(level);
     arrayPool.trimMemory(level);
@@ -165,6 +167,7 @@ public void onTrimMemory(int level) {
   
   @Override
   public void onLowMemory() {
+    //清空缓存
     clearMemory();
   }
   
@@ -175,6 +178,36 @@ public void onTrimMemory(int level) {
     arrayPool.clearMemory();
   }
 ```
+RequestManager.onTrimMemory
+com/bumptech/glide/RequestManager.java
+```
+  public void onTrimMemory(int level) {
+    if (level == TRIM_MEMORY_MODERATE && pauseAllRequestsOnTrimMemoryModerate) {
+      pauseAllRequestsRecursive();
+    }
+  }
+ public synchronized void pauseAllRequestsRecursive() {
+    pauseAllRequests();
+    for (RequestManager requestManager : treeNode.getDescendants()) {
+      requestManager.pauseAllRequests();
+    }
+  }
+ public synchronized void pauseAllRequests() {
+    requestTracker.pauseAllRequests();
+  }
+
+ public void pauseAllRequests() {
+    isPaused = true;
+    //清除请求，并加入pendingRequests
+    for (Request request : Util.getSnapshot(requests)) {
+      if (request.isRunning() || request.isComplete()) {
+        request.clear();
+        pendingRequests.add(request);
+      }
+    }
+  }    
+```
+
 看一下build方法
 //GlideBuilder.java
 ```
@@ -981,6 +1014,7 @@ public void begin() {
       status = Status.WAITING_FOR_SIZE;
       //测量一下ImageView的大小
       if (Util.isValidDimensions(overrideWidth, overrideHeight)) {
+        //开始使用engine加载
         onSizeReady(overrideWidth, overrideHeight);
       } else {
         target.getSize(this);
@@ -988,11 +1022,10 @@ public void begin() {
 
       if ((status == Status.RUNNING || status == Status.WAITING_FOR_SIZE)
           && canNotifyStatusChanged()) {
+        //engine是个耗时任务,先加载占位图  https://www.jianshu.com/p/4de87ebf5104
         target.onLoadStarted(getPlaceholderDrawable());
       }
-      if (IS_VERBOSE_LOGGABLE) {
-        logV("finished run method in " + LogTime.getElapsedMillis(startTime));
-      }
+      ..
     }
   }
 ```
@@ -1072,7 +1105,7 @@ public <R> LoadStatus load(
       ResourceCallback cb,
       Executor callbackExecutor) {
     long startTime = VERBOSE_IS_LOGGABLE ? LogTime.getLogTime() : 0;
-
+    //不同的宽高会被视为不同的请求而去再一次请求一次。  https://www.jianshu.com/p/4de87ebf5104
     EngineKey key =
         keyFactory.buildKey(
             model,
@@ -1229,7 +1262,7 @@ public void start(DecodeJob<R> decodeJob) {
     executor.execute(decodeJob);
 }
 ```
-//todo 缓存的情况
+
 我们这里暂时不考虑缓存的情况,那么使用的这里使用的GlideExecutor是GlideBuilder的build方法中初始化的
 sourceExecutor = GlideExecutor.newSourceExecutor();
 其实就是一个线程池. 然后DecodeJob是Runnable,放到线程池中去执行,所以我们知道找重点,去DecodeJob的run方法看
@@ -1634,7 +1667,7 @@ private void decodeFromRetrievedData() {
     return runLoadPath(data, dataSource, path);
   }  
 ```
-//todo 解耦方法
+
 ```
  private <Data, ResourceType> Resource<R> runLoadPath(
       Data data, DataSource dataSource, LoadPath<Data, ResourceType, R> path)
@@ -1791,7 +1824,6 @@ public Resource<Bitmap> decode(
     }
 
     // Use to retrieve exceptions thrown while reading.
-    // TODO(#126): when the framework no longer returns partially decoded Bitmaps or provides a
     // way to determine if a Bitmap is partially decoded, consider removing.
     ExceptionPassthroughInputStream exceptionStream =
         ExceptionPassthroughInputStream.obtain(bufferedStream);
@@ -2071,7 +2103,6 @@ EngineJob.java
     synchronized (this) {
       stateVerifier.throwIfRecycled();
       if (isCancelled) {
-        // TODO: Seems like we might as well put this in the memory cache instead of just recycling
         // it since we've gotten this far...
         resource.recycle();
         release();
@@ -2214,6 +2245,7 @@ ImageViewTarget.java
 ```
 //下面2个方法是DrawableImageViewTarget的父类ImageViewTarget中的
  public void onResourceReady(@NonNull Z resource, @Nullable Transition<? super Z> transition) {
+    //执行transition动画
     if (transition == null || !transition.transition(resource, this)) {
       setResourceInternal(resource);
     } else {
@@ -2238,5 +2270,3 @@ protected void setResource(@Nullable Drawable resource) {
 6. 总结
    到这里,Glide的从网络加载图片到ImageView上的这个主流程是走完了.真的是成吨成吨的操作,各种复杂逻辑,各种封装,各种转换....
    看代码看得欲仙欲死....大量逻辑集中在into里面,很容易被绕晕..当然,我只是了解其中的主流程,细节真的太多太多了.
-
-ps: 太久没写博客了,,,,感觉写的不是很好,这写的是什么垃圾玩意儿....

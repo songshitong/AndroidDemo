@@ -27,10 +27,8 @@ Cache 这个工具类，我们提供了两个方法，一个是读缓存方法 g
 这样看来，读写锁的使用还是非常简单的。
 
 class Cache<K,V> {
-  final Map<K, V> m =
-    new HashMap<>();
-  final ReadWriteLock rwl =
-    new ReentrantReadWriteLock();
+  final Map<K, V> m = new HashMap<>();
+  final ReadWriteLock rwl = new ReentrantReadWriteLock();
   // 读锁
   final Lock r = rwl.readLock();
   // 写锁
@@ -64,10 +62,8 @@ class Cache<K,V> {
 我们才去查询数据库并更新本地缓存。为什么我们要再次验证呢？
 
 class Cache<K,V> {
-  final Map<K, V> m =
-    new HashMap<>();
-  final ReadWriteLock rwl = 
-    new ReentrantReadWriteLock();
+  final Map<K, V> m = new HashMap<>();
+  final ReadWriteLock rwl = new ReentrantReadWriteLock();
   final Lock r = rwl.readLock();
   final Lock w = rwl.writeLock();
  

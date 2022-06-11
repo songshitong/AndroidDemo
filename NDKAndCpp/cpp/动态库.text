@@ -1,0 +1,64 @@
+GCC  GNU C Compiler，可以编译C、C++、JAVA、Fortran、Pascal、Object-C、Ada等语言,可以使用的程序有gcc,g++
+gcc  gcc是GCC中的GUN C Compiler（C 编译器）
+g++  g++是GCC中的GUN C++ Compiler（C++编译器）
+gdb  GNU symbolic debugger  命令行调试
+
+gcc与g++
+gcc和g++的主要区别
+https://www.zhihu.com/question/20940822/answer/536826078 番茄老夫子
+1. 对于 *.c和*.cpp文件，gcc分别当做c和cpp文件编译（c和cpp的语法强度是不一样的）
+2. 对于 *.c和*.cpp文件，g++则统一当做cpp文件编译
+3. 使用g++编译文件时，g++会自动链接标准库STL，而gcc不会自动链接STL
+4. gcc在编译C文件时，可使用的预定义宏是比较少的
+5. gcc在编译cpp文件时/g++在编译c文件和cpp文件时（这时候gcc和g++调用的都是cpp文件的编译器），会加入一些额外的宏，这些宏如下：
+#define __GXX_WEAK__ 1
+#define __cplusplus 1
+#define __DEPRECATED 1
+#define __GNUG__ 4
+#define __EXCEPTIONS 1
+#define __private_extern__ extern
+6.  在用gcc编译c++文件时，为了能够使用STL，需要加参数 –lstdc++ ，但这并不代表 gcc –lstdc++ 和 g++等价。
+
+
+库的概念:
+  一个容器文件，里面装的函数。由于windows和Linux平台不同（主要是编译器，汇编器和连接器的不同），因此二者的二进制库不兼容
+
+
+库的意义：
+  库是别人写好的，现有的，成熟的，可以复用的代码，现实中每个程序都要依赖很多基础的底层库，不可能每个人的代码都从0开始，
+  因此库的存在意义非同寻常
+
+库的种类： 动态库（.so/.dll）（以时间换空间），静态库（.a/.lib）（以空间换时间）
+
+动态库与静态库的区别
+ 1 静态库文件比较大，静态库文件比较小
+ 2 静态库需要在编译时被连接在目标代码中，动态库在运行时才会被连接到目标代码中
+ 3 静态库类似于Android中module，一旦打包apk需要重新编译
+ 4 动态库类似于Jar包，打包时不需要重新编译
+
+
+如何编译一个动态库:如何编译一个动态库.png
+   gcc编译命令：gcc test.c -fPIC -shared -o -test.so
+
+编译为可以执行文件
+gcc test.c -o test
+
+编译的四个阶段 预处理(也称预编译，Preprocessing)、编译(Compilation)、汇编 (Assembly)和连接(Linking)
+预处理
+gcc -E test.c -o test.i 或 gcc -E test.c
+
+编译为汇编代码(Compilation)
+gcc -S test.i -o test.s
+gcc的-S选项，表示在程序编译期间，在生成汇编代码后，停止，-o输出汇编代码文件
+
+汇编(Assembly)
+gcc -c test.s -o test.o
+
+连接(Linking)
+gcc连接器是gas提供的，负责将程序的目标文件与所需的所有附加的目标文件连接起来，最终生成可执行文件。
+附加的目标文件包括静态连接库和动态连接库。
+gcc test.o -o test
+
+执行 ./test
+
+todo 其他用法  https://www.cnblogs.com/ggjucheng/archive/2011/12/14/2287738.html

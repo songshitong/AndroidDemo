@@ -98,14 +98,11 @@ CancelableCountDownLatch  支持取消的  执行cancel后，计数会被置为0
 
 Latch  锁上,门闩
 
-
 // 创建2个线程的线程池
-Executor executor = 
-  Executors.newFixedThreadPool(2);
+Executor executor = Executors.newFixedThreadPool(2);
 while(存在未对账订单){
   // 计数器初始化为2
-  CountDownLatch latch = 
-    new CountDownLatch(2);
+  CountDownLatch latch = new CountDownLatch(2);
   // 查询未对账订单
   executor.execute(()-> {
     pos = getPOrders();
@@ -148,7 +145,7 @@ while(存在未对账订单){
 下面这幅图形象地描述了上面的意图：线程 T1 和线程 T2 只有都生产完 1 条数据的时候，才能一起向下执行，也就是说，线程 T1 和线程 T2 要互相等待，
 步调要一致；同时当线程 T1 和 T2 都生产完一条数据的时候，还要能够通知线程 T3 执行对账操作
 
-用 CyclicBarrier 实现线程同步
+用 CyclicBarrier 实现线程同步  //又叫栅栏
 下面我们就来实现上面提到的方案。这个方案的难点有两个：一个是线程 T1 和 T2 要做到步调一致，另一个是要能够通知到线程 T3。
 你依然可以利用一个计数器来解决这两个难点，计数器初始化为 2，线程 T1 和 T2 生产完一条数据都将计数器减 1，如果计数器大于 0 则线程 T1 或者 T2 等待。
 如果计数器等于 0，则通知线程 T3，并唤醒等待的线程 T1 或者 T2，与此同时，将计数器重置为 2，这样线程 T1 和线程 T2 生产
@@ -171,11 +168,9 @@ Vector<P> pos;
 // 派送单队列
 Vector<D> dos;
 // 执行回调的线程池 
-Executor executor = 
-  Executors.newFixedThreadPool(1);
-final CyclicBarrier barrier =
-  new CyclicBarrier(2, ()->{
-    executor.execute(()->check());
+Executor executor = Executors.newFixedThreadPool(1);
+final CyclicBarrier barrier = new CyclicBarrier(2, ()->{
+       executor.execute(()->check());
   });
   
 void check(){

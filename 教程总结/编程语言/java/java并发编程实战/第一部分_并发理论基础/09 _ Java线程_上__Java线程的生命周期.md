@@ -66,7 +66,7 @@ JVM 层面并不关心操作系统调度相关的状态，因为在 JVM 看来�
 第三种场景，调用 LockSupport.park() 方法。其中的 LockSupport 对象，也许你有点陌生，其实 Java 并发包中的锁，都是基于它实现的。
   调用 LockSupport.park() 方法，当前线程会阻塞，线程的状态会从 RUNNABLE 转换到 WAITING。调用 LockSupport.unpark(Thread thread) 
   可唤醒目标线程，目标线程的状态又会从 WAITING 状态转换到 RUNNABLE。 
-  todo LockSupport相关的
+ 
   
 3. RUNNABLE 与 TIMED_WAITING 的状态转换
 有五种场景会触发这种转换：

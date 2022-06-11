@@ -2,6 +2,7 @@ package sst.example.androiddemo.feature.widget
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import sst.example.androiddemo.feature.R
 
 ///todo 实现outlineprovider
@@ -11,5 +12,8 @@ class ViewOutlineProvider : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_outline_provider)
+        val view: View?=null
+        view?.invalidateOutline()
+
     }
 }

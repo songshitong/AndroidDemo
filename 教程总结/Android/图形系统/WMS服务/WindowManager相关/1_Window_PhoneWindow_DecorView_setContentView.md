@@ -1,7 +1,8 @@
 https://www.jianshu.com/p/e42b638944ae  文章源码基于8.1及以前
 
 ///Window，PhoneWindow，DecorView，setContentView
-
+https://www.jianshu.com/p/d0f645d1012a
+https://www.jianshu.com/p/e42b638944ae
 
 一个顶级窗口查看和行为的一个抽象基类。这个类的实例作为一个顶级View添加到Window Manager
 。它提供了一套标准的UI方法，比如添加背景，标题，menu等等。
@@ -367,3 +368,64 @@ activity
   phoneWindow
   DecorView  继承FrameLayout
     ContentView
+
+
+findViewById的流程
+通过ViewGroup遍历子view，如果子view的id与要查找的id相等，直接返回
+android/app/Activity.java
+```
+public <T extends View> T findViewById(@IdRes int id) {
+        return getWindow().findViewById(id);
+    }
+```
+android/view/Window.java
+```
+ public <T extends View> T findViewById(@IdRes int id) {
+        return getDecorView().findViewById(id);
+    }
+```
+DecorView没有重写findViewById
+android/view/View.java
+```
+  public final <T extends View> T findViewById(@IdRes int id) {
+        if (id == NO_ID) {
+            return null;
+        }
+        return findViewTraversal(id);
+    }  
+
+    protected <T extends View> T findViewTraversal(@IdRes int id) {
+        //如果要查找的id与自己相等，返回this
+        if (id == mID) {
+            return (T) this;
+        }
+        return null;
+    } 
+ //mId的初始化，也就是在xml中设置的id，默认-1
+ case com.android.internal.R.styleable.View_id:
+                    mID = a.getResourceId(attr, NO_ID);
+                    break;        
+```
+ViewGroup的重写
+遍历子view，如果子view的id与要查找的id相等，返回
+```
+ protected <T extends View> T findViewTraversal(@IdRes int id) {
+        if (id == mID) {
+            return (T) this;
+        }
+        final View[] where = mChildren;
+        final int len = mChildrenCount;
+        for (int i = 0; i < len; i++) {
+            View v = where[i];
+            if ((v.mPrivateFlags & PFLAG_IS_ROOT_NAMESPACE) == 0) {
+                v = v.findViewById(id);
+                if (v != null) {
+                    return (T) v;
+                }
+            }
+        }
+        return null;
+    }
+```
+
+

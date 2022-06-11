@@ -1,4 +1,23 @@
 linux system programming
+
+TEMP_FAILURE_RETRY
+宏定义  unistd.h
+```
+#ifndef TEMP_FAILURE_RETRY
+#define TEMP_FAILURE_RETRY(expression) ({     \
+  __typeof(expression) __result;              \
+  do {                                        \
+    __result = (expression);                  \
+  } while (__result == -1 && errno == EINTR); \
+  __result; })
+#endif
+```
+含义为：expression表达式返回值为-1或者错误码为EINTR，则重复执行expression。-1代表操作失败，errno == EINTR代表中断暂停，
+两个情况下都应该不断重试。用于忽略系统中断造成的错误。
+示例  android hanlder唤醒
+ssize_t nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &inc, sizeof(uint64_t)));
+
+
 文件打开open函数
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -48,18 +67,25 @@ mmap内存映射
 说得好，不过什么意思？
 简单地说就是存在映射关系的双方，只要修改其中一方的内容，另一方也会发生改变
 它会在内核虚拟地址空间中申请一块与用户虚拟内存相同大小的内存，然后再申请物理内存，将同一块物理内存分别映射到内核虚拟地址空间和用户虚拟内存空间，
-实现了内核虚拟地址空间和用户虚拟内存空间的数据同步操作
+实现了内核虚拟地址空间和用户虚拟内存空间的数据同步操作，程序只要操作用户空间的数据由系统自动同步到文件，省去了copy_from_user,copy_to_user
 ```//原型
 /*
 addr: 代表映射到进程地址空间的起始地址，当值等于0则由内核选择合适地址，此处为0；
 size: 代表需要映射的内存地址空间的大小
 prot: 代表内存映射区的读写等属性值，此处为PROT_READ(可读取);
+    PROT_EXEC内容可以被执行；
+    PROT_READ:内容可以被读取；
+    PROT_WRITE:内容可以被写入;
+    PROT_NONE:内容不可访问
 flags: 标志位，此处为MAP_PRIVATE(私有映射，多进程间不共享内容的改变)和 MAP_NORESERVE(不保留交换空间)
-fd: 代表mmap所关联的文件描述符，
-offset：偏移量，此处为0。
+    MAP_SHARED:共享；MAP_PRIVATE:私用；MAP_ANONYMOUS:匿名映射(不基于文件)，fd传入-1
+fd: 代表mmap所关联的文件描述符，打开文件的句柄
+offset：偏移量，此处为0。 必须是4k的整数倍，一个物理页映射是4k
 void* mmap(void* addr, size_t size, int prot, int flags, int fd, off_t offset)
 //mVMStart = mmap(0, BINDER_VM_SIZE, PROT_READ, MAP_PRIVATE | MAP_NORESERVE, mDriverFD, 0) 
 ```
+解除内存映射
+munmap(m_ptr, oldSize);
 
 stat函数
 函数原型  #include <sys/stat.h>
@@ -71,10 +97,11 @@ int lstat(const char *restrict pathname, struct stat *restrict buf);
 类似于stat.但是当命名的文件是一个符号链接时，lstat返回该符号链接的有关信息，而不是由该符号链接引用文件
 函数说明: 通过文件名filename获取文件信息，并保存在buf所指的结构体stat中返回值:
 执行成功则返回0，失败返回-1，错误代码存于errno
-
 第二个参数是个指针，它指向一个我们应提供的结构。这些函数填写由buf指向的结构。
-该结构的实际定义可能所实施而有所不同，但其基本形式是：
 
+struct stat这个结构体是用来描述一个linux系统文件系统中的文件属性的结构
+struct stat sb = {};
+int result = stat(path, &sb)
 
 
 fork()创建子进程  返回进程ID

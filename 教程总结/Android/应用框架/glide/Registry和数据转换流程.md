@@ -134,6 +134,9 @@ ModelLoader
 ModelLoader是通过ModelLoaderRegistry进行管理，ModelLoader需要接受两个泛型类型<Model,Data>，ModelLoader本身是一个工厂接口，
 主要工作是将复杂数据模型转通过DataFetcher转换成需要的Data，LoadData是ModelLoader的内部类，是对DataFetcher和Key的封装实体，
 ModelLoader的创建用ModelLoaderFactory
+这个是用于生成用于读取的数据，比如说String转化为InputStream等。而且妙的一点那是，每个生成工厂之间可以嵌套，最后会一层层解析获取到一些参数，
+  进入到最为基础的数据模型。  https://www.jianshu.com/p/4de87ebf5104
+参考HttpGlideUrlLoader,用来将GlideUrl转换为InputStream
 ModelLoaderRegistry.java
 ```
 public class ModelLoaderRegistry {
@@ -344,7 +347,7 @@ public class HttpGlideUrlLoader implements ModelLoader<GlideUrl, InputStream> {
 ```
 buildLoadData()需要创建LoadData,需要传入Key和DataFetcher，handles()返回值代表是否接受当前model类型的，true代表接受，
   所以一般都是true;
-第二步：自定义Fetcher实现DataFecher，重写loadData()、cleanup()、cancel()、getDataClass()、getDataSource()方法；
+第二步：自定义Fetcher实现DataFetcher，重写loadData()、cleanup()、cancel()、getDataClass()、getDataSource()方法；
 HttpUrlFetcher.java
 ```
 public class HttpUrlFetcher implements DataFetcher<InputStream> {
@@ -666,8 +669,9 @@ public final class InputStreamRewinder implements DataRewinder<InputStream> {
 
 
 ResourceTranscoder
-ResourceTranscoder是一个接口，作用是对两个Resource<?>进行转换，接受泛型<Z,R>，主要方法是transcode(),一般泛型的接收范围是Bitmap、Drawable、byte[]等，
-  将Z转换为R
+ResourceTranscoder是一个接口，作用是对两个Resource<?>进行转换，接受泛型<Z,R>，主要方法是transcode(),
+一般泛型的接收范围是Bitmap、Drawable、byte[]等，将Z转换为R
+Bitmap->byte[];Bitmap->BitmapDrawable;Drawable->byte[];GifDrawable->byte[]
 ```
 public interface ResourceTranscoder<Z, R> {
   Resource<R> transcode(@NonNull Resource<Z> toTranscode, @NonNull Options options);
@@ -745,7 +749,7 @@ public interface ImageHeaderParser {
 
 
 加载/解析 数据转换流程
-上面介绍一堆组件和一堆泛型，数据类型的转换到底是怎样？搞明白这一点还得从Rigistry提供的操作方法入手：
+上面介绍一堆组件和一堆泛型，数据类型的转换到底是怎样？搞明白这一点还得从Registry提供的操作方法入手：
 Registry提供getModelLoaders()和getLoadPath()，我们先从定义方法的泛型来看:
 Registry.java
 ```
@@ -764,7 +768,6 @@ LoadPath()入参类型为<Data, TResource, Transcode>，其中<Data>是在getMod
 <TResource>是待定类型，调用者一般传?,
 <Transcode>调用Glide.with().as(xxx)时as()传入的类型，Glide提供有asBitmap(),asFile(),asGif()，默认是Drawable类型；
   在调用时<TResource>是待定类型，肯定有逻辑获取它的目标类型
-//todo 其中<Data>是在getModelLoaders()返回的类型
 ```
   private static final RequestOptions DECODE_TYPE_BITMAP = decodeTypeOf(Bitmap.class).lock();
   private static final RequestOptions DECODE_TYPE_GIF = decodeTypeOf(GifDrawable.class).lock();
@@ -780,7 +783,7 @@ LoadPath()入参类型为<Data, TResource, Transcode>，其中<Data>是在getMod
   }
 ```
 
-下面分析getLoadPath()方法一看究竟；
+下面分析getLoadPath()方法一看究竟； 示例:输入ByteBuffer,Object,Drawable 输出LoadPath<ByteBuffer,Object,Drawable>
 ```
 public <Data, TResource, Transcode> LoadPath<Data, TResource, Transcode> getLoadPath(
       @NonNull Class<Data> dataClass,
@@ -810,6 +813,15 @@ public <Data, TResource, Transcode> LoadPath<Data, TResource, Transcode> getLoad
 LoadPath()方法从loadPathCache获取缓存对象，如果不存在，调用getDecodePaths()，经过判断，创建LoadPath对象，将获取的结果放入LoadPath，
 最后放入loadPathCache并返回，LoadPath是对Data,TResource,Transcode和List<DecodePath<Data, TResource, Transcode>>的封装，
 最终的逻辑还是再DecodePath中；
+com/bumptech/glide/load/engine/LoadPath.java
+```
+public class LoadPath<Data, ResourceType, Transcode> {
+  private final Class<Data> dataClass;
+  private final Pool<List<Throwable>> listPool;
+  private final List<? extends DecodePath<Data, ResourceType, Transcode>> decodePaths;
+  private final String failureMessage;
+ }
+```
 看一下getDecodePaths()方法定义：
 ```
  private <Data, TResource, Transcode> List<DecodePath<Data, TResource, Transcode>> getDecodePaths(
@@ -833,7 +845,7 @@ LoadPath()方法从loadPathCache获取缓存对象，如果不存在，调用get
         //4 获取registeredResourceClass和registeredTranscodeClasss对应的所有ResourceTranscoder    
         ResourceTranscoder<TResource, Transcode> transcoder =
             transcoderRegistry.get(registeredResourceClass, registeredTranscodeClass);
-        //创建DecodePath,把相关信息封装
+        //创建DecodePath,把相关信息封装  //将查到的信息封装
         DecodePath<Data, TResource, Transcode> path =
             new DecodePath<>(
                 dataClass,
@@ -849,6 +861,7 @@ LoadPath()方法从loadPathCache获取缓存对象，如果不存在，调用get
     return decodePaths;
   }
 ```
+到各个Registry查询注册的类
 为了更清楚的分析代码，我可以将假设泛型的类型为<InputStream,?,Drawable>；
 我在上面代码中做了标记：代码1通过调用transcoderRegistry.getTranscodeClasses()，返回的类型就是泛型?所未知的具体类型；
 代码2通过调用transcoderRegistry.getTranscodeClasses()，返回所有符合条件的registeredTranscodeClasses;
@@ -897,6 +910,7 @@ class SourceGenerator implements DataFetcherGenerator, DataFetcherGenerator.Fetc
     try {
       //获取Encoder
       Encoder<Object> encoder = helper.getSourceEncoder(dataToCache);
+      //将data写入文件
       DataCacheWriter<Object> writer =
           new DataCacheWriter<>(encoder, dataToCache, helper.getOptions());
       originalKey = new DataCacheKey(loadData.sourceKey, helper.getSignature());
@@ -917,14 +931,15 @@ class SourceGenerator implements DataFetcherGenerator, DataFetcherGenerator.Fetc
 
 ResourceEncoder流程
 ResourceEncoder的使用场景是在数据解析完毕后，将处理过的数据进行缓存，调用的地方在DecodeJob.onResourceDecoded()方法中，
-  其最终通过调用Registry.getResultEncoder()获取；
+  其最终通过调用Registry.getResultEncoder()获取；//缓存为file
 DecodeJob.java
 ```
 <Z> Resource<Z> onResourceDecoded(DataSource dataSource, @NonNull Resource<Z> decoded) {
-    ...
+    ...//Resource<Z> decoded 可能是BitmapResource 泛型是Bitmap
     final EncodeStrategy encodeStrategy;
     final ResourceEncoder<Z> encoder;
-    if (decodeHelper.isResourceEncoderAvailable(transformed)) {
+    if (decodeHelper.isResourceEncoderAvailable(transformed)) {  transformed可能是BitmapResources
+      //获取ResourceEncoder    可能是BitmapEncoder
       encoder = decodeHelper.getResultEncoder(transformed);
       encodeStrategy = encoder.getEncodeStrategy(options);
     } else {
@@ -935,4 +950,4 @@ DecodeJob.java
 ```
 ResourceEncoder数据类型是从Resource<X>->File；执行的时机在解析流程之后；
 
-//todo 类型转换图
+glide_数据装换流程图.awebp

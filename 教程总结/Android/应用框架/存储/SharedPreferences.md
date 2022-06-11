@@ -1,4 +1,4 @@
-android sdk 29
+android sdk 29  android10.0
 https://www.jianshu.com/p/c1c30753145a
 
 sp文件
@@ -263,6 +263,7 @@ public final class EditorImpl implements Editor {
       //临时存储要提交数据的map
       private final Map<String, Object> mModified = new HashMap<>();
       public Editor putString(String key, @Nullable String value) {
+            //上锁
             synchronized (mEditorLock) {
                 mModified.put(key, value);
                 return this;
@@ -330,15 +331,43 @@ public final class EditorImpl implements Editor {
                 };
             //异步执行磁盘文件写入，注意这里和commit不同的是postWriteRunnable不为空
             SharedPreferencesImpl.this.enqueueDiskWrite(mcr, postWriteRunnable);
-
+            最终回调给SharedPreferencesImpl注册监听registerOnSharedPreferenceChangeListener
             notifyListeners(mcr);
-        }       
+        }    
+
+//回调给mcr.listeners.onSharedPreferenceChanged  
+private void notifyListeners(final MemoryCommitResult mcr) {
+            if (mcr.listeners == null || mcr.keysModified == null ||
+                mcr.keysModified.size() == 0) {
+                return;
+            }
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                for (int i = mcr.keysModified.size() - 1; i >= 0; i--) {
+                    final String key = mcr.keysModified.get(i);
+                    for (OnSharedPreferenceChangeListener listener : mcr.listeners) {
+                        if (listener != null) {
+                            listener.onSharedPreferenceChanged(SharedPreferencesImpl.this, key);
+                        }
+                    }
+                }
+            } else {
+                // Run this function on the main thread.
+                ActivityThread.sMainThreadHandler.post(() -> notifyListeners(mcr));
+            }
+        }           
 ```
-//todo notifyListeners
+
 
 commit()方法很简单，就3步，写入内存缓存、写入磁盘文件、返回写入文件结果。apply的流程和commit差不多，只是apply没有返回值。
  二者都会调用enqueueDiskWrite写入文件，commit的postWriteRunnable参数为null，apply是有值的
 ```
+frameworks/base/core/java/android/app/SharedPreferencesImpl.java 可以注册监听
+    public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+        synchronized(mLock) {
+            mListeners.put(listener, CONTENT);
+        }
+    }
+
 private MemoryCommitResult commitToMemory() {
      long memoryStateGeneration;
     boolean keysCleared = false;
@@ -418,7 +447,7 @@ private static class MemoryCommitResult {
 
         volatile boolean writeToDiskResult = false;
         boolean wasWritten = false;
-
+        
         private MemoryCommitResult(long memoryStateGeneration, boolean keysCleared,
                 @Nullable List<String> keysModified,
                 @Nullable Set<OnSharedPreferenceChangeListener> listeners,
@@ -537,6 +566,7 @@ private void enqueueDiskWrite(final MemoryCommitResult mcr,
             FileUtils.sync(str);
             fsyncTime = System.currentTimeMillis();
             str.close();
+            //设置文件权限
             ContextImpl.setFilePermissionsFromMode(mFile.getPath(), mMode, 0);
             try {
                 final StructStat stat = Os.stat(mFile.getPath());
@@ -588,7 +618,7 @@ public static void queue(Runnable work, boolean shouldDelay) {
         }
     }
 
-//懒加载创建子线程的Handler，后面的写入文件的任务都在子线程完成
+//懒加载创建子线程的Handler，后面的写入文件的任务都在子线程完成  名字是"queued-work-looper"
 private static Handler getHandler() {
         synchronized (sLock) {
             if (sHandler == null) {
@@ -623,6 +653,7 @@ private static class QueuedWorkHandler extends Handler {
             sFinishers.remove(finisher);
         }
     }  
+  //添加待完成的runnalbe  
   public static void addFinisher(Runnable finisher) {
     synchronized (sLock) {
         sFinishers.add(finisher);
@@ -660,45 +691,97 @@ private static void processPendingWork() {
 4、commit()有返回值，是在主线程写入文件；apply()没有返回值，在子线程写入文件。
 
 
-//todo  xmlutil   
+https://www.jianshu.com/p/ca1a2129523b   android10.0
+跨进程设置：
+frameworks/base/core/java/android/app/SharedPreferencesImpl.java
+```
+ private void writeToFile(MemoryCommitResult mcr, boolean isFromSyncCommit) {
+    ...
+       FileOutputStream str = createFileOutputStream(mFile);
+        if (str == null) {
+            mcr.setDiskWriteResult(false, false);
+            return;
+        }
+        XmlUtils.writeMapXml(mcr.mapToWriteToDisk, str);
+        writeTime = System.currentTimeMillis();
+        FileUtils.sync(str);
+        fsyncTime = System.currentTimeMillis();
+        str.close();
+      //配置权限  
+     ContextImpl.setFilePermissionsFromMode(mFile.getPath(), mMode, 0);
+    ...
+ }
+```
+frameworks/base/core/java/android/app/ContextImpl.java
+```
+   static void setFilePermissionsFromMode(String name, int mode,
+            int extraPermissions) {
+        //设置用户和组的rw权限 read,write   
+        int perms = FileUtils.S_IRUSR|FileUtils.S_IWUSR
+            |FileUtils.S_IRGRP|FileUtils.S_IWGRP
+            |extraPermissions;
+        //标记位做与运算    public static final int MODE_WORLD_READABLE = 0x0001; 二进制0001    context中
+        //SP设置多进程读写时候的标志位：mode  MODE_MULTI_PROCESS = 0x0004; 二进制0100 context中
+        //0001 & 0100 =0;  添加其他人权限
+        if ((mode&MODE_WORLD_READABLE) != 0) {
+            perms |= FileUtils.S_IROTH;
+        }
+        //public static final int MODE_WORLD_WRITEABLE = 0x0002; 二进制0010    context中
+        //0100 & 0010 = 0  添加了其他人权限
+        if ((mode&MODE_WORLD_WRITEABLE) != 0) {
+            perms |= FileUtils.S_IWOTH;
+        }
+        ...
+        FileUtils.setPermissions(name, perms, -1, -1);
+    }
+```
+frameworks/base/core/java/android/os/FileUtils.java
+```
+//用户  7是rwx权限 4=r 2=w 1=x    linux文件权限为3列，分别是用户，组，其他人
+  public static final int S_IRWXU = 00700;
+  public static final int S_IRUSR = 00400;
+  public static final int S_IWUSR = 00200;
+  public static final int S_IXUSR = 00100;
+//组
+  public static final int S_IRWXG = 00070;
+  public static final int S_IRGRP = 00040;
+  public static final int S_IWGRP = 00020;
+  public static final int S_IXGRP = 00010;
+//其他人
+  public static final int S_IRWXO = 00007;
+  public static final int S_IROTH = 00004;
+  public static final int S_IWOTH = 00002;
+  public static final int S_IXOTH = 00001;
+ public static int setPermissions(String path, int mode, int uid, int gid) {
+        try {
+            Os.chmod(path, mode);
+        } catch (ErrnoException e) {
+            Slog.w(TAG, "Failed to chmod(" + path + "): " + e);
+            return e.errno;
+        }
 
-android 11
-frameworks/base/core/java/com/android/internal/util/XmlUtils.java
-```
-   public static final HashMap<String, ?> readMapXml(InputStream in)
-    throws XmlPullParserException, java.io.IOException
-    {
-        XmlPullParser   parser = Xml.newPullParser();
-        parser.setInput(in, StandardCharsets.UTF_8.name());
-        return (HashMap<String, ?>) readValueXml(parser, new String[1]);
-    }
-   public static final void writeMapXml(Map val, OutputStream out)
-            throws XmlPullParserException, java.io.IOException {
-        XmlSerializer serializer = new FastXmlSerializer();
-        serializer.setOutput(out, StandardCharsets.UTF_8.name());
-        serializer.startDocument(null, true);
-        serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-        writeMapXml(val, null, serializer);
-        serializer.endDocument();
+        if (uid >= 0 || gid >= 0) {
+            try {
+                Os.chown(path, uid, gid);
+            } catch (ErrnoException e) {
+                Slog.w(TAG, "Failed to chown(" + path + "): " + e);
+                return e.errno;
+            }
+        }
+        return 0;
     }
 ```
-android 12
-TypedXmlPullParser  {@link XmlPullParser}的专门化，它添加了显式方法来支持原语数据类型的一致和高效转换。
+这个过程中就是通过chmod方法设置了文件的在系统中的权限。从名称就能知道，这个方法每一次读写之后都会默认给用户和组都能够进行读写
+根据位运算，SP在Android 10.0根本没有进行多进程读写文件的互斥处理，给其他人授予了权限
+我们看看MODE_MULTI_PROCESS的注释：
 ```
-  public static final HashMap<String, ?> readMapXml(InputStream in)
-            throws XmlPullParserException, java.io.IOException {
-        TypedXmlPullParser parser = Xml.newFastPullParser();
-        parser.setInput(in, StandardCharsets.UTF_8.name());
-        return (HashMap<String, ?>) readValueXml(parser, new String[1]);
-    }
-  public static final void writeMapXml(Map val, OutputStream out)
-            throws XmlPullParserException, java.io.IOException {
-        TypedXmlSerializer serializer = Xml.newFastSerializer();
-        serializer.setOutput(out, StandardCharsets.UTF_8.name());
-        serializer.startDocument(null, true);
-        serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
-        writeMapXml(val, null, serializer);
-        serializer.endDocument();
-    }
+MODE_MULTI_PROCESS does not work reliably in
+     * some versions of Android, and furthermore does not provide any
+     * mechanism for reconciling concurrent modifications across
+     * processes.  Applications should not attempt to use it.  Instead,
+     * they should use an explicit cross-process data management
+     * approach such as {@link android.content.ContentProvider ContentProvider}.
+```
+这里面已经说明了，在某些Android版本中SP将不会提供跨进程读写文件的保护，如果有需求，请使用ContentProvider
 
-```
+//todo linux文件权限

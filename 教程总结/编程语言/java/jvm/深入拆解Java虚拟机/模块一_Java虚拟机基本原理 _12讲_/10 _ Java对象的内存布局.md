@@ -176,6 +176,18 @@ java -cp jol-cli-0.9-full.jar org.openjdk.jol.Main internals java.lang.String
 [1] https://wiki.openjdk.java.net/display/HotSpot/CompressedOops
 [2] http://openjdk.java.net/jeps/142
 
+todo 代码中使用JOL  java object layout   使用JOL查看锁状态
+https://mp.weixin.qq.com/s/OSi1fEoGHA1qdC0dJMs55Q
+```
+implementation 'org.openjdk.jol:jol-core:0.14'
+Object o = new Object();
+  log.info("未进入同步块，MarkWord 为：");
+  log.info(ClassLayout.parseInstance(o).toPrintable());
+  synchronized (o){
+   log.info(("进入同步块，MarkWord 为："));
+   log.info(ClassLayout.parseInstance(o).toPrintable());
+  }
+```
 
 
 放个屁臭到了自己
@@ -210,6 +222,9 @@ JVM利用这个特性来实现压缩指针，也可以用这三位来记录一�
 
 HotSpot的对象头一直是mark word(标记字段)和类型指针。如果对源代码有兴趣可以查看OpenJDK源代码目录下，src/hotspot/share/oops/oop.hpp里的class oopDesc。
 数组对象头是同目录下的arrayOop.hpp里的class arrayOopDesc
+
+MarkWord
+path/hotspot/src/share/vm/oops/markOop.hpp
 
 熊猫酒仙
 接触过C/C++的内存字节对齐，就比较好理解本章内容了。希望老师后面讲讲java内存在并发上的相关机制，譬如搞不懂的内存障是怎么实现的！

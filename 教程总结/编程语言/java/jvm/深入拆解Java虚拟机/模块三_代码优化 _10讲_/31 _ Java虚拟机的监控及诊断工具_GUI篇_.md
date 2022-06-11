@@ -206,8 +206,11 @@ JMC_MBean Server.webp
 
 由于篇幅的限制，我就不再介绍VisualVM 以及JITWatch 了。感兴趣的同学可自行下载研究。
 https://visualvm.github.io/index.html
-https://github.com/AdoptOpenJDK/jitwatch
+VisualVM 是一款免费的性能分析工具。它通过 jvmstat、JMX、SA（Serviceability Agent）以及 Attach API 等多种方式从程序运行时获得实时数据，
+从而进行动态的性能分析。同时，它能自动选择更快更轻量级的技术尽量减少性能分析对应用程序造成的影响，提高性能分析的精度。
 
+https://github.com/AdoptOpenJDK/jitwatch
+Java HotSpot JIT编译器的日志分析器/可视化程序。检查内联决策、热方法、字节码和汇编
 
 
 遇见未来

@@ -45,6 +45,7 @@ abstract class BaseHandler : Handler {
     private fun checkFragment() =
         fragmentWeakReference == null || fragmentWeakReference!!.get() == null || fragmentWeakReference!!.get()!!.isRemoving()
 
+    //activity是否调用finish()
     private fun checkActivity() =
         activityWeakReference == null || activityWeakReference!!.get() == null || activityWeakReference!!.get()!!.isFinishing
 

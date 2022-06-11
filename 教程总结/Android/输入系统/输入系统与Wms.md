@@ -57,7 +57,24 @@ public class WindowManagerService extends IWindowManager.Stub{
   }
 }
 
-//todo InputWindowHandle
+```
+InputWindowHandle 接收input的window的handle
+frameworks/base/services/core/java/com/android/server/input/InputWindowHandle.java
+```
+public final class InputWindowHandle {
+  public final InputApplicationHandle inputApplicationHandle;
+  public final Object windowState;
+  public final IWindow clientWindow;
+  public InputChannel inputChannel;
+  public final int displayId;
+ public InputWindowHandle(InputApplicationHandle inputApplicationHandle,
+            Object windowState, IWindow clientWindow, int displayId) {
+        this.inputApplicationHandle = inputApplicationHandle;
+        this.windowState = windowState;
+        this.clientWindow = clientWindow;
+        this.displayId = displayId;
+    }
+}
 ```
 openInputChannel的过程
 /frameworks/base/services/core/java/com/android/server/wm/WindowState.java

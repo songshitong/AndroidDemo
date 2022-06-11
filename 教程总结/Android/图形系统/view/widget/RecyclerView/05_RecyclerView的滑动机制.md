@@ -328,7 +328,7 @@ GapWorker的初始化
             if (mGapWorker == null) {
                 mGapWorker = new GapWorker();
 
-                //只查询一次频率，很昂贵(> 1ms)
+                //只查询一次频率，很昂贵(> 1ms)  todo查询频率可能涉及ipc 
                 Display display = ViewCompat.getDisplay(this);
                 float refreshRate = 60.0f;
                 if (!isInEditMode() && display != null) {

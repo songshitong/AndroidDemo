@@ -222,7 +222,7 @@ for (int i=0; i<3; i++) {
 }  
 
 
-aroll   //todo
+aroll   
 建议并发编程课程中的Demo代码，尽量少使用System.out.println, 因为其实现有使用隐式锁，一些情况还会有锁粗化产生
 作者回复: 好建议
 

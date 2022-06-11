@@ -74,7 +74,9 @@ public static void loop() {
             msg.recycleUnchecked();
         }
 ```
+
 取消息的过程
+Looper.loop->MessageQueue.next->handler.dispatchMessage
 /frameworks/base/core/java/android/os/MessageQueue.java
 ```
 Message next() {
@@ -153,6 +155,7 @@ int Looper::pollInner(int timeoutMillis) {
 
 
 发送消息的入队操作   其他线程唤醒阻塞的主线程
+Handler.sendMessage->MessageQueue.enqueueMessage 会将msg.target设为handler
 /frameworks/base/core/java/android/os/MessageQueue.java
 ```
 public final class MessageQueue { 

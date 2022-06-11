@@ -134,7 +134,7 @@ https://juejin.cn/post/6844904079152381959#heading-23
  
  
   replace 方法
-  getfield opcode  getfield是Java的字节码  opcode操作码
+  getfield opcode  getfield是Java的字节码，加载变量  opcode操作码
   在一个方法中需要大量引用实例域变量的时候，使用方法中的局部变量代替引用可以减少getfield操作的次数，提高性能。
   public String replace(char oldChar, char newChar) {
       //1. 如果两者相同,那么就没必要进行比较了

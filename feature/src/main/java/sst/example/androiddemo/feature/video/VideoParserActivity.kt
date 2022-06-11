@@ -21,13 +21,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blankj.utilcode.util.FileUtils
-import com.blankj.utilcode.util.UriUtils
-import com.tencent.mm.opensdk.modelmsg.SendMessageToWX
-import com.tencent.mm.opensdk.modelmsg.WXGameVideoFileObject
-import com.tencent.mm.opensdk.modelmsg.WXMediaMessage
-import com.tencent.mm.opensdk.openapi.IWXAPI
-import com.tencent.mm.opensdk.openapi.WXAPIFactory
 import kotlinx.android.synthetic.main.activity_video_parser.*
 import sst.example.androiddemo.feature.R
 import sst.example.androiddemo.feature.common.BaseHandler
@@ -49,9 +42,6 @@ class VideoParserActivity : AppCompatActivity() {
     //videoview 的preparlistener 在拉起系统播放，返回后会出发
     var isVideoViewInit: Boolean = false
 
-    //微信参数
-    private var api: IWXAPI? = null
-    private var mTargetScene = SendMessageToWX.Req.WXSceneSession
 
 
     inner class MyHandler : BaseHandler {
@@ -105,7 +95,8 @@ class VideoParserActivity : AppCompatActivity() {
 
         MyUtils.initDirectory(inDirectory)
         MyUtils.initDirectory(outDirectory)
-        FileUtils.deleteFilesInDir(outDirectory)
+//        todo FileUtils移除
+//        FileUtils.deleteFilesInDir(outDirectory)
         frameRcy.layoutManager =
             LinearLayoutManager(this, RecyclerView.HORIZONTAL, false) as RecyclerView.LayoutManager?
         videoView.setOnTouchListener { v, event ->
@@ -150,8 +141,7 @@ class VideoParserActivity : AppCompatActivity() {
             }
         })
 
-        //微信设置
-        api = WXAPIFactory.createWXAPI(this, appId, false)
+
 
         shareVideo.setOnClickListener {
             val outPath = inDirectory + "/out.mp4"
@@ -187,7 +177,8 @@ class VideoParserActivity : AppCompatActivity() {
                 videoView.post {
                     Toast.makeText(this@VideoParserActivity, "编辑完成:$outPath", Toast.LENGTH_SHORT).show()
                 }
-                startActivity(MyUtils.getSysVideoPlayer(UriUtils.file2Uri(File(outPath))))
+//                todo UriUtils移除
+//                startActivity(MyUtils.getSysVideoPlayer(UriUtils.file2Uri(File(outPath))))
             }
 
             override fun onFailure() {
@@ -220,7 +211,8 @@ class VideoParserActivity : AppCompatActivity() {
                         progressCurrent.text = length
 //                        //读取相册图片到/sdcard/android/data
 //                        BitmapUtils.readImgUri2File(uri, inPath)
-                        inPath = uri?.let { it1 -> UriUtils.uri2File(it1).path }.toString()
+                        //todo UriUtils移除
+//                        inPath = uri?.let { it1 -> UriUtils.uri2File(it1).path }.toString()
                         //提取第一帧加载
                         showIv.setImageBitmap(getVideoFrame(inPath, 0))
 
@@ -279,7 +271,8 @@ class VideoParserActivity : AppCompatActivity() {
                 val bitmaps = ArrayList<Bitmap>()
                 files.forEach {
                     Log.d(TAG, "all frames " + it.toString())
-                    bitmaps.add(BitmapUtils.getBitmapFromUri(UriUtils.file2Uri(File(outDirectory + "/" + it.toString()))))
+//                    todo UriUtils移除
+//                    bitmaps.add(BitmapUtils.getBitmapFromUri(UriUtils.file2Uri(File(outDirectory + "/" + it.toString()))))
                 }
                 videoView.post {
                     frameRcy.adapter = FrameRcyAdapter(this@VideoParserActivity, bitmaps)
@@ -292,7 +285,8 @@ class VideoParserActivity : AppCompatActivity() {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "video/*"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "这是标题")//添加分享内容标题
-        shareIntent.putExtra(Intent.EXTRA_STREAM, UriUtils.file2Uri(File(path)))//添加分享内容
+        //todo UriUtils移除
+//        shareIntent.putExtra(Intent.EXTRA_STREAM, UriUtils.file2Uri(File(path)))//添加分享内容
         this.startActivity(Intent.createChooser(shareIntent, "分享title"))
 
         //只分享到微信
@@ -325,22 +319,22 @@ class VideoParserActivity : AppCompatActivity() {
     private fun shareLocalVideo(path: String) {
         shareVideo(path)
         return
-        val gameVideoFileObject = WXGameVideoFileObject()
-        gameVideoFileObject.filePath = path
-//        val video = WXVideoObject()
-//        video.videoUrl = path
-
-        val msg = WXMediaMessage()
-//        msg.setThumbImage(Util.extractThumbNail(path, 150, 150, true))
-        msg.title = "this is title"
-        msg.description = "this is description"
-        msg.mediaObject = gameVideoFileObject
-
-        val req = SendMessageToWX.Req()
-        req.transaction = buildTransaction("appdata")
-        req.message = msg
-        req.scene = mTargetScene
-        api!!.sendReq(req)
+//        val gameVideoFileObject = WXGameVideoFileObject()
+//        gameVideoFileObject.filePath = path
+////        val video = WXVideoObject()
+////        video.videoUrl = path
+//
+//        val msg = WXMediaMessage()
+////        msg.setThumbImage(Util.extractThumbNail(path, 150, 150, true))
+//        msg.title = "this is title"
+//        msg.description = "this is description"
+//        msg.mediaObject = gameVideoFileObject
+//
+//        val req = SendMessageToWX.Req()
+//        req.transaction = buildTransaction("appdata")
+//        req.message = msg
+//        req.scene = mTargetScene
+//        api!!.sendReq(req)
     }
 
     private fun buildTransaction(type: String?): String {

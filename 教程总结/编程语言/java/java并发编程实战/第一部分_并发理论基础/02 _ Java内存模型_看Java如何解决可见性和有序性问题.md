@@ -230,3 +230,5 @@ JSR 133 (Java Memory Model) FAQ http://www.cs.umd.edu/~pugh/java/memoryModel/jsr
 Java内存模型FAQ  http://ifeve.com/jmm-faq/
 JSR-133: JavaTM Memory Model and Thread Specification
   https://www.cs.umd.edu/~pugh/java/memoryModel/jsr133.pdf
+jsr-133的中文版
+http://ifeve.com/wp-content/uploads/2014/03/JSR133%E4%B8%AD%E6%96%87%E7%89%881.pdf

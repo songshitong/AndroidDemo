@@ -44,11 +44,11 @@ HashMap
 元素获取 get(Object key)
  1. 计算hash，根据(n - 1) & hash得到index
  2. 如果是hash相等，key相等，k的equals相等，返回table[index]
- 3. table[index]不为null，可能存在哈希冲突，从链表或红黑树获取   hash相等，key不等的情况
+ 3. hash相等，key不等的情况 table[index]不为null，可能存在哈希冲突，从链表或红黑树获取   
  4. table[index]为null，返回null
 
 元素插入 put(K key, V value)
-1. 如果 table 还未初始化或者容量为 0 则进行resize初始化和扩容
+1. 如果 table 还未初始化或者容量为 0 则进行resize初始化
 2. 判断是否存在哈希冲突   通过hash函数计算hash，通过[(n - 1) & hash]定位元素index，如果插入位置已存在元素说明哈希冲突了
 3. 如果不存在哈希冲突，则直接将该键值对存入计算出来的位置
 4. 如果存在哈希冲突，则将键值对添加到该位置的红黑树或者链表上，并且在链表达到最大长度时将链表转换为红黑树
@@ -57,7 +57,7 @@ HashMap
 7. 当保存键值对后，进行必要的扩容resize
 
 扩容时机
-哈希数组的容量是 16，阈值loadFactor 是 0.75，容量达到12时，扩容一倍变为32
+哈希数组的容量是 16，阈值loadFactor 是 0.75，容量大于12时，扩容一倍变为32
 1.计算新的阈值，新建数组newTab
 2. 如果table[i]不存在哈希冲突(e.next == null)，直接计算新的哈希,迁移元素newTab[e.hash & (newCap - 1)] = e 
 3. 如果存在哈希冲突，将链表或红黑树的节点，通过e.hash & oldCap==0确定是否在原位置，否则是原位置+原容量
@@ -72,7 +72,7 @@ HashMap
 6。 table[index]为null，直接返回
 
 扰动函数
-(h = key.hashCode()) ^ (h >>> 16)
+(h = key.hashCode()) ^ (h >>> 16)  哈希与低16位异或
 1一定要尽可能降低 hash 碰撞，越分散越好；   h右移16位，高16位补0，然后与h做异或，结果高16位是h的高16位，低位是h的高16位与低16位做异或
    hash 值的生成规则同时使用到了 hashCode 的高 16 位和低 16 位，在 hashCode 的基础上加大了随机性
 2算法一定要尽可能高效，因为这是高频操作, 因此采用位运算；
@@ -84,15 +84,34 @@ tab[(n - 1) & hash]
 n=16  15&hash  0< 结果 <15
 2.保证元素尽可能的均匀分布   hashcode的生成(h = key.hashCode()) ^ (h >>> 16)，加入扰动函数，增大随机，减少hash冲突
 
-红黑树
+红黑树  查询复杂度log2n
 1 根节点是黑色的；
 2 每个叶子节点都是黑色的空节点（NIL），也就是说，叶子节点不存储数据；
 3 任何相邻的节点都不能同时为红色，也就是说，红色节点是被黑色节点隔开的；
 4 每个节点，从该节点到达其可达叶子节点的所有路径，都包含相同数目的黑色节点；
 
 链表与红黑树转换
-红黑树转换为链表 <= 6
-链表转换为红黑树 8  >=8
+红黑树转换为链表 <= 6  
+链表转换为红黑树 8  插入第9个进行转换，同时数组长度要大于64,否则执行扩容  经过debug测试,table[]小于64不进行扩容
+
+HashMap JDK1.7是数组+链表
+头插法
+```
+//创建新的节点  
+void createEntry(int hash, K key, V value, int bucketIndex) {
+    //table[bucketIndex] 是放到新插入节点的后面,所以这里是头插法
+    Entry<K,V> e = table[bucketIndex];
+    table[bucketIndex] = new Entry<>(hash, key, value, e);
+    size++;
+}
+//entry的构造器
+Entry(int h, K k, V v, Entry<K,V> n) {
+        value = v;
+        next = n;
+        key = k;
+        hash = h;
+    }   
+```
 
 
 LinkedHashMap
@@ -106,8 +125,8 @@ LinkedHashMap通过扩展父类来实现扩展功能 通过对数组/链表/红�
  确定新的after和before 
 
 
-HashTable的数据结构是table[]+链表
-线程安全靠对公开方法加锁synchronized实现，同一时刻只有一个现场能访问HashTable对象，效率不高
+HashTable的数据结构是table[]+链表  key,value都不能为null
+线程安全靠对公开方法加锁synchronized实现，同一时刻只有一个现场能访问或者修改HashTable对象，效率不高
 已经不推荐使用了，如果需要线程安全请使用ConcurrentHashMap，如果不需要请使用HashMap
 
 ConcurrentHashMap
@@ -125,6 +144,62 @@ ConcurrentHashMap加锁只对要操作的节点node加锁，锁的粒度足够�
 ConcurrentHashMap在table[i]上，存储了以Node为单位的不同数据集合，每个table[i]，就是一个锁，由此分散了竞争。
 transfer()方法，也是以table[i]的位置的Node为锁，再进行扩容操作。
 
+节点是怎么样的
+它是实现Map.Entry<K,V>接口。里面存放了hash，key，val，以及next节点。它的value和next节点是用volatile进行修饰，
+可以保证多线程之间的可见性。 新增节点，改变val，其他线程可见
+
+初始容量为16,扩容为2倍
+
+key和value可以是null吗
+key和value不能是null，putVal进行了校验，会抛出异常
+
+putVal的过程
+1 如果桶数组未初始化，则初始化；
+2 如果待插入的元素所在的桶为空，则尝试把此元素直接插入到桶的第一个位置(CAS插入)；
+3 如果正在扩容，则当前线程一起加入到扩容的过程中；  //扩容的table[i]的hash为moved
+4 如果待插入的元素所在的桶不为空且不在迁移元素，则锁住这个桶（分段锁）； //防止其他线程操作
+5 如果当前桶中元素以链表方式存储，则在链表中寻找该元素或者插入元素；
+6 如果当前桶中元素以红黑树方式存储，则在红黑树中寻找该元素或者插入元素；
+7 如果元素存在，则返回旧值；
+8 如果元素不存在，整个Map的元素个数加1，并检查是否需要扩容；
+
+扩容过程
+1 以stride为长度单位，将table划分各个区域     多核 stride=(length/8)/cpu核数   单核stride=length  stride最小为16
+2 每个参与扩容的线程，通过CAS竞争更新transferIndex，分配到负责的区域   //每次竞争transferIndex减少stride  从n->0
+3 每个线程知道自己负责的区域边界，对区域内的table[i]逐个进行扩容处理    //处理时对table[i]上锁synchronized
+4 正在被处理的table[i]的位置，将被标记为ForwardingNode //hash小于0
+5 每个table[i]上的Node，将可能去往nextTable的不同索引位置，nextTable[i]或nextTable[i + n]，通过新有的有效位加以区分
+   区分方式hash&n是否为0,                     
+6 当处理完区域后，向上返回。由更上层控制，要不要继续进入transfer()。
+
+get(Object key)
+1 计算 hash 值
+2 根据 hash 值找到数组对应位置: (n - 1) & h
+3 根据该位置处结点性质进行相应查找
+如果该位置为 null，那么直接返回 null 就可以了
+如果该位置处的节点刚好就是我们需要的，返回该节点的值即可
+如果该位置节点的 hash 值小于 0，说明正在扩容，或者是红黑树  从扩容节点或红黑树节点查找   ReservationNode todo
+没找到则从链表中查找
+
+ConcurrentHashMap使用什么技术来保证线程安全？
+jdk1.7：Segment+HashEntry来进行实现的；
+jdk1.8：放弃了Segment臃肿的设计，采用Node+CAS+Synchronized来保证线程安全；
+
+
+ConcurrentHashMap的get方法是否要加锁，为什么？
+不需要，get方法采用了unsafe方法，来保证线程安全
+
+ConcurrentHashmap是如何计算它的size大小的 todo
+
+ConcurrentHashMap迭代器是强一致性还是弱一致性？HashMap呢？  todo
+弱一致性，HashMap强一直性。
+ConcurrentHashMap可以支持在迭代过程中，向map添加新元素，而HashMap则抛出了ConcurrentModificationException，
+因为HashMap包含一个修改计数器，当你调用他的next()方法来获取下一个元素时，迭代器将会用到这个计数器。
+
+ConcurrentHashMap1.7和1.8的区别  todo
+jdk1.8的实现降低锁的粒度，jdk1.7锁的粒度是基于Segment的，包含多个HashEntry，而jdk1.8锁的粒度就是Node
+
+数据结构：jdk1.7 Segment+HashEntry；jdk1.8 数组+链表+红黑树+CAS+synchronized
 
 
 HashSet

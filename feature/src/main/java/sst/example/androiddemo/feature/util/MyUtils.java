@@ -15,8 +15,6 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 
-import com.blankj.utilcode.util.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -32,7 +30,7 @@ public class MyUtils {
     //todo activity不显示后  bitmap 内存优化
     //todo surfaceview 自定义view  opengl
     //http://weishu.me/2016/12/23/dive-into-android-optimize-vm-heap/
-    //todo view.bringToFront
+
 
 
     /**
@@ -221,10 +219,9 @@ public class MyUtils {
      * 创建目录.
      */
     public static void initDirectory(String file) {
-        //todo 移除第三方util
         //头像目录
-        if (!FileUtils.isFileExists(file)) {
-            File target = new File(file);
+        File target = new File(file);
+        if (!target.exists()) {
             target.mkdir();
         }
     }
@@ -232,10 +229,10 @@ public class MyUtils {
      * 创建文件.
      */
     public static void initFile(String file) {
-        //todo 移除第三方util
         //头像目录
-        if (!FileUtils.isFileExists(file)) {
-            File target = new File(file);
+        File target = new File(file);
+        if (!target.exists()) {
+
             try {
                 target.createNewFile();
             } catch (IOException e) {

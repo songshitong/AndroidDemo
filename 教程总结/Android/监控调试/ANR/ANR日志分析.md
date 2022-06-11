@@ -1,5 +1,16 @@
 https://mp.weixin.qq.com/s/kT0hZaYRlW9X8fIVEQKJLQ
 https://mp.weixin.qq.com/s/TDtjQdOktLcUYec3ldhh5g   来自公众号vivo互联网技术
+https://www.jianshu.com/p/082045769443
+
+anr获取
+```
+//android 7.0
+adb shell kill -S QUIT PID
+adb pull /data/anr/traces.txt
+//高版本  默认保存在手机的/bugreports，可以直接查看和pull到电脑
+adb bugreport E:\Reports\MyBugReports  
+//目录示例 bugreport-lavender-WORKOS-2022-04-25-16-35-34/FS/data/anr   里面有arn时间的文件anr_2022-04-25-16-04-23-482
+```
 
 干货：ANR日志分析全面解析
 一、概述
@@ -56,7 +67,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 很多开发者认为，那就是耗时操作导致ANR，全部是app应用层的问题。实际上，线上环境大部分ANR由系统原因导致。
 3.1 应用层导致ANR（耗时操作）   
 ```
-a. 函数阻塞：如死循环、主线程IO、处理大数据
+a. 函数阻塞：如死循环、主线程IO、处理大数据    根据下载的回调去更新页面，一直有回调，一直更新页面，主线程卡死，应该是动画每隔16ms去取一下进度
 b. 锁出错：主线程等待子线程的锁
 c. 内存紧张：系统分配给一个应用的内存是有上限的，长期处于内存紧张，会导致频繁内存交换，进而导致应用的一些操作超时
 ```
@@ -67,9 +78,29 @@ b. 系统服务无法及时响应：比如获取系统联系人等，系统的�
 c. 其他应用占用的大量内存
 ```
 
+分析流程
+1 根据log确认发生ANR的进程、发生时间、大概在做什么操作，同时关注此时CPU、内存、IO的情况。
+2 分析trace，先看时间是否能对的上，判断是不是案发现场，然后关注主线程是否存在耗时、死锁、等锁等问题，可以基本看出是APP问题还是系统问题。
+3 如果是系统问题导致的，再结合binder_sample、dvm_lock_sample来分别定位下binder call耗时 和 系统持锁耗时的问题。
+4 结合代码或源码来具体分析有问题的点。
 
 四、分析日志
 发生ANR的时候，系统会产生一份anr日志文件（手机的/data/anr 目录下，文件名称可能各厂商不一样，业内大多称呼为trace文件），内含如下几项重要信息。
+查看anr时间 搜索am_anr
+```
+04-25 16:23:46.525  1000  2308  2327 I am_anr  : [0,7564,包名,818462278,Input dispatching timed out (类名, Waiting because the touched window's input channel is not registered with the input dispatcher.  The window may be in the process of being removed.)]
+```
+查看anr的进程 ANR in
+```
+04-25 16:23:50.297  1000  2308  2327 E ActivityManager: ANR in 包名.recording (包名.recording/.MainActivity)
+04-25 16:23:50.297  1000  2308  2327 E ActivityManager: PID: 7564
+04-25 16:23:50.297  1000  2308  2327 E ActivityManager: Reason: Input dispatching timed out (包名.recording/包名.recording.MainActivity, Waiting because the touched window's input channel is not registered with the input dispatcher.  The window may be in the process of being removed.)
+04-25 16:23:50.297  1000  2308  2327 E ActivityManager: Load: 6.43 / 6.38 / 6.47
+04-25 16:23:50.297  1000  2308  2327 E ActivityManager: CPU usage from 58547ms to 0ms ago (2022-04-25 16:22:47.932 to 2022-04-25 16:23:46.478):
+04-25 16:23:50.297  1000  2308  2327 E ActivityManager:   9.3% 3595/com.qiyou.id: 7% user + 2.3% kernel
+04-25 16:23:50.297  1000  2308  2327 E ActivityManager:   8.1% 804/surfaceflinger: 4.9% user + 3.2% kernel / faults: 2 minor
+04-25 16:23:50.297  1000  2308  2327 E ActivityManager:   4.7% 2308/system_server: 2.9% user + 1.8% kernel / faults: 126 minor
+```
 4.1 CPU 负载
 ```
 Load: 2.62 / 2.55 / 2.25
@@ -282,9 +313,8 @@ main" prio=5 tid=1 Native
     IntentService, 线程池(官方四种或自定义), new thread等，一般来说不建议直接new thread
 
 
-5.3 主线程被锁阻塞
+5.3 主线程被锁阻塞     搜索Blocked
 ```
-
 "main" prio=5 tid=1 Blocked
   | group="main" sCount=1 dsCount=0 flags=1 obj=0x72deb848 self=0x7748c10800
   | sysTid=22838 nice=-10 cgrp=default sched=0/0 handle=0x77cfa75ed0
@@ -418,6 +448,42 @@ sysTid 代表系统进程号 4894 查找相关进程信息
 判断Binder是否用完，可以在trace中搜索关键字"binder_f"，如果搜索到则表示已经用完，然后就要找log其他地方看是谁一直在消耗binder或者是有死锁发生
 之前有遇到过压力测试手电筒应用，出现BInder线程池被占满情况，解决的思路就是降低极短时间内大量Binder请求的发生，修复的手法是发送BInder请求的函数中做时间差过滤，
    限定在500ms内最多执行一次
+
+查看系统耗时关键字:binder_sample,dvm_lock_sample,am_lifecycle_sample,binder thread
+监控每个进程的主线程的binder transaction的耗时情况, 当超过阈值（比如：500ms）时,则输出相应的目标调用信息
+```
+2754 2754 I binder_sample: [android.app.IActivityManager,35,2900,android.process.media,5]
+1.主线程2754
+2.执行android.app.IActivityManager接口,<br>
+3.所对应方法code =35(即STOP_SERVICE_TRANSACTION),<br>
+4.所花费时间为2900ms,<br>
+5.该block所在package为 android.process.media.<br>
+最后一个参数是sample比例(没有太大价值)</p>
+```
+dvm_lock_sample:当某个线程等待lock的时间blocked超过阈值（比如：500ms）,则输出当前的持锁状态.
+```
+dvm_lock_sample: [system_server,1,Binder_9,1500,ActivityManagerService.java,6403,-,1448,0]
+说明：system_server: Binder_9,执行到ActivityManagerService.java的6403行代码,一直在等待AMS锁, "-"代表持锁的是同一个文件，
+即该锁被同一文件的1448行代码所持有, 从而导致Binder_9线程被阻塞1500ms.
+```
+am_lifecycle_sample： 当app在主线程的生命周期回调方法执行时间超过阈值（比如：3000ms）,则输出相应信息.
+```
+02-23 11:02:35.876 8203 8203 I am_lifecycle_sample: [0,com.android.systemui,114,3837]
+说明： pid=8203, processName=com.android.systemui, MessageCode=114(CREATE_SERVICE), 耗时3.827s
+注意: MessageCode=200 (并行广播onReceive耗时), 其他Code见 ActivityThread.H类
+```
+binder thread：当system_server等进程的线程池使用完, 无空闲线程时, 则binder通信都处于饥饿状态, 则饥饿状态超过一定阈值则输出信息.
+```
+1232 1232 "binder thread pool (16 threads) starved for 100 ms"
+说明:  system_server进程的 线程池已满的持续长达100ms
+以上的binder call 信息,我们查找日志中的持锁信息
+12-17 02:08:44.559 1999 4899 I dvm_lock_sample: [system_server,1,Binder:1999_16,68916,PackageManagerService.java,3537,UserManagerService.java,3380,0]
+12-17 02:08:44.696 1999 4131 I dvm_lock_sample: [system_server,1,Binder:1999_14,61042,PackageManagerService.java,3537,UserManagerService.java,3380,0]
+PackageManagerService.java第3537需要的锁被UserManagerService.java中的3380行持有,我们再结合源码查看UserManagerService.java中的3380行是因为什么原因导致持锁耗时
+注意:binder call出现耗时,有binder在通信过程中因为繁忙造成,也有可能因为对端持锁或者执行一些耗时的操作耗时,
+日志中打印binder call信息表明binder call与远程端通信已经结束,出现binder call信息也不不代表framework出现问题,
+需要根据日志分析准确定位.
+```
 
 5.7  io阻塞
 卡在IO上        //todo  mainlog

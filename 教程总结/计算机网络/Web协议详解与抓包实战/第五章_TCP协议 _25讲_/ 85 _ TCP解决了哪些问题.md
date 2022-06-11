@@ -7,7 +7,7 @@ TCP协议的分层
 
  udp可以1对多
 
-TCP  Transmission Control Protocol
+
 
 
 rfc

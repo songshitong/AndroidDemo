@@ -38,7 +38,7 @@ onBindViewHolder
        图片请求和加载放到SCROLL_STATE_IDLE的时候，其他状态暂停图片请求
           RecyclerView.addOnScrollListener(listener)滑动过程中停止加载耗时的操作
     减少ImageView渲染时间
-      使用协程 + Glide 同步加载方法，以缩减加载图片耗时   glide初始化需要启动线程池，而线程池的构建是昂贵的
+      使用协程 + Glide 同步加载方法，以缩减加载图片耗时   glide初始化需要启动线程池，而线程池的构建是昂贵的//线程创建涉及内核调用  //todo glide的同步方法
   预加载
      Glide是不是可以提前初始化一次，大部分框架都提前初始化了吧
      日期的比较和日期的格式化，是很耗时的，需要提前准备好，然后直接设置
@@ -125,6 +125,8 @@ onCreateViewHolder()和onBindViewHolder()都会在这个循环中被调用。所
 https://cloud.tencent.com/developer/article/1645586?from=15425
 https://zhuanlan.zhihu.com/p/208408804
 
+线程池的构建是昂贵的，耗时的   // 
+可以使用下面优化
 协程+glide加载图片
 ```
 fun ImageView.load(url: String) {
@@ -160,7 +162,7 @@ val View.viewScope: CoroutineScope
 
 ```
 
-线程池的构建是昂贵的，耗时的   //todo
+
 ```
 public static void setMaxFlingVelocity(RecyclerView recyclerView, final BaseAdapter adapter, final int velocity) {
         try {

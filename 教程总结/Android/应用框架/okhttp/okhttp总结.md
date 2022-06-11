@@ -1,4 +1,7 @@
 
+todo
+如何提升技术能力
+
 https://blog.csdn.net/jaynm/article/details/112002901
 执行流程：
 1 通过构建者构建出OkHttpClient对象,再通过newCall方法获得RealCall请求对象.
@@ -190,4 +193,10 @@ RealCall.kt
     ...
     return null
   }
+```
+
+判断是否是android平台
+```
+val isAndroid: Boolean
+get() = "Dalvik" == System.getProperty("java.vm.name")
 ```

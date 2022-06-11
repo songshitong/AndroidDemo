@@ -110,6 +110,7 @@ public class QQDragBubbleView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+//        https://juejin.cn/post/6943590136424693767#heading-6  可以参考水滴效果
         super.onDraw(canvas);
         if (bubbleState == BUBBLE_STATE_CONNECT) {
             //固定小球

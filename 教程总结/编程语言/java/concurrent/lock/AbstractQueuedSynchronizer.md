@@ -2,8 +2,21 @@
 https://juejin.cn/post/6975435256111300621#heading-5
 https://mp.weixin.qq.com/s/sA01gxC4EbgypCsQt5pVog
 
+可以先看自己动手写一个锁Lock.md帮助理解
+
+总结
+1.通过int的state描述当前是否有线程获得锁，0没有，1有，>1多次获得锁，state的更新通过cas更新，更新的值由子类tryAcquire和tryRelease实现
+  (是否可重入，再次加1，或者再次减1)
+2.AQS内部维护一个先进先出的双向队列，存储获锁失败的线程，入队添加到队尾，可能发生并发，使用cas更新
+  线程唤醒时没有并发，出队队列的头非CANCELLED的线程唤醒，唤醒后尝试获锁
+3. todo 查看实现共享锁的子类，完善共享锁
+4. todo 完善condition的情况
+
+
 在java程序中一般用synchronized关键字来实现线程对共享变量的互斥访问。而从JDK1.5以后java并发大师 Doug Lea 开发了
   AbstractQueuedSynchronizer（下文用AQS代替）组件，使用原生java代码实现了synchronized语义
+
+AQS的全称是AbstractQueuedSynchronizer，它的定位是为Java中几乎所有的锁和同步器提供一个基础框架
 
 AQS  http://ifeve.com/introduce-abstractqueuedsynchronizer/
 提供了一个基于FIFO队列，可以用于构建锁或者其他相关同步装置的基础框架。该同步器（以下简称同步器）利用了一个int来表示状态，
@@ -22,7 +35,7 @@ AQS与其子类配合，子类负责加锁，解锁，AQS负责将锁分配给�
 例如JUC中，如CountDownLatch、Semaphore、ReentrantLock、ReentrantReadWriteLock等并发工具，均是借助AQS完成他们的
   所需要的锁分配问题
 
-AQS基于CAS和Volatile
+AQS基于CAS和Volatile,LockSupport
 
 基于CAS的状态更新
 AQS要把锁正确地分配给请求者，就需要其他的属性来维护信息，那么自身也要面对并发问题，因为信息将会被更改，而且可能来源于任意线程。
@@ -35,6 +48,13 @@ CAS是硬件层面上提供的原子操作保证，意味着任意时刻只有�
 因此，AQS对于自身所需要的各种信息更新，均使用CAS协助并发正确
 
 
+AQS支持排他锁和独占锁
+排他锁也叫独占锁，是指该锁一次只能被一个线程所持有。如果线程T对数据A加上排它锁后，则其他线程不能再对A加任何类型的锁。
+获得排它锁的线程即能读数据又能修改数据。
+
+共享锁是指该锁可被多个线程所持有。如果线程T对数据A加上共享锁后，则其他线程只能对A再加共享锁，不能加排它锁。获得共享锁的线程只能读数据，
+不能修改数据
+
 
 构造器
 ```
@@ -45,7 +65,7 @@ public abstract class AbstractQueuedSynchronizer
     }
 ```
 
-CLH队列   //todo clh队列的扩展
+CLH队列   
 CLH队列得名于Craig、Landin 和 Hagersten的名字缩写，他们提出实现了以自旋锁方式在并发中构建一个FIFO(先入先出)队列。在AQS中，
 也维护着这样一个同步队列，来记录各个线程对锁的申请状态。
 每一记录单元，以AQS的内部类Node作为体现：
@@ -113,7 +133,7 @@ EXCLUSIVE  [ɪkˈskluːsɪv]  独家;(个人或集体)专用的，专有的，�
 private transient volatile Node tail;
 private Node enq(final Node node) {
     for (;;) {
-        Node t = tail;
+        Node t = tail;//入队失败，可以获取新的tail
         if (t == null) { 
             // 进入到这里，说明没有head节点，CAS操作创建一个head节点
             // 失败也不要紧，失败说明发生了并发，会走到下面的else
@@ -121,7 +141,7 @@ private Node enq(final Node node) {
                 tail = head;
         } else {
             node.prev = t;
-            // 把Node加入到尾部，保证加入到为止，并发会重走
+            // 把Node加入到尾部，保证加入到为止，并发会重走   可能有多个入队，所以使用cas
             if (compareAndSetTail(t, node)) {
                 t.next = node;
                 return t;
@@ -131,7 +151,7 @@ private Node enq(final Node node) {
 }
 ```
 AQS中，以head为CLH队列头部，以tail为CLH队列尾部，当加入节点时，通过CAS和自旋保证节点正确入队
-有可能连续遇到失败，插入tail并发失败，插入head并发失败
+有可能连续遇到失败，插入tail并发失败，新建head并发失败
 Java_AQS_入队并发失败
 
 上图解释了插入Node时，可能发生的并发情况和解决过程。AQS支持独占锁和共享锁，那么CLH队列也就需要能区分节点类型。无论那种节点，
@@ -281,7 +301,6 @@ private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
     }
 ```
 
-park 公园;专用区;园区;(英国)庄园，庭院   停(车);泊(车);坐下(或站着);把…搁置，推迟(在以后的会议上讨论或处理)
 那么，获取锁的过程就清晰了，进入到acquireQueued()的方法，可能预见的情况如下图：
 
 java_AQS_acquireQueued情况分析.webp
@@ -316,6 +335,7 @@ private void unparkSuccessor(Node node) {
 线程唤醒发生在取消请求时cancelAcquire()，或释放锁时，对unparkSuccessor()的调用。
 
 unparkSuccessor()将从CLH队里中唤醒最靠前的应该被唤醒的Node记录的线程，此之后，线程从parkAndCheckInterrupt()继续执行下去。
+//然后进入acquireQueued的for再次尝试获得锁
 
 这里也以独占锁的释放锁的方法看unparkSuccessor()的调用
 ```
@@ -362,6 +382,8 @@ protected boolean isHeldExclusively() {
 可控获取锁时间申请锁的时间，也可以控制，实现只需要通过在申请不到锁入队时，设置线程唤醒时间即可。AQS提供了其他版本的申请锁方法，流程大体一致。
 
 并发量控制AQS通过属性 state 来提供控制并发量的方式，state只能通过原子性的操作修改。子类控制加解锁操作时，可以通过控制state来做出判断。
+使用state标识当前是否有线程获得锁，0没有，1有，>1是多次获得锁，>=1的情况线程获锁失败需要等待特定线程释放锁，此时state归0,其他线程才可以获得锁
+compareAndSetState 更新状态，代表线程对锁的抢占
 ```
 public abstract class AbstractQueuedSynchronizer {
     //同步状态
@@ -645,7 +667,7 @@ private void doSignal(Node first) {
         return true;
         }
 ```
-当Conditon条件达成时，将把节点从ConditionObject维护的队列移动到CLH队列，这样，当有资源时，才可被正确唤醒。 挂起处位于：
+当Condition条件达成时，将把节点从ConditionObject维护的队列移动到CLH队列，这样，当有资源时，才可被正确唤醒。 挂起处位于：
 ```
  public final void await() throws InterruptedException {
 
@@ -771,11 +793,12 @@ AQS是解决并发过程中锁分配的问题，使锁的实现者可以聚焦�
 通过CAS和自旋控制自身状态并发，足够快
 支持重入性判断，通过控制isHeldExclusively()，其代码位于操作CONDITION节点的各处，较零碎，因此没有将代码放出。可在tryAcquire()等子类的加锁方法中，
     借助setExclusiveOwnerThread()和getExclusiveOwnerThread()一起实现是否可重入
+    //setExclusiveOwnerThread()将获得锁的线程Thread进行保存，后面可以使用getExclusiveOwnerThread()查询
 支持中断。
 支持锁的获取时间控制。
 
 
-查询是否有线程等待获取的时间长于当前线程
+查询是否有线程等待获取的时间长于当前线程  出队列的队头不是当前线程
 ```
 public final boolean hasQueuedPredecessors() {
         Node t = tail; // Read fields in reverse initialization order

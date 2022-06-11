@@ -2,7 +2,7 @@
 https://blog.csdn.net/jaynm/article/details/108614788?spm=1001.2014.3001.5502
 Retrofit 流程
 1 通过解析网络请求接口的注解，配置网络请求参数
-2 通过动态代理生成网络请求对象
+2 通过动态代理生成对应接口的网络请求对象
 3 通过GsonRequestBodyConverter将请求体转为json字符
 4 通过OkHttpCall发送网络请求
 5 通过GsonResponseBodyConverter将json字符响应流转为model
@@ -13,7 +13,7 @@ CallAdapter是实现CallAdapter接口，重写adapt方法，将Call的结果回�
 
 Retrofit 通过 java 接口以及注解来描述网络请求，并用动态代理的方式生成网络请求的 request，然后通过 client 调用相应的网络框架
 （默认 okhttp）去发起网络请求，并将返回的 response 通过 converterFactory 转换成相应的数据 model，
-最后通过 calladapter 转换成其他数据方式（如 rxjava Observable）
+最后通过calladapter转换成其他数据方式（如 rxjava Observable）
 
 动态代理
 生成被代理接口的代理类，对接口方法进行功能增强，也就是进行网络请求的过程，并且每个方法调用网络的流程类似，通过动态代理减少样板代码

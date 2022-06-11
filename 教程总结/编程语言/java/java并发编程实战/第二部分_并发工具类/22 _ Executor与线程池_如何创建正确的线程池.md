@@ -271,3 +271,15 @@ class SerialExecutor implements Executor {
    }
  }
 ```
+
+http://gityuan.com/2016/01/16/thread-pool/
+线程池监控
+利用线程池提供的参数进行监控，参数如下：
+
+taskCount：线程池需要执行的任务数量。
+completedTaskCount：线程池在运行过程中已完成的任务数量，小于或等于taskCount。
+largestPoolSize：线程池曾经创建过的最大线程数量，通过这个数据可以知道线程池是否满过。如等于线程池的最大大小，则表示线程池曾经满了。
+getPoolSize：线程池的线程数量。如果线程池不销毁的话，池里的线程不会自动销毁，所以这个大小只增不减。
+getActiveCount：获取活动的线程数。
+通过扩展线程池进行监控：继承线程池并重写线程池的beforeExecute()，afterExecute()和terminated()方法，可以在任务执行前、
+后和线程池关闭前自定义行为。如监控任务的平均执行时间，最大执行时间和最小执行时间等。

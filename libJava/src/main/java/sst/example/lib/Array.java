@@ -9,4 +9,27 @@ public class Array {
     //int[][] temp={{1,2},{3,4}};    2行2列的数组
     // 获取行数 temp.length;  获取列数temp[0].length
     // 获取第一行第二个temp[0][2]
+
+
+    public static void main(String[] args) {
+        int[] a1 =new int[]{1,2,3};
+        for(int i=0;i<a1.length;i++){
+           for (int j=0;j<i;j++){
+               System.out.println("j "+j);
+               //退出内循环
+               if(j==1){
+                   break;
+               }
+           }
+        }
+
+        out:
+        for(int i=0;i<a1.length;i++){
+            for (int j=0;j<i;j++){
+                System.out.println("j "+j);
+                //退出外循环
+                break out;
+            }
+        }
+    }
 }

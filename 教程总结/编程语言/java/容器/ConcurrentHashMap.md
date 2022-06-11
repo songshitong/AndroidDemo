@@ -10,6 +10,7 @@ ConcurrentHashMap只有对table修改时才会加锁，volatile保证修改后�
 CAS+synchronized的使用
 通过cas控制sizeCtl，确定哪个线程有对table的初始化权   初始化的并操作通过临界条件sizeCtl控制而不是对整个方法上锁
 通过cas控制sizeCtl和transferIndex，确定哪个线程对哪个段有扩容权限，获得权限后进行加锁，防止其他线程在扩容期间进行操作
+  默认transferIndex为n,每有一个线程减stride作为自己的负责区间，直到transferIndex<=0分配完成
 对于线程的控制
 第一个线程进入时，sizeCtl是+2，后续线程进入时+1，退出时-1，然后检查-2后是否符合resizeStamp()移位后获得的值以判断扩容是否结束
 
@@ -74,6 +75,9 @@ private static final int RESIZE_STAMP_SHIFT = 32 - RESIZE_STAMP_BITS;
 //分段扩容的幅度
 private static final int MIN_TRANSFER_STRIDE = 16
 
+//transferIndex是扩容时，旧table还未处理的索引位置
+private transient volatile int transferIndex;
+
 //哈希相关  如果hash>0
 //在ForwardingNode中使用
 static final int MOVED     = -1; // hash for forwarding nodes
@@ -100,10 +104,11 @@ class Node<K,V> implements Map.Entry<K,V> {
     ... 省略部分代码
 }
 ```
-其中value和next都用volatile修饰，保证并发的可见性
+其中value和next都用volatile修饰，保证并发的可见性，新增节点或者改变val其他线程可以快速可见
 ForwardingNode：一个特殊的Node节点，hash值为-1，其中存储nextTable的引用
 ```
 final class ForwardingNode<K,V> extends Node<K,V> {
+    //扩容时新的table
     final Node<K,V>[] nextTable;
     ForwardingNode(Node<K,V>[] tab) {
         super(MOVED, null, null, null);
@@ -265,6 +270,15 @@ sizeCtl默认为0，如果ConcurrentHashMap实例化时有传参数，sizeCtl会
 
 put操作
 假设table已经初始化完成，put操作采用CAS+synchronized实现并发插入或更新操作，具体实现如下
+ConcurrentHashMap的key和value不能是null，抛出异常
+1 如果桶数组未初始化，则初始化；  https://zhuanlan.zhihu.com/p/429503859
+2 如果待插入的元素所在的桶为空，则尝试把此元素直接插入到桶的第一个位置(CAS插入)；
+3 如果正在扩容，则当前线程一起加入到扩容的过程中；  //扩容的table[i]的hash为moved
+4 如果待插入的元素所在的桶不为空且不在迁移元素，则锁住这个桶（分段锁）； //防止其他线程操作
+5 如果当前桶中元素以链表方式存储，则在链表中寻找该元素或者插入元素；
+6 如果当前桶中元素以红黑树方式存储，则在红黑树中寻找该元素或者插入元素；
+7 如果元素存在，则返回旧值；
+8 如果元素不存在，整个Map的元素个数加1，并检查是否需要扩容；
 ```
 final V putVal(K key, V value, boolean onlyIfAbsent) {
         if (key == null || value == null) throw new NullPointerException();
@@ -286,7 +300,7 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
                 //cas更新失败，说明存在多线程的hash冲突，当前位置node已经不为null，竞争失败，进入for重试    
             }
             else if ((fh = f.hash) == MOVED)
-                //当前node为FowardingNode
+                //当前node为FowardingNode   正在扩容
                 //扩容完成再次进入for尝试
                 tab = helpTransfer(tab, f);
             else {
@@ -365,7 +379,7 @@ http://hg.openjdk.java.net/jdk/jdk/file/9af672cab7cb/src/java.base/share/classes
 https://stackoverflow.com/questions/53493706/how-the-conditions-sc-rs-1-sc-rs-max-resizers-can-be-achieved-in
 截止Android11，仍然存在这个问题
 
-6.其余情况把新的Node节点按链表或红黑树的方式插入到合适的位置，这个过程采用同步内置锁实现并发，代码如下:
+6.其余情况把新的Node节点按链表或红黑树的方式插入到合适的位置，这个过程采用同步内置锁实现并发，代码如下: 
 ```
   //记录旧的值
   V oldVal = null;
@@ -398,7 +412,7 @@ https://stackoverflow.com/questions/53493706/how-the-conditions-sc-rs-1-sc-rs-ma
                     }
                 }
             }
-            //红黑树的处理  //todo
+            //红黑树的处理 
             else if (f instanceof TreeBin) {
                 Node<K,V> p;
                 //更新binCount为2
@@ -621,14 +635,15 @@ putVal在成功加入新的数据后，再通过addCount()更新当前数据容�
                                nextIndex - stride : 0))) {
             //i<bound，还没扩容完成进入这个if 请求下一个分段                   
             // 通过CAS竞争扩容区域的负责权  上面都没走，代表当前线程开始请求扩容一段
-            //  nextBound = (nextIndex > stride ?nextIndex - stride : 0)   nextIndex > stride带分配的不止一个段   nextIndex<=stride待分配的只有第一个段了，设为0即可
+            //  nextBound = (nextIndex > stride ?nextIndex - stride : 0)  
+             //nextIndex > stride带分配的不止一个段   nextIndex<=stride待分配的只有第一个段了，设为0即可
             // ③
             // 记住负责的扩容区域边界                   
             bound = nextBound;
             // 此时i就为当前负责的扩容区域的索引
             i = nextIndex - 1;
             advance = false;
-        }
+        }  
         //cas竞争失败，当前段被其他线程竞争到了，重新进入while竞争， bound每次更新-stride往前申请
     }
   ...      
@@ -893,12 +908,12 @@ java_ConcourrentHashMap_扩容4.webp
 
 扩容小结
 扩容的过程可以总结为：
-以stride为长度单位，将table划分各个区域
-每个参与扩容的线程，通过CAS竞争更新transferIndex，分配到负责的区域
-每个线程知道自己负责的区域边界，对区域内的table[i]逐个进行扩容处理
-正在被处理的table[i]的位置，将被标记为ForwardingNode
-每个table[i]上的Node，将可能去往nextTable的不同索引位置，nextTable[i]或nextTable[i + n]，通过新有的有效位加以区分
-当处理完区域后，向上返回。由更上层控制，要不要继续进入transfer()。
+1 以stride为长度单位，将table划分各个区域     多核 stride=(length/8)/cpu核数   单核stride=length  stride最小为16
+2 每个参与扩容的线程，通过CAS竞争更新transferIndex，分配到负责的区域   //每次竞争transferIndex减少stride
+3 每个线程知道自己负责的区域边界，对区域内的table[i]逐个进行扩容处理    //处理时对table[i]上锁synchronized
+4 正在被处理的table[i]的位置，将被标记为ForwardingNode
+5 每个table[i]上的Node，将可能去往nextTable的不同索引位置，nextTable[i]或nextTable[i + n]，通过新有的有效位加以区分
+6 当处理完区域后，向上返回。由更上层控制，要不要继续进入transfer()。
 
 
 
@@ -911,17 +926,18 @@ public V get(Object key) {
     int h = spread(key.hashCode());
     if ((tab = table) != null && (n = tab.length) > 0 &&
         (e = tabAt(tab, (n - 1) & h)) != null) {
+        //tabAt使用了unsafe，直接获取内存的table[index]，不需要上锁
         //e为 table[i]的元素
-        if ((eh = e.hash) == h) {
+        if ((eh = e.hash) == h) {//再校验一次hash，防止元素变了？？
             //比较node的hash  key的地址  key相等
             if ((ek = e.key) == key || (ek != null && key.equals(ek)))
                 return e.val;
         }
         else if (eh < 0)
-          //从红黑树查找 todo eh<0
+          //从红黑树查找   eh<0   可能正在扩容，也可能是红黑树   扩容节点和红黑树节点重写了find方法
             return (p = e.find(h, key)) != null ? p.val : null;
         while ((e = e.next) != null) {
-            //遍历链表
+            //从链表查找
             if (e.hash == h &&
                 ((ek = e.key) == key || (ek != null && key.equals(ek))))
                 return e.val;
@@ -929,9 +945,42 @@ public V get(Object key) {
     }
     return null;
 }
+
+ //扩容节点查找
+ Node<K,V> find(int h, Object k) {
+            // loop to avoid arbitrarily deep recursion on forwarding nodes
+            outer: for (Node<K,V>[] tab = nextTable;;) {
+                Node<K,V> e; int n;
+                if (k == null || tab == null || (n = tab.length) == 0 ||
+                    (e = tabAt(tab, (n - 1) & h)) == null)
+                    return null;
+                for (;;) {
+                    int eh; K ek;
+                    if ((eh = e.hash) == h &&
+                        ((ek = e.key) == k || (ek != null && k.equals(ek))))
+                        return e;
+                    if (eh < 0) {
+                        //如果节点是扩容的，取出新的table给tab，从新的table继续查找   扩容时会新建一个table并进行元素迁移
+                        if (e instanceof ForwardingNode) {
+                            tab = ((ForwardingNode<K,V>)e).nextTable;
+                            continue outer;
+                        }
+                        else
+                            return e.find(h, k);
+                    }
+                    if ((e = e.next) == null)
+                        return null;
+                }
+            }
+        }
 ```
-1 判断table是否为空，如果为空，直接返回null。
-2 计算key的hash值，并获取指定table中指定位置的Node节点，通过遍历链表或则树结构找到对应的节点，返回value值。
+1 计算 hash 值
+2 根据 hash 值找到数组对应位置: (n - 1) & h
+3 根据该位置处结点性质进行相应查找
+如果该位置为 null，那么直接返回 null 就可以了
+如果该位置处的节点刚好就是我们需要的，返回该节点的值即可
+如果该位置节点的 hash 值小于 0，说明正在扩容，或者是红黑树  从扩容节点或红黑树节点查找   ReservationNode todo
+没找到则从链表中查找
 
 
 由于使用了分段锁，所以对于计数使用了CounterCell记录每一段的长度
@@ -1222,5 +1271,3 @@ ConcurrentHashMap 是设计为非阻塞的。在更新时会局部锁住某部�
 则只能get到目前为止已经顺利插入的部分数据。
 
 
-其他逻辑
-ForEachKeyTask

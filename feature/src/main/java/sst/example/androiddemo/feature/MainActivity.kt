@@ -10,17 +10,21 @@ import android.media.MediaPlayer
 import android.os.*
 import android.provider.Settings
 import android.util.Log
-import android.view.View
-import android.view.ViewGroup
+import android.view.KeyEvent
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.text.PrecomputedTextCompat
-import com.blankj.utilcode.util.UriUtils
+import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.MutableLiveData
 import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.Animation.LayoutAnimationActivity
+import sst.example.androiddemo.feature.Animation.RevealAnimatorActivity
+import sst.example.androiddemo.feature.Animation.activity.ActivityAnimation
+import sst.example.androiddemo.feature.Animation.activity.ActivityTransition
 import sst.example.androiddemo.feature.Animation.dynamicanimation.DynamicAnimaitonActivity
+import sst.example.androiddemo.feature.Animation.evaluator.TypeEvaluatorActivity
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
 import sst.example.androiddemo.feature.activity.launchmode.LaunchActivity
@@ -33,11 +37,11 @@ import sst.example.androiddemo.feature.util.MyUtils
 import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
+import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
-import java.io.File
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 
 class  MainActivity : AppCompatActivity()  {
@@ -90,7 +94,7 @@ class  MainActivity : AppCompatActivity()  {
             startActivity(intent)
         }
         layoutWeight.setOnClickListener {
-            val intent = Intent(this, LayoutActivity::class.java)
+            val intent = Intent(this, LinearLayoutActivity::class.java)
             startActivity(intent)
         }
 
@@ -293,6 +297,7 @@ class  MainActivity : AppCompatActivity()  {
             handler.post(runnable)
             Log.d(TAG, "2")
         }
+
         val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -309,12 +314,6 @@ class  MainActivity : AppCompatActivity()  {
         //WindowManager.LayoutParams.FLAG_SECURE  禁止截屏
         //安全 监听截屏事件的产生  系统源码 TakeScreenshotService  GlobalScreenshot
         //  ContentObserver 监听图片的变化。。
-
-
-
-//       todo  isFinishing()的含义 与调用时机，查看阿里规范
-
-        //todo 阿里规范 shareprefrence不适合进程通信，查看原理   支持进程通信的sp https://github.com/grandcentrix/tray
 
 
 
@@ -358,6 +357,62 @@ class  MainActivity : AppCompatActivity()  {
             startActivity(Intent(this,
                 IntentServiceActivity::class.java))
         }
+        IntentConstrainLayoutActivity.setOnClickListener {
+            startActivity(Intent(this,
+                ConstrainLayoutActivity::class.java))
+        }
+        IntentRevealAnimatorActivity.setOnClickListener {
+            startActivity(Intent(this,
+                RevealAnimatorActivity::class.java))
+        }
+        IntentTypeEvaluatorActivity.setOnClickListener {
+            startActivity(Intent(this,
+                TypeEvaluatorActivity::class.java))
+        }
+        IntentActivityAnimation.setOnClickListener {
+            startActivity(Intent(this,
+                ActivityAnimation::class.java))
+        }
+        IntentActivityTransition.setOnClickListener {
+            startActivity(Intent(this,
+                ActivityTransition::class.java),ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
+        }
+        //测试livedata连续调用
+        val ld = MutableLiveData<String>()
+        ld.observe(this) {
+            Log.d(TAG,"ld observe $it")
+        }
+        ld.postValue("1")
+        ld.postValue("2")
+
+        getProcessInfo()
+    }
+
+    private fun getProcessInfo() {
+          //adb shell pidof sst.example.androiddemo.feature  31076
+
+          //jdwp                     list pids of processes hosting a JDWP transport
+          //adb jdwp 也可以获取，
+//        adb获取  31076就是进程id   adb shell ps|findstr com.something  // windows
+//        adb shell ps | grep sst.example.androiddemo.feature
+//        u0_a65       31076  1870 1466352  94080 ep_poll             0 S sst.example.androiddemo.feature
+        //https://blog.csdn.net/Danny_llp/article/details/122246236
+        //获取当前进程号
+        Log.i(TAG, "Process.myPid: "+Process.myPid());
+        //获取当前线程号
+        Log.i(TAG, "Process.myTid: "+Process.myTid());
+        //当前调用该进程的用户号
+        Log.i(TAG, "Process.myUid: "+Process.myUid());
+        //当前线程ID
+        Log.i(TAG, "Thread.currentThread().getId: "+Thread.currentThread().getId());
+        //主线程ID
+        Log.i(TAG, "getMainLooper().getThread().getId: "+getMainLooper().getThread().getId());
+        //当前Activity所在栈的ID
+        Log.i(TAG, "getTaskId: "+getTaskId());
+        //当前调用该应用程序的用户号
+        Log.i(TAG, "getApplicationInfo().uid: "+getApplicationInfo().uid);
+        //当前调用该应用程序的进程名
+        Log.i(TAG, "getApplicationInfo().processName): "+getApplicationInfo().processName);
 
     }
 
@@ -377,8 +432,6 @@ class  MainActivity : AppCompatActivity()  {
 //    }
 
 
-//    https://www.jianshu.com/p/e4ab065220a3
-//
 
 
 
@@ -401,15 +454,13 @@ class  MainActivity : AppCompatActivity()  {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "video/*"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "这是标题")//添加分享内容标题
-        shareIntent.putExtra(Intent.EXTRA_STREAM, UriUtils.file2Uri(File(path)))//添加分享内容
+//        shareIntent.putExtra(Intent.EXTRA_STREAM, UriUtils.file2Uri(File(path)))//添加分享内容
         this.startActivity(Intent.createChooser(shareIntent, "分享title"))
     }
     //todo lottie svga(yy ued 开源)
     //不规则图形  点击图片就显色 bitmap.getPixel   1点击位置是否是不规则 2点击位置的颜色  需图片大小与控件大小  普通view加载背景图片的方式，fit?
     //dalvik system CloseGuard
     //ndk 稳定版16b  aiqiyi xhook elf hook原理
-
-    //GPU编程 GPU的io瓶颈，相关原理
 
 
     //webview  好用的webview
@@ -424,12 +475,7 @@ class  MainActivity : AppCompatActivity()  {
     //todo Android字体，苹果字体，字体压缩
 
 
-    //todo 游戏排行榜  1000个只有7个渲染，滚动7个，只是数据在滚动，实际的渲染并没有增加   这不就recyclerview。。。
 
-    //todo 混淆  https://developer.android.com/studio/build/shrink-code?hl=zh-cn#usage
-    ///release 可能移除有用的代码，需要自定义保留
-
-//    screenWidth = getResources().getDisplayMetrics().widthPixels
 
     //项目根gradle
 //    buildscript {
@@ -520,22 +566,23 @@ class  MainActivity : AppCompatActivity()  {
     }
 
 //     home 键禁用
-//    fun onAttachedToWindow() {
-//        println("Page01 -->onAttachedToWindow")
+override fun onAttachedToWindow() {
+        println("Page01 -->onAttachedToWindow")
+        //适用android4.4以下
 //        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD)
-//        super.onAttachedToWindow()
-//    }
-//
-//    fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-//        println("Page01 -->onKeyDown: keyCode: $keyCode")
-//        if (KeyEvent.KEYCODE_HOME === keyCode) {
-//            println("HOME has been pressed yet ...")
-//            // android.os.Process.killProcess(android.os.Process.myPid());
-//            Toast.makeText(
-//                getApplicationContext(), "HOME 键已被禁用...",
-//                Toast.LENGTH_LONG
-//            ).show()
-//        }
-//        return super.onKeyDown(keyCode, event) // 不会回到 home 页面
-//    }
+        super.onAttachedToWindow()
+    }
+
+override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        println("Page01 -->onKeyDown: keyCode: $keyCode")
+        if (KeyEvent.KEYCODE_HOME === keyCode) {
+            println("HOME has been pressed yet ...")
+            // android.os.Process.killProcess(android.os.Process.myPid());
+            Toast.makeText(
+                getApplicationContext(), "HOME 键已被禁用...",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        return super.onKeyDown(keyCode, event) // 不会回到 home 页面
+    }
 }

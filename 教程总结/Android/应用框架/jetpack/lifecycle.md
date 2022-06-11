@@ -76,6 +76,31 @@ public interface LifecycleOwner {
     Lifecycle getLifecycle();
 } 
 
+LifeCycleObserver生命周期观察者，一般是组件实现接口
+```
+public interface LifecycleObserver {}
+public interface LifecycleEventObserver extends LifecycleObserver {
+    void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event);
+}
+interface FullLifecycleObserver extends LifecycleObserver {
+    void onCreate(LifecycleOwner owner);
+    void onStart(LifecycleOwner owner);
+    void onResume(LifecycleOwner owner);
+    void onPause(LifecycleOwner owner);
+    void onStop(LifecycleOwner owner);
+    void onDestroy(LifecycleOwner owner);
+}
+public interface DefaultLifecycleObserver extends FullLifecycleObserver {
+    default void onCreate(@NonNull LifecycleOwner owner) { }
+    default void onStart(@NonNull LifecycleOwner owner) {}
+    default void onResume(@NonNull LifecycleOwner owner) {}
+    default void onPause(@NonNull LifecycleOwner owner) {}
+    default void onStop(@NonNull LifecycleOwner owner) {}
+    default void onDestroy(@NonNull LifecycleOwner owner) {}
+}
+
+```
+
 
 LifecycleRegistry extends Lifecycle{
  ///注册具备Android生命周期的类，弱引用持有，减少泄漏

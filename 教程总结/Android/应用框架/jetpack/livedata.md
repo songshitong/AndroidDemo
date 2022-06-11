@@ -8,7 +8,17 @@ observe 保存观察者到SafeIterableMap  ObserverWrapper对Observer进行功�
      一种是AlwaysActiveObserver永久激活的观察者
 setValue  分发value给所有的观察者  连续两次调用，只有第一次生效，第一个正在分发中   setValue只对活跃的观察者通知
 postValue 通过handler将消息发送到主线程  只有在赋值的时候上锁了，可能在线程切换时，其他线程把值变更了，只保留最新的值
-    还有一种情况在一个线程连续调用两次postValue，只有第一次生效   todo 进行实验
+    还有一种情况在一个线程连续调用两次postValue，只有第一次生效   
+   //连续两次调用，第二次先赋值mPendingData，发现上一次没有分发成功然后就退出了，第一次分发时值mPendingData就变了
+```
+   val ld = MutableLiveData<String>()
+        ld.observe(this) {
+            Log.d(TAG,"ld observe $it")
+        }
+        ld.postValue("1")
+        ld.postValue("2")
+```
+结果： ld observe 2
 
 LiveData是一个类,将数据放在它里面我们可以观察数据的变化.它是lifecycle-aware(生命周期感知的).这个特性非常重要,
   我们可以用它来更新UI的数据,当且仅当activity、fragment或者Service是处于活动状态时。
@@ -52,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 }
+```
+kotlin
+```
+ val ld = MutableLiveData<String>()
+ ld.observe(this) { 
+    
+ }
 ```
 1 首先是定义一个LiveData的实例,LiveData是一个抽象类,MutableLiveData是它的一个子类.
 2 然后调用LiveData的observe()方法,进行注册,开始观察数据,当我们的数据变化时,会回调onChanged()方法.

@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import com.blankj.utilcode.util.StringUtils;
 
 public class FFmpegCmd implements SurfaceHolder.Callback {
    private SurfaceHolder surfaceHolder;

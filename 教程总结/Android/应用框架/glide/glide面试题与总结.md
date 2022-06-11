@@ -1,14 +1,49 @@
 
+https://blog.csdn.net/u010302765/article/details/103193470
+Glide加载一个一兆的图片（100 * 100），是否会压缩后再加载，放到一个300 * 300的view上会怎样，800*800呢，图片会很模糊，
+怎么处理？
+分析
+（因为你缓存机制无论是看博客还是看一些面试宝典，如果只是考原理或者定义，光把上面的文字背诵下来就可以了，但是背诵和真正的理解是两回事，
+自己没有形成感悟，不理解这个框架，只是一味的迎合面试，这个问题就可以卡住你，另外千万别和面试官嘚瑟，果然，这个面试的哥们，
+这块就卡住了，支支吾吾的半天没答上来，果然是只看了博客，没真正的阅读过源码）
+答案
+当我们调整imageview的大小时，Picasso会不管imageview大小是什么，总是直接缓存整张图片，而Glide就不一样了，
+它会为每个不同尺寸的Imageview缓存一张图片，也就是说不管你的这张图片有没有加载过，只要imageview的尺寸不一样，
+那么Glide就会重新加载一次，这时候，它会在加载的imageview之前从网络上重新下载，然后再缓存。
+举个例子，如果一个页面的imageview是300 * 300像素，而另一个页面中的imageview是100 * 100像素，这时候想要让两个imageview像是同一张图片，
+  那么Glide需要下载两次图片，并且缓存两张图片。
+看到了吧，缓存Key的生成条件之一就是控件的长宽。
+```
+public <R> LoadStatus load() {
+    // 根据请求参数得到缓存的键
+    EngineKey key = keyFactory.buildKey(model, signature, width, height, transformations,
+        resourceClass, transcodeClass, options);
+```
+
+
+
+https://blog.csdn.net/u010302765/article/details/103193470
+简单说一下内存泄漏的场景，如果在一个页面中使用Glide加载了一张图片，图片正在获取中，如果突然关闭页面，这个页面会造成内存泄漏吗？
+分析
+（注意一定要审题，因为之前问了这个小伙，内存泄漏的原因，无非是长生命周期引用了短生命周期的对象等等，然后突然画风一变，
+直接问了Glide加载图片会不会引起图片泄漏，这个小伙想也没想，直接回答道会引起内存泄漏，可以用LeakCanary检测，巴拉巴拉。。。）
+答案
+因为Glide 在加载资源的时候，如果是在 Activity、Fragment 这一类有生命周期的组件上进行的话，会创建一个透明的 RequestManagerFragment 加入到FragmentManager 之中，
+感知生命周期，当 Activity、Fragment 等组件进入不可见，或者已经销毁的时候，Glide 会停止加载资源。
+但是如果，是在非生命周期的组件上进行时，会采用Application 的生命周期贯穿整个应用，所以 applicationManager 只有在应用程序关闭的时候终止加载。
+
+
+
 https://jishuin.proginn.com/p/763bfbd664ba
 图片加载总体流程
-1.封装参数：从指定来源，到输出结果，中间可能经历很多流程，所以第一件事就是封装参数，这些参数会贯穿整个过程；
+1.封装参数：从指定来源，到输出结果，中间可能经历很多流程，所以第一件事就是封装参数，这些参数会贯穿整个过程； todo
 2.解析路径：图片的来源有多种，格式也不尽相同，需要规范化；
 3.读取缓存：为了减少计算，通常都会做缓存；同样的请求，从缓存中取图片（Bitmap）即可；
 4.查找文件/下载文件：如果是本地的文件，直接解码即可；如果是网络图片，需要先下载；
 5.解码：这一步是整个过程中最复杂的步骤之一，有不少细节；
-6.变换：解码出Bitmap之后，可能还需要做一些变换处理（圆角，滤镜等）；
+6.变换：解码出Bitmap之后，可能还需要做一些变换处理（圆角，滤镜等）；  transform
 7.缓存：得到最终bitmap之后，可以缓存起来，以便下次请求时直接取结果；
-8.显示：显示结果，可能需要做些动画（淡入动画，crossFade等）
+8.显示：显示结果，可能需要做些动画（淡入动画，crossFade等）     transition
 
 设备分级 glide activityManager.isLowRamDevice()
 低内存设备申请小一点的缓冲池
@@ -29,25 +64,40 @@ arrayPool.clearMemory();
 磁盘缓存-资源类型	DiskLruCacheWrapper	被解码后的图片写入磁盘文件中
 磁盘缓存-原始数据	DiskLruCacheWrapper	网络请求成功后将原始数据在磁盘中缓存
 
-Glide的缓存机制，主要分为2种缓存，一种是内存缓存，一种是磁盘缓存。    //todo 磁盘缓存的两种
-内存缓存防止应用重复将图片读入到内存，造成内存资源浪费。
-磁盘缓存防止应用重复的从网络或者其他地方下载和读取数据。
+Glide的缓存机制，主要分为2种缓存，一种是内存缓存，一种是磁盘缓存。    
+内存缓存防止应用重复将图片读入到内存，造成内存资源浪费。   //避免重复读取文件
+磁盘缓存防止应用重复的从网络或者其他地方下载和读取数据。   //避免重复下载文件
 
 内存缓存
 内存缓存其实分两个部分，ActiveResource缓存与LRU缓存
 ActiveResources 就是一个弱引用的 HashMap ，用来缓存正在使用中的图片,使用 ActiveResources 来缓存正在使用中的图片，
-   可以保护这些图片不会被 LruCache 算法回收掉
-内存缓存加载顺序如下：                    //todo  流程顺序，活动资源的大小限制
-1.根据图片地址，宽高，变换，签名等生成key   //todo signature的作用   //ActiveResource的回收过程在后台线程
+   可以保护这些图片不会被 LruCache 算法回收掉，弱引用可以在gc时被回收
+不再使用中的图片使用LruCache来进行缓存的功能
+内存缓存加载顺序如下：                    //活动资源没有大小限制，ActiveResource的回收过程在后台线程
+1.根据图片地址，宽高，变换，签名等生成key    不同的变换transform后图片是不同的，需要进行区分
 2.第一次加载没有获取到活动缓存。
-3.接着加载内存资源缓存，先清理掉内存缓存，在添加进行活动缓存。
-4.第二次加载活动缓存已经存在。
+3.接着加载内存资源缓存，先清理掉内存缓存，再添加进行活动缓存,引用计数加1
+4.第二次加载活动缓存已经存在,引用计数加1
 5.当前图片引用为 0 的时候，清理活动资源，并且添加进内存资源。
 6.又回到了第一步，然后就这样环环相扣。
+
+ActiveResource缓存原理
+ActiveResources采用HashMap+WeakReference方式保存EngineResource对象，没有对集合size做限制，在使用WeakReference的时候，
+创建了一个ReferenceQueue，来记录被GC回收的EngineResource对象，而且在创建ReferenceQueue时生成了一个线程池后台线程"glide-active-resources"，
+不断地执行cleanReferenceQueue()方法，一旦ReferenceQueue取出不为空，便取出ref对象，执行cleanupActiveReference()方法
+释放缓存并重用到MemoryCache
+
 为什么设计两种内存缓存？
 LruCache算法的实现，你会发现它其实是用一个LinkedHashMap来缓存对象的，每次内存超出缓存设定的时候，就会把最近最少使用的缓存去掉，
   因此有可能会把正在使用的缓存给误伤了，我还在用着它呢就给移出去了。因此这个弱引用可能是对正在使用中的图片的一种保护，
   使用的时候先从LruCache里面移出去，用完了再把它重新加到缓存里面
+内存资源缓存 (LRU回收) -> 活动缓存 (引用计数为0) ->内存资源缓存
+
+https://www.jianshu.com/p/4de87ebf5104
+首先即使是使用了LruCache最近最少用算法，也无法避免OOM的结果，毕竟加载图片很消耗内存。但是如果把正在使用的资源放在弱引用里面结果就不同了。
+弱引用相当于打上一个标记，当gc来的时候就会回收掉。一来我正在使用这个资源，即使gc来了，经过分析对象可达性，
+如果没有使用者也会尝试把这个列表里面的资源全部回收掉。这样就尽量保证了不会出现OOM的情况。
+//被回收了怎么办,下次重新加载  正在显示图片已经上传到GPU了,内存里的被GC回收了
 
 
 磁盘缓存策略
@@ -61,13 +111,13 @@ DiskCacheStrategy.AUTOMATIC：它会尝试对本地和远程图片使用最佳�
 
 在了解磁盘缓存时我们主要需要明确一个概念，是当我们使用 Glide 去加载一张图片的时候，Glide 默认并不会将原始图片展示出来，
  而是会对图片进行压缩和转换，总之就是经过种种一系列操作之后得到的图片，就叫转换过后的图片。 我们既可以缓存变换之前的原始图片，
-  也可以缓存变换后的图片   //todo
+  也可以缓存变换后的图片   
 
-为什么需要两种磁盘缓存
+为什么需要两种磁盘缓存    //采样变化后bitmap尺寸不同，避免了多次变换， 应用transform的图片也可以缓存
 DiskCacheStrategy.RESOURCE缓存的是变换后的资源，DiskCacheStrategy.DATA缓存的是变换前的资源
 举个例子，同一张图片，我们先在100*100的View是展示，再在200*200的View上展示
 如果不缓存变换后的类型相当于每次都要进行一次变换操作，如果不缓存原始数据则每次都要去重新下载数据
-如下可以看出，两种缓存的key不一样   //todo
+如下可以看出，两种缓存的key不一样   
 ```
 DiskCacheStrategy.RESOURCE
 currentKey = new ResourceCacheKey(helper.getArrayPool(),sourceId,helper.getSignature(),helper.getWidth(),helper.getHeight(),transformation,resourceClass,helper.getOptions());
@@ -130,6 +180,7 @@ inBitmap介绍
 BitmapPool中传入宽高与格式Bitmap.config，得到一个可复用的对象，这样就实现了Bitmap的内存复用
 BitmapPool的实现类LruBitmapPool通过策略模式处理不同版本SizeConfigStrategy(4.4之上)和AttributeStrategy
   都通过按LRU淘汰最老的
+LruBitmapPool存在默认限制
 
 
 Glide如何管理生命周期
@@ -143,256 +194,3 @@ Glide如何管理生命周期
 2.监听Fragment生命周期，销毁时释放Glide资源  移除后续的请求
   构建RequestManager并传入Fragment生命周期
 
-线程池
-https://juejin.cn/post/7038795986482757669
-GlideExecutor.java中有四个定义    可以在GlideBuilder.java中进行初始化
-```
-SourceExecutor  //加载源文件的线程池，包括网络加载
-DiskCacheExecutor //加载硬盘缓存的线程池
-UnlimitedSourceExecutor  //无限制的线程池
-AnimationBuilder  //动画线程池
-```
-
-看一下几个线程池的构建
-SourceExecutor
-```
- public static GlideExecutor newSourceExecutor() {
-    return newSourceBuilder().build();
-  }
-  
- public static GlideExecutor.Builder newSourceBuilder() {
-    return new GlideExecutor.Builder(/*preventNetworkOperations=*/ false)
-        .setThreadCount(calculateBestThreadCount())
-        .setName(DEFAULT_SOURCE_EXECUTOR_NAME); //DEFAULT_SOURCE_EXECUTOR_NAME = "source"
- } 
- 
- 
-public static final class Builder {
-    private UncaughtThrowableStrategy uncaughtThrowableStrategy = UncaughtThrowableStrategy.DEFAULT;
-   
-   public Builder setThreadCount(@IntRange(from = 1) int threadCount) {
-      //核心与最大线程数设置为一样的
-      corePoolSize = threadCount;
-      maximumPoolSize = threadCount;
-      return this;
-    }
-     
-   public GlideExecutor build() {
-      ...
-      //创建线程池
-      ThreadPoolExecutor executor =
-          new ThreadPoolExecutor(
-              corePoolSize,
-              maximumPoolSize,
-              /*keepAliveTime=*/ threadTimeoutMillis,
-              TimeUnit.MILLISECONDS,
-              //PriorityBlockingQueue是一个具有优先级的无界阻塞队列。也就是说优先级越高越先执行。
-              new PriorityBlockingQueue<Runnable>(),
-              new DefaultThreadFactory(name, uncaughtThrowableStrategy, preventNetworkOperations));
-      //NO_THREAD_TIMEOUT=0 也就是默认不设置
-      if (threadTimeoutMillis != NO_THREAD_TIMEOUT) {
-        executor.allowCoreThreadTimeOut(true);
-      }
-
-      return new GlideExecutor(executor);
-    }
-} 
-
-    
- public static int calculateBestThreadCount() {
-    if (bestThreadCount == 0) {
-       //如果cpu数超过4则核心线程数为4  如果Cpu数小于4那么使用Cpu数作为核心线程数量  则bestThreadCount<=4
-      //MAXIMUM_AUTOMATIC_THREAD_COUNT = 4
-      bestThreadCount =
-          Math.min(MAXIMUM_AUTOMATIC_THREAD_COUNT, RuntimeCompat.availableProcessors());
-    }
-    return bestThreadCount;
-  }  
-```
-DefaultThreadFactory定义了失败策略
-```
-private static final class DefaultThreadFactory implements ThreadFactory {
-    private static final int DEFAULT_PRIORITY =
-        android.os.Process.THREAD_PRIORITY_BACKGROUND
-            + android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
-            
-  public synchronized Thread newThread(@NonNull Runnable runnable) {
-      final Thread result =
-          new Thread(runnable, "glide-" + name + "-thread-" + threadNum) {
-            @Override
-            public void run() {
-              android.os.Process.setThreadPriority(
-                  DEFAULT_PRIORITY); // NOPMD AccessorMethodGeneration
-              if (preventNetworkOperations) {
-                //todo 禁止进行网络请求
-                StrictMode.setThreadPolicy(
-                    new ThreadPolicy.Builder().detectNetwork().penaltyDeath().build());
-              }
-              try {
-                super.run();
-              } catch (Throwable t) {
-                //定义失败的策略
-                uncaughtThrowableStrategy.handle(t);
-              }
-            }
-          };
-      threadNum++;
-      return result;
-    }           
-}  
-
-//失败策略接口
-public interface UncaughtThrowableStrategy {
-    //忽略，什么都不做
-    UncaughtThrowableStrategy IGNORE =
-        new UncaughtThrowableStrategy() {
-          @Override
-          public void handle(Throwable t) {
-            // ignore
-          }
-        };
-    
-    //打印错误日志，也就是默认执行的策略
-    UncaughtThrowableStrategy LOG =
-        new UncaughtThrowableStrategy() {
-          @Override
-          public void handle(Throwable t) {
-            if (t != null && Log.isLoggable(TAG, Log.ERROR)) {
-              Log.e(TAG, "Request threw uncaught throwable", t);
-            }
-          }
-        };
-    
-    //抛出异常
-    UncaughtThrowableStrategy THROW =
-        new UncaughtThrowableStrategy() {
-          @Override
-          public void handle(Throwable t) {
-            if (t != null) {
-              throw new RuntimeException("Request threw uncaught throwable", t);
-            }
-          }
-        };
-
-    
-    UncaughtThrowableStrategy DEFAULT = LOG;
-
-    void handle(Throwable t);
-  }          
-```
-
-DiskCacheExecutor
-```
-  public static GlideExecutor newDiskCacheExecutor() {
-    return newDiskCacheBuilder().build();
-  }
-  
-  public static GlideExecutor.Builder newDiskCacheBuilder() {
-    return new GlideExecutor.Builder(/*preventNetworkOperations=*/ true)  //不进行网络请求
-        .setThreadCount(DEFAULT_DISK_CACHE_EXECUTOR_THREADS)  //DEFAULT_DISK_CACHE_EXECUTOR_THREADS = 1
-        .setName(DEFAULT_DISK_CACHE_EXECUTOR_NAME);  //DEFAULT_DISK_CACHE_EXECUTOR_NAME = "disk-cache"
-  }
-```
-
-animationExecutor
-```
- public static GlideExecutor newAnimationExecutor() {
-    return newAnimationBuilder().build();
-  }
-  
- public static GlideExecutor.Builder newAnimationBuilder() {
-    //bestThreadCount<=4
-    int bestThreadCount = calculateBestThreadCount();
-    // We don't want to add a ton of threads running animations in parallel with our source and
-    // disk cache executors. Doing so adds unnecessary CPU load and can also dramatically increase
-    // our maximum memory usage. Typically one thread is sufficient here, but for higher end devices
-    // with more cores, two threads can provide better performance if lots of GIFs are showing at
-    // once.
-    int maximumPoolSize = bestThreadCount >= 4 ? 2 : 1;
-    //maximumPoolSize是2或1  glide认为不需要大量的线程
-    return new GlideExecutor.Builder(/*preventNetworkOperations=*/ true)
-        .setThreadCount(maximumPoolSize)
-        .setName(DEFAULT_ANIMATION_EXECUTOR_NAME);  //DEFAULT_ANIMATION_EXECUTOR_NAME = "animation"
-  } 
-```
-
-UnlimitedSourceExecutor
-```
-  public static GlideExecutor newUnlimitedSourceExecutor() {
-    return new GlideExecutor(
-        new ThreadPoolExecutor(
-            0,
-            Integer.MAX_VALUE,
-            KEEP_ALIVE_TIME_MS,  //KEEP_ALIVE_TIME_MS = TimeUnit.SECONDS.toMillis(10);
-            TimeUnit.MILLISECONDS,
-            new SynchronousQueue<Runnable>(),
-            //DEFAULT_SOURCE_UNLIMITED_EXECUTOR_NAME = "source-unlimited";
-            new DefaultThreadFactory(
-                DEFAULT_SOURCE_UNLIMITED_EXECUTOR_NAME, UncaughtThrowableStrategy.DEFAULT, false)));
-  }
-```
-UnlimitedSourceExecutor是一个核心为0,最大为Integer.MAX_VALUE，超时为10,使用无界队列
-
-线程池对比
-DiskCacheExecutor和SourceExecutor 采用固定核心线程数固定，适用于处理CPU密集型的任务，但是没有非核心线程。
-  确保CPU在长期被工作线程使用的情况下，尽可能的少的分配线程，即适用执行长期的任务。
-UnlimitedSourceExecutor采用无核心线程，非核心线程无限大适用于并发执行大量短期的小任务。在空闲的时候消耗资源非常少。
-AnimationExecutor没有核心线程，非核心线程有限，同UnlimitedSourceExecutor的区别就是核心线程数量和工作队列不一致
-
-
-
-
-线程池在EngineJob的使用
-```
-  public synchronized void start(DecodeJob<R> decodeJob) {
-    this.decodeJob = decodeJob;
-    //从disk加载使用diskCacheExecutor，否则
-    // 如果使用无限制，则是sourceUnlimitedExecutor，否则
-    //如果使用动画，则是animationExecutor，否则是sourceExecutor
-    GlideExecutor executor =
-        decodeJob.willDecodeFromCache() ? diskCacheExecutor : getActiveSourceExecutor();
-    executor.execute(decodeJob);
-  }
-  private GlideExecutor getActiveSourceExecutor() {
-    return useUnlimitedSourceGeneratorPool
-        ? sourceUnlimitedExecutor
-        : (useAnimationPool ? animationExecutor : sourceExecutor);
-  }
-```
-
-Glide如何实现加载优先级
-除了UnlimitedSourceExecutor其余的都是使用的PriorityBlockingQueue。PriorityBlockingQueue是一个具有优先级的无界阻塞队列。
- 也就是说优先级越高越先执行。
-我们知道图片的加载是在线程池中执行的DecodeJob，DecodeJob实现了Runnable和Comparable接口。当DecodeJob被提交到线程池的时候，
-  如果需要加入工作队列会通过compareTo比较DecodeJob优先级
-DecodeJob.java
-```
-  public int compareTo(@NonNull DecodeJob<?> other) {
-    int result = getPriority() - other.getPriority();
-    if (result == 0) {
-      result = order - other.order;
-    }
-    return result;
-  }
-  
-   private int getPriority() {
-    return priority.ordinal();
-  }
- 
-//优先级有4中 
-public enum Priority {
-  IMMEDIATE,
-  HIGH,
-  NORMAL,
-  LOW,
-}
-```
-
-开发者实现图片的优先级加载
-```
-Glide.with(context).load(url).priority(Priority.HIGH).into(view)
-```
-开发者指定使用UnlimitedSourceExecutor线程池
-```
-Glide.with(context).load("").useUnlimitedSourceGeneratorsPool(true).into(view)
-```

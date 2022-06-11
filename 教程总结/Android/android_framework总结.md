@@ -1,4 +1,7 @@
-                        
+
+架构总览
+http://gityuan.com/android/
+
 AMS activity启动过程
 1. Launcher startActivity   通过binder向AMS发送START_ACTIVITY_TRANSACTION
 2. AMS startActivity   AMS通过socket(名字为zygote)向zygote发送应用进程的启动参数，包括uid,gid等
@@ -8,7 +11,7 @@ AMS activity启动过程
    4.2. handleBindApplication    创建Application
    4.3  attachBaseContext          Application.attachBaseContext
    4.4. installContentProviders    安装ContentProvider
-   4.5. Application onCreate
+   4.5. Application onCreate   //在onCreate前，ContentProvider要准备好
 5. ActivityThread 进入loop循环
 6. ActivityThread通过反射创建Activity    performLaunchActivity
    Activity生命周期回调，onCreate、onStart、onResume... 
@@ -89,7 +92,8 @@ InputManager{
      这样InputDispatcher就可以将输入事件派发给合适的Window  通过InputChannel发送
 }
 InputManagerService   运行在SystemServer进程，里面的mHandler运行在android.display线程
-//todo InputManagerService跟inputManager的关系
+  InputManagerService跟inputManager的关系
+  InputManagerService，创建了InputManager
 
 IMS启动了InputDispatcherThread和InputReaderThread，分别用来运行InputDispatcher和InputReader。
 InputDispatcher先于InputReader被创建，InputDispatcher的dispatchOnceInnerLocked函数用来将事件分发给合适的Window。

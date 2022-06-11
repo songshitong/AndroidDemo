@@ -987,6 +987,7 @@ protected boolean setFrame(int left, int top, int right, int bottom) {
                 sizeChange(newWidth, newHeight, oldWidth, oldHeight);
             }
 
+            //设置可见时 进行重绘
             if ((mViewFlags & VISIBILITY_MASK) == VISIBLE || mGhostView != null) {
                 // If we are visible, force the DRAWN bit to on so that
                 // this invalidate will go through (at least to our parent).

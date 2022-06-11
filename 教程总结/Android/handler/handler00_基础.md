@@ -135,7 +135,8 @@ application启动时，可不止一个main线程，还有其他两个Binder线�
 1 当系统受到因用户操作产生的通知时，会通过 Binder 方式跨进程通知 ApplicationThread;    
 2 它通过Handler机制，往 ActivityThread 的 MessageQueue 中插入消息，唤醒了主线程；
 3 queue.next() 能拿到消息了,然后 dispatchMessage 完成事件分发；
-PS：ActivityThread 中的内部类H中有具体实现
+PS：ActivityThread 中的内部类H中有具体实现   todo ApplicationThread和ActivityManagerProxy是binder线程?   
+//ActivityManagerProxy应该后来是IActivityManager
 
 
 消息的类型
@@ -240,7 +241,7 @@ public void requestLayout() {
 2、在ViewRootImpl创建之前进行子线程的UI更新，比如onCreate方法中进行子线程更新UI。
 3、子线程切换到主线程进行UI更新，比如Handler、view.post方法
 
-
+todo
 如何设计一个永不崩溃的app  //todo https://juejin.cn/post/6904283635856179214
 我的理解是这样：loop方法中做的事情就是死循环获取消息队列中的消息并进行处理。 我们在已经开启死循环的Looper中加入一条消息
 ：Looper.loop，那么上一个Looper.loop的消息处理就会一直“卡”在新的消息——Looper.loop中，

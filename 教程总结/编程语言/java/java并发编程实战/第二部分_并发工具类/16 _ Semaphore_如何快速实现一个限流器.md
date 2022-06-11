@@ -98,7 +98,7 @@ static void addOne() {
 
 信号量的计数器，在上面的例子中，我们设置成了 1，这个 1 表示只允许一个线程进入临界区，但如果我们把计数器的值设置成对象池里对象的个数 N，
 就能完美解决对象池的限流问题了。下面就是对象池的示例代码。
-
+```
 class ObjPool<T, R> {
   final List<T> pool;
   // 用信号量实现限流器
@@ -109,6 +109,7 @@ class ObjPool<T, R> {
     for(int i=0; i<size; i++){
       pool.add(t);
     }
+    //限流的大小
     sem = new Semaphore(size);
   }
   // 利用对象池的对象，调用func
@@ -125,13 +126,13 @@ class ObjPool<T, R> {
   }
 }
 // 创建对象池
-ObjPool<Long, String> pool = 
-  new ObjPool<Long, String>(10, 2);
+ObjPool<Long, String> pool = new ObjPool<Long, String>(10, 2);
 // 通过对象池获取t，之后执行  
 pool.exec(t -> {
     System.out.println(t);
     return t.toString();
 });
+```
 
 
 我们用一个 List来保存对象实例，用 Semaphore 实现限流器。关键的代码是 ObjPool 里面的 exec() 方法，这个方法里面实现了限流的功能。

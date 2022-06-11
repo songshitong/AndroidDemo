@@ -40,7 +40,7 @@ final void appNotResponding(ProcessRecord app, ActivityRecord activity, Activity
         } else if (app.killed) { 进程已经被kill
             return;
         }
-      //记录ANR到EventLog
+      //记录ANR到EventLog  todo EventLog
       EventLog.writeEvent(EventLogTags.AM_ANR, app.userId, app.pid,
               app.processName, app.info.flags, annotation);
               
@@ -104,7 +104,7 @@ final void appNotResponding(ProcessRecord app, ActivityRecord activity, Activity
     }
 
     info.append(processCpuTracker.printCurrentState(anrTime));  //记录从anr时间开始的Cpu使用情况      
-    //输出当前ANR的reason，以及CPU使用率、负载信息
+    //输出当前ANR的reason，以及CPU使用率、负载信息  todo Slog   main log??
     Slog.e(TAG, info.toString()); 
     
     //将traces文件 和 CPU使用率信息保存到dropbox，即data/system/dropbox目录      //todo dropbox
@@ -387,6 +387,8 @@ rc = TEMP_FAILURE_RETRY(recv(set_timeout(sockfd.get()), &response, sizeof(respon
 static bool send_signal(pid_t pid, bool backtrace) {
   sigval val;
   val.sival_int = backtrace;
+  //#define DEBUGGER_SIGNAL (__SIGRTMIN + 3)  system/core/debuggerd/include/debuggerd/handler.h
+  //sigqueue是linux向队列中的进程发送信号，相比kill可以携带参数
   if (sigqueue(pid, DEBUGGER_SIGNAL, val) != 0) {
     return false;
   }

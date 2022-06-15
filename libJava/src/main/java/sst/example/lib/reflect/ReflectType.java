@@ -18,6 +18,10 @@ public class ReflectType {
     //WildcardType: 表示泛型通配符类型，即泛型申明中带 ? 通配符，比如：List<? extends Number> 中 ? extends Number 就用 WildcardType 来描述；
     //GenericArrayType: 表示泛型数组，比如申明一个泛型数组的域 T[] array，它就用 GenericArrayType 来描述；
     //Class: 表示运行时的类或接口
+    //type转为class
+//    if (type instanceof Class) {
+//        Class<?> clazz = (Class<?>) type;
+//    }
     String getMethodReturnType(Method method){
         Type type = method.getGenericReturnType();
         if (type instanceof Class<?>) {

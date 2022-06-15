@@ -41,6 +41,10 @@ public class MGeneric {
         System.out.println(t.getClass().getSimpleName());
     }
 
+    public <T> void getName1(){
+        System.out.println("11");
+    }
+
     //带返回值得泛型方法  返回类型为泛型
     public <T> T getNameReturn(T t){
         System.out.println(t.getClass().getSimpleName());

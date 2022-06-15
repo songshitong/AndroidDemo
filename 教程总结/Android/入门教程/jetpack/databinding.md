@@ -1,4 +1,6 @@
 
+
+
 2022-04-12
 https://juejin.cn/post/6844903609079971854
 
@@ -62,6 +64,11 @@ activity中使用   省略setContentView
         user = new User("leavesC", "123456");
         activityMain2Binding.setUserInfo(user);
     }
+```
+与viewModel建立关系,将binding的事件传递给viewModel，不然viewmodel接受不到
+```
+ ActivityLoginBinding binding = ((ActivityLoginBinding) viewDataBinding);
+ binding.setLoginVM(loginVm);
 ```
 
 
@@ -239,6 +246,15 @@ android:afterTextChanged
 android:onTextChanged
 ...
 
+点击的另一种
+```
+android:onClick="@{loginVM.onSmsBtnClick}"
+  public void onSmsBtnClick(View v) {
+        Toast.makeText(getApplication(),"111",Toast.LENGTH_SHORT);
+        Log.d("AHLoginViewModel","l");
+    }
+    
+```
 在 Activity 内部新建一个 UserPresenter 类来声明 onClick() 和 afterTextChanged() 事件相应的回调方法
 ```
 public class UserPresenter {
@@ -269,6 +285,22 @@ public class UserPresenter {
 可以使用方法签名@{userPresenter.afterTextChanged}
 可以使用方法引用::  @{UserPresenter::onUserNameClick}
 可以使用lambda形式 @{()->userPresenter.onUserNameClick(userInfo)}
+
+其他事件
+```
+android:afterTextChanged="@{loginVM.onSmsCodeChange}"
+  public void onSmsCodeChange(Editable s) {
+        Toast.makeText(getApplication(),s.toString(),Toast.LENGTH_SHORT);
+        Log.d("AHLoginViewModel",s.toString());
+    }
+
+android:onTextChanged="@{loginVM.onTextChanged}"    
+public void onTextChanged(CharSequence s, int start, int before, int count) {
+          Log.d("AHLoginViewModel",s.toString());
+       }        
+```
+
+
 
 
 使用类方法

@@ -303,6 +303,7 @@ public void onTextChanged(CharSequence s, int start, int before, int count) {
 
 
 
+
 使用类方法
 ```
 导入工具类
@@ -439,6 +440,12 @@ xml使用
             android:text="红色背景蓝色字"
             android:textColor='@{"蓝色"}'/>
 ```
+颜色绑定
+https://stackoverflow.com/questions/39910832/set-text-color-using-data-binding-on-android
+<data>
+<import type="androidx.core.content.ContextCompat" />
+</data>
+android:textColor="@{ContextCompat.getColor(context, data.colorRes)}"/>
 
 
 资源引用
@@ -466,3 +473,4 @@ xml使用
          android:text='@{@string/format("leavesC", "Ye")}'
          android:textAllCaps="false" />
 ```
+

@@ -2,7 +2,7 @@ package sst.example.lib;
 
 //基本类型
 public class Type {
-    public static void main(StringTest[] args) {
+    public static void main(String[] args) {
 
         //int的拆箱，装箱
         Integer integer = Integer.valueOf(2);
@@ -50,7 +50,44 @@ public class Type {
         Fruit fruit = new Fruit();
         Food food = (Food) fruit;
         System.out.println(food.name);
+
+        //type转bit https://blog.csdn.net/dengzhi_00/article/details/52885820
+        //转为string，然后使用charAt
+        byte byte1 = (byte) 0x11;
+        System.out.println("byte1 is:"+getBit(byte1));
+        //转为16进制字符串 结果是"11"，第一个char:1  第二个char:2
+        String hexBytes = bytes2Hex(new byte[]{byte1});
+        System.out.printf("byte1 is:"+hexBytes);
+        for(char temp:hexBytes.toCharArray()){
+            System.out.printf("byte1 char:"+temp);
+        }
     }
+    public static String getBit(byte by){
+        StringBuffer sb = new StringBuffer();
+        sb.append((by>>7)&0x1)
+                .append((by>>6)&0x1)
+                .append((by>>5)&0x1)
+                .append((by>>4)&0x1)
+                .append((by>>3)&0x1)
+                .append((by>>2)&0x1)
+                .append((by>>1)&0x1)
+                .append((by>>0)&0x1);
+        return sb.toString();
+    }
+    public static String bytes2Hex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        String tmp;
+        for (byte b : bytes) {
+            tmp = Integer.toHexString(0xFF & b);
+            if (tmp.length() == 1) {
+                tmp = "0" + tmp;
+            }
+            sb.append(tmp);
+        }
+        return sb.toString().toUpperCase();
+    }
+
+
 
     //输出基本类型信息
     private static void outInfo() {

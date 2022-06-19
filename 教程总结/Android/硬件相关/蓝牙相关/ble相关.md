@@ -1,0 +1,216 @@
+https://developer.android.com/guide/topics/connectivity/bluetooth-le?hl=zh-cn
+
+
+Android 4.3 （API 18 ）引入了低功耗蓝牙，应用可以查询周围设备、查询设备的服务、传输信息
+
+关键术语：
+1.通用属性配置文件 (GATT) — GATT 配置文件是一种通用规范，内容针对在 BLE 链路上发送和接收称为“属性”的简短数据片段。
+   目前所有低功耗应用配置文件均以 GATT 为基础
+蓝牙特别兴趣小组 (Bluetooth SIG) 为低功耗设备定义诸多配置文件。配置文件是描述设备如何在特定应用中工作的规范。
+一台设备可以实现多个配置文件。例如，一台设备可能包含心率监测仪和电池电量检测器
+2.属性协议 (ATT) — 属性协议 (ATT) 是 GATT 的构建基础，二者的关系也被称为 GATT/ATT。ATT 经过优化，可在 BLE 设备上运行。
+为此，该协议尽可能少地使用字节。每个属性均由通用唯一标识符 (UUID) 进行唯一标识，后者是用于对信息进行唯一标识的字符串 ID 的 128 位标准化格式。
+由 ATT 传输的属性采用特征和服务格式
+3. 特征 — 特征包含一个值和 0 至多个描述特征值的描述符。您可将特征理解为类型，后者与类类似。
+4. 描述符 — 描述符是描述特征值的已定义属性。例如，描述符可指定人类可读的描述、特征值的可接受范围或特定于特征值的度量单位。
+5. Service — 服务是一系列特征。例如，您可能拥有名为“心率监测器”的服务，其中包括“心率测量”等特征。
+ 您可以在 bluetooth.org 上找到基于 GATT 的现有配置文件和服务的列表
+
+关键代码
+1.检查是否支持BLE
+```
+if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+    Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+    finish();
+}
+```
+2.获取 BluetoothAdapter
+BluetoothAdapter 代表设备自身的蓝牙适配器（蓝牙无线装置）。整个系统有一个蓝牙适配器，并且您的应用可使用此对象与之进行交互
+```
+private BluetoothAdapter bluetoothAdapter;
+final BluetoothManager bluetoothManager =
+        (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+bluetoothAdapter = bluetoothManager.getAdapter();
+```
+BluetoothAdapter的关键方法
+```
+public BluetoothLeScanner getBluetoothLeScanner()
+ public BluetoothDevice getRemoteDevice(String address)
+
+//扫描设备 可能被废弃了
+public boolean startLeScan(BluetoothAdapter.LeScanCallback callback)
+public void stopLeScan(BluetoothAdapter.LeScanCallback callback) 
+```
+2.启用蓝牙
+```
+if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+    context.startActivity(enableBtIntent);
+    //startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+}
+```
+3.查找 BLE 设备
+扫描非常耗电，因此您应遵循以下准则：
+找到所需设备后，立即停止扫描。
+绝对不进行循环扫描，并设置扫描时间限制。之前可用的设备可能已超出范围，继续扫描会耗尽电池电量。
+```
+public class DeviceScanActivity extends ListActivity {
+
+    private BluetoothAdapter bluetoothAdapter;
+    private boolean mScanning;
+    private Handler handler;
+    private static final long SCAN_PERIOD = 10000;
+    ...
+    private void scanLeDevice(final boolean enable) {
+        if (enable) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScanning = false;
+                    bluetoothAdapter.stopLeScan(leScanCallback);
+                }
+            }, SCAN_PERIOD);
+
+            mScanning = true;
+            bluetoothAdapter.startLeScan(leScanCallback);
+        } else {
+            mScanning = false;
+            bluetoothAdapter.stopLeScan(leScanCallback);
+        }
+    }
+...
+}
+
+private LeDeviceListAdapter leDeviceListAdapter;
+private BluetoothAdapter.LeScanCallback leScanCallback =
+        new BluetoothAdapter.LeScanCallback() {
+    @Override
+    public void onLeScan(final BluetoothDevice device, int rssi,
+            byte[] scanRecord) {
+        runOnUiThread(new Runnable() {
+           @Override
+           public void run() {
+               leDeviceListAdapter.addDevice(device);
+               leDeviceListAdapter.notifyDataSetChanged();
+           }
+       });
+   }
+};
+```
+BlueBoothDevice代表蓝牙设备
+```
+public String getName()
+public BluetoothGatt connectGatt(Context context, boolean autoConnect, BluetoothGattCallback callback)
+```
+4.连接到 GATT 服务器
+与 BLE 设备交互的第一步便是连接到 GATT 服务器。更具体地说，是连接到设备上的 GATT 服务器。
+```
+bluetoothGatt = device.connectGatt(this, false, gattCallback);
+```
+这将连接到由 BLE 设备托管的 GATT 服务器，并返回 BluetoothGatt 实例，然后您可使用该实例执行 GATT 客户端操作
+BluetoothGattCallback会有状态变化的监听onConnectionStateChange，onServicesDiscovered服务发现，onCharacteristicRead。。。
+BluetoothGatt关键方法
+```
+public boolean connect()
+bluetoothGatt.discoverServices() //发现服务
+bluetoothGatt.getServices//获取服务
+public boolean readCharacteristic(BluetoothGattCharacteristic characteristic)
+public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic)
+```
+监听到连接成功需要发现服务和获取服务
+```
+bluetoothGatt.discoverServices() //发现服务
+bluetoothGatt.getServices//获取服务
+```
+5.读取 BLE 属性
+当您的 Android 应用成功连接到 GATT 服务器并发现服务后，应用便可在支持的位置读取和写入属性。
+```
+ for (BluetoothGattService gattService : gattServices) {
+    uuid = gattService.getUuid().toString();
+    List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
+    uuid = gattCharacteristic.getUuid().toString();  
+     for (BluetoothGattCharacteristic characteristic : bluetoothGattService.getCharacteristics()) {
+       //符合某种特征的uuid
+      if (characteristic.getUuid().toString().equals(readUUID)) {  //读特征
+        ...
+      } else if (characteristic.getUuid().toString().equals(writeUUID)) {  //写特征
+        ...
+      }
+    }            
+ }
+```
+BluetoothGattService关键代码
+```
+public UUID getUuid()
+public List<BluetoothGattCharacteristic> getCharacteristics()
+```
+BluetoothGattCharacteristic关键代码
+代表蓝牙GATT特性   一般有读特征，写特征
+GATT特征是用于构建GATT服务的基本数据元素， BluetoothGattService 。 该特性包含一个值以及附加信息和可选的GATT描述符， BluetoothGattDescriptor 。
+```
+public static final int PERMISSION_READ = 1;
+public static final int PERMISSION_WRITE = 16;
+public static final int PROPERTY_READ = 2;
+public static final int PROPERTY_WRITE = 8;
+public UUID getUuid()
+public boolean addDescriptor(BluetoothGattDescriptor descriptor)
+public boolean setValue(byte[] value)
+public byte[] getValue()
+```
+BluetoothGattDescriptor描述符有
+```
+public class BluetoothGattDescriptor implements Parcelable {
+    public static final byte[] DISABLE_NOTIFICATION_VALUE = new byte[0];
+    public static final byte[] ENABLE_INDICATION_VALUE = new byte[0];
+    //开启通知
+    public static final byte[] ENABLE_NOTIFICATION_VALUE = new byte[0];
+    public static final int PERMISSION_READ = 1;
+    public static final int PERMISSION_READ_ENCRYPTED = 2;
+    public static final int PERMISSION_READ_ENCRYPTED_MITM = 4;
+    public static final int PERMISSION_WRITE = 16;
+    public static final int PERMISSION_WRITE_ENCRYPTED = 32;
+    public static final int PERMISSION_WRITE_ENCRYPTED_MITM = 64;
+    public static final int PERMISSION_WRITE_SIGNED = 128;
+    public static final int PERMISSION_WRITE_SIGNED_MITM = 256;
+}
+```
+6.接收 GATT 通知
+BLE 应用通常会要求在设备上的特定特征发生变化时收到通知
+```
+bluetoothGatt.setCharacteristicNotification(characteristic, enabled);
+...
+BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+bluetoothGatt.writeDescriptor(descriptor);
+```
+为某个特征启用通知后，如果远程设备上的特征发生更改，则会触发 onCharacteristicChanged() 回调：
+回调给BluetoothGattCallback
+7.关闭客户端应用
+当应用完成对 BLE 设备的使用后，其应调用 close()，以便系统可以适当地释放资源
+```
+public void close() {
+    if (bluetoothGatt == null) {
+        return;
+    }
+    bluetoothGatt.close();
+    bluetoothGatt = null;
+}
+```
+9.给蓝牙设备发送命令
+```
+ boolean b = writeCharacteristic.setValue(bytes);
+ bluetoothGatt.writeCharacteristic(writeCharacteristic);
+```
+
+
+https://www.jianshu.com/p/b2d35d4c2fa3
+android 12适配
+BLUETOOTH 和 BLUETOOTH_ADMIN权限已经被舍弃,
+被3个新权限代替啦BLUETOOTH_CONNECT, BLUETOOTH_SCAN, BLUETOOTH_ADVERTISE.
+ACCESS_FINE_LOCATION权限要根据需求,不是必须添加的啦
+```
+<uses-permission android:name="android.permission.BLUETOOTH"
+                     android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+                     android:maxSdkVersion="30" />
+```

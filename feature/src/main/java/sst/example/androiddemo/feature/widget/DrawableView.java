@@ -23,6 +23,7 @@ import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.LevelListDrawable;
 import android.graphics.drawable.NinePatchDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
@@ -42,6 +43,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+
+import com.google.android.material.ripple.RippleUtils;
 
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.graphics.BitmapActivity;
@@ -256,6 +259,12 @@ public class DrawableView extends View {
         if (drawable != null) {
             drawable.mutate();
         }
+
+
+        //水波纹的drawable
+//        setBackground(context, R.drawable.animation_drawable);
+//        RippleDrawable rippleDrawable  = (RippleDrawable) getBackground();
+        //https://www.jianshu.com/p/f98dfa2027de todo
     }
 
     @Override

@@ -21,6 +21,9 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:replace="android:allowBackup">
         <activity
+                android:name=".RippleDrawableActivity"
+                android:exported="false" />
+        <activity
                 android:name=".Animation.activity.ActivityTransition3"
                 android:exported="false" />
         <activity

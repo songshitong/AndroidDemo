@@ -30,8 +30,7 @@ public class InterfaceDefaultMethod {
 
         }
 
-        @Override
-        void goHome();
+        default @Override void goHome(){}
     }
 
     //StudentB可以选择实现某个方法
@@ -39,7 +38,8 @@ public class InterfaceDefaultMethod {
 
         @Override
         public void goHome() {
-
+            //执行父接口的默认方法，不写这一句不执行
+             DefaultStudent.super.goHome();
         }
     }
 }

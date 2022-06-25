@@ -11,3 +11,24 @@ LoadControl：用于控制MediaSource何时缓冲更多的媒体资源以及缓�
 
 ExoPlayer库提供了在普通使用场景下上述组件的默认实现。ExoPlayer可以使用这些默认的组件，也可以使用自定义组件。
    例如可以注入一个自定义的LoadControl用来改变播放器的缓存策略，或者可以注入一个自定义渲染器以使用Android本身不支持的视频解码器。
+
+
+https://stackoverflow.com/questions/28590782/android-exoplayer-onprogresschanged
+进度更新
+```
+handler = new Handler();
+runnable = new Runnable() {
+      @Override
+      public void run() {
+           progressbar.setProgress((int) ((exoPlayer.getCurrentPosition()*100)/exoPlayer.getDuration()));
+           handler.postDelayed(runnable, 1000);
+      }
+};
+handler.postDelayed(runnable, 0);
+```
+
+stop方法 版本com.google.android.exoplayer:exoplayer:2.18.0
+会释放播放的资源，最好使用pause方法
+seekto方法
+拖动进度条seekto自动播放，pasue不好使
+解决 拖动进度条播放状态seekto，停止状态记录进度，播放按钮时再seekto

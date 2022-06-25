@@ -1,3 +1,8 @@
+
+kotlin引入Java工程
+新建activity——》选择kotlin作为语言，kotlin的插件经常变，最好自动生成
+
+
 java与kotlin大部分情况是可以直接调用
 
 

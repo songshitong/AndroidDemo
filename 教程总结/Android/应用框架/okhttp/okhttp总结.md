@@ -2,6 +2,14 @@
 todo
 如何提升技术能力
 
+todo
+okhttp的ResponseBody 如果没有调用close方法
+1. 会有什么问题?
+2. 为什么会产生连接泄漏
+3. okhttp 是如何检测连接泄漏的
+   写一套监控 Closeable对象 未被close的 系统
+
+
 https://blog.csdn.net/jaynm/article/details/112002901
 执行流程：
 1 通过构建者构建出OkHttpClient对象,再通过newCall方法获得RealCall请求对象.

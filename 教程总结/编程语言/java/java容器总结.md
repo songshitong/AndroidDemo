@@ -21,6 +21,11 @@ Vector类中的方法很多有synchronized进行修饰，这样就导致了Vecto
 3)Vector可以设置增长因子，而ArrayList不可以。
 4)Vector是一种老的动态数组，是线程同步的，效率很低，一般不赞成使用
 
+并发安全的list
+new Vector<>()
+Collections.synchronizedList(new ArrayList<>())
+new CopyOnWriteArrayList<>()
+
 
 
 LinkedList

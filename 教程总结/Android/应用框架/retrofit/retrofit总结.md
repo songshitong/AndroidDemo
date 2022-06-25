@@ -6,7 +6,7 @@ Retrofit 流程
 3 通过GsonRequestBodyConverter将请求体转为json字符
 4 通过OkHttpCall发送网络请求
 5 通过GsonResponseBodyConverter将json字符响应流转为model
-6 通过CallAdapter将结果包装为默认的Call
+6 通过CallAdapter将结果包装为默认的Call   //多个CallAdapter返回第一个符合返回值的
 7 用户在主线程处理返回结果
 
 CallAdapter是实现CallAdapter接口，重写adapt方法，将Call的结果回调包装为另一种形式

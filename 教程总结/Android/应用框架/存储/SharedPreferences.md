@@ -13,6 +13,21 @@ val sp: SharedPreferences = context.getSharedPreferences("zx", Context.MODE_PRIV
  editor.apply() //异步提交
 val result = sp.getString("key0", "")      
 ```
+putStringSet失效问题
+https://www.jianshu.com/p/f04bd535f366
+https://stackoverflow.com/questions/21396358/sharedpreferences-putstringset-doesnt-work
+```
+SharedPreferences preferences = context.getSharedPreferences(SP_FILE_NAME, Context.MODE_PRIVATE);
+//重新new一个set对象，将getStringSet返回的set添加进去而不是直接使用
+Set<String> set = new HashSet<String>();
+set.addAll(preferences.getStringSet("test", new HashSet<String>()));
+SharedPreferences.Editor editor = preferences.edit();
+set.add("value");
+editor.remove(key).apply();
+editor.putStringSet("test", set);
+editor.apply();
+```
+
 
 sp存储初认识
 ```

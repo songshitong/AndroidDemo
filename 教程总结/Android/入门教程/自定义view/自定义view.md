@@ -178,6 +178,12 @@ descendantFocusAbility  父子焦点顺序放在根布局
 setDuplicateParentStateEnabled  子view是否跟随父view的焦点状态
 
 
+判断view是否可见
+```
+private boolean isVisible(View v) {
+    return v.getLocalVisibleRect(new Rect());
+}
+```
 
 获取可见区域
 View.getGlobalVisibleRect(Rect);

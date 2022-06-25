@@ -1,5 +1,7 @@
 package sst.example.lib;
 
+import java.nio.charset.StandardCharsets;
+
 //基本类型
 public class Type {
     public static void main(String[] args) {
@@ -34,6 +36,12 @@ public class Type {
         }
         //输出为4
 
+        //string转为ascii 数组
+        String strAsc ="11";
+        strAsc.getBytes(StandardCharsets.US_ASCII);
+        //Byte数组转为String
+        new String(new byte[]{0x11,0x22});
+
         //继承的类型转换
         //在继承中，子类可以自动转型为父类，但是父类强制转换为子类时只有当引用类型真正的身份为子类时才会强制转换成功，否则失败
         //声明父类，不能强转为子类  抛出异常java.lang.ClassCastException
@@ -51,16 +59,21 @@ public class Type {
         Food food = (Food) fruit;
         System.out.println(food.name);
 
+        //字节（byte）：   java中一个byte为8个二进制位。https://blog.csdn.net/qq_34763699/article/details/78650272
         //type转bit https://blog.csdn.net/dengzhi_00/article/details/52885820
         //转为string，然后使用charAt
         byte byte1 = (byte) 0x11;
         System.out.println("byte1 is:"+getBit(byte1));
         //转为16进制字符串 结果是"11"，第一个char:1  第二个char:2
         String hexBytes = bytes2Hex(new byte[]{byte1});
-        System.out.printf("byte1 is:"+hexBytes);
+        System.out.println("byte1 is:"+hexBytes);
         for(char temp:hexBytes.toCharArray()){
             System.out.printf("byte1 char:"+temp);
         }
+        //字节转int
+        int value = bytes2Int(new byte[]{byte1});
+        System.out.println("=========");
+        System.out.println("bytes2Int:"+value);
     }
     public static String getBit(byte by){
         StringBuffer sb = new StringBuffer();
@@ -74,6 +87,8 @@ public class Type {
                 .append((by>>0)&0x1);
         return sb.toString();
     }
+
+
     public static String bytes2Hex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         String tmp;
@@ -87,6 +102,10 @@ public class Type {
         return sb.toString().toUpperCase();
     }
 
+
+    public static Integer bytes2Int(byte[] bytes) {
+        return Integer.parseInt(bytes2Hex(bytes), 16);
+    }
 
 
     //输出基本类型信息

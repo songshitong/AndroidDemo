@@ -364,6 +364,11 @@ public class ReflectDemo {
         //你可以获得这个被参数化类型的具体参数。总之：
         //你不能在运行期获知一个被参数化的类型的具体参数类型是什么，但是你可以在用到这个被参数化类型的方法以及变量中找到他们，
         //换句话说就是获知他们具体的参数化类型。
+        //对象泛型获取
+        //(T) (((ParameterizedType) (obj.getClass().getGenericSuperclass())).getActualTypeArguments()[0])
+        //接口泛型获取
+        // ((ParameterizedType) (obj.getClass().getGenericInterfaces()[0])).getActualTypeArguments()[0];
+
         // 获取泛型方法返回类型  List<String>
         Method method = ReflectDemo.class.getMethod("getStringList");
         Type returnType = method.getGenericReturnType();

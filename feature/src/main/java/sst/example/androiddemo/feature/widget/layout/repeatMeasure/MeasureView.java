@@ -4,10 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
-import androidx.viewpager.widget.ViewPager;
 
 public class MeasureView extends View {
     public String tag="";

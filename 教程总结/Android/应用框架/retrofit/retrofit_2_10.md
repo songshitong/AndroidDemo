@@ -777,6 +777,35 @@ static <ResponseT, ReturnT> HttpServiceMethod<ResponseT, ReturnT> parseAnnotatio
               continuationBodyNullable);
     }
   }
+  
+  private static <ResponseT, ReturnT> CallAdapter<ResponseT, ReturnT> createCallAdapter(
+      Retrofit retrofit, Method method, Type returnType, Annotation[] annotations) {
+    try {
+      //noinspection unchecked
+      return (CallAdapter<ResponseT, ReturnT>) retrofit.callAdapter(returnType, annotations);
+    } catch (RuntimeException e) { // Wide exception range because factories are user code.
+      throw methodError(method, e, "Unable to create call adapter for %s", returnType);
+    }
+  }
+ public CallAdapter<?, ?> callAdapter(Type returnType, Annotation[] annotations) {
+    return nextCallAdapter(null, returnType, annotations);
+  }
+ 
+  public CallAdapter<?, ?> nextCallAdapter(
+      @Nullable CallAdapter.Factory skipPast, Type returnType, Annotation[] annotations) {
+    Objects.requireNonNull(returnType, "returnType == null");
+    Objects.requireNonNull(annotations, "annotations == null");
+
+    int start = callAdapterFactories.indexOf(skipPast) + 1;
+    //取第一个符合返回值类型的callAdapter  callAdapterFactory的get()方法不为null即可
+    for (int i = start, count = callAdapterFactories.size(); i < count; i++) {
+      CallAdapter<?, ?> adapter = callAdapterFactories.get(i).get(returnType, annotations, this);
+      if (adapter != null) {
+        return adapter;
+      }
+    }
+    ....
+  }     
 ```
 然后ServiceMethod构建,就是将上面这些获取到的所有数据全部存进去,包括方法注解，参数注解，适配器callAdapter，转换器Converter
 然后我们回到动态代码的那个方法,我已经放到下面来了.

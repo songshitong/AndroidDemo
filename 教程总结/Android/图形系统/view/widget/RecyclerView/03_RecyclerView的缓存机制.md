@@ -16,6 +16,7 @@ https://www.jianshu.com/p/efe81969f69d
        (ArrayList)           这部分的ViewHolder通常来说，意义跟一级缓存差不多。
 三级缓存	ViewCacheExtension	自定义缓存
 四级缓存	 RecycledViewPool	根据ViewType来缓存ViewHolder，每个ViewType的数组大小为5，可以动态的改变。
+RecyclerView.getRecycledViewPool().setMaxRecycledViews(0,10)
 (SparseArray<ScrapData(ArrayList)>)       可以通过RecyclerView的setRecycledViewPool()和getRecycledViewPool()共享RecycledViewPool缓存
 
 Scrap [skræp] 碎片，小块(纸、织物等);丝毫;一丁点;残羹剩饭

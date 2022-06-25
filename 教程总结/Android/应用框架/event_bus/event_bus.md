@@ -333,7 +333,7 @@ private boolean checkAddWithMethodSignature(Method method, Class<?> eventType) {
      Class<?> methodClass = method.getDeclaringClass();
      Class<?> methodClassOld = subscriberClassByMethodKey.put(methodKey, methodClass);
      
-     //isAssignableFrom() 方法说明：   todo isAssignableFrom
+     //isAssignableFrom() 方法说明：  
      //当前的Class对象所表示的类，是不是参数中传递的Class对象所表示的类的父类，超接口，或者是相同的类型。
      //是则返回true，否则返回false。
      if (methodClassOld == null || methodClassOld.isAssignableFrom(methodClass)) {

@@ -1,4 +1,9 @@
 
+
+view截图
+https://blog.csdn.net/lou_liang/article/details/118296761
+
+
 默认情况下，View没有启用这个优化标记位，但是ViewGroup会默认启用这个优化标记位。
 当我们的自定义控件继承于ViewGroup并且本身不具备绘制功能时，就可以开启这个标记位从而便于系统进行后续的优化。
 当明确知道一个ViewGroup需要通过onDraw来绘制内容时，我们需要显示地关闭WILL_NOT_DRAW这个标记位。

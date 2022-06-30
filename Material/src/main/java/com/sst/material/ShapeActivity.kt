@@ -39,6 +39,9 @@ class ShapeActivity : AppCompatActivity() {
             //缩放
             scale=1f
 
+            //圆角还是切角
+            setCornerSize(10f)
+
             //阴影
             initializeElevationOverlay(this@ShapeActivity)
             elevation=20f

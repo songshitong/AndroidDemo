@@ -1,4 +1,17 @@
 
+https://juejin.cn/post/6844903630538031112
+ItemDecoration  为每个item加文字
+```
+for (int i = 0; i < parent.getChildCount(); i++) {
+    View view = parent.getChildAt(i);
+    int position = parent.getChildAdapterPosition(view);
+    String text = String.valueOf(position+1);
+    float w = textPaint.measureText(text);
+    c.drawText(text, 20 - w / 2, view.getBottom() - view.getHeight() / 2 + textPaint.getFontMetri().descent, textPaint);
+}
+
+```
+
 
 https://www.jianshu.com/p/eac9b55023be
 装饰设计模式 - RecyclerView添加头部和底部

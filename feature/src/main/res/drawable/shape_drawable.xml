@@ -16,7 +16,13 @@
 
         <!--
 
-        android:innerRadius  圆环的半径   innerRadius优先级大于innerRadiusRatio
+android:shape  rectangle 长方形 /默认,oval 椭圆,line 线,ring 环形
+
+ <solid android:color="@color/colorGrey500"/> 填充色
+
+radius设置四周的圆角， bottomLeftRadius 左下
+
+android:innerRadius  圆环的半径   innerRadius优先级大于innerRadiusRatio
 android:innerRadiusRatio   内半径占整个Drawable宽度的比例，默认值为9.如果为n，那么半径=宽度/n
 android:thickness  圆环的厚度
 android：thicknessRatio  圆环厚度占整个Drawable宽度比例  thickness优先级大于thicknessRatio

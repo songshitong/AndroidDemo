@@ -19,7 +19,8 @@ ATRACE_CALL();
 如果使用插住的方法，对于log、加解密等在底层非常频繁调用的函数，需要进行过滤，防止出现大量毛刺
 
 
-
+目录$ANDROID_HOME/platform-tools/systrace   python要求必须2.7
+33.0.1（2022 年 3 月） systrace 已移除。请改用 Studio 性能分析器/gpuinspector.dev/Perfetto。
 常用操作   enter停止收集数据
 ```
 python systrace.py --list-categories   //列举可用类型，对缩写有解释 例如，wm是WindowManager,

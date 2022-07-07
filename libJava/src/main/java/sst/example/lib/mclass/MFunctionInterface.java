@@ -1,12 +1,14 @@
 package sst.example.lib.mclass;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class MFunctionInterface {
 //    https://mp.weixin.qq.com/s/l3XNXXppfNCyh0rPIgN9OQ
+      //更多函数参考https://www.runoob.com/java/java8-functional-interfaces.html
 //    Function 函数式接口
 //    使用注解@FunctionalInterface标识，并且只包含一个抽象方法的接口是函数式接口。
 //    函数式接口主要分为Supplier供给型函数、Consumer消费型函数、Runnable无参无返回型函数和Function有参有返回型函数
@@ -22,6 +24,10 @@ public class MFunctionInterface {
 //    public interface Consumer<T> {
 //        void accept(T var1);
 //    }
+      //BiConsumer 接受两个参数无返回
+    //public interface BiConsumer<T, U> {
+    //void accept(T var1, U var2);
+    //}
 
 //    Runnable无参无返回型函数
 //      Runnable的表现形式为即没有参数也没有返回值
@@ -29,12 +35,15 @@ public class MFunctionInterface {
 //    public interface Runnable {
 //        void run();
 //    }
+     //Callable 带异常的无参无返回值
 
 //    Function函数的表现形式为接收一个参数，并返回一个值。
 //      Supplier、Consumer和Runnable可以看作Function的一种特殊表现形式
 //    public interface Function<T, R> {
 //        R apply(T var1);
 //    }
+    //BiFunction<T,U,R>
+    //代表了一个接受两个输入参数的方法，并且返回一个结果
 
     public static void main(String[] args) {
         MFunctionInterface mf = new MFunctionInterface();
@@ -56,6 +65,7 @@ public class MFunctionInterface {
            int b = it++;
            System.out.println("it "+it);
        };
+
        //先执行andThen，而后执行accept
        a.andThen((it)->{
            System.out.println("andThen "+it);

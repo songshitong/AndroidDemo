@@ -2,6 +2,7 @@ package sst.example.androiddemo.feature.graphics;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
@@ -10,8 +11,11 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,6 +25,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -116,6 +122,32 @@ public class BitmapActivity extends AppCompatActivity {
         return result;
     }
 
+    public static Bitmap getViewBp(View v) {
+        if (null == v) {
+            return null;
+        }
+        v.setDrawingCacheEnabled(true);
+        v.buildDrawingCache();
+        if (Build.VERSION.SDK_INT >= 11) {
+            v.measure(View.MeasureSpec.makeMeasureSpec(v.getWidth(),
+                View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(
+                v.getHeight(), View.MeasureSpec.EXACTLY));
+            v.layout((int) v.getX(), (int) v.getY(),
+                (int) v.getX() + v.getMeasuredWidth(),
+                (int) v.getY() + v.getMeasuredHeight());
+        } else {
+            v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
+        }
+        Bitmap b =
+            Bitmap.createBitmap(v.getDrawingCache(), 0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
+
+        v.setDrawingCacheEnabled(false);
+        v.destroyDrawingCache();
+        return b;
+    }
+
 
     public byte[] getBitmapByte(Bitmap bitmap) {   //将bitmap转化为byte[]类型也就是转化为二进制
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -153,8 +185,67 @@ public class BitmapActivity extends AppCompatActivity {
         return bitmap;
     }
 
-    //todo bitmap 写入文件
+    //保存bitmap到文件
+    public static void saveBitmap(String name, Bitmap bm, Context mContext) {
+        Log.d("Save Bitmap", "Ready to save picture");
+        //指定我们想要存储文件的地址
+        String TargetPath = mContext.getFilesDir() + "/images/";
+        Log.d("Save Bitmap", "Save Path=" + TargetPath);
+        //判断指定文件夹的路径是否存在 // TODO: 2022/7/4 文件夹创建
+        if (!(new File(TargetPath)).exists()) {
+            Log.d("Save Bitmap", "TargetPath isn't exist");
+        } else {
+            //如果指定文件夹创建成功，那么我们则需要进行图片存储操作
+            File saveFile = new File(TargetPath, name);
 
+            try {
+                FileOutputStream saveImgOut = new FileOutputStream(saveFile);
+                // compress - 压缩的意思
+                bm.compress(Bitmap.CompressFormat.JPEG, 80, saveImgOut);
+                //存储完成后需要清除相关的进程
+                saveImgOut.flush();
+                saveImgOut.close();
+                Log.d("Save Bitmap", "The picture is save to your phone!");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    //保存到相册
+    public static boolean saveImageToGallery(Context context, Bitmap bmp) {
+        // 首先保存图片
+        String storePath =
+            Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "dearxy";
+        File appDir = new File(storePath);
+        if (!appDir.exists()) {
+            appDir.mkdir();
+        }
+        String fileName = System.currentTimeMillis() + ".jpg";
+        File file = new File(appDir, fileName);
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            //通过io流的方式来压缩保存图片
+            boolean isSuccess = bmp.compress(Bitmap.CompressFormat.JPEG, 60, fos);
+            fos.flush();
+            fos.close();
+
+            //把文件插入到系统图库
+            MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), fileName, null);
+
+            //保存图片后发送广播通知更新数据库
+            Uri uri = Uri.fromFile(file);
+            context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+            if (isSuccess) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
    @RequiresApi(api = Build.VERSION_CODES.O)
    private void getBitMapOption(){

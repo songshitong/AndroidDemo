@@ -36,7 +36,7 @@ public class MathTest {
         //-1.0
         System.out.println("Math.abs(-1.3) "+Math.ceil(-1.3));
         System.out.println("Math.abs(-1.7) "+Math.ceil(-1.7));
-        //2.0
+        //2.0 超过1取2
         System.out.println("Math.abs(1.3) "+Math.ceil(1.3));
         System.out.println("Math.abs(1.7) "+Math.ceil(1.7));
 
@@ -48,13 +48,6 @@ public class MathTest {
         System.out.println("Math.floor(1.3) "+Math.floor(1.3));
         System.out.println("Math.floor(1.7) "+Math.floor(1.7));
 
-
-        //随机数 [0,1)
-        System.out.println("Math.random() "+Math.random());
-//        [0,100)
-        System.out.println("Math.random()*100 "+Math.random()*100);
-
-
         //四舍五入rint double->double
         System.out.println("Math.rint(1.3) "+Math.rint(1.3));
         System.out.println("Math.rint(1.7) "+Math.rint(1.7));
@@ -62,6 +55,15 @@ public class MathTest {
         //四舍五入round float->int  double->long
         System.out.println("Math.round(1.3) "+Math.round(1.3));
         System.out.println("Math.round(1.7) "+Math.round(1.7));
+
+
+        //随机数 [0,1)
+        System.out.println("Math.random() "+Math.random());
+//        [0,100)
+        System.out.println("Math.random()*100 "+Math.random()*100);
+
+
+
 
 
         //nextUp()方法返回比第一个参数大的最近浮点数

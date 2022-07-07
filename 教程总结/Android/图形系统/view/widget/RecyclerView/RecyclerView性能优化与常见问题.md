@@ -1,5 +1,23 @@
 https://juejin.cn/post/6844903661726859271
 
+
+设置方向  mOrientationHelper只有在setOrientation时才初始化，并且多次用到，不设置可能卡顿
+recyclerview-1.2.1  帮助LinearLayoutManager保持滚动位置
+LinearLayoutManager.java   
+```
+public void setOrientation(@RecyclerView.Orientation int orientation) {
+        if (orientation != mOrientation || mOrientationHelper == null) {
+            mOrientationHelper =
+                    OrientationHelper.createOrientationHelper(this, orientation);
+            mAnchorInfo.mOrientationHelper = mOrientationHelper;
+            mOrientation = orientation;
+            requestLayout();
+        }
+    }
+```
+
+
+
 RecyclerView做性能优化要说复杂也复杂，比如说布局优化，缓存，预加载等等。其优化的点很多，在这些看似独立的点之间，
   其实存在一个枢纽：Adapter。因为所有的ViewHolder的创建和内容的绑定都需要经过Adaper的两个函数onCreateViewHolder和onBindViewHolder。
 因此我们性能优化的本质就是要减少这两个函数的调用时间和调用的次数   //这两个函数是运行在UI线程

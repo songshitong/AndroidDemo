@@ -7,6 +7,19 @@ xml解析 XmlResourceParser
 优先遍历的目录 android/widget,android/webkit,android/app
 
 
+```
+LayoutInflater.from(mContext).inflate(R.layout.item, null);
+LayoutInflater.from(mContext).inflate(R.layout.item, parent, false);
+LayoutInflater.from(mContext).inflate(R.layout.item, parent, true);
+```
+https://www.jianshu.com/p/2a06dc6b9a24
+如果你的View不需要LayoutParams，那么不用传入parent；   //不传入parent一般item根布局的属性不生效
+如果你的View需要LayoutParams，那么必须传入一个parent，如果还要将View添加到parent中，那么attachToRoot为true，此时该方法的返回值为parent；
+如果不需要添加到parent中，则attachToRoot为false。
+一般RecyclerView.onCreateView中的parent是RecyclerView自己
+LayoutInflater.from(mContext).inflate(R.layout.item, RecyclerView, false);
+
+
 对于 LayoutInflater，相信每个 Android 开发人员都不会感到陌生。业界一般称它为布局解析器（或填充器），翻开 LayoutInflater 源码发现它是一个抽象类，
  我们先来看下它的自我介绍。
 
@@ -317,12 +330,12 @@ public View inflate(XmlPullParser parser, @Nullable ViewGroup root, boolean atta
                 rInflateChildren(parser, temp, attrs, true);
 
                 if (root != null && attachToRoot) {
-                    // 添加到ViewGroup
+                    // 添加到ViewGroup  此时没有使用View的root的layoutParam
                     root.addView(temp, params);
                 }
 
                 if (root == null || !attachToRoot) {
-                    // 此时布局根节点为temp
+                    // 此时布局根节点为temp  此时没有使用View的root的layoutParam
                     result = temp;
                 }
             }

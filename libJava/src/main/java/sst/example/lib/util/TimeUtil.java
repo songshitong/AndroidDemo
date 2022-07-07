@@ -73,11 +73,24 @@ public class TimeUtil {
       return result;
     }
   }
+
+  public static String formatTimeStamp(long timeStamp){
+    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    String sd = sdf.format(new Date(Long.parseLong(String.valueOf(timeStamp))));      // 时间戳转换成时间
+    //
+    //String sd = sdf.format(Long.parseLong(String.valueOf(timeStamp)));
+    //String sd = sdf.format(timeStamp)
+    System.out.println("格式化结果：" + sd);
+    return sd;
+  }
+
   public static void main(String[] args) {
     System.out.println(getCurrentTime());
     System.out.println("====");
     System.out.println(formatDuration2HHMMSS(1000));
     System.out.println(formatDuration2HHMMSS(60*1000));
     System.out.println(formatDuration2HHMMSS(60*60*1000));
+    System.out.println("======");
+    System.out.println("格式化时间戳: "+formatTimeStamp(System.currentTimeMillis()));
   }
 }

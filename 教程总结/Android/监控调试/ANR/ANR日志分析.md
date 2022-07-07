@@ -395,6 +395,46 @@ CPU usage from 0ms to 10625ms later (2020-03-09 14:38:31.633 to 2020-03-09 14:38
 
 5.5.1 内存紧张导致的频繁GC
  大量GC占用CPU资源，导致卡死
+搜索GC time
+```
+Total mutator paused time: 1.246s
+Total time waiting for GC to complete: 1.458s
+Total GC count: 2914
+Total GC time: 238.825s
+Total blocking GC count: 28
+Total blocking GC time: 10.019s
+```
+读写内存，文件，频繁gc 
+场景：主线程接受蓝牙数据，保存在内存中(发生频繁扩容和拷贝数据,List保存到文件会写入很多空数据，内部的数组没有填满)，然后写入文件  可能是几兆的拷贝
+解决拿到数据的大小，byte[] a = new byte[size]; 这样就不用频繁扩容和拷贝数据了
+```
+suspend all histogram:	Sum: 3.291s 99% C.I. 0.002ms-5.455ms Avg: 1.398ms Max: 7.181ms
+DALVIK THREADS (43):
+"Binder:16460_6" prio=5 tid=17 Runnable
+  | group="main" sCount=0 ucsCount=0 flags=2 obj=0x13342970 self=0xb400006fbb49f400
+  | sysTid=17003 nice=0 cgrp=default sched=0/0 handle=0x6fa42e7cb0
+  | state=R schedstat=( 5067801514 832518623 5911 ) utm=174 stm=332 core=7 HZ=100
+  | stack=0x6fa41f0000-0x6fa41f2000 stackSize=991KB
+  | held mutexes= "mutator lock"(shared held)
+  native: #00 pc 000000000056acfc  /apex/com.android.art/lib64/libart.so (art::DumpNativeStack(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, int, BacktraceMap*, char const*, art::ArtMethod*, void*, bool)+144)
+  native: #01 pc 0000000000685fa8  /apex/com.android.art/lib64/libart.so (art::Thread::DumpStack(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, bool, BacktraceMap*, bool) const+368)
+  native: #02 pc 00000000006a43dc  /apex/com.android.art/lib64/libart.so (art::DumpCheckpoint::Run(art::Thread*)+924)
+  native: #03 pc 0000000000686f40  /apex/com.android.art/lib64/libart.so (art::Thread::RunCheckpointFunction()+180)
+  native: #04 pc 000000000074cc24  /apex/com.android.art/lib64/libart.so (art::JniMethodFastEnd(unsigned int, art::Thread*)+120)
+  at java.lang.System.arraycopy(Native method)
+  at ....ble.cmd.impl.FileDataMsgHandler.addToDatas(FileDataMsgHandler.java:140)
+  at .......ble.cmd.impl.FileDataMsgHandler.handleInner(FileDataMsgHandler.java:57)
+  at .......ble.cmd.MessageHandlerBase.handle(MessageHandlerBase.java:45)
+  at .......ble.MessageService.handleMessage(MessageService.java:116)
+  at .......ble.BleManager$2.onCharacteristicChanged(BleManager.java:192)
+  at android.bluetooth.BluetoothGatt$1$8.run(BluetoothGatt.java:490)
+  at android.bluetooth.BluetoothGatt.runOrQueueCallback(BluetoothGatt.java:823)
+  at android.bluetooth.BluetoothGatt.access$200(BluetoothGatt.java:47)
+  at android.bluetooth.BluetoothGatt$1.onNotify(BluetoothGatt.java:484)
+  at android.bluetooth.IBluetoothGattCallback$Stub.onTransact(IBluetoothGattCallback.java:315)
+  at android.os.Binder.execTransactInternal(Binder.java:1187)
+  at android.os.Binder.execTransact(Binder.java:1146)
+```
 
 5.6 系统服务超时导致ANR  或者主线程Binder调用等待超时
 系统服务超时一般会包含BinderProxy.transactNative关键字，请看如下日志：

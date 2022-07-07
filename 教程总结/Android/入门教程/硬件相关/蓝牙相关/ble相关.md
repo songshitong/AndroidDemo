@@ -213,9 +213,61 @@ characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
 ```
 
 
+自动重连
+```
+ public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+        super.onConnectionStateChange(gatt, status, newState);
+        //newState可能是BluetoothGatt.STATE_CONNECTING  
+        //status
+        switch (newState) {
+          case BluetoothProfile.STATE_CONNECTED://连接成功
+            gatt.discoverServices();
+            break;
+          case BluetoothProfile.STATE_DISCONNECTED://断开连接
+            refreshDeviceCache();
+            //先关闭本次，防止重连后多次回调
+            close();
+            //开始重连的逻辑
+            this.bluetoothAdapter.startLeScan(new UUID[] { SERVICE_UUID }, this.leScanCallback);
+            break;
+          default:
+            break;
+        }
+      }
 
-
-
+      public void close() {
+        if(null != bluetooth4Adapter){
+          bluetooth4Adapter.cancelDiscovery();
+        }
+        if (bluetoothGatt != null) {
+          bluetoothGatt.disconnect();
+          bluetoothGatt.close();
+        }
+      }
+      
+/**
+   * Clears the internal cache and forces a refresh of the services from the	 * remote device.
+   */
+  public static boolean refreshDeviceCache(BluetoothGatt mBluetoothGatt) {
+    if (mBluetoothGatt != null) {
+      try {
+        BluetoothGatt localBluetoothGatt = mBluetoothGatt;
+        Method localMethod = localBluetoothGatt.getClass().getMethod("refresh", new Class[0]);
+        if (localMethod != null) {
+          boolean bool =
+              ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
+          return bool;
+        }
+      } catch (Exception localException) {
+        Log.i("Config", "An exception occured while refreshing device");
+      }
+    }
+    return false;
+  }      
+```
+重连后多次回调问题
+https://stackoverflow.com/questions/33274009/how-to-prevent-bluetoothgattcallback-from-being-executed-multiple-times-at-a-tim
+注意localBluetoothGatt的关闭
 
 直接扫描对应的设备
 this.bluetooth4Adapter.startLeScan(new UUID[]{SERVICE_UUID}, this.leScanCallback);

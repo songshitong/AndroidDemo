@@ -11,6 +11,7 @@ public interface Call<T> extends Cloneable {
   //异步方法
   void enqueue(Callback<T> callback);
   boolean isExecuted();
+  //请求取消
   void cancel();
   boolean isCanceled();
   Call<T> clone();
@@ -24,6 +25,7 @@ public interface Callback<T> {
 }
 ```
 call的实现是OkHttpCall，可以通过Retrofit.Builder.callFactory自定义call
+
 
 
 看一下CallAdapter的接口

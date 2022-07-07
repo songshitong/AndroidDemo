@@ -946,3 +946,39 @@ RealCall.kt
    ... 调用链开始请求，查看上面的分析
   }
 ```
+
+
+
+请求的取消cancel
+okhttp3/internal/connection/RealCall.kt
+```
+ override fun cancel() {
+    if (canceled) return // Already canceled.
+
+    canceled = true
+    exchange?.cancel()
+    
+    //okhttp3/internal/connection/RealConnection.kt  socket取消
+    connectionToCancel?.cancel()
+
+    eventListener.canceled(this)
+  }
+```
+okhttp3/internal/connection/Exchange.kt
+```
+ fun cancel() {
+    codec.cancel()
+  }
+  
+okhttp3/internal/http1/Http1ExchangeCodec.kt  
+  override fun cancel() {
+    connection.cancel()
+  }
+  
+okhttp3/internal/http2/Http2ExchangeCodec.kt
+ override fun cancel() {
+    canceled = true
+    //htttp2关闭流
+    stream?.closeLater(ErrorCode.CANCEL)
+  }
+```

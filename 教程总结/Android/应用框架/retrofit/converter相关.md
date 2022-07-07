@@ -221,5 +221,18 @@ Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
       throw e;
     }
   }
+  
+//请求的取消
+ public void cancel() {
+    canceled = true;
+
+    okhttp3.Call call;
+    synchronized (this) {
+      call = rawCall;
+    }
+    if (call != null) {
+      call.cancel();
+    }
+  }  
 ```
 可以看到主要是用于将网络响应ResponseBody转换为业务类

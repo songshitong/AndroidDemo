@@ -1,10 +1,18 @@
 package sst.example.lib.util;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class CalendarTest {
   public static void main(String[] args) {
@@ -14,7 +22,8 @@ public class CalendarTest {
     //calendar.setTime(new Date());
     //如何设置时间： month – the month between 0-11.
     //calendar.set(2021, 11, 25);
-    //calendar.set(Calendar.DAY_OF_MONTH, 1)
+    //calendar.set(Calendar.DAY_OF_MONTH, 1) //明天
+    //calendar.set(Calendar.DAY_OF_MONTH, -1) //昨天
 
 
 
@@ -44,7 +53,7 @@ public class CalendarTest {
 
     //日期加减
     calendar.add(Calendar.DAY_OF_MONTH, -3);
-    System.out.println("3天前："+calendar.get(Calendar.DAY_OF_MONTH));
+    System.out.println("3天前："+calendar.getTime());
 
     //比较是否是同一天
     //1
@@ -65,6 +74,30 @@ public class CalendarTest {
     //不能判断是否同一天，这种不靠谱，如果设置了小时以下的值就不对了
     System.out.println(calendar.compareTo((Calendar) calendar.clone()));
 
+    //相差几天 将相差的时间段转为天数
+    //1
+    Calendar calendar1 = (Calendar) Calendar.getInstance().clone();
+    calendar1.set(2022-1900, 1,3,10,10);
+    Calendar calendar2 = (Calendar) Calendar.getInstance().clone();
+    calendar2.set(2022-1900, 1,6,8,8); //hour改为12结果就是3天 hour为8就是2天
+    System.out.println("相差几天 "+ChronoUnit.DAYS.between(calendar1.toInstant(),calendar2.toInstant()));
+    //2
+    LocalDateTime date1 = LocalDateTime.from(convertCalendar(calendar1));
+    LocalDateTime date2 = LocalDateTime.from(convertCalendar(calendar2));
+    long daysBetween = Duration.between(date1, date2).toDays();
+    System.out.println ("Days: " + daysBetween);
+    //3
+    long days = TimeUnit.DAYS.convert(calendar1.getTimeInMillis()-calendar2.getTimeInMillis(),TimeUnit.MILLISECONDS);
+    System.out.println ("Days timeunit: " + days);
+    //4
+    float betweenTime = (float) (calendar1.getTimeInMillis() - calendar2.getTimeInMillis()) / (1000 * 60 * 60 * 24);
+    System.out.println("betweenTime "+betweenTime);
+    System.out.println("betweenTime round"+Math.round(betweenTime));
+    System.out.println("betweenTime floor"+Math.floor(betweenTime));
+    System.out.println("betweenTime floor"+ (int)betweenTime);
+    System.out.println("2.2 "+Math.ceil(2.2f));
+    //4 转为数字 不对啊  20220601-20220529  相差不为1
+
 
     //复制一份calendar 写日历时表示多个时间可以用
     Calendar newC = (Calendar) calendar.clone();
@@ -73,6 +106,42 @@ public class CalendarTest {
     Calendar gregorianCalendar = GregorianCalendar.getInstance();
 
     testDate();
+    testInstant();
+    testLocalTime();
+  }
+
+  static LocalDateTime convertCalendar(Calendar calendar){
+    return LocalDateTime.ofInstant(calendar.toInstant(),calendar.getTimeZone().toZoneId());
+  }
+
+  private static void testLocalTime() {
+    //LocalDateTime  https://blog.csdn.net/fragrant_no1/article/details/83988042
+    //它表示的是不带时区的 日期及时间，替换之前的Calendar
+    //两个人都在2013年7月2日11点出生，第一个人是在英国出生，而第二个是在加尼福利亚，如果我们问他们是在什么时候出生的话，
+    // 则他们看上去都是 在同样的时间出生（就是LocalDateTime所表达的），但如果我们根据时间线（如格林威治时间线）去仔细考察，
+    // 则会发现在出生的人会比在英国出生的人稍微晚几个小时（这就是Instant所表达的概念，并且要将其转换为UTC格式的时间）
+    LocalDateTime localDateTime = LocalDateTime.now();
+    System.out.println(localDateTime+" localDateTime1");
+    //当前时间加上5小时，分钟等一样的用法，支持链式编程
+    LocalDateTime localDateTime1 = localDateTime.plusHours(5);
+    System.out.println(localDateTime1+" localDateTime1");
+    //当前时间加上5小时，分钟等一样的用法，支持链式编程 但是这里localtime只是时间，不展示年月日，只展示如：15:26:50.398 时分秒毫秒
+    LocalTime localDateTime2 = localDateTime.toLocalTime().plusHours(5);
+    //当前时间加上5天，只展示年月日，不展示时分秒毫秒,下面是两种写法，都可以
+    LocalDate localDate = localDateTime.toLocalDate().plusDays(5);
+    System.out.println(localDateTime2+" localDateTime2 "+localDate+ " localDate");
+    LocalDate plus = localDateTime.toLocalDate().plus(Period.ofDays(5));
+    System.out.println(plus+"  plus");
+
+  }
+
+  private static void testInstant() {
+    //https://blog.csdn.net/fragrant_no1/article/details/83988042
+   // Instant 类代表的是某个时间（有点像 java.util.Date），准确的说是：”是不带时区的即时时间点“，它是精确到纳秒的
+    // （而不是象旧版本的Date精确到毫秒）
+    Instant now = Instant.now();//Instant.now()使用等是UTC时间
+    Date nowDate = Date.from(now);
+    Instant nowInstant = nowDate.toInstant();
   }
 
   private static void testDate() {

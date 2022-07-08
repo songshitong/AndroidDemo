@@ -151,6 +151,12 @@ mTypedArray.recycle();
 3 findViewById修改子控件属性，然后可以使用了
 
 
+动态修改view的大小
+ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+lp.height = dpToPx(100)
+holder.itemView.setLayoutParams(lp);
+
+
 常用方法  https://www.jianshu.com/p/5ec0f278e0a3
 invalidate
 invalidate：

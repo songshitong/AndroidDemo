@@ -57,15 +57,7 @@ public class MyUtils {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dp, dm);
     }
 
-    /**
-     * Show hide soft key bord.   隐藏和展示
-     *
-     * @param context the context
-     */
-    public static void showHideSoftKeyBord(Context context) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-    }
+
 
     /**
      * Get system album intent intent.

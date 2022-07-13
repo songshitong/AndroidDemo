@@ -57,6 +57,15 @@ activity onCreate,onStart,onResume,onCreateOptionsMenu,onPrepareOptionsMenu
    （1）前台activity---正在和用户交互的activity，优先级最高
    （2）可见但非前台activity---比如activity中弹出了一个对话框，导致activity可见但是位于后台无法和用户直接交互。
    （3）后台activity---已经被暂停的activity，比如执行了onStop，优先级最低。
+
+横竖屏切换代码
+```
+   //手机，竖屏   
+       MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);  
+     
+  //平板，横屏   
+       MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);   
+```
   
 
 activity与fragment

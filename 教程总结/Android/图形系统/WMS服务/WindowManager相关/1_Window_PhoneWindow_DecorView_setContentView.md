@@ -39,6 +39,26 @@ class Window {
 }
 
 
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/com/android/internal/policy/PhoneWindow.java#mContentParent
+addContentView  在当前内容的基础上添加新的view覆盖在上面
+最终通过mContentParent.addView，添加到根布局
+```
+ public void addContentView(View view, ViewGroup.LayoutParams params) {
+        if (mContentParent == null) {
+            installDecor();
+        }
+        if (hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
+            Log.v(TAG, "addContentView does not support content transitions");
+        }
+        mContentParent.addView(view, params);
+        mContentParent.requestApplyInsets();
+        final Callback cb = getCallback();
+        if (cb != null && !isDestroyed()) {
+            cb.onContentChanged();
+        }
+    }
+```
+
 Window的唯一实现类 PhoneWindow
 PhoneWindow 持有DecorView
 public class PhoneWindow extends Window implements MenuBuilder.Callback {

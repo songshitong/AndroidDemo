@@ -1,16 +1,22 @@
 package sst.example.androiddemo.feature.util;
 
+import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
@@ -58,6 +64,31 @@ public class MyUtils {
     }
 
 
+    //xml设置
+    // <style name="AppTheme" parent="Theme.AppCompat.Light">
+    //    <item name="colorPrimary">@color/color_primary</item>
+    //    <item name="colorPrimaryDark">@color/color_secondary</item>
+    //    <item name="colorAccent">@color/color_accent</item>
+    //    <item name="android:statusBarColor">@color/color_primary</item>
+    //</style>
+    //设置状态栏颜色
+    public void setStatusBarColor(Window window, int color) {
+        //取消设置透明状态栏,使 ContentView 内容不再覆盖状态栏
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        //需要设置这个 flag 才能调用 setStatusBarColor 来设置状态栏颜色
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        //设置状态栏颜色
+        window.setStatusBarColor(color);
+    }
+
+    //设置全屏
+    public static void setFullScreen(Activity activity) {
+       activity.getWindow().getDecorView()
+            .setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
 
     /**
      * Get system album intent intent.
@@ -75,17 +106,47 @@ public class MyUtils {
 //        getImage.addCategory(Intent.CATEGORY_OPENABLE);
         Intent getImage = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         getImage.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-//        getImage.setType(MIME_TYPE_IMAGE_JPEG);
+        //getImage.setType(MIME_TYPE_IMAGE_JPEG);
         return getImage;
     }
 
     //多张图片
     public static Intent getSystemMultipleAlbumIntent(){
-        // TODO: 2018/11/13 知识点
         Intent getImage = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         getImage.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
         getImage.putExtra(EXTRA_ALLOW_MULTIPLE,true);
         return getImage;
+    }
+
+    //限制图片为JPG  视频为mp4
+    //https://stackoverflow.com/questions/4922037/android-let-user-pick-image-or-video-from-gallery
+    public static Intent getMediaIntent(){
+        Intent intent;
+        if (Build.VERSION.SDK_INT < 19) {
+            //intent = new Intent(Intent.ACTION_GET_CONTENT);
+            //intent.setType("image/* video/*");
+             intent = new Intent(Intent.ACTION_PICK);
+            intent.setDataAndType(android.provider
+                .MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/jpg video/mp4");
+        } else {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/jpg");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"image/jpg", "video/mp4"});
+        }
+        return intent;
+    }
+
+    //拿到intent后，查询文件的大小和名字
+    public static void getContentProviderInfo(Context context,Uri uri){
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+        while (cursor.moveToNext()){
+            Log.d(TAG,"file size: " + cursor.getInt(sizeIndex));
+            Log.d(TAG,"file name: " + cursor.getString(nameIndex));
+        }
+        cursor.close();
     }
 
     //视频

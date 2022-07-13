@@ -6,7 +6,7 @@
    AsyncTask初始化 futureTask使用WorkerRunnable，call时调用doInBackground
    执行完成回调onPostExecute，publishProgress需要在doInBackground中手动调用
   executeOnExecutor使用线程池执行future
-4 默认串行执行，提供并发的线程池  
+4 默认串行执行，提供并发的线程池   如果有一个长时间耗时后面的没机会运行了
   串行执行的关键，将任务添加ArrayDeque的双向队列，任务执行完成，从队列取出，然后交由并发线程池去执行  
 Runnable的逻辑就是运行完成后处理下一个
 ```

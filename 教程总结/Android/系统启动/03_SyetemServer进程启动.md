@@ -207,7 +207,7 @@ private void run() {
        ...
    }
 ```
-run函数代码很多，关键就是在注释1处加载了libandroid_servers.so。   //todo  System.loadLibrary("android_servers")加载到哪了
+run函数代码很多，关键就是在注释1处加载了libandroid_servers.so。  
 接下来在注释2处创建SystemServiceManager，它会对系统的服务进行创建、启动和生命周期管理。启动系统的各种服务，
 在注释3中的startBootstrapServices函数中用SystemServiceManager启动了ActivityManagerService、PowerManagerService、PackageManagerService等服务。
 在注释4处的函数中则启动了BatteryService、UsageStatsService和WebViewUpdateService。

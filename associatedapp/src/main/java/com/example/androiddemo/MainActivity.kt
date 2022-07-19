@@ -17,7 +17,6 @@ import kotlin.concurrent.thread
 
 //todo 判断asset文件是否可读写
 //device file explorer 查看Linux的文件权限
-//cdn 相关知识
 
 // monkey 自动化测试
 class MainActivity : AppCompatActivity() {

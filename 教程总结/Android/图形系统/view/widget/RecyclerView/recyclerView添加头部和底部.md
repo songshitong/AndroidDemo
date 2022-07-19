@@ -1,4 +1,13 @@
-
+http://www.recyclerview.org/
+https://github.com/CymChad/BaseRecyclerViewAdapterHelper   BRVAH
+https://github.com/CymChad/BaseRecyclerViewAdapterHelper/blob/2.x/README-cn.md
+recyclerview 封装的思路
+遇到的坑,不要重写getItemCount，否则footer或者header不显示
+```
+  @Override public int getItemCount() {
+    return getData().size();
+  }
+```
 
 https://www.jianshu.com/p/eac9b55023be
 装饰设计模式 - RecyclerView添加头部和底部

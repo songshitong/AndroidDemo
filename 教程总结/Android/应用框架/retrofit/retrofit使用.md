@@ -296,6 +296,12 @@ public class MoreBaseUrlInterceptor implements Interceptor {
   }
 }
 ```
+使用
+```
+ public static final String DOMAIN_BASE_URL = "Domain-Name: baseUrl";
+ @Headers(DOMAIN_BASE_URL)
+  Observable<LoginEntity> userLogin(@Body Map map);
+```
 
 
 全局header
@@ -313,3 +319,9 @@ OkHttpClient client = new OkHttpClient.Builder()
                     }
                 }).build();
 ```
+
+todo 请求取消
+https://juejin.cn/post/6844903729418764302
+https://cloud.tencent.com/developer/article/1783096
+https://www.jianshu.com/p/206f0060e1e4
+https://stackoverflow.com/questions/39592084/how-to-cancel-retrofit-request

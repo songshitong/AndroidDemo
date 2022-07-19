@@ -8,6 +8,7 @@ import android.content.SharedPreferences
 import android.content.pm.ResolveInfo
 import android.media.MediaPlayer
 import android.os.*
+import android.os.Build.VERSION
 import android.provider.Settings
 import android.util.Log
 import android.view.KeyEvent
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.snackbar.Snackbar
 import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.Animation.LayoutAnimationActivity
@@ -34,15 +36,13 @@ import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
 import sst.example.androiddemo.feature.util.MyUtils
+import sst.example.androiddemo.feature.util.ToastUtil
 import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
 import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
-
 
 class  MainActivity : AppCompatActivity()  {
 
@@ -50,6 +50,8 @@ class  MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        getAndroidVersion()
+        ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)
         var startTime = System.currentTimeMillis()
         val sp: SharedPreferences = getSharedPreferences("sp", Context.MODE_PRIVATE)
         sp.edit().putString("a","11111").apply();
@@ -388,7 +390,12 @@ class  MainActivity : AppCompatActivity()  {
         getProcessInfo()
     }
 
-    private fun getProcessInfo() {
+  private fun getAndroidVersion() {
+    //android 版本 其他信息 https://blog.csdn.net/chyychfchx/article/details/59484332
+    Log.i(TAG ,"android version" + VERSION.RELEASE)
+  }
+
+  private fun getProcessInfo() {
           //adb shell pidof sst.example.androiddemo.feature  31076
 
           //jdwp                     list pids of processes hosting a JDWP transport

@@ -140,6 +140,20 @@ Java 在 1.6 版本还增加了 allowCoreThreadTimeOut(boolean value) 方法，�
 使用有界队列，当任务过多时，线程池会触发执行拒绝策略，线程池默认的拒绝策略会 throw RejectedExecutionException 这是个运行时异常，
 对于运行时异常编译器并不强制 catch 它，所以开发人员很容易忽略。因此默认拒绝策略要慎重使用。如果线程池处理的任务非常重要，
 建议自定义自己的拒绝策略；并且在实际工作中，自定义的拒绝策略往往和降级策略配合使用。
+//拒绝后重新入队的拒绝策略
+```
+ private RejectedExecutionHandler handler = new RejectedExecutionHandler() {
+    @Override
+    public void rejectedExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
+      try {
+        //被拒绝后重新排队  service是线程池使用的阻塞队列
+        service.put(new FutureTask<Object>(runnable, null));
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+  };
+```
 
 使用线程池，还要注意异常处理的问题，例如通过 ThreadPoolExecutor 对象的 execute() 方法提交任务时，如果任务在执行的过程中出现运行时异常，
 会导致执行任务的线程终止；不过，最致命的是任务虽然异常了，但是你却获取不到任何通知，这会让你误以为任务都执行得很正常。

@@ -1,13 +1,4 @@
-http://www.recyclerview.org/
-https://github.com/CymChad/BaseRecyclerViewAdapterHelper   BRVAH
-https://github.com/CymChad/BaseRecyclerViewAdapterHelper/blob/2.x/README-cn.md
-recyclerview 封装的思路
-遇到的坑,不要重写getItemCount，否则footer或者header不显示
-```
-  @Override public int getItemCount() {
-    return getData().size();
-  }
-```
+
 
 https://www.jianshu.com/p/eac9b55023be
 装饰设计模式 - RecyclerView添加头部和底部
@@ -15,8 +6,10 @@ https://www.jianshu.com/p/eac9b55023be
 装饰设计模式也称包装设计模式，使用一种透明的方式来动态的扩展对象的功能，也是继承关系的的一种替代方案之一。说个大白话就是，
 在不使用的继承的方式下，采用装饰设计模式可以扩展一个对象的功能，可以使一个对象变得越来越强大。
 
-2.2 模式的运用
-RecyclerView 本身是不支持添加底部和头部的，那么采用装饰设计模式可以对其进行功能扩展，使其能够支持底部和头部的添加：
+2.2 模式的运用 RecyclerView 本身是不支持添加底部和头部的，那么采用装饰设计模式可以对其进行功能扩展，使其能够支持底部和头部的添加：
+
+//todo 有footer，清空数据，再添加数据  展示异常，footer不展示，数据有重复
+建议使用https://github.com/XRecyclerView/
 ```
 可以添加头部底部的 WrapRecyclerAdapter
 class WrapRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -26,7 +19,7 @@ class WrapRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     ArrayList<View> mFooterViews; // 底部
     
     public WrapRecyclerAdapter(RecyclerView.Adapter adapter) {
-        mRealAdapter = adapter;
+        this.mRealAdapter = adapter;
         mHeaderViews = new ArrayList<>();
         mFooterViews = new ArrayList<>();
     }
@@ -131,11 +124,17 @@ class WrapRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
+      if (0 == mRealAdapter.getItemCount()) {
+        return mHeaderViews.size();
+      } else {
+        //todo 真实adapter只有一个数据时，显示异常，没有显示fotter  只设置fotter的情况
         return mRealAdapter.getItemCount() + mHeaderViews.size() + mFooterViews.size();
+      }
     }
 
 }
 ```
+
 ```
 支持添加底部和头部的 RecyclerView
 public class WrapRecyclerView extends RecyclerView{
@@ -158,7 +157,57 @@ public class WrapRecyclerView extends RecyclerView{
     public void setAdapter(Adapter adapter) {
         // 这里做一个替换
         mWrapAdapter = new WrapRecyclerAdapter(adapter);
+        registerListener(adapter);
         super.setAdapter(mWrapAdapter);
+    }
+    
+    //监听真实adapter的数据改变
+    private void registerListener(Adapter adapter){
+       mRealAdapter.registerAdapterDataObserver(new AdapterDataObserver() {
+      @Override public void onChanged() {
+        super.onChanged();
+        if(null != mWrapAdapter){
+          mWrapAdapter.notifyDataSetChanged();
+        }
+      }
+
+      @Override public void onItemRangeChanged(int positionStart, int itemCount) {
+        super.onItemRangeChanged(positionStart, itemCount);
+        if(null != mWrapAdapter){
+          mWrapAdapter.notifyItemRangeChanged(positionStart,itemCount);
+        }
+      }
+
+      @Override
+      public void onItemRangeChanged(int positionStart, int itemCount, @Nullable Object payload) {
+        super.onItemRangeChanged(positionStart, itemCount, payload);
+        if(null != mWrapAdapter){
+          mWrapAdapter.notifyItemRangeChanged(positionStart,itemCount);
+        }
+      }
+
+      @Override public void onItemRangeInserted(int positionStart, int itemCount) {
+        super.onItemRangeInserted(positionStart, itemCount);
+        if(null != mWrapAdapter){
+          mWrapAdapter.notifyItemRangeInserted(positionStart,itemCount);
+        }
+      }
+
+      @Override public void onItemRangeRemoved(int positionStart, int itemCount) {
+        super.onItemRangeRemoved(positionStart, itemCount);
+        if(null != mWrapAdapter){
+          mWrapAdapter.notifyItemRangeRemoved(positionStart,itemCount);
+        }
+      }
+
+      @Override public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+        super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+        if(null != mWrapAdapter){
+          mWrapAdapter.notifyItemMoved(fromPosition,toPosition);
+        }
+      }
+    });
+    
     }
 
     /**
@@ -200,9 +249,71 @@ public class WrapRecyclerView extends RecyclerView{
             mWrapAdapter.removeFooterView(view);
         }
     }
+    
+    //https://github.com/XRecyclerView/XRecyclerView/blob/master/xrecyclerview/src/main/java/com/jcodecraeer/xrecyclerview/XRecyclerView.java
+    //observer逻辑分发给实际的adapter，方式dataNotify不生效
+     @Override
+    public void registerAdapterDataObserver(AdapterDataObserver observer) {
+        adapter.registerAdapterDataObserver(observer);
+    }
+     @Override
+    public void registerAdapterDataObserver(@NonNull AdapterDataObserver observer) {
+      if(null != mRealAdapter){
+        mRealAdapter.registerAdapterDataObserver(observer);
+      }
+    }
+    @Override
+    public void unregisterAdapterDataObserver(@NonNull AdapterDataObserver observer) {
+      if(null != mRealAdapter){
+        mRealAdapter.unregisterAdapterDataObserver(observer);
+      }
+    }
+    @Override
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+      if(null != mRealAdapter){
+        mRealAdapter.onViewDetachedFromWindow(holder);
+      }
+    }
+    @Override
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+      if(null != mRealAdapter){
+        mRealAdapter.onViewRecycled(holder);
+      }
+    }
+    @Override
+    public boolean onFailedToRecycleView(@NonNull RecyclerView.ViewHolder holder) {
+      if(null != mRealAdapter){
+        return mRealAdapter.onFailedToRecycleView(holder);
+      }else{
+        return  super.onFailedToRecycleView(holder);
+      }
+    }
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+      super.onAttachedToRecyclerView(recyclerView);
+      if(null != mRealAdapter){
+        mRealAdapter.onAttachedToRecyclerView(recyclerView);
+      }
+    }
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+      if(null != mRealAdapter){
+        mRealAdapter.onDetachedFromRecyclerView(recyclerView);
+      }
+    }
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+      super.onViewAttachedToWindow(holder);
+      if(null != mRealAdapter){
+        mRealAdapter.onViewAttachedToWindow(holder);
+      }
+    }
+   
 }
 ```
+
 使用
+
 ```
 // 实例化头部View
 View headerView = LayoutInflater.from(this).inflate(R.layout.layout_rc_header, mRecyclerView, false);

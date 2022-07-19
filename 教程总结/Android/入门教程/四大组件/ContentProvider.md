@@ -15,6 +15,32 @@ contentprovider是android四大组件之一的内容提供器，它主要的作�
 可以通过读取系统通讯录的联系人信息，显示在Listview中来实践这些知识。不要忘记在读取通讯录的时候，在清单文件中要加入相应的读取权限
 
 
+https://blog.csdn.net/carson_ho/article/details/76101093
+1.ContentProvider根据 URI 返回MIME类型
+getContentResolver().getType(Uri)
+MIME类型形式
+MIME类型有2种形式：
+// 形式1：单条记录  
+vnd.android.cursor.item/自定义
+// 形式2：多条记录（集合）
+vnd.android.cursor.dir/自定义
+2.查询数据
+// 通过ContentResolver 向ContentProvider中查询数据
+Cursor cursor = resolver.query(uri_user, new String[]{"_id","name"}, null, null, null);
+while (cursor.moveToNext()){
+System.out.println("query book:" + cursor.getInt(0) +" "+ cursor.getString(1));
+// 将表中数据全部输出
+}
+cursor.close();
+
+query参数的签名
+```
+query(Uri uri, String[] projection, String selection,String[] selectionArgs,String sortOrder)
+```
+
+
+
+
 自定义ContentProvider
 查看具体内容 adb shell content query --uri  content://aa/bb/userId
 内容提供者首先要做的一个事情就是将我们传递过来的Uri解析出来，确定其他程序到底想访问哪些数据。Uri的形式一般有两种：
@@ -108,6 +134,7 @@ this.getContentResolver().registerContentObserver(Uri.parse("content://sms"),tru
 Uri.parse("content://sms/inbox"), null, null, null, null);
             while (cursor.moveToNext()) {
                 StringBuilder sb = new StringBuilder();
+                //获取string 
                 sb.append("address=").append(
                         cursor.getString(cursor.getColumnIndex("address")));
                 sb.append(";subject=").append(

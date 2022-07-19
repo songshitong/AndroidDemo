@@ -1,4 +1,6 @@
 
+
+
 context.getExternalCacheDir()
 目录在/storage/emulated
 context.getCacheDir()目录在/data/data/
@@ -11,3 +13,23 @@ context.getCacheDir()目录在/data/data/
             cachePath = context.getCacheDir().getPath();
         }
 ```  
+
+
+文件监听  
+//2022-07-06先监听后创建目录不生效的。。。。  
+```
+ observer = new FileObserver(BleManager.getInstance("/d') {
+      @Override public void onEvent(int event, @Nullable String path) {
+        switch (event){
+            case FileObserver.CREATE:
+              Logger.i(TAG+"文件改变");
+              ...
+              break;
+          }
+      }
+    };
+    observer.startWatching();
+        
+    observer.stopWatching();
+    
+```

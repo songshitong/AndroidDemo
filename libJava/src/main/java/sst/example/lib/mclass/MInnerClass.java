@@ -32,6 +32,9 @@ public class MInnerClass {
 
         //实现一个接口
         IInnerClassInterface iici = new IInnerClassInterface() {
+          @Override public void thisMethod() {
+
+          }
         };
 
     }
@@ -92,6 +95,6 @@ public class MInnerClass {
     }
 
    interface IInnerClassInterface{
-
+      public void thisMethod();
    }
 }

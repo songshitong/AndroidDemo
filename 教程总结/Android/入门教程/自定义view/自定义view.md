@@ -1,4 +1,9 @@
 
+
+view截图
+https://blog.csdn.net/lou_liang/article/details/118296761
+
+
 默认情况下，View没有启用这个优化标记位，但是ViewGroup会默认启用这个优化标记位。
 当我们的自定义控件继承于ViewGroup并且本身不具备绘制功能时，就可以开启这个标记位从而便于系统进行后续的优化。
 当明确知道一个ViewGroup需要通过onDraw来绘制内容时，我们需要显示地关闭WILL_NOT_DRAW这个标记位。
@@ -144,6 +149,12 @@ mTypedArray.recycle();
 1 新建view_customtitle.xml，添加多个控件和布局
 2 构造器中使用 LayoutInflater.from(context).inflate(R.layout.view_customtitle, this, true);解析布局
 3 findViewById修改子控件属性，然后可以使用了
+
+
+动态修改view的大小
+ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+lp.height = dpToPx(100)
+holder.itemView.setLayoutParams(lp);
 
 
 常用方法  https://www.jianshu.com/p/5ec0f278e0a3

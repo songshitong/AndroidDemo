@@ -10,6 +10,7 @@ retrofit的优点
 4.使用大量注解来简化请求，Retrofit将okhttp请求抽象成java接口，使用注解来配置和描述网络请求参数
 5.支持同步、异步、Rxjava
 6.rest风格
+7.支持网络请求取消 //个人
 
 Retrofit,一个远近闻名的网络框架,它是由Square公司开源的.Square公司,是我们的老熟人了,很多框架都是他开源的,比如OkHttp,picasso,leakcanary等等.
   他们公司的很多开源库,几乎已经成为现在开发Android APP的标配.

@@ -1,7 +1,11 @@
 
+汽车之家AI工牌  2022-07-02
+测试10分钟2.6M左右
+
 https://baike.baidu.com/item/OGG/1790364
 Ogg全称是OGGVobis(oggVorbis)是一种音频压缩格式，类似于MP3等的音乐格式。Ogg是完全免费、开放和没有专利限制的。OggVorbis文件的扩展名是".ogg"。
 Ogg文件格式可以不断地进行大小和音质的改良，而不影响旧有的编码器或播放器。
+
 优点与缺点
 优点1：Ogg Vorbis的音质和MP3不相上下，但无法和FLAC比。
 优点2：Ogg Vorbis支持类似于MP3的ID3信息

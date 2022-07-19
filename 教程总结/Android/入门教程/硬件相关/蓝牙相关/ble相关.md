@@ -181,11 +181,16 @@ bluetoothGatt.setCharacteristicNotification(characteristic, enabled);
 ...
 BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+//有的使用BluetoothGattDescriptor.ENABLE_INDICATION_VALUE这个特征
 bluetoothGatt.writeDescriptor(descriptor);
 ```
 为某个特征启用通知后，如果远程设备上的特征发生更改，则会触发 onCharacteristicChanged() 回调：
 回调给BluetoothGattCallback
 7.关闭客户端应用
+https://blog.csdn.net/LoveDou0816/article/details/98508612
+一般都是先调用disconnect()方法，此时如果断开成功，会回调onConnectionStateChange()方法，在这个方法中我们再调用close()释放资源。但如果我们使用disconnect()方法后立即调用close()，
+会导致无法回调onConnectionStateChange()方法。因此我们需要在合适的地方使用close()释放资源。
+
 当应用完成对 BLE 设备的使用后，其应调用 close()，以便系统可以适当地释放资源
 ```
 public void close() {
@@ -199,23 +204,70 @@ public void close() {
 9.给蓝牙设备发送命令
 ```
  boolean b = writeCharacteristic.setValue(bytes);
- bluetoothGatt.writeCharacteristic(writeCharacteristic);
+ //极端情况存在写入失败
+ boolean result = bluetoothGatt.writeCharacteristic(writeCharacteristic);
+```
+发送无响应的配置
+```
+characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
 ```
 
 
-https://www.jianshu.com/p/b2d35d4c2fa3
-android 12适配
-BLUETOOTH 和 BLUETOOTH_ADMIN权限已经被舍弃,
-被3个新权限代替啦BLUETOOTH_CONNECT, BLUETOOTH_SCAN, BLUETOOTH_ADVERTISE.
-ACCESS_FINE_LOCATION权限要根据需求,不是必须添加的啦
+自动重连
 ```
-<uses-permission android:name="android.permission.BLUETOOTH"
-                     android:maxSdkVersion="30" />
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
-                     android:maxSdkVersion="30" />
+ public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+        super.onConnectionStateChange(gatt, status, newState);
+        //newState可能是BluetoothGatt.STATE_CONNECTING  
+        //status
+        switch (newState) {
+          case BluetoothProfile.STATE_CONNECTED://连接成功
+            gatt.discoverServices();
+            break;
+          case BluetoothProfile.STATE_DISCONNECTED://断开连接
+            refreshDeviceCache();
+            //先关闭本次，防止重连后多次回调
+            close();
+            //开始重连的逻辑
+            this.bluetoothAdapter.startLeScan(new UUID[] { SERVICE_UUID }, this.leScanCallback);
+            break;
+          default:
+            break;
+        }
+      }
+
+      public void close() {
+        if(null != bluetooth4Adapter){
+          bluetooth4Adapter.cancelDiscovery();
+        }
+        if (bluetoothGatt != null) {
+          bluetoothGatt.disconnect();
+          bluetoothGatt.close();
+        }
+      }
+      
+/**
+   * Clears the internal cache and forces a refresh of the services from the	 * remote device.
+   */
+  public static boolean refreshDeviceCache(BluetoothGatt mBluetoothGatt) {
+    if (mBluetoothGatt != null) {
+      try {
+        BluetoothGatt localBluetoothGatt = mBluetoothGatt;
+        Method localMethod = localBluetoothGatt.getClass().getMethod("refresh", new Class[0]);
+        if (localMethod != null) {
+          boolean bool =
+              ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
+          return bool;
+        }
+      } catch (Exception localException) {
+        Log.i("Config", "An exception occured while refreshing device");
+      }
+    }
+    return false;
+  }      
 ```
-
-
+重连后多次回调问题
+https://stackoverflow.com/questions/33274009/how-to-prevent-bluetoothgattcallback-from-being-executed-multiple-times-at-a-tim
+注意localBluetoothGatt的关闭
 
 直接扫描对应的设备
 this.bluetooth4Adapter.startLeScan(new UUID[]{SERVICE_UUID}, this.leScanCallback);

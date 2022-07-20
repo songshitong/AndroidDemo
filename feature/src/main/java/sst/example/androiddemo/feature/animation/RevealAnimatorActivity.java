@@ -1,13 +1,10 @@
-package sst.example.androiddemo.feature.Animation;
+package sst.example.androiddemo.feature.animation;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.transition.Explode;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;

@@ -141,6 +141,11 @@ TimeInterpolator（时间插值器）
 LinearInterpolator（线性插值器）：匀速动画。
 AccelerateDecelerateInterpolator（加速减速插值器）：动画两头慢，中间快。
 DecelerateInterpolator（减速插值器）：动画越来越慢。
+Anticipate Interpolator    先往回，然后前进
+Overshoot Interpolator     冲出去
+Anticipate Overshoot Interpolator
+Bounce Interpolator 弹跳插值器
+Cycle Interpolator(周期插值器)   对于缩放动画：先放大->缩小 -> 放大 ->恢复原来 
 
 TypeEvaluator（类型估值算法，即估值器）：    
 作用：根据当前属性改变的百分比来计算改变后的属性值。

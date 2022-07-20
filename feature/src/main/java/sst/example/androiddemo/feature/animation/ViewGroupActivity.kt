@@ -1,4 +1,4 @@
-package sst.example.androiddemo.feature.Animation
+package sst.example.androiddemo.feature.animation
 
 import android.content.Context
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package sst.example.androiddemo.feature.Animation.activity;
+package sst.example.androiddemo.feature.animation.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 

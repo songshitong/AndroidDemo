@@ -1,4 +1,4 @@
-package sst.example.androiddemo.feature.Animation.evaluator;
+package sst.example.androiddemo.feature.animation.evaluator;
 
 import static android.graphics.Color.BLUE;
 import static android.graphics.Color.RED;
@@ -7,8 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
-import android.animation.PointFEvaluator;
-import android.animation.RectEvaluator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Point;

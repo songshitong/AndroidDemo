@@ -21,17 +21,18 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import sst.example.androiddemo.feature.Animation.LayoutAnimationActivity
-import sst.example.androiddemo.feature.Animation.RevealAnimatorActivity
-import sst.example.androiddemo.feature.Animation.activity.ActivityAnimation
-import sst.example.androiddemo.feature.Animation.activity.ActivityTransition
-import sst.example.androiddemo.feature.Animation.dynamicanimation.DynamicAnimaitonActivity
-import sst.example.androiddemo.feature.Animation.evaluator.TypeEvaluatorActivity
+import sst.example.androiddemo.feature.animation.LayoutAnimationActivity
+import sst.example.androiddemo.feature.animation.RevealAnimatorActivity
+import sst.example.androiddemo.feature.animation.activity.ActivityAnimation
+import sst.example.androiddemo.feature.animation.activity.ActivityTransition
+import sst.example.androiddemo.feature.animation.dynamicanimation.DynamicAnimaitonActivity
+import sst.example.androiddemo.feature.animation.evaluator.TypeEvaluatorActivity
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
 import sst.example.androiddemo.feature.activity.launchmode.LaunchActivity
 import sst.example.androiddemo.feature.activity.scrollNested.ScrollNestedActivity
 import sst.example.androiddemo.feature.activity.testAnr.TestAnrActivity
+import sst.example.androiddemo.feature.animation.KeyFrameActivity
 import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
@@ -379,6 +380,10 @@ class  MainActivity : AppCompatActivity()  {
             startActivity(Intent(this,
                 ActivityTransition::class.java),ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
         }
+      ActivityKeyFrame.setOnClickListener {
+        startActivity(Intent(this,
+          KeyFrameActivity::class.java))
+      }
         //测试livedata连续调用
         val ld = MutableLiveData<String>()
         ld.observe(this) {

@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">AndroidDemo</string>
-    <string name="title_activity_sticky">StickyActivity</string>
+  <string name="app_name">AndroidDemo</string>
+  <string name="title_activity_sticky">StickyActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+  <!-- TODO: Remove or change this placeholder text -->
+  <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

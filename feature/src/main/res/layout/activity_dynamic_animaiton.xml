@@ -5,7 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Animation.dynamicanimation.DynamicAnimaitonActivity">
+        tools:context=".animation.dynamicanimation.DynamicAnimaitonActivity">
         <Button
                 android:id="@+id/startSpringBtn"
                 app:layout_constraintTop_toTopOf="parent"

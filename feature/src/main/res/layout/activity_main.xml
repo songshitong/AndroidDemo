@@ -233,5 +233,9 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="Activity Transition"
             />
+    <Button  android:id="@+id/ActivityKeyFrame"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Key Frame Animator"
+        />
 </LinearLayout>
 </ScrollView>

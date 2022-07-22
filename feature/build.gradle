@@ -34,7 +34,10 @@ android {
 //        }
 //    }
 
-
+//    build出错不停止
+    lintOptions {
+        abortOnError false
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -119,5 +122,10 @@ task emptyTask() {
 task getGitVersion(dependsOn: 'getIPConfig') {
     def out = tasks.getIPConfig.output()
     println("out is " + out)
-
 }
+
+task beforeBuild{
+    println "this is first"
+}
+
+build.dependsOn beforeBuild

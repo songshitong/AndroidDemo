@@ -147,6 +147,9 @@ Google后来迁移到了OpenJDK   ojluni是OpenJDK,java.lang/java.util/java.net/
 /libcore/ojluni/src/main/java/java/lang/Thread.java
 https://www.zhihu.com/question/39010777
 
+https://juejin.cn/post/6850418111439437832
+（小知识：Android Java API迁移）,查看libcore/ojluni/src/main/native/Android.bp：
+
 
 
 aosp与内核的关系

@@ -138,3 +138,43 @@ taskAffinity属性呢，可以简单的理解为任务相关性。
   这两种启动模式下不会创建新的task（如果不指定即默认值，即包名）
 <activity  android:taskAffinity="com.demo.singletop"/>
 
+
+https://www.jianshu.com/p/388dbdbcc197
+一个完全透明的Activity有很多用处，比如在应用启动的时候，可以用它处理根据用户是否登录的状态来跳转相应界面的情况，实际上微信启动的时候就是做了这种效果、或者在Server检测版本更新的时候弹出它来显示对话框
+不展示的activity
+android:theme="@android:style/Theme.NoDisplay"
+透明的activity
+android:theme="@android:style/Theme.Translucent"
+自己定义theme
+```
+<style name="TranslucentTheme">
+   <item name="android:windowBackground">@android:color/transparent</item>
+   <item name="android:colorBackgroundCacheHint">@null</item>
+   <item name="android:windowIsTranslucent">true</item>
+   <item name="android:windowAnimationStyle">@android:style/Animation</item>
+   <item name="android:windowNoTitle">true</item>
+   <item name="android:windowContentOverlay">@null</item>
+</style>
+```
+1像素activity https://www.jianshu.com/p/ef4a9531bc15
+```
+public class OnePiexlActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //设置1像素
+        Window window = getWindow();
+        window.setGravity(Gravity.LEFT | Gravity.TOP);
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.x = 0;
+        params.y = 0;
+        params.height = 1;
+        params.width = 1;
+        window.setAttributes(params);  
+    }
+}
+//设置透明主题
+    <style name="OnePixelActivity" parent="android:Theme.Holo.Light.NoActionBar">//无标题
+        <item name="android:windowIsTranslucent">true</item>//透明
+    </style>
+```

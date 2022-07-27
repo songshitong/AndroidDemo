@@ -10,7 +10,7 @@ class RippleDrawableActivity : AppCompatActivity() {
         setContentView(R.layout.activity_ripple_drawable)
         //ripple标签的使用
 //        https://www.jianshu.com/p/f98dfa2027de
-//        1 没有边界的Ripple（Ripple With No Mask）
+//        1 没有边界的Ripple（Ripple With No Mask） mask按下显示
 //        <ripple>标签
 //        Ripple标签，即对应一个RippleDrawable，当它被设置为一个控件的background属性时，控件在按下时，即会显示水波效果
 //        <ripple xmlns:android="http://schemas.android.com/apk/res/android"
@@ -32,13 +32,22 @@ class RippleDrawableActivity : AppCompatActivity() {
 //        <item android:id="@android:id/mask"
 //        android:drawable="@drawable/icon_folder_r" />
 
-//         4用设定形状作为Mask的Ripple（Ripple With Shape Mask）
+//         4用设定形状作为Mask的Ripple（Ripple With Shape Mask）  mask按下才显示
 //        如果在一个ripple标签中，添加一个item，其id为@android:id/mask，drawable属性为引用的形状(shape) ，
 //        则水波效果会限定在shape对应的区域内部。
 //        <item
 //        android:id="@android:id/mask"
 //        android:drawable="@drawable/shape"/>
-
+          //常用的写法 显示蓝色，圆角，按下灰色的水波纹
+        // <ripple xmlns:android="http://schemas.android.com/apk/res/android"
+        // android:color="@android:color/darker_gray">
+        // <item >
+        // <shape android:shape="rectangle">
+        // <gradient android:type="linear"  android:startColor="#ff206cfe" android:endColor="#ff4c88ff" android:angle="270" />
+        // <corners android:radius="40dp" />
+        // </shape>
+        // </item>
+        // </ripple>
 
 //          5 搭配selector作为Ripple（Ripple With Selector）
 //        如果在一个ripple标签中，添加一个item，在item的内部写上<selector>标签，那么这个RippleDrawable在按下的时候，

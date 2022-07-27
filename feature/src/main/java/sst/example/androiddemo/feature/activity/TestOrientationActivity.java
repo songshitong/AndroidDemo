@@ -1,5 +1,7 @@
 package sst.example.androiddemo.feature.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -12,9 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import sst.example.androiddemo.feature.R;
 
-public class NormalActivity extends AppCompatActivity  {
+public class TestOrientationActivity extends AppCompatActivity  {
     private static final String TAG = "NormalActivity";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,13 @@ public class NormalActivity extends AppCompatActivity  {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             }
         });
+        findViewById(R.id.landscape_btn).setOnClickListener(v -> startActivity(new Intent(this,LandscapeActivity.class)));
+        //NormalActivity先切换横屏，然后跳转到LandscapeActivity   LandscapeActivity会竖屏进入，然后切换为横屏
+        //解决复写LandscapeActivity的进入动画
+
+        //横竖屏会改变方向，影响下一个activity
+        //NormalActivity竖屏  LandscapeActivity从右向左进入
+        //NormalActivity横屏  LandscapeActivity从底部向上进入
     }
 
     @Override

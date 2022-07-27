@@ -12,14 +12,18 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/animation_drawable.xml" value="0.1205" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/layer_drawable.xml" value="0.2785" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/ripple_drawable.xml" value="0.1455" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/ripple_with_no_mask.xml" value="0.1305" />
-        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/shape_drawable.xml" value="0.1635" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/shape_drawable.xml" value="0.2785" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_constrain_layout.xml" value="0.291213768115942" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_drawable.xml" value="0.1" />
-        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_key_frame.xml" value="0.1" />
-        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_view_property_animator.xml" value="0.11956521739130435" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_key_frame.xml" value="0.30520833333333336" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_landscape.xml" value="0.2911458333333333" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_normal.xml" value="0.309375" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_view_property_animator.xml" value="0.30520833333333336" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/toast_custom_bg.xml" value="0.30520833333333336" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/toast_custom_layout.xml" value="0.30520833333333336" />
         <entry key="feature/src/main/res/drawable/animation_drawable.xml" value="0.2255" />
         <entry key="feature/src/main/res/layout/activity_anr.xml" value="0.22916666666666666" />
         <entry key="feature/src/main/res/layout/activity_big_picture.xml" value="0.21979166666666666" />

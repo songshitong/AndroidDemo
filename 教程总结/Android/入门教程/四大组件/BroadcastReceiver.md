@@ -2,7 +2,9 @@ https://www.jianshu.com/p/51aaa65d5d25
 普通广播（Normal broadcasts）
 普通广播是完全异步的，可以在同一时刻（逻辑上）被所有接收者接收到，消息传递的效率比较高，但缺点是：接收者不能将处理结果传递给下一个接收者，
   并且无法终止广播Intent的传播
-Context.sendBroadcast(new Intent("test"))  发送的是普通广播，所有订阅者都有机会获得并进行处理
+Intent intent = new Intent()
+intent.setAction();
+Context.sendBroadcast(intent)  发送的是普通广播，所有订阅者都有机会获得并进行处理
 
 有序广播（Ordered broadcasts）
 有序广播是按照接收者声明的优先级别（声明在intent-filter元素的android:priority属性中，数越大优先级别越高,取值范围:-1000到1000。
@@ -128,12 +130,4 @@ public class LocalReceiver extends BroadcastReceiver {
 }
 LocalReceiver localReceiver = new LocalReceiver();
 
-//2. 注册广播
-LocalBroadcastManager.getInstance(context)
-             .registerReceiver(localReceiver, new IntentFilter(“test”));
-//4. 发送广播
-LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("test"));
-//5. 取消注册广播
-LocalBroadcastManager.getInstance(context).unregisterReceiver(localReceiver);
-```
 

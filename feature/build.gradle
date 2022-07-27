@@ -51,13 +51,15 @@ android {
 //       exclude '重复文件'
     }
 
-//  使用子module的libs的文件
-//    flatDir {
-//        dirs project(':rammus').file('libs')
-//    }
-//    flatDir {
-//        dirs 'libs','../rammus/libs'
-//    }
+    //  使用子module的libs的文件与下面的fileTree 配合使用
+    // repositories {
+    //    flatDir {
+    //        dirs project(':rammus').file('libs')
+    //    }
+    //    flatDir {
+    //        dirs 'libs','../rammus/libs'
+    //        }
+//     }
 }
 
 dependencies {

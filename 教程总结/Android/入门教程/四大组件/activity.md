@@ -29,7 +29,8 @@ onDestroy 与下一个activity的关系
 弹出dialog        没有生命周期变化
 被其他activity覆盖其上DialogActivity    onPause      DialogActivity消失 onResume
 
-锁屏：onPause,onStop,停滞状态               解锁屏： onRestart,onStart,onResume
+
+锁屏：onPause,onStop,停滞状态               解锁屏： onRestart,onStart,onResume  不可见的activity也会触发
 
 
 
@@ -139,12 +140,37 @@ taskAffinity属性呢，可以简单的理解为任务相关性。
 <activity  android:taskAffinity="com.demo.singletop"/>
 
 
+
+https://stackoverflow.com/questions/3588682/is-it-normal-for-the-activity-oncreate-method-to-be-called-multiple-times
+activity创建两次
+可能原因 onCreate后调用设置主题
+横竖屏切换  android:configChanges="orientation|keyboardHidden"
+```
+@Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.splash_screen);
+        if(savedInstanceState == null){
+            // everything else that doesn't update UI
+        }
+    }
+```
+
 https://www.jianshu.com/p/388dbdbcc197
 一个完全透明的Activity有很多用处，比如在应用启动的时候，可以用它处理根据用户是否登录的状态来跳转相应界面的情况，实际上微信启动的时候就是做了这种效果、或者在Server检测版本更新的时候弹出它来显示对话框
 不展示的activity
 android:theme="@android:style/Theme.NoDisplay"
 透明的activity
 android:theme="@android:style/Theme.Translucent"
+android自带透明主题的定义
+```
+    <style name="Theme.Translucent">
+        <item name="windowBackground">@color/transparent</item>
+        <item name="colorBackgroundCacheHint">@null</item>
+        <item name="windowIsTranslucent">true</item>
+        <item name="windowAnimationStyle">@style/Animation</item>
+    </style>
+```
 自己定义theme
 ```
 <style name="TranslucentTheme">
@@ -156,6 +182,14 @@ android:theme="@android:style/Theme.Translucent"
    <item name="android:windowContentOverlay">@null</item>
 </style>
 ```
+透明主题在android8.0强制横竖屏会闪退 需要动态修改横竖屏  只有全屏不透明的activity可以设置orientation
+```
+ if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }
+```
+
+
 1像素activity https://www.jianshu.com/p/ef4a9531bc15
 ```
 public class OnePiexlActivity extends Activity {
@@ -177,4 +211,29 @@ public class OnePiexlActivity extends Activity {
     <style name="OnePixelActivity" parent="android:Theme.Holo.Light.NoActionBar">//无标题
         <item name="android:windowIsTranslucent">true</item>//透明
     </style>
+```
+
+
+https://blog.csdn.net/haiping1224746757/article/details/109066151
+android.intent.action.MAIN  // 决定应用程序最先启动的Activity
+android.intent.category.LAUNCHER // 决定应用程序是否显示在程序列表里
+设置多个桌面图标
+```
+ <activity android:name="com.camera.demo.CameraActivity"
+        android:label="@string/app_name">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+
+    <activity android:name="com.camera.demo.Camera2Activity"
+        android:icon="@mipmap/ic_launcher" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
 ```

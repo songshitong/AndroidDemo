@@ -16,6 +16,49 @@ service
    2，manifest.xml文件中配置service
    3，使用context的startService(Intent)方法启动service
    4，不在使用时，调用stopService(Intent)方法停止服务
+```
+public class SimpleService extends Service {
+
+    /**
+     * 绑定服务时才会调用
+     * 必须要实现的方法  
+     */
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    /**
+     * 首次创建服务时，系统将调用此方法来执行一次性设置程序（在调用 onStartCommand() 或 onBind() 之前）。
+     * 如果服务已在运行，则不会调用此方法。该方法只被调用一次
+     */
+    @Override
+    public void onCreate() {
+        System.out.println("onCreate invoke");
+        super.onCreate();
+    }
+
+    /**
+     * 每次通过startService()方法启动Service时都会被回调。
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        System.out.println("onStartCommand invoke");
+        return super.onStartCommand(intent, flags, startId);
+    }
+    @Override
+    public void onDestroy() {
+        System.out.println("onDestroy invoke");
+        super.onDestroy();
+    }
+}
+xml  enabled为false，service不启动了
+<service
+        android:name="com.cubic.vicar.activity.AHTencentLiveService"
+        android:enabled="true"
+        android:exported="false" />
+```
    
    生命周期
    onCreate() -- > onStartCommand() -- > onDestroy()   onStartCommand调用onStart

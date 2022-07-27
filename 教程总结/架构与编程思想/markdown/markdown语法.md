@@ -1,3 +1,9 @@
+
+编辑器
+https://github.com/marktext/marktext
+https://github.com/benweet/stackedit
+
+
 http://xianbai.me/learn-md/article/syntax/links.html  
 换行：敲个空格，再按回车（两行之间有一个空行，没有空行直接使用一个空格）
 如果需要在段落内加入换行（\<br>）：
@@ -24,6 +30,13 @@ http://xianbai.me/learn-md/article/syntax/links.html
 content!!!
 </code></pre>
 </details>
-   
+
+
+代码函数
+`printf()`函数
+代码段  
+```
+Student a;
+```
 
 todo 寻找帮助写Markdown的脚本或工具

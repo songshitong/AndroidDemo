@@ -1,9 +1,8 @@
 
-
-
-
-
 ```
+//直接使用
+toJson(）
+
 //方式1
 Gson gson = new Gson(); // Or use new GsonBuilder().create();
    MyType target = new MyType();
@@ -19,6 +18,7 @@ Type listType = new TypeToken<List<String>>() {}.getType();
    String json = gson.toJson(target, listType);
    //反序列化
    List<String> target2 = gson.fromJson(json, listType);
+   
 ```
 
 

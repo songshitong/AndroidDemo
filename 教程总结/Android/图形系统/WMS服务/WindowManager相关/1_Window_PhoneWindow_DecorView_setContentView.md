@@ -40,16 +40,14 @@ class Window {
 
 
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/com/android/internal/policy/PhoneWindow.java#mContentParent
-addContentView  在当前内容的基础上添加新的view覆盖在上面
+addContentView  在当前内容的基础上添加新的view覆盖在上面  添加后系统方法不支持移除
 最终通过mContentParent.addView，添加到根布局
 ```
  public void addContentView(View view, ViewGroup.LayoutParams params) {
         if (mContentParent == null) {
             installDecor();
         }
-        if (hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
-            Log.v(TAG, "addContentView does not support content transitions");
-        }
+        ...
         mContentParent.addView(view, params);
         mContentParent.requestApplyInsets();
         final Callback cb = getCallback();

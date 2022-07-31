@@ -6,7 +6,8 @@ buildscript {
     repositories {
         google()
         maven { url 'https://jitpack.io' }
-//        自定义插件
+
+        //        自定义插件
 //        maven {
 //            url uri('./repos') //指定本地maven的路径，在项目根目录下
 //        }
@@ -34,3 +35,4 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+

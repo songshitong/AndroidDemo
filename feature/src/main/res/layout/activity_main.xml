@@ -237,5 +237,9 @@
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:text="Key Frame Animator"
         />
+    <Button  android:id="@+id/dialogFragmentBtn"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="dialog fragment"
+        />
 </LinearLayout>
 </ScrollView>

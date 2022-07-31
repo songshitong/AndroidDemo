@@ -385,6 +385,10 @@ class  MainActivity : AppCompatActivity()  {
         startActivity(Intent(this,
           KeyFrameActivity::class.java))
       }
+      dialogFragmentBtn.setOnClickListener {
+        startActivity(Intent(this,
+          DialogFragmentActivity::class.java))
+      }
         //测试livedata连续调用
         val ld = MutableLiveData<String>()
         ld.observe(this) {

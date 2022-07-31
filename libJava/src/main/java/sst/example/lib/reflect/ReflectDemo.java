@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sst.example.lib.metadata.MyAnnotation;
-///修改类的属性的访问限制，继承重写，反射+包装类  todo json序列化原理  私有属性没有getset方法，没法序列化，通过反射获取然后在进行序列化
+///修改类的属性的访
+// 问限制，继承重写，反射+包装类  todo json序列化原理  私有属性没有getset方法，没法序列化，通过反射获取然后在进行序列化
 
 ///todo 默认default方法是否可以被子类调用，重写 几种访问权限
 
@@ -434,7 +435,28 @@ public class ReflectDemo {
         } catch (ClassNotFoundException e) {
             System.out.println("class not found "+e.toString());
         }
+
+        ReflectDemo reflectDemo = new ReflectDemo();
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName("sst.example.lib.reflect.ReflectDemo");
+            Method methodShow = clazz.getMethod("show", int.class);
+            methodShow.invoke(null, 0);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
+
+    public static void show(int i) {
+        System.out.println("start show========");
+        new Exception("#" + i).printStackTrace();
+    }
+
+
 
     public static Class getClass(String className) throws ClassNotFoundException {
         if("int" .equals(className)) return int .class;

@@ -5,7 +5,7 @@ LayoutInflater每个activity一个
 xml解析 XmlResourceParser
 反射  constructor.newInstance
 优先遍历的目录 android/widget,android/webkit,android/app
-
+LayoutParams 在root不为空时生成
 
 ```
 LayoutInflater.from(mContext).inflate(R.layout.item, null);

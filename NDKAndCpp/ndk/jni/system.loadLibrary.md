@@ -1,6 +1,31 @@
-todo 完成
+android6.0流程
+```
+System.loadLibrary()
+  Runtime.loadLibrary()
+    Runtime.doLoad()
+      Runtime_nativeLoad()
+          LoadNativeLibrary()
+              dlopen()
+              dlsym()
+              JNI_OnLoad()
+```
+LoadNativeLibrary()方法，该方法主要操作：
+通过dlopen打开动态共享库;
+通过dlsym获取JNI_OnLoad符号所对应的方法；
+调用该加载库中的JNI_OnLoad()方法。
+
+android12流程
+System.loadLibrary整体流程：
+1 libcore中的Java代码提供了System.loadLibrary这个API，并进行简单封装后，JNI转调libcore。此处Java代码中主要是一些业务逻辑，如：so的查找路径的梳理等
+2 libcore中的Native代码仍然是简单封装，然后转调libart
+3 libart主要是为了承载上面的Java，然后转调libdl。从分析来看，仍然不涉及so加载的核心
+4 libdl来到了bionic中，其中逐步解析so文件格式，然后按照Segment将so mmap到进程的虚拟内存空间中，至此才结束整个流程
+
+
 
 http://gityuan.com/2017/03/26/load_library/    android_12.0.0_r3
+https://blog.csdn.net/xt_xiaotian/article/details/122296084?spm=1001.2014.3001.5502
+
 C++动态库加载
 所需要的头文件的#include, 最为核心的方法如下:
 ```
@@ -18,7 +43,6 @@ System.load("/data/local/tmp/libgityuan_jni.so");
 System.loadLibrary("gityuan_jni");
 ```
 以上两个方法都用于加载动态库，两者的区别如下：
-
 加载的路径不同：System.load(String filename)是指定动态库的完整路径名；而System.loadLibrary(String libname)则只会从指定lib目录下查找，并加上lib前缀和.so后缀；
 自动加载库的依赖库的不同：System.load(String filename)不会自动加载依赖库；而System.loadLibrary(String libname)会自动加载依赖库。
 
@@ -132,6 +156,7 @@ public String findLibrary(String name) {
           //系统目录的native库
           this.systemNativeLibraryDirectories =
                   splitPaths(System.getProperty("java.library.path"), true);
+          //getAllNativeLibraryDirectories()是将nativeLibraryDirectories和systemNativeLibraryDirectories添加到allNativeLibraryDirectories        
           //记录所有的Native动态库        
           this.nativeLibraryPathElements = makePathElements(getAllNativeLibraryDirectories());
             ....
@@ -155,7 +180,15 @@ public String findLibrary(String name) {
 /data/app/[packagename]-1/lib/arm64
 /vendor/lib64
 /system/lib64
-
+加载so是先查找App路径下，然后再查找系统路径。通过前缀，也能发现，支持从zip文件base.apk中直接加载so(android12是支持的)
+博主的目录示意
+```
+"directory "/data/app/~~pgatC4H9zh6_9M5Okay-PA==/com.huchao.mysystemloadlibrary-R-Bnf1LWAGqkpWIltJG6_w==/lib/arm64""
+"zip file "/data/app/~~pgatC4H9zh6_9M5Okay-PA==/com.huchao.mysystemloadlibrary-R-Bnf1LWAGqkpWIltJG6_w==/base.apk", dir "lib/arm64-v8a""
+"directory "/system/lib64""
+"directory "/system/system_ext/lib64""
+"directory "/system/product/lib64""
+```
 
 System.mapLibraryName  是个native方法
 /libcore/ojluni/src/main/native/System.c
@@ -528,3 +561,13 @@ bool ElfReader::Load(address_space_params* address_space) {
     return did_load_;
   }
 ```
+ReserveAddressSpace将通过mmap申请足够大的匿名虚拟内存，以备后续加载使用
+LoadSegments() 通过mmap64将so中的所有Segment就都mmap到虚拟内存中
+接下来便是设置pre-link，global group等操作
+
+
+System.loadLibrary整体流程：
+1 libcore中的Java代码提供了System.loadLibrary这个API，并进行简单封装后，JNI转调libcore。此处Java代码中主要是一些业务逻辑，如：so的查找路径的梳理等
+2 libcore中的Native代码仍然是简单封装，然后转调libart
+3 libart主要是为了承载上面的Java，然后转调libdl。从分析来看，仍然不涉及so加载的核心
+4 libdl来到了bionic中，其中逐步解析so文件格式，然后按照Segment将so mmap到进程的虚拟内存空间中，至此才结束整个流程

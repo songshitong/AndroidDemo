@@ -180,6 +180,12 @@ WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_
 //WindowManager wm = this.getWindowManager();
 int width = wm.getDefaultDisplay().getWidth();
 int height = wm.getDefaultDisplay().getHeight();
+//android 11以后
+wm.getCurrentWindowMetrics().getBounds().width()
+wm.getCurrentWindowMetrics().getBounds().height()
+//
+DisplayMetrics dm = new DisplayMetrics();
+//dialog.getWindow().getWindowManager().getDefaultDisplay().getMetrics(dm);
 
 从父view中移除，加入到父view的顶端，最后一个绘制
 View.bringToFront

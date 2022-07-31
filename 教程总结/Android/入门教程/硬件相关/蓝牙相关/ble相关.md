@@ -47,6 +47,15 @@ if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
     context.startActivity(enableBtIntent);
     //startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+    //onActivityResult后进行Ble设备查找scanLeDevice
+     //打开蓝牙后自动链接设备 用户可能点击打开，但是只有权限页面打开有回调，点击确定取消没有回调
+     //有的手机例如小米，在权限页面打开后返回ResultCode为0(result cancel)
+              AHTimeUtil.retryTask(() -> {
+                if(bluetooth4Adapter.isEnabled()&& !isDeviceConnect){
+                  startLeScan();
+                }
+              },10,0,3000);
+    
 }
 ```
 3.查找 BLE 设备

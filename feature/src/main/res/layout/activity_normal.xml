@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activity.NormalActivity">
+        tools:context=".activity.TestOrientationActivity">
     <TextView
             android:id="@+id/normal_text"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -21,5 +21,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="change orientation"/>
-
+    <Button
+        android:id="@+id/landscape_btn"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/normal_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="to landscape"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

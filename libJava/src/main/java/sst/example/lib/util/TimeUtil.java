@@ -5,6 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author: songshitong
@@ -15,6 +17,8 @@ public class TimeUtil {
   private static final int HOUR_TO_MS = 60 * 60 * 1000;
   private static final int MINUTE_TO_MS = 60 * 1000;
   private static final int SECOND_TO_MS = 1000;
+
+
 
   //返回当前时间 20220616162104
   public static String getCurrentTime() {
@@ -84,6 +88,8 @@ public class TimeUtil {
     return sd;
   }
 
+
+
   public static void main(String[] args) {
     System.out.println(getCurrentTime());
     System.out.println("====");
@@ -92,5 +98,7 @@ public class TimeUtil {
     System.out.println(formatDuration2HHMMSS(60*60*1000));
     System.out.println("======");
     System.out.println("格式化时间戳: "+formatTimeStamp(System.currentTimeMillis()));
+
+
   }
 }

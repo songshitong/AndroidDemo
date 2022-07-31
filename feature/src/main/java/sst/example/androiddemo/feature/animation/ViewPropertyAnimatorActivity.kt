@@ -7,17 +7,21 @@ import sst.example.androiddemo.feature.R
 
 class ViewPropertyAnimatorActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_view_property_animator)
-        //z 轴的变化 比较两张图片
-//        todo自定义动画 animation
-        btn_view_property_animator.setOnClickListener {
-            btn_view_property_animator.animate().let {
-                it.duration = 2000
-                it.translationX(200f)
-                it.start()
-            }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_view_property_animator)
+
+    btn_view_property_animator.setOnClickListener {
+      btn_view_property_animator.let { button ->
+        button.alpha = 0.3f //设置开始alpha
+        button.translationX=100f
+        button.animate().let {
+          it.duration = 2000
+          it.translationX(200f)
+          it.alpha(1f)//从当前alpha变为a
+          it.start()
         }
+      }
     }
+  }
 }

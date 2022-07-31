@@ -30,6 +30,12 @@ class MObject {
         fun main(args: Array<String>) {
             //调用
             MObject.Factory.create()
+
+            //代替匿名内部类
+            // mAdapter!!.setOnItemClickListener(object : OnItemClickListener<String>{
+            //     override fun onItemClick(viewHolder: ViewHolder?, data: String?, position: Int){
+            //     }
+            // })
         }
     }
     //代码编译

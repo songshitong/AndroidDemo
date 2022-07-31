@@ -43,14 +43,14 @@ valueAnim.addListener(new AnimatorListenerAdapter() {
 });
 ```
 ObjectAnimator
-对象动画，继承ValueAnimator, 允许指定target object，并且target object需要有setter方法。
+对象动画，继承ValueAnimator, 允许指定target object，并且target object需要有setter方法。 例如setAlpha()
 ```
 ObjectAnimator anim = ObjectAnimator.ofFloat(targetObject, "alpha", 0f, 1f);
 anim.setDuration(1000);
 anim.start();
 ```
 AnimatorSet
-动画的集合，用于组合一系列动画。
+动画的集合，用于组合一系列动画。 设置动画的顺序
 ```
 AnimatorSet  animatorSet = new AnimatorSet();
 animatorSet.play(bounceAnim).before(squashAnim1);

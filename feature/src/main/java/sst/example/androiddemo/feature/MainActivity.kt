@@ -1,6 +1,7 @@
 package sst.example.androiddemo.feature
 
 import android.Manifest
+import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -18,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.MutableLiveData
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
 import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -52,7 +52,7 @@ class  MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        getAndroidVersion()
+        getAndroidInfo()
         ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)
         var startTime = System.currentTimeMillis()
         val sp: SharedPreferences = getSharedPreferences("sp", Context.MODE_PRIVATE)
@@ -66,7 +66,7 @@ class  MainActivity : AppCompatActivity()  {
         // Example of a call to a native method
 //        sample_text.text = stringFromJNI()
         mainNormalActivity.setOnClickListener {
-            val intent = Intent(this, NormalActivity::class.java)
+            val intent = Intent(this, TestOrientationActivity::class.java)
             startActivity(intent)
         }
         launchActivity.setOnClickListener {
@@ -400,9 +400,11 @@ class  MainActivity : AppCompatActivity()  {
         getProcessInfo()
     }
 
-  private fun getAndroidVersion() {
+  private fun getAndroidInfo() {
     //android 版本 其他信息 https://blog.csdn.net/chyychfchx/article/details/59484332
     Log.i(TAG ,"android version" + VERSION.RELEASE)
+    Log.i(TAG ,"手机型号" + Build.MODEL)
+    Log.i(TAG ,"手机厂商" + Build.BOARD)
   }
 
   private fun getProcessInfo() {
@@ -421,17 +423,40 @@ class  MainActivity : AppCompatActivity()  {
         //当前调用该进程的用户号
         Log.i(TAG, "Process.myUid: "+Process.myUid());
         //当前线程ID
-        Log.i(TAG, "Thread.currentThread().getId: "+Thread.currentThread().getId());
+        Log.i(TAG, "Thread.currentThread().getId: "+Thread.currentThread().id);
         //主线程ID
-        Log.i(TAG, "getMainLooper().getThread().getId: "+getMainLooper().getThread().getId());
+        Log.i(TAG, "getMainLooper().getThread().getId: "+ mainLooper.thread.id);
         //当前Activity所在栈的ID
-        Log.i(TAG, "getTaskId: "+getTaskId());
+        Log.i(TAG, "getTaskId: "+ taskId);
         //当前调用该应用程序的用户号
-        Log.i(TAG, "getApplicationInfo().uid: "+getApplicationInfo().uid);
+        Log.i(TAG, "getApplicationInfo().uid: "+ applicationInfo.uid);
         //当前调用该应用程序的进程名
-        Log.i(TAG, "getApplicationInfo().processName): "+getApplicationInfo().processName);
+        Log.i(TAG, "getApplicationInfo().processName): "+ applicationInfo.processName);
 
+        Log.i(TAG,"主进程名 "+packageManager.getApplicationInfo(packageName, 0).processName)
+        getRunningAppProcessInfos(this).forEach {
+          Log.i(TAG,"当前包含的进程有${it.processName}")
+        }
     }
+
+  //获取所有的进程
+  public fun getRunningAppProcessInfos( context:Context):List<ActivityManager.RunningAppProcessInfo> {
+    val am:ActivityManager  = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    return am.runningAppProcesses
+  }
+
+  private fun  getCurrentProcessName():String {
+    val pid =Process.myPid()
+    var processName = "";
+    val manager:ActivityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    manager.runningAppProcesses.forEach {
+      if (it.pid == pid) {
+        processName = it.processName;
+      }
+    }
+    return processName;
+  }
+
 
 
 //    /**

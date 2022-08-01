@@ -28,6 +28,16 @@ getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) 
         <item name="android:padding">0dp</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
+//其他主题
+<style name="Dialog.FullScreen" parent="android:style/Theme.Dialog">
+    <item name="android:padding">0dp</item>
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:windowNoTitle">true</item>
+  </style>    
 ```
 editNameDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen);
 editNameDialogFragment.show(getSupportFragmentManager(), "edit");
+
+https://www.cnblogs.com/mr-wang1/p/13265827.html   
+软键盘布局上顶
+setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen);

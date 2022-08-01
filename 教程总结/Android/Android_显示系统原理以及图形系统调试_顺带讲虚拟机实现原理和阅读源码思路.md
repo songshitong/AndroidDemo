@@ -1,4 +1,24 @@
 
+打印view的层级，是否执行requestLayout
+```
+private void checkView(View decor){
+    if(decor!=null&&decor instanceof ViewGroup){
+      ViewGroup vg= (ViewGroup) decor;
+      AHLogUtil.i(TAG+"vg "+vg+" isLayoutRequested "+vg.isLayoutRequested());
+      int count=vg.getChildCount();
+      for(int i=0;i<count;i++){
+        View child = vg.getChildAt(i);
+        child.setPadding(0,0,0,0);
+        AHLogUtil.i(TAG+"parent="+vg+"======child"+count+"===="+i+"===="+child);
+        if(child instanceof  ViewGroup){
+          checkView(child);
+        }
+      }
+    }
+  }
+```
+
+
 虚拟框架微信视频号    android 8.1
 问题:太极APP打开显示黑屏
 要知道surfaceflinger与bufferqueue在进程共享内存 由gralloc分配 

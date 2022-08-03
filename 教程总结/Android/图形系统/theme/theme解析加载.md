@@ -1,106 +1,129 @@
-
-appcompat-1.2.0  sdk 30
 https://blog.csdn.net/yanbober/article/details/51015630
 
-theme的属性继承，以DarkActionBar为例
-Theme.AppCompat.Light.DarkActionBar
 
-定义在
-appcompat-1.2.0\res\values\values.xml
+setTheme放在setContentView之前
+android-12.0.0_r3
+setContentView->installDecor->generateLayout
+http://www.aospxref.com/android-12.0.0_r3/xref/frameworks/base/core/java/com/android/internal/policy/PhoneWindow.java#2378
 ```
-<style name="Theme.AppCompat.Light.DarkActionBar" parent="Base.Theme.AppCompat.Light.DarkActionBar"/>
-```
-Base.Theme.AppCompat.Light.DarkActionBar的实现
-```
-<style name="Base.Theme.AppCompat.Light.DarkActionBar" parent="Base.Theme.AppCompat.Light">
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="actionBarWidgetTheme">@null</item>
-        <item name="actionBarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
-
-        <!-- Panel attributes -->
-        <item name="listChoiceBackgroundIndicator">@drawable/abc_list_selector_holo_dark</item>
-
-        <item name="colorPrimaryDark">@color/primary_dark_material_dark</item>
-        <item name="colorPrimary">@color/primary_material_dark</item>
-    </style>
-```
-然后一路追踪
-```
-<style name="Base.Theme.AppCompat.Light" parent="Base.V7.Theme.AppCompat.Light">
-<style name="Base.V7.Theme.AppCompat.Light" parent="Platform.AppCompat.Light">
-        <item name="windowNoTitle">false</item>
-        <item name="windowActionBar">true</item>
-        <item name="windowActionBarOverlay">false</item>
-        <item name="windowActionModeOverlay">false</item>
-        <item name="actionBarPopupTheme">@null</item>
-        ...
-</style>
-
-android-30\data\res\values\themes_holo.xml
- <style name="Platform.AppCompat.Light" parent="android:Theme.Holo.Light">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-        ...
- </style>
-
-platforms\android-30\data\res\values\themes.xml
- <style name="Theme.Holo.Light" parent="Theme.Light">
-        <item name="colorForeground">@color/bright_foreground_holo_light</item>
-        <item name="colorForegroundInverse">@color/bright_foreground_inverse_holo_light</item>
-        <item name="colorBackground">@color/background_holo_light</item>
-        <item name="colorBackgroundFloating">@color/background_holo_light</item>
-        <item name="colorBackgroundCacheHint">@color/background_cache_hint_selector_holo_light</item>
-        <item name="disabledAlpha">0.5</item> 
-        ...
- </style>  
+ //获取当前主题
+ TypedArray a = getWindowStyle();
+ ...
+ //解析一堆主题属性，譬如下面的是否浮动window（dialog）等
+ mIsFloating = a.getBoolean(R.styleable.Window_windowIsFloating, false);
+ ...
+ if (a.getBoolean(R.styleable.Window_windowNoTitle, false)) {
+ ...
+ if (a.getBoolean(R.styleable.Window_windowActionBarOverlay, false)) {
+ ...
  
-  <style name="Theme.Light">
-        <item name="isLightTheme">true</item>
-        <item name="windowBackground">@drawable/screen_background_selector_light</item>
-        <item name="windowClipToOutline">false</item>                    
+ //依据属性获取不同的布局添加到Decor
+  int layoutResource;
+  //可以查看/frameworks/base/core/java/android/view/Window.java
+  //常见的feature有FEATURE_NO_TITLE，FEATURE_ACTION_BAR ，FEATURE_ACTIVITY_TRANSITIONS 等
+  int features = getLocalFeatures();
+  // System.out.println("Features: 0x" + Integer.toHexString(features));
+  if ((features & ((1 << FEATURE_LEFT_ICON) | (1 << FEATURE_RIGHT_ICON))) != 0) {
+      if (mIsFloating) {
+          TypedValue res = new TypedValue();
+          getContext().getTheme().resolveAttribute(
+                  R.attr.dialogTitleIconsDecorLayout, res, true);
+          layoutResource = res.resourceId;
+      } else {
+          layoutResource = R.layout.screen_title_icons;
+      }
+   ...
+    else if ((features & (1 << FEATURE_ACTION_MODE_OVERLAY)) != 0) {
+              layoutResource = R.layout.screen_simple_overlay_action_mode;
+          } else {
+              layoutResource = R.layout.screen_simple;
+          }   
+  ...    
+  mDecor.onResourcesLoaded(mLayoutInflater, layoutResource);
+  ViewGroup contentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT);
+  ...
+   return contentParent;
 ```
-最终的theme
-
-Sdk\platforms\android-30\data\res\values\themes.xml
+/frameworks/base/core/java/android/view/Window.java
+getWindowStyle
 ```
- <style name="Theme">
-        <!-- Text styles -->
-        <!-- Button styles -->
-        <!-- List attributes -->
-        <!-- @hide -->
-        <!-- Gallery attributes -->
-        <!-- Window attributes -->
-        <!-- Define these here; ContextThemeWrappers around themes that define them should
-             always clear these values. -->
-        <!-- Dialog attributes -->
-        <!-- AlertDialog attributes -->
-        <!-- Presentation attributes (introduced after API level 10 so does not
-             have a special old-style theme. -->
-        <!-- Toast attributes -->
-        <!-- Panel attributes -->
-        <!-- These three attributes do not seems to be used by the framework. Declared public though -->
-        <!-- Scrollbar attributes -->
-        <!-- Text selection handle attributes -->
-        <!-- Widget styles -->
-        <!-- Preference styles -->
-        <!-- Search widget styles -->
-        <!-- Action bar styles -->
-        <!-- Floating toolbar styles -->
-        <!-- SearchView attributes -->
-        <!-- PreferenceFrameLayout attributes -->
-        <!-- NumberPicker style-->
-        <!-- CalendarView style-->
-        <!-- TimePicker style -->
-        <!-- TimePicker dialog theme -->
-        <!-- DatePicker style -->
-        <!-- DatePicker dialog theme -->
-        <!-- Pointer style -->
-        <!-- Accessibility focused drawable -->
-        <!-- Lighting and shadow properties -->
-  </style> 
+     public final TypedArray getWindowStyle() {
+          synchronized (this) {
+              if (mWindowStyle == null) {
+                  mWindowStyle = mContext.obtainStyledAttributes(
+                          com.android.internal.R.styleable.Window);
+              }
+              return mWindowStyle;
+          }
+      }
 ```
-它里面定义了关于我们整个应用中文字样式、按钮样式、列表样式、窗体样式、对话框样式等，这些样式都是默认样式，它还有很多我们常用的扩展样式，
-譬如Theme.Light、Theme.NoTitleBar、Theme.NoTitleBar.Fullscreen等等
+/frameworks/base/core/java/android/content/Context.java
+```
+   public final TypedArray obtainStyledAttributes(
+              @Nullable AttributeSet set, @NonNull @StyleableRes int[] attrs) {
+          return getTheme().obtainStyledAttributes(set, attrs, 0, 0);
+      }
+public abstract Resources.Theme getTheme();      
+```
+context的实现
+ContextThemeWapprer
+/frameworks/base/core/java/android/view/ContextThemeWrapper.java
+```
+//获取主题
+public Resources.Theme getTheme() {
+          if (mTheme != null) {
+              return mTheme;
+          }
+           //没有设置Theme则获取默认的selectDefaultTheme
+          mThemeResource = Resources.selectDefaultTheme(mThemeResource,
+                  getApplicationInfo().targetSdkVersion);
+          initializeTheme();
+  
+          return mTheme;
+      }
+//设置主题
+public void setTheme(int resid) {
+    //通过外部设置以后mTheme和mThemeResource就不为null了
+    if (mThemeResource != resid) {
+        mThemeResource = resid;
+        //初始化选择的主题，mTheme就不为null了
+        initializeTheme();
+    }
+}    
+```
+默认主题的获取
+/frameworks/base/core/java/android/content/res/Resources.java
+```
+   public static int selectDefaultTheme(int curTheme, int targetSdkVersion) {
+          return selectSystemTheme(curTheme, targetSdkVersion,
+                  com.android.internal.R.style.Theme,
+                  com.android.internal.R.style.Theme_Holo,
+                  com.android.internal.R.style.Theme_DeviceDefault,
+                  com.android.internal.R.style.Theme_DeviceDefault_Light_DarkActionBar);
+      }
+      
+   public static int selectSystemTheme(int curTheme, int targetSdkVersion, int orig, int holo,
+              int dark, int deviceDefault) {
+          if (curTheme != ID_NULL) {
+              return curTheme;
+          }
+          if (targetSdkVersion < Build.VERSION_CODES.HONEYCOMB) {
+             //android 3.0以下 R.style.Theme
+              return orig;
+          }
+          if (targetSdkVersion < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+               //android4.0以下  Theme_Holo
+              return holo;
+          }
+          if (targetSdkVersion < Build.VERSION_CODES.N) {
+             //android7.0以下   Theme_DeviceDefault 深色主题
+              return dark;
+          }
+          //其他使用 Theme_DeviceDefault_Light_DarkActionBar
+          return deviceDefault;
+      }
+      
+```
 
 
 manifest中theme的调用
@@ -368,4 +391,122 @@ base::expected<std::monostate, IOError> ApplyStyle(Theme* theme, ResXMLParser* x
     out_indices[0] = indices_idx;
     return {};
   }
+```
+
+
+
+https://www.jianshu.com/p/a021e628c1bf
+view的主题加载
+以button为例
+Sdk\sources\android-32\android\widget\Button.java
+```
+public Button(Context context) {
+        this(context, null);
+    }
+public Button(Context context, AttributeSet attrs) {
+    //默认的button样式buttonStyle
+    this(context, attrs, com.android.internal.R.attr.buttonStyle);
+}
+public Button(Context context, AttributeSet attrs, int defStyleAttr) {
+    this(context, attrs, defStyleAttr, 0);
+}  
+public Button(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
+}      
+```
+
+
+AttributeSet：在XML中明确写出了的属性集合
+attrs 自定义的属性写在declare-styleable中
+defStyleAttr：这是一个定义在attrs.xml文件中的attribute。这个值起作用需要两个条件：1. 值不为0；2. 在Theme中使用了（出现即可）
+defStyleRes：这是在styles.xml文件中定义的一个style。只有当defStyleAttr没有起作用，才会使用到这个值。
+
+属性查找
+framework中 frameworks\base\core\res\res\values目录下的attrs.xml、styles.xml、themes.xml三个
+或者sdk   Sdk\platforms\android-32\data\res\values\attrs.xml
+```
+ <attr name="buttonStyle" format="reference" />
+```
+theme中使用
+themes.xml文件下，有这样一个style：
+```
+<item name="buttonStyle">@style/Widget.Button</item>
+```
+style查看
+Sdk\platforms\android-32\data\res\values\styles.xml
+```
+    <style name="Widget.Button">
+        <item name="background">@drawable/btn_default</item>
+        <item name="focusable">true</item>
+        <item name="clickable">true</item>
+        <item name="textAppearance">?attr/textAppearanceSmallInverse</item>
+        <item name="textColor">@color/primary_text_light</item>
+        <item name="gravity">center_vertical|center_horizontal</item>
+    </style>
+//themes.xml
+<item name="textAppearanceSmallInverse">@style/TextAppearance.Small.Inverse</item>
+//styles.xml
+<style name="TextAppearance.Small.Inverse">
+    <item name="textColor">?textColorSecondaryInverse</item>
+    <item name="textColorHint">?textColorHintInverse</item>
+    <item name="textColorHighlight">?textColorHighlightInverse</item>
+    <item name="textColorLink">?textColorLinkInverse</item>
+</style>   
+```
+
+Sdk\sources\android-32\android\widget\TextView.java
+```
+  public TextView(
+            Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+ TypedArray a = theme.obtainStyledAttributes(attrs,
+                com.android.internal.R.styleable.TextViewAppearance, defStyleAttr, defStyleRes);
+
+}        
+```
+TextViewAppearance的属性
+```
+Sdk\platforms\android-32\data\res\values\attrs.xml
+  <declare-styleable name="TextViewAppearance">
+        <attr name="textAppearance" />
+    </declare-styleable>
+    
+Sdk\platforms\android-32\data\res\values\themes.xml 
+        <item name="textAppearance">@style/TextAppearance</item>
+
+Sdk\platforms\android-32\data\res\values\styles.xml 
+ <style name="TextAppearance">
+        <item name="textColor">?textColorPrimary</item>
+        <item name="textColorHighlight">?textColorHighlight</item>
+        <item name="textColorHint">?textColorHint</item>
+        <item name="textColorLink">?textColorLink</item>
+        <item name="textSize">16sp</item>
+        <item name="textStyle">normal</item>
+    </style>  
+```
+通过样式对比button重写了TextView的textAppearance和textColor
+Sdk\sources\android-32\android\widget\TextView.java
+TextView的构造器读取主题中属性然后进行配置
+```
+ a = theme.obtainStyledAttributes(
+                    attrs, com.android.internal.R.styleable.TextView, defStyleAttr, defStyleRes);
+        saveAttributeDataForStyleable(context, com.android.internal.R.styleable.TextView, attrs, a,
+                defStyleAttr, defStyleRes);
+        ...
+        int n = a.getIndexCount();
+
+        boolean textIsSetFromXml = false;
+        for (int i = 0; i < n; i++) {
+            int attr = a.getIndex(i);
+            switch (attr) {
+                case com.android.internal.R.styleable.TextView_editable:
+                    editable = a.getBoolean(attr, editable);
+                    break;
+                case com.android.internal.R.styleable.TextView_inputMethod:
+                    inputMethod = a.getText(attr);
+                    break;
+                case com.android.internal.R.styleable.TextView_numeric:
+                    numeric = a.getInt(attr, numeric);
+                    break;                  
+             ....
 ```

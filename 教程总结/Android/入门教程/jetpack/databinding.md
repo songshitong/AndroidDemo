@@ -74,6 +74,7 @@ activity中使用   省略setContentView
 
 每个数据绑定布局文件都会生成一个绑定类，ViewDataBinding 的实例名是根据布局文件名来生成，将之改为首字母大写的驼峰命名法来命名，
   并省略布局文件名包含的下划线。控件的获取方式类似，但首字母小写
+ba_activity_register.xml 生成的binding为BaActivityRegisterBinding
 也可以通过如下方式自定义 ViewDataBinding 的实例名
 ```
     <data class="CustomBinding">

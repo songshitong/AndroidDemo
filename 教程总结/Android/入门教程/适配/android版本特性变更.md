@@ -113,3 +113,25 @@ activity 生命周期 按下“返回”按钮时，不再完成根启动器 act
  应用无法关闭系统对话框  弃用了 ACTION_CLOSE_SYSTEM_DIALOGS intent 操作
 《行为变更：以 Android 12 为目标平台的应用》
 https://developer.android.com/about/versions/12/behavior-changes-12
+https://juejin.cn/post/6985806802831015950
+1. exported  需要Intent-filter的组件显性的声明exported属性
+2. pendingIntent必须声明可变性  https://developer.android.com/about/versions/12/behavior-changes-12
+```
+PendingIntent pendingActivityIntent = PendingIntent.getActivity(Application.getContext(), R.drawable.ic_launcher, intent,
+PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+```
+
+
+android 13
+https://juejin.cn/post/7099762078977622053
+1 更安全地导出上下文注册的接收器
+以 Android 13(33) 或更高版本为目标平台的应用，必须为每个广播接收器指定 RECEIVER_EXPORTED 或 RECEIVER_NOT_EXPORTED，
+否则当 App 尝试注册广播接收器时，系统会抛出 SecurityException
+```
+context.registerReceiver(sharedBroadcastReceiver, intentFilter,
+    RECEIVER_EXPORTED);
+
+context.registerReceiver(privateBroadcastReceiver, intentFilter,
+    RECEIVER_NOT_EXPORTED);
+```
+

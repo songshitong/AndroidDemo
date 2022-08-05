@@ -1,4 +1,28 @@
 
+优点 
+1 横竖屏切换保存dialog状态
+2 管理生命周期，使得dialog可以跟随activity
+
+缺点：消失后再次显示走onCreateView，如果想保存消失前的内容比较繁琐
+解决 避免每次解析view
+全局DialogFragment df;
+if(df == null){
+  df = new DialogFragment();
+}
+```
+ public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    //避免每次解析view 
+    if(null == mRootView){
+      mRootView = LayoutInflater.from(getContext()).inflate(R.layout.vi_view_live, null, false);
+    }else{
+     ViewGroup vg = (ViewGroup) mRootView.getParent();
+     vg.removeView(mRootView);
+    }
+    return mRootView;
+  }
+```
+
 https://www.jianshu.com/p/0861ee5b9028
 创建 DialogFragment 有两种方式：
 覆写其 onCreateDialog 方法 — ① 利用AlertDialog或者Dialog创建出Dialog。

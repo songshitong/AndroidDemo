@@ -1,12 +1,10 @@
 package sst.example.lib.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-/**
- * @author: songshitong
- * @date: 2022/8/3
- * @description:
- */
+
 public class DecimalFormatTest {
 
   //https://www.jianshu.com/p/c1dec1796062
@@ -54,6 +52,42 @@ public class DecimalFormatTest {
     //比如：
     //1、格式化数字，保留两位小数，不足的小数部分用0代替，这时候，我们就可以使用："0.00"；
     //2、格式化数字，只保留有效数字，最多保留两位小数，这时候，我们就可以使用："#.##"。
+
+
+    System.out.println("四舍五入 ==========");
+    //当要格式化的数字超过占位符的时候，格式化的结果会进行四舍五入
+    DecimalFormat format = new DecimalFormat("#.##");
+    //默认 RoundingMode.HALF_EVEN
+    format.setRoundingMode(RoundingMode.HALF_EVEN);
+    String formatEven = format.format(13.14567);//结果：13.14
+    System.out.println("formatEven "+formatEven);
+    //指定舍入方式为：RoundingMode.DOWN，直接舍去格式化以外的部分
+    format.setRoundingMode(RoundingMode.DOWN);
+    String formatDown = format.format(13.14567);//结果：13.14
+    System.out.println("formatDown "+formatDown);
+    //指定舍入方式为：RoundingMode.HALF_UP，四舍五入
+    format.setRoundingMode(RoundingMode.HALF_UP);
+    String formatHalfUp = format.format(13.14567);//结果：13.15
+    System.out.println("formatHalfUp "+formatHalfUp);
+
+    System.out.println("测试stringAlign=============");
+    System.out.println(stringAlign("11.012"));//11.01
+    System.out.println(stringAlign("11.019"));//11.02
+    System.out.println(stringAlign("11.1"));//11.10
+    System.out.println(stringAlign("1.1"));//1.10
+  }
+
+
+
+
+  //保留两位自动补0
+  public static String stringAlign(String str) {
+    if (null == str || str.isEmpty()) {
+      return "";
+    }
+    DecimalFormat format = new DecimalFormat("0.00");
+    format.setRoundingMode(RoundingMode.HALF_UP);
+    return format.format(new BigDecimal(str));
   }
 
 }

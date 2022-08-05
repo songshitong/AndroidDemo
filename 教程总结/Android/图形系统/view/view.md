@@ -468,9 +468,11 @@ public void requestLayout() {
     return (mPrivateFlags & PFLAG_FORCE_LAYOUT) == PFLAG_FORCE_LAYOUT;
 }
 ```
+/frameworks/base/core/java/android/view/ViewRootImpl.java
 ViewRootImpl.requestLayout
 ```
  public void requestLayout() {
+  //如果没有在执行 performLayout中
   if (!mHandlingLayoutInLayoutRequest) {
       checkThread();
       mLayoutRequested = true;

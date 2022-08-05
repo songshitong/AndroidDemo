@@ -270,6 +270,7 @@ BoundField标记类的字段名字，是否需要序列化和反序列化
  private ReflectiveTypeAdapterFactory.BoundField createBoundField(
       final Gson context, final Field field, final String name,
       final TypeToken<?> fieldType, boolean serialize, boolean deserialize) {
+    //是否是基础类型  
     final boolean isPrimitive = Primitives.isPrimitive(fieldType.getRawType());
     // special casing primitives here saves ~5% on Android...
     JsonAdapter annotation = field.getAnnotation(JsonAdapter.class);
@@ -313,6 +314,65 @@ BoundField标记类的字段名字，是否需要序列化和反序列化
   }  
 ```
 
+反序列化的过程
+typeAdapter.read
+gson\internal\bind\ReflectiveTypeAdapterFactory.java
+```
+ @Override public T read(JsonReader in) throws IOException {
+      ...
+      //反射构建实例
+      T instance = constructor.construct();
 
+      try {
+        in.beginObject();
+        //遍历json流
+        while (in.hasNext()) {
+          String name = in.nextName();
+          BoundField field = boundFields.get(name);
+          if (field == null || !field.deserialized) {
+            in.skipValue();
+          } else {
+            field.read(in, instance);
+          }
+        }
+      } ...
+      in.endObject();
+      return instance;
+    }
+
+```
+构造实例过程
+gson\internal\ObjectConstructor.java
+```
+public interface ObjectConstructor<T> {
+  public T construct();
+}
+```
+com/google/gson/internal/ConstructorConstructor.java
+```
+ private <T> ObjectConstructor<T> newDefaultConstructor(Class<? super T> rawType) {
+    try {
+      //获取构造器
+      final Constructor<? super T> constructor = rawType.getDeclaredConstructor();
+      if (!constructor.isAccessible()) {
+        accessor.makeAccessible(constructor);
+      }
+      return new ObjectConstructor<T>() {
+        @Override public T construct() {
+          try {
+            Object[] args = null;
+            //反射创建
+            return (T) constructor.newInstance(args);
+          } ...
+        }
+      };
+    }...
+  }
+```
+
+JsonReader读取json
+beginObject()  开始
+```
+```
 
 todo 一段json 序列化，反序列化的流程，不需要流程图

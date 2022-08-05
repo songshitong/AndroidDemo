@@ -1,4 +1,6 @@
 
+
+
 https://juejin.cn/post/6844904136937324552#heading-55
 Android与 js 是如何交互的
 Android调js
@@ -21,3 +23,9 @@ WebView.addJavascriptInterface()。
    原因在于 onJsAlert 是没有返回值的，而 onJsConfirm 只有 true 和 false 两个返回值，同时在前端开发中 prompt 方法基本不会被调用，
    所以才会采用 onJsPrompt。
 
+
+https://www.itranslater.com/qa/details/2582595927299064832
+清除webview内容
+```
+webView.loadUrl("about:blank")
+```

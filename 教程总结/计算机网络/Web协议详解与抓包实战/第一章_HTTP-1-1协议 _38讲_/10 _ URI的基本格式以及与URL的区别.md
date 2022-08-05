@@ -97,7 +97,14 @@ https://domain/index#L18
 fragment 的改变不会触发浏览器刷新页面，但是会生成浏览历史；
 fragment 会被浏览器根据文件媒体类型（MIME type）进行对应的处理；
 Google 的搜索引擎会忽略 # 及其后面的字符串。
-//todo fragment的应用
+
+https://www.ruanyifeng.com/blog/2011/03/url_hash.html
+1 #代表网页中的一个位置。其右面的字符，就是该位置的标识符。比如，
+http://www.example.com/index.html#print
+就代表网页index.html的print位置。浏览器读取这个URL后，会自动将print位置滚动至可视区域。
+为网页位置指定标识符，有两个方法。一是使用锚点，比如<a name="print"></a>，二是使用id属性，比如<div id="print" >。
+2 window.location.hash读取#值
+window.location.hash这个属性可读可写。读取时，可以用来判断网页状态是否改变；写入时，则会在不重载网页的前提下，创造一条访问历史记录。
 
 
 

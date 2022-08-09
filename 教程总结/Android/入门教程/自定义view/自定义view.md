@@ -156,6 +156,44 @@ ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
 lp.height = dpToPx(100)
 holder.itemView.setLayoutParams(lp);
 
+获取view的大小，创建后获取或者onCreate获取为0
+1
+```
+//View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED) 将mode和size组合在一起
+ ViewGroup.measure(
+          View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+          View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+    }
+ ViewGroup.getMeasuredWidth()
+```
+2 
+```
+//MeasureSpec与LayoutParams.WRAP_CONTENT并不相同，尽量避免这种写法！！！
+myImage.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+int width = myImage.getMeasuredWidth();
+int height = myImage.getMeasuredHeight();
+```
+3  缺点view添加到布局，下一次绘制消息才会调用
+```
+view.post(new Runnable() {
+            @Override
+            public void run() {
+                view.getHeight(); //height is ready
+            }
+        });
+}
+```
+4
+```
+view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                view.getHeight(); //height is ready
+            }
+        });
+或者view.getViewTreeObserver().addOnPreDrawListener        
+```
 
 常用方法  https://www.jianshu.com/p/5ec0f278e0a3
 invalidate

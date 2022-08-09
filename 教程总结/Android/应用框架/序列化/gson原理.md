@@ -327,15 +327,18 @@ gson\internal\bind\ReflectiveTypeAdapterFactory.java
         in.beginObject();
         //遍历json流
         while (in.hasNext()) {
+          //读取json的key
           String name = in.nextName();
           BoundField field = boundFields.get(name);
           if (field == null || !field.deserialized) {
             in.skipValue();
           } else {
+            //将读到的值写入对象实例instance  最终使用jsonReader读取
             field.read(in, instance);
           }
         }
       } ...
+      //停止
       in.endObject();
       return instance;
     }
@@ -371,8 +374,51 @@ com/google/gson/internal/ConstructorConstructor.java
 ```
 
 JsonReader读取json
+json格式标准  https://www.ietf.org/rfc/rfc7159.txt
 beginObject()  开始
+com/google/gson/stream/JsonReader.java
 ```
+  public void beginObject() throws IOException {
+    int p = peeked;
+    if (p == PEEKED_NONE) {
+      p = doPeek();
+    }
+    if (p == PEEKED_BEGIN_OBJECT) {
+      push(JsonScope.EMPTY_OBJECT);
+      peeked = PEEKED_NONE;
+    } else {
+      throw new IllegalStateException("Expected BEGIN_OBJECT but was " + peek() + locationString());
+    }
+  }
+  
+  public boolean hasNext() throws IOException {
+    int p = peeked;
+    if (p == PEEKED_NONE) {
+      p = doPeek();
+    }
+    //对象结束}，数组结束]标记着json没了
+    return p != PEEKED_END_OBJECT && p != PEEKED_END_ARRAY;
+  }  
+  
+   public String nextName() throws IOException {
+    int p = peeked;
+    if (p == PEEKED_NONE) {
+      p = doPeek();
+    }
+    String result;
+    if (p == PEEKED_UNQUOTED_NAME) {
+      result = nextUnquotedValue();
+    } else if (p == PEEKED_SINGLE_QUOTED_NAME) {
+      result = nextQuotedValue('\'');
+    } else if (p == PEEKED_DOUBLE_QUOTED_NAME) {
+      result = nextQuotedValue('"');
+    } else {
+      throw new IllegalStateException("Expected a name but was " + peek() + locationString());
+    }
+    peeked = PEEKED_NONE;
+    pathNames[stackSize - 1] = result;
+    return result;
+  }
 ```
 
 todo 一段json 序列化，反序列化的流程，不需要流程图

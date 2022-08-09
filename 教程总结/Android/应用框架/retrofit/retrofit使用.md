@@ -325,3 +325,10 @@ https://juejin.cn/post/6844903729418764302
 https://cloud.tencent.com/developer/article/1783096
 https://www.jianshu.com/p/206f0060e1e4
 https://stackoverflow.com/questions/39592084/how-to-cancel-retrofit-request
+
+
+自定义注解与处理  Retrofit2.6.0以后
+https://stackoverflow.com/questions/47760861/retrofit-2-custom-annotations-for-custom-interceptor
+自定义注解YourAnnotation
+获取注解
+request.tag(Invocation.class).getClass().getAnnotation(YourAnnotation.class)

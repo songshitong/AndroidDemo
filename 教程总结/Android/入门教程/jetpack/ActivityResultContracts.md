@@ -1,4 +1,6 @@
 
+onActivityResult缺点必须在activity或fragment里面，不能脱离
+多个intent的结果在同一个方法里面，很容易变得非常庞大
 
 https://blog.csdn.net/guolin_blog/article/details/121063078
 https://www.xlgz520.com/index.php/archives/26/
@@ -14,5 +16,5 @@ https://www.xlgz520.com/index.php/archives/26/
     requestDataLauncher.launch(intent)
 ```
 使用要点
-1. AppCompatActivity
-2. registerForActivityResult防止start之前
+1. 需要实现ActivityResultCaller例如AppCompatActivity，Fragment(androidx)
+2. registerForActivityResult放在start之前

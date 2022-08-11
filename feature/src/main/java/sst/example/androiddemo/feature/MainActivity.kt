@@ -22,18 +22,18 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import sst.example.androiddemo.feature.animation.LayoutAnimationActivity
-import sst.example.androiddemo.feature.animation.RevealAnimatorActivity
-import sst.example.androiddemo.feature.animation.activity.ActivityAnimation
-import sst.example.androiddemo.feature.animation.activity.ActivityTransition
-import sst.example.androiddemo.feature.animation.dynamicanimation.DynamicAnimaitonActivity
-import sst.example.androiddemo.feature.animation.evaluator.TypeEvaluatorActivity
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
 import sst.example.androiddemo.feature.activity.launchmode.LaunchActivity
 import sst.example.androiddemo.feature.activity.scrollNested.ScrollNestedActivity
 import sst.example.androiddemo.feature.activity.testAnr.TestAnrActivity
 import sst.example.androiddemo.feature.animation.KeyFrameActivity
+import sst.example.androiddemo.feature.animation.LayoutAnimationActivity
+import sst.example.androiddemo.feature.animation.RevealAnimatorActivity
+import sst.example.androiddemo.feature.animation.activity.ActivityAnimation
+import sst.example.androiddemo.feature.animation.activity.ActivityTransition
+import sst.example.androiddemo.feature.animation.dynamicanimation.DynamicAnimaitonActivity
+import sst.example.androiddemo.feature.animation.evaluator.TypeEvaluatorActivity
 import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
@@ -45,6 +45,8 @@ import sst.example.androiddemo.feature.webview.JumpActivity
 import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
+import java.io.PrintWriter
+import java.io.StringWriter
 
 class  MainActivity : AppCompatActivity()  {
 
@@ -53,6 +55,7 @@ class  MainActivity : AppCompatActivity()  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         getAndroidInfo()
+        getMethodTrace()
         ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)
         var startTime = System.currentTimeMillis()
         val sp: SharedPreferences = getSharedPreferences("sp", Context.MODE_PRIVATE)
@@ -407,6 +410,7 @@ class  MainActivity : AppCompatActivity()  {
     Log.i(TAG ,"手机厂商" + Build.BOARD)
   }
 
+
   private fun getProcessInfo() {
           //adb shell pidof sst.example.androiddemo.feature  31076
 
@@ -438,6 +442,22 @@ class  MainActivity : AppCompatActivity()  {
           Log.i(TAG,"当前包含的进程有${it.processName}")
         }
     }
+
+  //获取方法调用栈
+  private fun getMethodTrace(){
+    println("getMethodTrace start ==================================")
+    val ste = Thread.currentThread().stackTrace
+    ste.forEach {
+      println(it)
+    }
+    println("getMethodTrace use Throwable ==================================")
+    //两种输出的内容大体一致
+    val sw = StringWriter()
+    Throwable("").printStackTrace(PrintWriter(sw))
+    val stackTrace: String = sw.toString()
+    println(stackTrace)
+    println("getMethodTrace use Throwable end ==================================")
+  }
 
   //获取所有的进程
   public fun getRunningAppProcessInfos( context:Context):List<ActivityManager.RunningAppProcessInfo> {

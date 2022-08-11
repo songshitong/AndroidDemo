@@ -407,10 +407,13 @@ com/google/gson/stream/JsonReader.java
     }
     String result;
     if (p == PEEKED_UNQUOTED_NAME) {
+      //非引号
       result = nextUnquotedValue();
     } else if (p == PEEKED_SINGLE_QUOTED_NAME) {
+      //单引号
       result = nextQuotedValue('\'');
     } else if (p == PEEKED_DOUBLE_QUOTED_NAME) {
+     //双引号
       result = nextQuotedValue('"');
     } else {
       throw new IllegalStateException("Expected a name but was " + peek() + locationString());

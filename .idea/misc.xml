@@ -11,10 +11,18 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/ainmated_vector_drawable.xml" value="0.1945" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/animation_drawable.xml" value="0.1205" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/bitmap_drawable.xml" value="0.1945" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/ic_launcher_background.xml" value="0.1945" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/inset_drawable.xml" value="0.1945" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/layer_drawable.xml" value="0.1945" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/ripple_drawable.xml" value="0.1455" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/ripple_with_no_mask.xml" value="0.1305" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/shape_drawable.xml" value="0.1635" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/statelist_drawable.xml" value="0.1945" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/toast_custom_bg.xml" value="0.1945" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/drawable/transition_drawable.xml" value="0.1945" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_constrain_layout.xml" value="0.291213768115942" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_drawable.xml" value="0.1" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_key_frame.xml" value="0.1" />

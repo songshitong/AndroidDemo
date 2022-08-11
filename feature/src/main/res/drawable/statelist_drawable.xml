@@ -10,6 +10,8 @@
         <animated-rotate android:drawable="@drawable/ic_launcher" android:pivotX="50%" android:pivotY="50%"/>
     </item>
     <item android:drawable="@drawable/ic_launcher"/>
+<!-- 也可以设置颜色,用于不同的状态控件的颜色，要支持ColorStateList，例如textColor
+   <item android:color="@android:color/transparent"/>-->
 </selector>
 
         <!--不写状态是默认状态-->

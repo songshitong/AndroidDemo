@@ -243,6 +243,21 @@ public class MyUtils {
         return  intent;
     }
 
+    //打电话
+    public static Intent dialPhone(String num){
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        Uri data = Uri.parse("tel:" + num);
+        intent.setData(data);
+        return intent;
+    }
+
+    //直接打电话，需要权限<uses-permission android:name="android.permission.CALL_PHONE" />
+    public static Intent directCall(String num){
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        Uri data = Uri.parse("tel:" + num);
+        intent.setData(data);
+        return intent;
+    }
 
     /**
      * 创建目录.

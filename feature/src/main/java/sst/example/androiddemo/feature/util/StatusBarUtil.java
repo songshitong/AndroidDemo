@@ -23,7 +23,10 @@ public class StatusBarUtil {
     window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
   }
 
+  //配合透明状态栏使用
+  //给需要留边的view使用(增加一个状态栏的高度的paddingTop)  一般不用在根布局，这样内容又被顶下来了
   //设置fitSystemWindow  https://stackoverflow.com/questions/30439661/androidfitssystemwindows-at-runtime
+  //xml中android:fitsSystemWindows="true"
   public void fitSystemWindow(Activity activity){
     View view = activity.findViewById(android.R.id.content);
     view.setFitsSystemWindows(false);
@@ -37,6 +40,7 @@ public class StatusBarUtil {
   //    <item name="colorPrimaryDark">@color/color_secondary</item>
   //    <item name="colorAccent">@color/color_accent</item>
   //    <item name="android:statusBarColor">@color/color_primary</item>
+  //    <item name="android:windowLightStatusBar">true</item> //改变状态栏系统文字的颜色 true深色 false浅色
   //</style>
   //设置状态栏颜色
   public void setStatusBarColor(Window window, int color) {

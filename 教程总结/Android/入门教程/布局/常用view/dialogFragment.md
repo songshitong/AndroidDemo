@@ -61,6 +61,13 @@ getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) 
 ```
 editNameDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen);
 editNameDialogFragment.show(getSupportFragmentManager(), "edit");
+onCreate中设置边距
+```
+ @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.XGDialogBlackCover);
+  }
+```
 
 https://www.cnblogs.com/mr-wang1/p/13265827.html   
 软键盘布局上顶

@@ -83,6 +83,8 @@ VirtualBox安装虚拟机
 vitrual box 设置共享文件夹，用户界面开启顶部显示
 virtual box 存储挂载addition.iso,设备-》安装增强功能，ubuntu文件打开virtualbox->运行文件，重启后看到sf_share
 
+https://source.android.com/setup/build/initializing  初始化配置参考
+
 系统下载脚本
 将export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/' 添加到~/.bashrc
 #export REPO_URL='https://mirrors.bfsu.edu.cn/git/git-repo'

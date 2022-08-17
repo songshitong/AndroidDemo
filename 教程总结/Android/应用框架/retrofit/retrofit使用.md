@@ -41,6 +41,10 @@ Call<User> createUser(@Body User user);
 @POST("user/edit")
 Call<User> updateUser(@Field("first_name") String first, @Field("last_name") String last);
 ```
+多个参数
+@FormUrlEncoded
+@POST("/things")
+Call<ResponseBody> things(@FieldMap Map<String, String> fields);
 
 多类型请求
 ```

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="XGTheme.App" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <!-- Primary brand color. -->
+    <item name="colorPrimary">@android:color/white</item>
+    <item name="colorPrimaryVariant">@android:color/white</item>
+    <item name="colorOnPrimary">@android:color/white</item>
+    <!-- Secondary brand color. -->
+    <item name="android:textColorPrimary">#ff111E36</item>
+    <item name="android:textColor">#ff111E36</item>
+    <item name="minWidth">0dp</item>
+    <item name="minHeight">0dp</item>
+    <item name="android:minHeight">0dp</item>
+    <item name="android:minWidth">0dp</item>
+    <item name="android:windowBackground">@android:color/white</item>
+    <item name="android:statusBarColor">@android:color/white</item>
+    <item name="android:windowLightStatusBar">true</item>
+    <!-- Customize your theme here. -->
+  </style>
+</resources>

@@ -252,6 +252,7 @@ public class MyUtils {
     }
 
     //直接打电话，需要权限<uses-permission android:name="android.permission.CALL_PHONE" />
+    //使用时动态请求  ActivityCompat.requestPermissions(this,new String []{Manifest.permission.CALL_PHONE},1);
     public static Intent directCall(String num){
         Intent intent = new Intent(Intent.ACTION_CALL);
         Uri data = Uri.parse("tel:" + num);

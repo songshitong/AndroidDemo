@@ -5,6 +5,8 @@ onActivityResult缺点必须在activity或fragment里面，不能脱离
 https://blog.csdn.net/guolin_blog/article/details/121063078
 https://www.xlgz520.com/index.php/archives/26/
 ```
+ActivityResultLauncher<Intent> launcher;//java声明，调用launch方法一般要求参数是intent
+
  private val requestDataLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data?.getStringExtra("data")
@@ -15,6 +17,7 @@ https://www.xlgz520.com/index.php/archives/26/
     val intent = Intent(this, SecondActivity::class.java)
     requestDataLauncher.launch(intent)
 ```
+其他类型RequestMultiplePermissions(请求多个权限)，TakePicture(照相)等
 使用要点
 1. 需要实现ActivityResultCaller例如AppCompatActivity，Fragment(androidx)
 2. registerForActivityResult放在start之前

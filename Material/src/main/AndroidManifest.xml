@@ -2,9 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="com.sst.material">
 
-    <application>
-        <activity android:name=".BottomNavigationActivity"></activity>
-        <activity android:name=".ShapeActivity" />
+    <application
+        android:supportsRtl="false"
+        android:icon="@mipmap/ic_launcher" android:theme="@style/XGTheme.App">
+        <activity android:name=".BottomNavigationActivity"/>
+        <activity android:name=".ShapeActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

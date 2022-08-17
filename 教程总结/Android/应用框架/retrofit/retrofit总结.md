@@ -3,7 +3,7 @@ https://blog.csdn.net/jaynm/article/details/108614788?spm=1001.2014.3001.5502
 Retrofit 流程
 1 通过解析网络请求接口的注解，配置网络请求参数
 2 通过动态代理生成对应接口的网络请求对象
-3 通过GsonRequestBodyConverter将请求体转为json字符
+3 通过GsonRequestBodyConverter将请求体转为json字符 //多个同一类型的converter返回第一个
 4 通过OkHttpCall发送网络请求
 5 通过GsonResponseBodyConverter将json字符响应流转为model
 6 通过CallAdapter将结果包装为默认的Call   //多个CallAdapter返回第一个符合返回值的

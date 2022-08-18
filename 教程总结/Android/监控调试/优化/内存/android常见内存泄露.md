@@ -46,6 +46,22 @@ private AppSettings(Context context) {
 全局的上下文Application Context就是应用程序的上下文，和单例的生命周期一样长，这样就避免了内存泄漏。
 
 单例模式对应应用程序的生命周期，所以我们在构造单例的时候尽量避免使用Activity的上下文，而是使用Application的上下文。
+另外的方式初始context，将init和getInstance分离
+```
+ //application中init
+ public static void init(Context context){
+    //静态变量
+    BleManager.applicationContext = context.getApplicationContext();
+  }
+  public static BleManager getInstance() {
+    if (instance == null) {
+      ....
+      instance = new BleManager(bluetoothManager);
+    }
+    return instance;
+  }
+```
+
 
 
 
@@ -233,6 +249,9 @@ public class MainActivity extends AppCompatActivity {
 默认就隐式的持有外部Activity的引用，导致Activity内存泄露。要避免内存泄露的话还是需要像上面Handler一样使用静态内部类+弱应用的方式（参考上面Hanlder的正确写法）
 destroy的时候取消task或者线程 thread.interrupt()
 
+
+
+
 未取消注册或回调导致内存泄露
 比如我们在Activity中注册广播，如果在Activity销毁后不取消注册，那么这个广播会一直存在系统中，同上面所说的非静态内部类一样持有Activity引用，
 导致内存泄露。因此注册广播后在Activity销毁后一定要取消注册。
@@ -266,6 +285,34 @@ public class MainActivity extends AppCompatActivity {
 OnClickListener为什么不会导致内存泄露
 一般view设置OnClickListener，View的生命周期与activity一致，跟随activity进行销毁，不会发生内存泄露
  所以注册监听时，注意被观察者的生命周期，一般被观察者都持有观察者的引用
+
+
+给单例设置监听导致的泄漏
+实例：
+```
+ public onCreate(){
+   BleManager.getInstance().addListener(new DeviceListener(){
+    ...//匿名内部类持有外部的activity
+   });
+ }
+```
+解决1 lifecycle
+```
+ public void addDeviceConnectListener(Lifecycle lifecycle,DeviceConnectListener deviceConnect) {
+    lifecycle.addObserver(new DefaultLifecycleObserver() {
+      @Override public void onDestroy(@NonNull LifecycleOwner owner) {
+        DefaultLifecycleObserver.super.onDestroy(owner);
+        deviceConnectListeners.remove(deviceConnect);
+        owner.getLifecycle().removeObserver(this);
+      }
+    });
+    deviceConnectListeners.add(deviceConnect);
+  }
+```
+解决2 listener使用weakReference包裹
+解决3 静态内部类实现监听接口，使用class，然后注意取消回调
+private static class DeviceConnectListenerImpl implements DeviceConnectListener{
+}
 
 
 
@@ -334,6 +381,10 @@ public class MainActivity extends AppCompatActivity {
 ```
 当我们Activity销毁的时，有可能Timer还在继续等待执行TimerTask，它持有Activity的引用不能被回收，
   因此当我们Activity销毁的时候要立即cancel掉Timer和TimerTask，以避免发生内存泄漏。
+
+Toast导致的内存泄漏
+Toast的生命周期可能比activity长
+可以使用applicationContext
 
 
 属性动画造成内存泄露

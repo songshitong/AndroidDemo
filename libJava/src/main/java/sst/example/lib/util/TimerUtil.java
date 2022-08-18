@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 /**
  * @author: songshitong
@@ -14,12 +15,20 @@ public class TimerUtil {
 
   //todo
   //https://cloud.tencent.com/developer/article/1038304
-  public static void retryTask(Runnable runnable,int tryCount,long delay,long period){
+  //实例：
+  //    XGTimeUtil.retryTask((timer) -> {
+  //      if (true) {
+  //        dosomething();
+  //      }else{
+  //        timer.cancel();
+  //      }
+  //    }, 10, 0, 3000);
+  public static void retryTask(Consumer<Timer> consumer,int tryCount,long delay,long period){
     final int[] count = { 0 };
     final Timer[] timer = { new Timer() };
     timer[0].schedule(new TimerTask() {
       @Override public void run() {
-        runnable.run();
+        consumer.accept(timer[0]);
         count[0]++;
         if(count[0]>=tryCount){
           timer[0].cancel();

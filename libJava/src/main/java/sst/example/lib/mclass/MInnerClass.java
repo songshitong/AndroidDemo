@@ -47,6 +47,16 @@ public class MInnerClass {
         lic.name();
     }
 
+    void innerClassWithParam(){
+      MockContext context = new MockContext();
+      new IInnerClassInterface(){
+
+        @Override public void thisMethod() {
+          System.out.println(context);
+        }
+      };
+    }
+
     public void effectivelyFinal(){
            //effectively final功能
 //         Java 中局部内部类和匿名内部类访问的局部变量必须由 final 修饰，以保证内部类和外部类的数据一致性。但从 Java 8 开始，
@@ -96,5 +106,9 @@ public class MInnerClass {
 
    interface IInnerClassInterface{
       public void thisMethod();
+   }
+
+   public class MockContext{
+      String name ="this is MockContext";
    }
 }

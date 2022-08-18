@@ -51,6 +51,13 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 广播还可以通过动态注册：
 ```
 registerReceiver(new MyBroadcastReceiver(),new IntentFilter("test"));
+
+取消注册 无法检查receiver是否注册
+ try {
+      mContext.unregisterReceiver(receiver);
+    }catch (Exception e){
+      Logger.e("receiver未注册");
+    }
 ```
 一定要加上这个权限（坑）  监听电话进行拦截
 ```

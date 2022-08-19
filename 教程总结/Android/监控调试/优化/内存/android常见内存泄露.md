@@ -249,6 +249,23 @@ public class MainActivity extends AppCompatActivity {
 默认就隐式的持有外部Activity的引用，导致Activity内存泄露。要避免内存泄露的话还是需要像上面Handler一样使用静态内部类+弱应用的方式（参考上面Hanlder的正确写法）
 destroy的时候取消task或者线程 thread.interrupt()
 
+单例里面的方法使用内部类，将参数的对象泄漏
+```
+class SingleInstance{
+//一直持有LeScanCallback
+BluetoothAdapter.LeScanCallback leScanCallback = null;
+ public void startScanAndConnect(String sn,ActivityResultLauncher<Intent> launcher) {
+    this.leScanCallback = new BluetoothAdapter.LeScanCallback() {
+      @Override
+      public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
+       //使用launcher
+       connect(launcher);
+      } 
+    };
+  }
+}
+```
+
 
 
 

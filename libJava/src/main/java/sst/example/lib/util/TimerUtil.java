@@ -40,6 +40,6 @@ public class TimerUtil {
 
   public static void main(String[] args) {
     AtomicInteger count= new AtomicInteger();
-    retryTask(() -> System.out.println("执行次数："+ count.getAndIncrement() +" 时间 "+new Date().toString()),5,0,1000);
+    retryTask((timer) -> System.out.println("执行次数："+ count.getAndIncrement() +" 时间 "+new Date().toString()),5,0,1000);
   }
 }

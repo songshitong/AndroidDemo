@@ -155,6 +155,10 @@ mTypedArray.recycle();
 ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
 lp.height = dpToPx(100)
 holder.itemView.setLayoutParams(lp);
+动态修改view的margin
+LinearLayout.LayoutParams lp = (LayoutParams) ceshiTv.getLayoutParams();
+lp.setMargins(30, 50, 22, 10);  //不同的Layout的LayoutParams设置可能不同
+
 
 获取view的大小，创建后获取或者onCreate获取为0
 1

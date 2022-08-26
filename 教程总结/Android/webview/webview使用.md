@@ -1,4 +1,29 @@
+销毁
+```
+ private void destroyWebView() {
+    stopLoading();
+    loadUrl("about:blank");
+    clearHistory();
+    removeAllViews();
+    ViewGroup viewGroup = (ViewGroup) getParent();
+    if (null != viewGroup) {
+      viewGroup.removeView(this);
+    }
+    destroy();
+    webview=null;
+  }
+```
 
+WebViewClient  一般监听控制webview行为
+shouldOverrideUrlLoading
+onPageStarted
+onPageFinished
+onReceivedError 页面加载失败
+
+WebChromeClient
+onReceivedTitle()
+onProgressChanged()
+onJsAlert()
 
 
 https://juejin.cn/post/6844904136937324552#heading-55

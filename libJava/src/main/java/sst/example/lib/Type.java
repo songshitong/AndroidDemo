@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 //基本类型
 public class Type {
     public static void main(String[] args) {
-
         //int的拆箱，装箱
         Integer integer = Integer.valueOf(2);
         int intValue = integer.intValue();

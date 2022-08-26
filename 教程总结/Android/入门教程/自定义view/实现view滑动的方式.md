@@ -37,7 +37,7 @@ LinearLayout.LayoutParams layoutParams= (LinearLayout.LayoutParams) getLayoutPar
 ObjectAnimator.ofFloat(mCustomView,"translationX",0,300).setDuration(1000).start();
 ```
 
-5.scollTo与scollBy
+5.scollTo与scollBy   滚动与设置的值是反的
 scollTo(x,y)表示移动到一个具体的坐标点，而scollBy(dx,dy)则表示移动的增量为dx、dy。其中scollBy最终也是要调用scollTo的。
 scollTo、scollBy移动的是View的内容，如果在ViewGroup中使用则是移动他所有的子View。
 ```

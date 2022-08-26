@@ -212,15 +212,22 @@ public class PaintView extends View {
 
         mPaint.setStyle(Paint.Style.FILL);
 
-        //todo 实现这个效果
+        //todo 实现这个效果  渐变文字 https://blog.csdn.net/u010126792/article/details/85237085
         //设置着色器Shader.TileMode.CLAMP 夹子  Shader.TileMode.repeat 重复    MIRROR镜像
 //        BitmapShader：实现圆形图像
-//        LinearGradient：实现渐变文字
+//        LinearGradient：实现渐变文字  支持两个颜色以及多种，构造器不同
 //        SweepGradient：实现雷达效果
 //        RadialGradient ：水波纹点击效果
 //        LinearGradient 线性渐变
         Shader shader = new LinearGradient(300, 100, 500, 300, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
         Shader shader1 = new LinearGradient(300, 100, 500, 300, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
+
+        //
+        int [] colors = {Color.RED,Color.GREEN, Color.BLUE};
+        float[] position = {0f, 0.3f, 1.0f};//渐变占用的区间 0-0.3 red到green的渐变  0.3-1 green到blue的渐变
+        LinearGradient linearGradient = new LinearGradient(0,0,getMeasuredWidth(),0,colors,position, Shader.TileMode.CLAMP);
+
+
 //        RadialGradient 辐射渐变 radius辐射半径
         shader = new RadialGradient((300 + 500) / 2, (100 + 300) / 2, 80, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
         Shader shader2 = new RadialGradient((300 + 500) / 2, (100 + 300) / 2, 80, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);

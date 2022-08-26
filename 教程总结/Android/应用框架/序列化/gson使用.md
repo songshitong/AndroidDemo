@@ -18,7 +18,27 @@ Type listType = new TypeToken<List<String>>() {}.getType();
    String json = gson.toJson(target, listType);
    //反序列化
    List<String> target2 = gson.fromJson(json, listType);
-   
+
+
+写入流
+Buffer buffer = new Buffer();
+Writer writer = new OutputStreamWriter(buffer.outputStream(), UTF_8);
+JsonWriter jsonWriter = gson.newJsonWriter(writer);
+TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
+adapter.write(jsonWriter, value);
+jsonWriter.close();   
+从流读入
+JsonReader jsonReader = gson.newJsonReader(value.charStream());
+    try {
+       TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
+      T result = adapter.read(jsonReader);
+      if (jsonReader.peek() != JsonToken.END_DOCUMENT) {
+        throw new JsonIOException("JSON document was not fully consumed.");
+      }
+      return result;
+    } finally {
+      value.close();
+    }
 ```
 
 

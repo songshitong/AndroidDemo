@@ -179,10 +179,6 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content" />
 
-    <Button  android:id="@+id/material"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="material"
-            />
     <Button  android:id="@+id/testAnrActivity"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="Test Anr"

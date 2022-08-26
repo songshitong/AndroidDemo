@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomappbar.BottomAppBarTopEdgeTreatment
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.MarkerEdgeTreatment
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -19,7 +20,6 @@ class ShapeActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_shape)
-
     ///负责形状的角度，边缘(图标，聊天气泡的角)
 //        RoundedCornerTreatment圆角  CutCornerTreatment切角
 //        TriangleEdgeTreatment  inside true 向内凹，false 向外凸   边上是否有三角形挖空   OffsetEdgeTreatment给个位移

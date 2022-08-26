@@ -5,3 +5,16 @@ WebView启动优化。
 
 内存泄露
 单独开一个进程,避免其他进程影响
+1 单独进程的activity
+在androidmanifest.xml的activity标签里加上android:process="packagename.web"
+2 使用ApplicationContext代码创建webView
+WebView mWebView = new WebView(getApplicationContext());
+
+
+
+
+https://juejin.cn/post/6844904149608300552#heading-3
+WebView后台耗电问题
+在WebView加载页面的时候，WebView会自动开启线程去加载，如果没有很好地将WebView销毁的话，这些残余的线程会一直在后台运行，由此导致你的应用程序耗电量居高不下
+解决方案：
+在Activity的onstop和onresume里分别把setJavaScriptEnabled()；给设置成false和true。

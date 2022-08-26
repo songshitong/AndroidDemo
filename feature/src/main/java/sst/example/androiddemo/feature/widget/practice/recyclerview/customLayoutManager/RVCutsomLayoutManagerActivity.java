@@ -1,5 +1,7 @@
 package sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager;
 
+import android.graphics.Bitmap;
+import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sst.example.androiddemo.feature.R;
+import sst.example.androiddemo.feature.graphics.BitmapActivity;
 
 public class RVCutsomLayoutManagerActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
@@ -28,10 +31,15 @@ public class RVCutsomLayoutManagerActivity extends AppCompatActivity {
         mAdapter = new RecyclerAdapter(mList);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        Button saveToGalleryBtn = findViewById(R.id.saveToGalleryBtn);
+        saveToGalleryBtn.setOnClickListener(v->{
+          Bitmap bitmap = BitmapActivity.shotRecyclerView(mRecyclerView);
+          BitmapActivity.saveImageToGallery(getBaseContext(),bitmap);
+        });
     }
 
     private void initData() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 20; i++) {
             mList.add(new Bean("content = " + i, Color.parseColor(ColorUtils.generateRandomColor())));
         }
     }

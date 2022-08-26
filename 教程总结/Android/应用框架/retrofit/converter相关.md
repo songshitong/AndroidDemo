@@ -1,6 +1,6 @@
 转换器主要用于将okhttp的ResponseBody转换为业务类，或者将业务类转为RequestBody
 
-converter接口    //todo泛型的使用
+converter接口    
 ```
 public interface Converter<F, T> {
   @Nullable
@@ -236,3 +236,44 @@ Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
   }  
 ```
 可以看到主要是用于将网络响应ResponseBody转换为业务类
+
+
+其他converter
+ScalarsConverter
+request 将基本数据类型转为string
+response 将string转为基本数据类型
+以responseBodyConverter为例 scalars/src/main/java/retrofit2/converter/scalars/ScalarsConverterFactory.java
+```
+ public @Nullable Converter<ResponseBody, ?> responseBodyConverter(
+      Type type, Annotation[] annotations, Retrofit retrofit) {
+    if (type == String.class) {
+      return StringResponseBodyConverter.INSTANCE;
+    }
+    if (type == Boolean.class || type == boolean.class) {
+      return BooleanResponseBodyConverter.INSTANCE;
+    }
+    if (type == Byte.class || type == byte.class) {
+      return ByteResponseBodyConverter.INSTANCE;
+    }
+    if (type == Character.class || type == char.class) {
+      return CharacterResponseBodyConverter.INSTANCE;
+    }
+    if (type == Double.class || type == double.class) {
+      return DoubleResponseBodyConverter.INSTANCE;
+    }
+    if (type == Float.class || type == float.class) {
+      return FloatResponseBodyConverter.INSTANCE;
+    }
+    if (type == Integer.class || type == int.class) {
+      return IntegerResponseBodyConverter.INSTANCE;
+    }
+    if (type == Long.class || type == long.class) {
+      return LongResponseBodyConverter.INSTANCE;
+    }
+    if (type == Short.class || type == short.class) {
+      return ShortResponseBodyConverter.INSTANCE;
+    }
+    return null;
+  }
+}
+```

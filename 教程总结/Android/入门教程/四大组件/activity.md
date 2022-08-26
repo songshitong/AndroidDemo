@@ -123,6 +123,13 @@ FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
 具有这个标记的 Activity 不会出现在历史 Activity 的列表中，在某些情况下我们不希望用户通过历史列表回到我们的 Activity 的
    时候这个标记比较有用。它等同于在 XML 中指定 Activity 的属性 android:excludeFromRecents="true"。
 
+退出登录时，关闭其他activity
+Intent intent = new Intent(context, XXActivity.class);
+intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+| Intent.FLAG_ACTIVITY_CLEAR_TOP
+| Intent.FLAG_ACTIVITY_NEW_TASK);
+context.startActivity(intent);
+
 
 taskAffinity 是否相同会直接影响到后台是否在同一张任务卡片里
 默认情况下，所有activity所需的任务栈的名字为应用的包名，可以通过给activity指定TaskAffinity属性来指定任务栈，

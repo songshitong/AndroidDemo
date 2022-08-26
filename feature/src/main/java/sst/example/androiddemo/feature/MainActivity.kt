@@ -20,7 +20,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
-import com.sst.material.BottomNavigationActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
@@ -189,12 +188,6 @@ class  MainActivity : AppCompatActivity()  {
         ffmpeg.setOnClickListener {
             val intent = Intent(this, FFmpegActivity::class.java)
             startActivity(intent)
-        }
-
-        material.setOnClickListener {
-            val intent = Intent(this, BottomNavigationActivity::class.java)
-            startActivity(intent)
-
         }
 
 

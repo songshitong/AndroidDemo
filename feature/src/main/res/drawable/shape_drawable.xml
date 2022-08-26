@@ -30,6 +30,7 @@ gradient设置颜色渐变与<solid>为互斥标签，因为solid表示纯色填
 颜色可以使用 startColor,centerColor,endColor三种或两种start，end
 android:gradientRadius	渐变的半径，当android:type=”radial”有效
 android:angle	渐变的角度，默认为0，其值务必为45°的倍数，0表示从左到右，90表示从下到上。 180是颜色反向
+   部分机型不是45的倍数会报出异常闪退，Android11以后不会抛出异常
 android:centerX	渐变中心点的横坐标
 android:centerY	渐变的中心点的纵坐标，渐变中心点会影响渐变的具体效果。
 android:type	渐变类别，linear(线性)为默认值，radial（径内渐变），sweep（扫描渐变）

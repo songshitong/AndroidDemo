@@ -28,7 +28,7 @@ onDestroy 与下一个activity的关系
 
 弹出dialog        没有生命周期变化
 被其他activity覆盖其上DialogActivity    onPause      DialogActivity消失 onResume
-
+弹出Toast
 
 锁屏：onPause,onStop,停滞状态               解锁屏： onRestart,onStart,onResume  不可见的activity也会触发
 

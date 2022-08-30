@@ -342,12 +342,14 @@ public class PaintView extends View {
 //        SOLID: 内部正常绘制，外部模糊
 //        INNER: 内部模糊，外部不绘制
 //        OUTER: 内部不绘制，外部模糊（
-        MaskFilter mf = new BlurMaskFilter(100, BlurMaskFilter.Blur.NORMAL);
+        MaskFilter mf = new BlurMaskFilter(200, BlurMaskFilter.Blur.INNER);
+        mPaint.setMaskFilter(mf);
+        canvas.drawBitmap(bitmapB,100,700,mPaint);
 
 //        EmbossMaskFilter  浮雕效果的 MaskFilter
         mf = new EmbossMaskFilter(new float[]{0, 1, 1}, 0.2f, 8, 10);
         mPaint.setMaskFilter(mf);
-        canvas.drawBitmap(bitmapB,100,700,mPaint);
+        canvas.drawBitmap(bitmapB,100,1000,mPaint);
 
 
 //        获取绘制的path 获取path后可以进行一些效果操作

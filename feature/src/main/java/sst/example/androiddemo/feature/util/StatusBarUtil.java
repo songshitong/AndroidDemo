@@ -1,6 +1,7 @@
 package sst.example.androiddemo.feature.util;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,7 +21,14 @@ public class StatusBarUtil {
       // true表示Light Mode，状态栏字体呈黑色(整体是偏白色，字体是黑色)，反之呈白色
       wic.setAppearanceLightStatusBars(statusTextBlack);
     }
-    window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+    //// TODO: 2022/8/30 属性设置
+    int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+    systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+    window.getDecorView().setSystemUiVisibility(systemUiVisibility);
+    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    window.setStatusBarColor(Color.TRANSPARENT);
   }
 
   //配合透明状态栏使用

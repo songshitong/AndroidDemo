@@ -1,4 +1,13 @@
 
+setResult不生效,手势退出的时候，可能是没有设置
+```
+ @Override public void onBackPressed() {
+    setResult();
+    super.onBackPressed();
+  }
+```
+
+
 onActivityResult缺点必须在activity或fragment里面，不能脱离
 多个intent的结果在同一个方法里面，很容易变得非常庞大
 

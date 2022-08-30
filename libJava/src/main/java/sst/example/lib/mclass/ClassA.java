@@ -21,4 +21,26 @@ public abstract class ClassA {
       //PLATFORM_BASE_URL = "...";
       //APPNO_VALUE = "12321";
    }
+
+   public static void main(String[] args) {
+      //普通代码块
+      {
+         int a =1;
+         int b = ++a;
+         System.out.println("b is "+b);
+      }
+      ClassA classA = new ClassA() {
+         @Override ClassB getClassB() {
+            return null;
+         }
+      };
+   }
+
+   //https://cloud.tencent.com/developer/article/1423768
+   //构造代码块：直接在类中定义且没有加static关键字的代码块称为{}构造代码块。构造代码块在创建对象时被调用，每次创建对象都会被调用，
+   // 并且构造代码块的执行次序优先于类构造函数。如果存在多个构造代码块，执行顺序由他们在代码中出现的次序决定，先出现先执行。
+   {
+     int a =111;
+     System.out.println("a is "+a);
+   }
 }

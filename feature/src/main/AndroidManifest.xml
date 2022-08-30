@@ -70,7 +70,7 @@
         android:name=".activity.testAnr.TestAnrActivity"
         android:exported="false" />
     <activity android:name=".activity.StartForResultActivity" />
-    <activity android:name=".widget.ViewOutlineProvider" />
+    <activity android:name=".widget.ViewOutlineProviderActivity" />
     <activity android:name=".camera.CameraActivity" />
     <activity android:name=".activity.LinearLayoutActivity" />
     <activity android:name=".activity.launchmode.OtherActivity" />

@@ -58,7 +58,9 @@ public CustomView(Context context, AttributeSet attrs) {
 ```
 接下来重写computeScroll()方法，系统会在绘制View的时候在draw()方法中调用该方法，这个方法中我们调用父类的scrollTo()方法
 并通过Scroller来不断获取当前的滚动值，每滑动一小段距离我们就调用invalidate()方法不断的进行重绘，重绘就会调用computeScroll()方法，
-这样我们就通过不断的移动一个小的距离并连贯起来就实现了平滑移动的效果：
+这样我们就通过不断的移动一个小的距离并连贯起来就实现了平滑移动的效果：  //draw->computeScroll->invalidate->draw...无限刷新滚动
+//如果自己知道滚动的距离和时间，可以不借助Scroller，自己重写computeScroll来实现停止的条件
+//todo scroller源码
 ```
 @Override
 public void computeScroll() {

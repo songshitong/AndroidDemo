@@ -2,6 +2,8 @@ package com.sst.material
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.CheckBox
+import com.google.android.material.checkbox.MaterialCheckBox
 
 class BottomNavigationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

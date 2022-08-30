@@ -41,6 +41,7 @@ import sst.example.androiddemo.feature.util.ToastUtil
 import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
+import sst.example.androiddemo.feature.widget.ViewOutlineProviderActivity
 import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
@@ -385,6 +386,11 @@ class  MainActivity : AppCompatActivity()  {
         startActivity(Intent(this,
           DialogFragmentActivity::class.java))
       }
+      viewOutlineProviderBtn.setOnClickListener {
+        startActivity(Intent(this,
+          ViewOutlineProviderActivity::class.java))
+      }
+
         //测试livedata连续调用
         val ld = MutableLiveData<String>()
         ld.observe(this) {

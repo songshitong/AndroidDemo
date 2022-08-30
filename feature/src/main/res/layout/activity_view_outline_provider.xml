@@ -4,6 +4,13 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".widget.ViewOutlineProvider">
+        tools:context=".widget.ViewOutlineProviderActivity">
+  <androidx.appcompat.widget.AppCompatImageView
+      android:id="@+id/outlineImage"
+      android:src="@mipmap/ic_launcher"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      android:layout_width="100dp"
+      android:layout_height="100dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

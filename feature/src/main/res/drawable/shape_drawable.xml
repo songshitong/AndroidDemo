@@ -6,6 +6,7 @@
               android:angle="45"
               android:type="linear"/>
     <corners  android:radius="5dp"/>
+<!--    背景距离内容的边距-->
     <padding android:top="10dp" android:left="-150dp" android:right="100dp"/>
 
     <stroke android:color="@android:color/black" android:width="2dp" android:dashWidth="10dp" android:dashGap="5dp"/>
@@ -16,7 +17,7 @@
         <!--
 
 android:shape  rectangle 长方形 /默认,oval 椭圆,line 线,ring 环形
-
+<size android:width="200dp" android:height="200dp"/> 指定大小
  <solid android:color="@color/colorGrey500"/> 填充色
 
 radius设置四周的圆角， bottomLeftRadius 左下

@@ -2,18 +2,39 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
             android:opacity="translucent"
 >
-    <item
-            android:top="50dp"
-            android:id="@+id/layer_drawable_item1"
-    >
-        <shape
-                android:shape="rectangle"
-        >
-            <solid android:color="@color/colorPrimaryDark"/>
+<!--    底部线的示例-->
+<!--    底部线的颜色-->
+    <item>
+        <shape>
+            <solid android:color="#9b9b9b" />
         </shape>
     </item>
-</layer-list>
+<!--    背景色白色 底部1px，将线留出一条缝-->
+    <item android:bottom="1px">
+        <shape>
+            <solid android:color="@android:color/white" />
+            <padding
+                android:bottom="5dp"
+                android:left="8dp"
+                android:right="8dp"
+                android:top="5dp" />
+        </shape>
+    </item>
 
-        <!--autoMirrored 镜像
+<!--    <item-->
+<!--            android:top="50dp"-->
+<!--            android:id="@+id/layer_drawable_item1"-->
+<!--    >-->
+<!--        <shape-->
+<!--                android:shape="rectangle"-->
+<!--        >-->
+<!--            <solid android:color="@color/colorPrimaryDark"/>-->
+<!--        </shape>-->
+<!--    </item>-->
+</layer-list>
+<!--    android:drawable="" 配置图片等-->
+<!--    android:top="50dp" 是放置drawable的位置-->
+<!--    android:gravity="bottom"是对齐 可能不生效-->
+    <!--autoMirrored 镜像
         opacity 不透明度     opaque不透明   translucent 半透明  transparent透明
         -->

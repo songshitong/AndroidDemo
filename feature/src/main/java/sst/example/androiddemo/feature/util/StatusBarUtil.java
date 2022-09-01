@@ -12,6 +12,7 @@ import sst.example.androiddemo.feature.R;
 //可以参考 https://github.com/Zackratos/UltimateBarX
 public class StatusBarUtil {
   //https://juejin.cn/post/6878195975966425101#heading-10
+  //https://blog.csdn.net/QQxiaoqiang1573/article/details/79867127
   //沉浸式状态栏
   //设置透明状态栏颜色 然后所有屏幕展示contentView，状态栏是颜色默认，但是内容顶上去了
   public void setTranslucentStatusBar(Window window,boolean statusTextBlack) {
@@ -22,11 +23,15 @@ public class StatusBarUtil {
       wic.setAppearanceLightStatusBars(statusTextBlack);
     }
 
-    //// TODO: 2022/8/30 属性设置
     int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+    //稳定布局，主要是在全屏和非全屏切换时，布局不要有大的变化。一般和View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN、View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION搭配使用。同时，android:fitsSystemWindows要设置为true
+    //
     systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+    //该方法废弃了，建议使用WindowInsetsController
     window.getDecorView().setSystemUiVisibility(systemUiVisibility);
+    //FLAG_TRANSLUCENT_STATUS被废弃了，建议使用window.setStatusBarColor
     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    //绘制状态栏背景，颜色为透明色
     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
     window.setStatusBarColor(Color.TRANSPARENT);
   }

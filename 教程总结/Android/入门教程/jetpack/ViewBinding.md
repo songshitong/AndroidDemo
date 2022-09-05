@@ -184,4 +184,4 @@ public abstract class ViewDataBinding extends BaseObservable implements ViewBind
 
 dataBinding生成文件目录
 /build/generated/data_binding_base_class_source_out/debug/out/.../databinding/ActivityMainBinding.java
-//todo dataBinding原理
+//todo dataBinding原理 与synthetic的实现对比

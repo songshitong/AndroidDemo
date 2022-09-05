@@ -33,10 +33,12 @@
                 android:text="three" />
     </LinearLayout>
 
+<!--    每个子view的weight是确定的话，android:weightSum="6"可以不用指定-->
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:weightSum="6"
             android:orientation="horizontal">
 
         <TextView
@@ -69,7 +71,6 @@
 
     <LinearLayout
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
@@ -100,7 +101,6 @@
     </LinearLayout>
     <LinearLayout
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">

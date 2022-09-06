@@ -19,6 +19,7 @@ import kotlin.math.ceil
 class ShapeActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    MaterialCheckBox
     setContentView(R.layout.activity_shape)
     ///负责形状的角度，边缘(图标，聊天气泡的角)
 //        RoundedCornerTreatment圆角  CutCornerTreatment切角

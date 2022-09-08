@@ -93,6 +93,7 @@ xml  enabled为false，service不启动了
 对于既使用startService，又使用bindService的情况，结束服务时需要注意的事项：Service的终止，
   需要unbindService和stopService都调用才行；
 
+前台服务从android8.0开始支持
 前台服务与后台服务
 前台Service和后台Service（普通）最大的区别就在于：
 前台Service在下拉通知栏有显示通知，但后台Service没有；
@@ -103,7 +104,6 @@ xml  enabled为false，service不启动了
     public void onCreate() {
         super.onCreate();
         System.out.println("执行了onCreat()");
-
         //添加下列代码将后台Service变成前台Service
         //构建"点击通知后打开MainActivity"的Intent对象
         Intent notificationIntent = new Intent(this,MainActivity.class);
@@ -118,8 +118,16 @@ xml  enabled为false，service不启动了
 
         Notification notification = builer.getNotification();//将Builder对象转变成普通的notification
         startForeground(1, notification);//让Service变成前台Service,并在系统的状态栏显示出来
-
     }
+```
+也可以使用 ContextCompat.startForegroundService()
+```
+if (Build.VERSION.SDK_INT >= 26) {
+    Api26Impl.startForegroundService(context, intent);
+} else {
+    // Pre-O behavior.
+    context.startService(intent);
+}
 ```
    
    远程服务  使用隐式intent

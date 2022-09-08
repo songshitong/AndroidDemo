@@ -67,7 +67,23 @@ activity onCreate,onStart,onResume,onCreateOptionsMenu,onPrepareOptionsMenu
   //平板，横屏   
        MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);   
 ```
-  
+其他设置
+https://www.jianshu.com/p/1903511d677f
+ActivityInfo.SCREEN_ORIENTATION_USER,//用户选择方向
+ActivityInfo.SCREEN_ORIENTATION_BEHIND,//继承Activity堆栈中当前Activity下面的那个Activity的方向
+ActivityInfo.SCREEN_ORIENTATION_SENSOR,//由物理感应器决定显示方向
+ActivityInfo.SCREEN_ORIENTATION_NOSENSOR,//忽略物理感应器——即显示方向与物理感应器无关
+ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE,   //锁定屏幕方向横屏  可以180度旋转
+ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT,    //锁定屏幕方向竖屏  可以180度旋转
+ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE,  //反向-横屏
+ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT,
+ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR, // Activity的方向由方向传感器来决定，显示会根据用户设备的移动情况来旋转
+// 希望Activity在横向屏幕上显示，但是可以根据用户指定的方向来进行改变
+https://www.jianshu.com/p/198f4d21a991
+ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
+ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
+
+
 
 activity与fragment
 activity重建伴随着fragment创建，fragment只是不显示

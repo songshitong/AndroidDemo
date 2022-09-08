@@ -62,3 +62,7 @@ public class ViewPagerFragmentStateAdapter extends FragmentStateAdapter {
     }
 }
 ```
+
+
+监听fragment是否显示
+ViewPager2 + FragmentStateAdapter + onResume()/onStop

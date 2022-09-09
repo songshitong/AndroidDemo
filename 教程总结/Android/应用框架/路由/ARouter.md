@@ -20,7 +20,7 @@ class AppModuleApplication : Application() {
     }
 }
 ```
-使用
+使用  activity或者fragment都可以
 ```
 @Route(path = "/login/LoginActivity")
 class LoginActivity : AppCompatActivity() {

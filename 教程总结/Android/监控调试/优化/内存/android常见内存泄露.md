@@ -327,7 +327,7 @@ OnClickListener为什么不会导致内存泄露
   }
 ```
 解决2 listener使用weakReference包裹
-解决3 静态内部类实现监听接口，使用class，然后注意取消回调
+解决3 静态内部类实现监听接口，使用class，然后注意onDestroy取消回调
 private static class DeviceConnectListenerImpl implements DeviceConnectListener{
 }
 

@@ -11,9 +11,11 @@ https://www.jianshu.com/p/79d909b6f8bd
 //所有的事件的值都会保留   
 1 好处，再次使用，可以拿到以前的值
 2 坏处，没有自动重置，再次使用可能收到以前的干扰  所有状态都保存在内存中。。。。
+  没有默认值，需要自己改造
 ```
 public class LiveEventBus {
 
+ //Class<T> clz用于确定liveData传入的泛型，并没有使用
   public static <T> MutableLiveData<T> getDefault(String key, Class<T> clz) {
     return ready().with(key, clz);
   }

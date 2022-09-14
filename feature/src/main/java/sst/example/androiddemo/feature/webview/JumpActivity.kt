@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_jump.*
 import sst.example.androiddemo.feature.R
 
+//scheme跳转方式
 class JumpActivity : AppCompatActivity() {
     val url = "sstdemo://www.sstdemo.com:80/mypath?key=mykey"
     override fun onCreate(savedInstanceState: Bundle?) {

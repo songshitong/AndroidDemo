@@ -1,4 +1,36 @@
 
+指示器配置  tab_selector.xml配置不同的drawable即可android:state_selected
+```
+<androidx.viewpager2.widget.ViewPager2
+    android:id="@+id/photos_viewpager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.tabs.TabLayout
+        app:tabBackground="@drawable/tab_selector"
+        app:tabGravity="center"
+        app:tabIndicatorHeight="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</androidx.viewpager.widget.ViewPager>
+
+//tablayout与ViewPager2绑定
+TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
+    when (position) {
+        0 -> {
+            tab.text = textLabel1
+            tab.icon = drawable1
+        }
+        1 -> {
+            tab.text = textLabel2
+            tab.icon = drawable2
+        }
+        ...
+    }
+}.attach()
+```
+
+
 监听page变换
 ViewPager.registerOnPageChangeCallback
 ```

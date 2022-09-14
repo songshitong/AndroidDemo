@@ -10,7 +10,7 @@ https://blog.csdn.net/tst116/article/details/118101947
 在控件中解析layout id中特定id的控件来达到用户自定义布局中的控件与视频播放ExoPlayer关联
 app:player_layout_id="@layout/live_playback_custom_player_view_layout"
 
-自定义布局中
+自定义布局中  自定义布局必须有原始布局的viewId
 id=exo_overlay为视频之上可显示的控件，主要显示自定义的播放视频的各种状态显示。
 id=exo_controller为用户控制播放器的控件id
 
@@ -20,6 +20,8 @@ com/google/android/exoplayer2/ui/StyledPlayerView.java
 将对应LayoutId的布局添加到ViewGroup中
 ```
 LayoutInflater.from(context).inflate(playerLayoutId, this);
+contentFrame = findViewById(R.id.exo_content_frame);
+StyledPlayerControlView customController = findViewById(R.id.exo_controller); //控制器
 ```
 布局为exo_content_frame,exo_shutter,exo_artwork,exo_subtitles,exo_buffering,exo_error_message,exo_ad_overlay
 exo_overlay,exo_controller_placeholder

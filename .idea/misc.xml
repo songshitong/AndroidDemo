@@ -28,6 +28,11 @@
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_key_frame.xml" value="0.1" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_layout.xml" value="0.30520833333333336" />
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_main.xml" value="0.1" />
+<<<<<<< HEAD
+=======
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_rvcutsom_layout_manager.xml" value="0.30520833333333336" />
+        <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_scheme.xml" value="0.30520833333333336" />
+>>>>>>> 30d6b23c37a757e70ab527583d0dd959dfae85e7
         <entry key="..\:/workspace/AndroidDemo/feature/src/main/res/layout/activity_view_property_animator.xml" value="0.11956521739130435" />
         <entry key="feature/src/main/res/drawable/animation_drawable.xml" value="0.2255" />
         <entry key="feature/src/main/res/layout/activity_anr.xml" value="0.22916666666666666" />

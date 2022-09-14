@@ -1,5 +1,6 @@
 package com.sst.libkotlin.clasz
 
+
 //kotlin object关键字的用法
 //1、单例
 //2、伴生对象   Companion伴侣
@@ -8,6 +9,7 @@ object MObjectSingleton{
 }
 
 class MObject {
+    val a =1
 //    https://www.bilibili.com/video/BV1Yq4y1U7rS?p=2
     //伴生对象 --类内部的对象声明
     //可以忽略名称  忽略名称后的方法调用 MObject.create()  忽略名称后默认编译的名字为Companion
@@ -28,6 +30,9 @@ class MObject {
 
         @JvmStatic
         fun main(args: Array<String>) {
+            //访问外部的a，相当于在静态方法中调用普通属性 新建一个对象,然后调用
+            println(create().a)
+
             //调用
             MObject.Factory.create()
 

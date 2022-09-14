@@ -1,5 +1,5 @@
 https://developer.android.com/guide/topics/connectivity/bluetooth-le?hl=zh-cn
-
+https://developer.android.com/guide/topics/connectivity/bluetooth/find-ble-devices 中文版可能落后
 
 Android 4.3 （API 18 ）引入了低功耗蓝牙，应用可以查询周围设备、查询设备的服务、传输信息
 
@@ -106,7 +106,8 @@ private BluetoothAdapter.LeScanCallback leScanCallback =
    }
 };
 ```
-BlueBoothDevice代表蓝牙设备
+BlueBoothDevice代表蓝牙设备  蓝牙设备的相关信息可能为空,可能受距离影响，离得远了就拿不到设备，连接不成功了
+ 例如getName()返回null 可以备用mac地址
 ```
 public String getName()
 public BluetoothGatt connectGatt(Context context, boolean autoConnect, BluetoothGattCallback callback)

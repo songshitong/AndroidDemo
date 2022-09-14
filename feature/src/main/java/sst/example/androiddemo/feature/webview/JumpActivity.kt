@@ -18,7 +18,10 @@ class JumpActivity : AppCompatActivity() {
             try {
                 startActivity(intent)
             }catch (e:Exception){
+              //拉不起来可以执行其他操作...比例打开备用页面
               Log.e("JumpActivity",e.printStackTrace().toString())
+              //错误信息
+              //   android.content.ActivityNotFoundException: No Activity found to handle Intent { act=android.intent.action.VIEW dat=sstdemo://www.sstdemo.com:80/mypath?key=mykey }
             }
         }
     }

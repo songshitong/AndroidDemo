@@ -98,7 +98,7 @@
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
     <activity android:name=".activity.FragmentActivity" />
     <activity
-        android:name=".activity.NormalActivity"
+        android:name=".activity.TestOrientationActivity"
         android:configChanges="orientation|keyboardHidden|screenSize" />
     <activity
         android:name=".activity.DialogActivity"

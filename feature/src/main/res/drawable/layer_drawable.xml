@@ -4,7 +4,7 @@
 >
 <!--    底部线的示例-->
 <!--    底部线的颜色-->
-    <item>
+    <item android:id="@+id/layer_drawable_item1">
         <shape>
             <solid android:color="#9b9b9b" />
         </shape>

@@ -56,7 +56,7 @@ class  MainActivity : AppCompatActivity()  {
         setContentView(R.layout.activity_main)
         getAndroidInfo()
         getMethodTrace()
-        ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)
+        // ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)
         var startTime = System.currentTimeMillis()
         val sp: SharedPreferences = getSharedPreferences("sp", Context.MODE_PRIVATE)
         sp.edit().putString("a","11111").apply();

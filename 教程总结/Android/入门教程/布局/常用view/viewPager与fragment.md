@@ -1,4 +1,9 @@
 
+指示器：
+viewPager+tabLayout 默认等比布局，不好调边距等
+viewPager+radioGroup  viewPager+多个ImageView等
+三方库
+
 监听page变换
 ViewPager.registerOnPageChangeCallback
 ```

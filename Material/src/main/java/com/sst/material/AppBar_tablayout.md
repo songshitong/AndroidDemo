@@ -21,9 +21,12 @@ https://github.com/material-components/material-components-android/blob/master/d
 
 
 https://juejin.cn/post/6844903975024590861
+TabLayout默认等比布局，边距不好调
 结构
 TabLayout继承自 HorizontalScrollView
 {TabView TabView TabView(taview内容取自TabItem) }
+Tab是一个数据类，包含TabLayout，TabView等
+TabLayout.SlidingTabIndicator指示器  extends LinearLayout
 
 tabLayout动态设置item文字
 tabLayout.getTabAt(binding.audioRecordTabSelect.getTabCount()-1).setText(Html.fromHtml(getFailText()));

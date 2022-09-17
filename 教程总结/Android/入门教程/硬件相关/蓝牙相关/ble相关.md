@@ -1,5 +1,5 @@
-https://developer.android.com/guide/topics/connectivity/bluetooth-le?hl=zh-cn
-https://developer.android.com/guide/topics/connectivity/bluetooth/find-ble-devices 中文版可能落后
+https://developer.android.com/guide/topics/connectivity/bluetooth-le?hl=zh-cn  中文版可能落后
+https://developer.android.com/guide/topics/connectivity/bluetooth/find-ble-devices  新的版本
 
 Android 4.3 （API 18 ）引入了低功耗蓝牙，应用可以查询周围设备、查询设备的服务、传输信息
 
@@ -38,8 +38,21 @@ public BluetoothLeScanner getBluetoothLeScanner()
  public BluetoothDevice getRemoteDevice(String address)
 
 //扫描设备 可能被废弃了
-public boolean startLeScan(BluetoothAdapter.LeScanCallback callback)
+public boolean startLeScan(BluetoothAdapter.LeScanCallback callback)  //内部调用Scanner的方法
 public void stopLeScan(BluetoothAdapter.LeScanCallback callback) 
+//使用scanner
+ScanSettings settings = new ScanSettings.Builder().setCallbackType(
+                        ScanSettings.CALLBACK_TYPE_ALL_MATCHES)  //匹配所有
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY) //高频率，低延迟适用于前台app
+                        .build();
+List<ScanFilter> filters = new ArrayList<ScanFilter>();
+if (serviceUuids != null && serviceUuids.length > 0) {
+    ScanFilter filter =
+            new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUuids[0])) //final UUID[] serviceUuids 过滤设备的service uuid
+                    .build();
+    filters.add(filter);
+}
+scanner.startScan(filters, settings, scanCallback);
 ```
 2.启用蓝牙
 ```

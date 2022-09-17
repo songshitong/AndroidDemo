@@ -27,7 +27,7 @@ class KotlinPractice {
 //3 当一个类没有显示的定义主构造函数，但是定义了次构造函数时，那么被继承的类后面不需要加 ()
 //若主构造函数无任何注解 / 可见性修饰符，可省略 constructor 关键字
 
-//类默认不可以被继承，使用open表示可以继承
+//类默认不可以被继承，使用open表示可以继承  abstract默认可以继承，不用增加open
 //    private ：本类内部都可见
 //    protected ：本类内部 & 子类中可见
 //    public：能见到类声明的任何客户端都可以见（public成员）(默认)
@@ -46,7 +46,8 @@ open class User private constructor(userName: String, age: Int = 10) : User1(use
 //init块是在主构造函数执行后立即执行的初始化块。一个类文件可以有一个或多个将串行执行的初始化块。如果你想在主构造函数中执行一些操作，
 // 那么在 Kotlin 中是不可能的，为此你需要使用init块
 init {
-  //...
+  //...   没有主构造器，init也调用，查看TestClass
+  println("this is user init")
 }
 
 
@@ -109,6 +110,12 @@ init {
   // * 使用：通过外部类的实例调用嵌套类
   // */
   //编译为 User里面 public final class User2
+  //内部类的继承
+  // class ExClass : AbClass() {  //外部继承，内部也继承
+  //   private inner class T : AbClass.Test() {
+  //
+  //   }
+  // }
   inner class User2 {
 
   }
@@ -166,3 +173,22 @@ val userData2: UserData = userData1.copy(age = 30)
 //@Parcelize
 //data class TestD(val name: String?):Parcelable {
 //}
+
+
+public class TestClass{
+  companion object{
+    @JvmStatic
+    fun main(args: Array<String>) {
+      val noConstruct = NoConstructClass("aa",10)
+    }
+  }
+}
+open class Class1{
+  constructor(name: String)
+}
+class NoConstructClass : Class1{
+  constructor(name: String,age: Int):super(name)
+  init {
+    println("this is init method")
+  }
+}

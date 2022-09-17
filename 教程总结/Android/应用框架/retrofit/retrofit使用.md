@@ -107,6 +107,7 @@ public class ProgressRequestBody extends RequestBody {
   private UploadCallbacks mListener;
   private String content_type;
   private static final int DEFAULT_BUFFER_SIZE = 2048;
+  Handler handler = new Handler(Looper.getMainLooper());
 
   public interface UploadCallbacks {
     void onProgressUpdate(int percentage);
@@ -141,7 +142,6 @@ public class ProgressRequestBody extends RequestBody {
 
     try {
       int read;
-      Handler handler = new Handler(Looper.getMainLooper());
       while ((read = in.read(buffer)) != -1) {
         //读完了
         uploaded += read;
@@ -151,14 +151,19 @@ public class ProgressRequestBody extends RequestBody {
       }
 
     } catch (Exception e) {
-       if(null != mListener){
-        mListener.onError();
-      }
+       callListenerError();
     } finally {
       in.close();
     }
   }
-
+  
+  //切换到主线程
+  private void callListenerError() {
+    if (null != mListener) {
+      handler.post(()-> mListener.onError());
+    }
+  }
+  
   private class ProgressUpdater implements Runnable {
     private long mUploaded;
     private long mTotal;

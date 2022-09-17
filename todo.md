@@ -22,3 +22,7 @@ https://www.zhihu.com/question/487990120/answer/2295005139
 https://blog.csdn.net/huangliniqng/article/details/125210444
 
 
+mediacodec
+https://www.jianshu.com/p/f5a1c9318524
+
+view.OnAttachStateChangeListener

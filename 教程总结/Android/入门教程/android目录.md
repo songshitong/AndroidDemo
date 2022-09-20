@@ -3,7 +3,7 @@
 
 context.getExternalCacheDir()
 目录在/storage/emulated
-context.getCacheDir()目录在/data/data/
+context.getCacheDir()目录在/data/data/       Cache目录在部分手机升级时文件会被丢弃，不要存放重要文件，只存放缓存
 /data/user/0/包名/cache
 ```
   if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())

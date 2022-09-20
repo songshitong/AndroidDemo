@@ -59,9 +59,9 @@ getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) 
     <item name="android:windowNoTitle">true</item>
   </style>    
 ```
-editNameDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen);
+editNameDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen); //onCreate中设置style也可以
 editNameDialogFragment.show(getSupportFragmentManager(), "edit");
-onCreate中设置边距
+onCreate中设置边距/style
 ```
  @Override public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

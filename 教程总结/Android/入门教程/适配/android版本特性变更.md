@@ -52,10 +52,11 @@ Android 9.0	28	P	网络连接变更
 
 对使用非 SDK 接口的限制
 
-
 Android 10.0	29	Q	引入分区存储
 分区存储：应用在默认情况下被赋予了对外部存储空间的分区访问权限（即分区存储）。此类应用只能访问外部存储空间上的应用专属目录，
   以及本应用所创建的特定类型的媒体文件。一般有图片，视频，音频，Download/等
+https://developer.android.com/training/data-storage/app-specific?hl=zh-cn
+可以访问应用自身的沙盒和特定的外部存储(高版本不需要权限，低版本需要)
 可能会遇到无法保存图片到本地，或者造成Permission denied等问题，具体解决方案参考：《关于安卓open failed: EACCES (Permission denied)》
   https://myhub.blog.csdn.net/article/details/108701706
   使用，新增媒体文件使用ContentProvider https://developer.android.com/training/data-storage/shared/media#java

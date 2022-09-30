@@ -39,7 +39,7 @@ public class StatusBarUtil {
   //配合透明状态栏使用
   //给需要留边的view使用(增加一个状态栏的高度的paddingTop)  一般不用在根布局，这样内容又被顶下来了
   //设置fitSystemWindow  https://stackoverflow.com/questions/30439661/androidfitssystemwindows-at-runtime
-  //xml中android:fitsSystemWindows="true"
+  //xml中android:fitsSystemWindows="true"  最好不用在非根布局，有没有刘海屏影响到父布局的marginTop
   public void fitSystemWindow(Activity activity){
     View view = activity.findViewById(android.R.id.content);
     view.setFitsSystemWindows(false);

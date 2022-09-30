@@ -164,3 +164,8 @@ https://source.android.google.cn/devices/architecture/kernel/android-common
 
 goldfish地址在线地址
 https://android.googlesource.com/kernel/goldfish/+/refs/heads/android-goldfish-3.4/drivers/staging/android/binder.c
+
+
+蓝牙模块
+常见gatt目录
+https://android.googlesource.com/platform/packages/apps/Bluetooth/+/319aeae6f4ebd13678b4f77375d1804978c4a1e1/src/com/android/bluetooth

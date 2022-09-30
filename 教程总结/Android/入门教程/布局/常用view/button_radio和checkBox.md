@@ -49,3 +49,11 @@ android:minWidth=1dp
 <item name="android:minHeight">1dp</item>
 <item name="android:minWidth">1dp</item>
 ```
+
+button去除阴影
+```
+//1
+android:stateListAnimator="@null"
+//2
+elevation=0
+```

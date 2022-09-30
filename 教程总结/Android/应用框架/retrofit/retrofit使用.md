@@ -341,3 +341,30 @@ https://stackoverflow.com/questions/47760861/retrofit-2-custom-annotations-for-c
 自定义注解YourAnnotation
 获取注解
 request.tag(Invocation.class).getClass().getAnnotation(YourAnnotation.class)
+
+
+下载文件  https://juejin.cn/post/6844903601341464589
+```
+@Streaming //大文件时要加不然会OOM
+@GET
+Call<ResponseBody> downloadFile(@Url String fileUrl)
+
+ mCall = mApi.downloadFile(url);
+            mCall.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull final Response<ResponseBody> response) {
+                    //下载文件放在子线程
+                    mThread = new Thread() {
+                        @Override
+                        public void run() {
+                            super.run();
+                            //保存到本地
+                            writeFile2Disk(response, mFile, downloadListener);
+                        }
+                    };
+                    mThread.start();
+                }
+//后续的读写流
+ InputStream is = response.body().byteStream(); //获取下载输入流
+  long totalLength = response.body().contentLength(); 
+```

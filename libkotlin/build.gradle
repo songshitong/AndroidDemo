@@ -15,4 +15,5 @@ dependencies {
 // 依赖当前平台所对应的平台库
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_coroutines"
+  implementation 'androidx.annotation:annotation:1.3.0'
 }

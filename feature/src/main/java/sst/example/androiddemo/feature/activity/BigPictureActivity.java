@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.WindowMetrics;
 import android.widget.ImageView;
 
+import androidx.fragment.app.DialogFragment;
 import java.io.IOException;
 import java.io.InputStream;
 

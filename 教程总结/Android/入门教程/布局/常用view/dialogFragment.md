@@ -41,9 +41,10 @@ getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_A
 }
 设置大小，其他与dialog类似
 onResume{
-ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
+WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
 params.width = LayoutParams.MATCH_PARENT;
 params.height = LayoutParams.MATCH_PARENT;
+params.gravity = Gravity.BOTTOM; //布局在底部
 getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
 }
 移除边距

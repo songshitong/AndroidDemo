@@ -13,7 +13,11 @@ context.getCacheDir()目录在/data/data/       Cache目录在部分手机升级
             cachePath = context.getCacheDir().getPath();
         }
 ```  
+getDataDir  data目录就是包名下面的 
+/data/data/包名/ 
 
+getFilesDir
+/data/data/包名/files/
 
 文件监听  
 //2022-07-06先监听后创建目录不生效的。。。。  

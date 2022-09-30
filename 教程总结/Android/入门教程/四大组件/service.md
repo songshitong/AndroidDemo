@@ -100,26 +100,49 @@ xml  enabled为false，service不启动了
 前台Service优先级较高，不会由于系统内存不足而被回收；后台Service优先级较低，当系统出现内存不足情况时，很有可能会被回收
 用法很简单，只需要在原有的Service类对onCreate()方法进行稍微修改即可
 ```
+android9.0  声明manifest
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/> 
+  <service android:name=".service.ForegroundService"/>
+
+String channelId = "";
 @Override
     public void onCreate() {
         super.onCreate();
         System.out.println("执行了onCreat()");
+        createNotificationChannel(...)
+        
         //添加下列代码将后台Service变成前台Service
         //构建"点击通知后打开MainActivity"的Intent对象
         Intent notificationIntent = new Intent(this,MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,notificationIntent,0);
 
         //新建Builer对象
-        Notification.Builder builer = new Notification.Builder(this);
+        Notification.Builder builer = new Notification.Builder(this,channelId);
         builer.setContentTitle("前台服务通知的标题");//设置通知的标题
         builer.setContentText("前台服务通知的内容");//设置通知的内容
         builer.setSmallIcon(R.mipmap.ic_launcher);//设置通知的图标
         builer.setContentIntent(pendingIntent);//设置点击通知后的操作
 
-        Notification notification = builer.getNotification();//将Builder对象转变成普通的notification
+        Notification notification = builer.gbuiler.build();//将Builder对象转变成普通的notification
         startForeground(1, notification);//让Service变成前台Service,并在系统的状态栏显示出来
     }
+    
+ private String createNotificationChannel(String channelId, String channelName){
+        NotificationChannel chan = new NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_DEFAULT);
+        chan.setLightColor(Color.BLUE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager service = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        service.createNotificationChannel(chan);
+        return channelId;
+    }  
 ```
+部分需要开启通知权限  https://juejin.cn/post/6844903518847893517
+检测开启：NotificationManagerCompat.from(context).areNotificationsEnabled()
+跳转  intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+intent.putExtra("android.provider.extra.APP_PACKAGE", context.getPackageName());
+
+
 也可以使用 ContextCompat.startForegroundService()
 ```
 if (Build.VERSION.SDK_INT >= 26) {
@@ -129,6 +152,7 @@ if (Build.VERSION.SDK_INT >= 26) {
     context.startService(intent);
 }
 ```
+停止服务service.stopForeground(boolean removeNotification)
    
    远程服务  使用隐式intent
    aidl：android interface definition language 安卓接口定义语言。

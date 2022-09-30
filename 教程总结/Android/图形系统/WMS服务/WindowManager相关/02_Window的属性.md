@@ -73,7 +73,7 @@ Flag	                         描述
 FLAG_ALLOW_LOCK_WHILE_SCREEN_ON	只要窗口可见，就允许在开启状态的屏幕上锁屏
 FLAG_NOT_FOCUSABLE	      窗口不能获得输入焦点，设置该标志的同时，FLAG_NOT_TOUCH_MODAL也会被设置
 FLAG_NOT_TOUCHABLE	      窗口不接收任何触摸事件
-FLAG_NOT_TOUCH_MODAL	  在该窗口区域外的触摸事件传递给其他的Window,而自己只会处理窗口区域内的触摸事件
+FLAG_NOT_TOUCH_MODAL	  在该窗口区域外的触摸事件传递给其他的Window,而自己只会处理窗口区域内的触摸事件  //例如loading以外的区域可以点击
 FLAG_KEEP_SCREEN_ON	      只要窗口可见，屏幕就会一直亮着
 FLAG_LAYOUT_NO_LIMITS	  允许窗口超过屏幕之外
 FLAG_FULLSCREEN	          隐藏所有的屏幕装饰窗口，比如在游戏、播放器中的全屏显示

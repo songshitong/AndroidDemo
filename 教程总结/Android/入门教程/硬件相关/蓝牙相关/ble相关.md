@@ -50,10 +50,25 @@ if (serviceUuids != null && serviceUuids.length > 0) {
     ScanFilter filter =
             new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUuids[0])) //final UUID[] serviceUuids 过滤设备的service uuid
                     .build();
+    //filter.setDeviceName(name)过滤设备名称  .setDeviceAddress(address)                
     filters.add(filter);
 }
 scanner.startScan(filters, settings, scanCallback);
 ```
+scanMode相关  https://juejin.cn/post/7046328465108402207
+4.1.1 SCAN_MODE_LOW_POWER
+这个是Android默认的扫描模式，耗电量最小。如果扫描不再前台，则强制执行此模式。
+在这种模式下， Android会扫喵0.5s,暂停4.5s.
+4.1.2 SCAN_MODE_BALANCED
+平衡模式， 平衡扫描频率和耗电量的关系。
+在这种模式下，Android会扫描2s, 暂停3s。 这是一种妥协模式。
+4.1.3 SCAN_MODE_LOW_LATENCY
+连续不断的扫描， 建议应用在前台时使用。但会消耗比较多的电量。 扫描结果也会比较快一些。
+4.1.4 SCAN_MODE_OPPORTUNISTIC
+这种模式下， 只会监听其他APP的扫描结果回调。它无法发现你想发现的设备。
+
+
+
 2.启用蓝牙
 ```
 if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
@@ -252,8 +267,36 @@ characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             close();
             //开始重连的逻辑
             this.bluetoothAdapter.startLeScan(new UUID[] { SERVICE_UUID }, this.leScanCallback);
+            //也可以判断此时的状态status
+            if (status == 133) {
+          //无法连接
+           } else if (status == 62) {
+          //成功连接没有发现服务断开
+          if (onBleConnectListener != null) {
+            gatt.close();
+            //62没有发现服务 异常断开
+            Log.e(TAG, "连接成功服务未发现断开status:" + status);
+          }
+        } else if (status == 0) {
+          if (onBleConnectListener != null) {
+            onBleConnectListener.onDisConnectSuccess(gatt, bluetoothDevice, status); //0正常断开 回调
+          }
+        } else if (status == 8) {
+          //因为距离远或者电池无法供电断开连接
+          // 已经成功发现服务
+        } else if (status == 34) {
+        } else {
+          //其它断开连接...
+        }
+            break;
+           case BluetoothProfile.STATE_CONNECTING:
+            Logger.i(TAG+" 连接中====");
+            break;
+          case BluetoothProfile.STATE_DISCONNECTING:
+            Logger.i(TAG+" 断开连接中 ");
             break;
           default:
+            Logger.i(TAG+" 蓝牙状态变更 未知状态："+status);
             break;
         }
       }
@@ -323,4 +366,19 @@ BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
             }
         };
 
+```
+
+检查设备是否连接
+```
+public boolean getConnected() {
+    if (null == bluetoothGatt) {
+      return false;
+    }
+    BluetoothDevice device = bluetoothGatt.getDevice();
+    if (null == device) {
+      return false;
+    }
+    return BluetoothProfile.STATE_CONNECTED == bluetoothManager.getConnectionState(device,
+        BluetoothProfile.GATT);
+  }
 ```

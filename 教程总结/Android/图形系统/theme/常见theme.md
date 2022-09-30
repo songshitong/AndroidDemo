@@ -43,7 +43,9 @@ Sdk\platforms\android-30\data\res\drawable\background_holo_light.xml
         <item name="windowAnimationStyle">@style/Animation</item>
     </style>
 ```
-
+透明主题在android8.0请求屏幕方向会崩溃
+Only fullscreen opaque activities can request orientation
+解决：只保留其中一个
 
 没有titleBar
 Theme.Light.NoTitleBar  白色无titleBar

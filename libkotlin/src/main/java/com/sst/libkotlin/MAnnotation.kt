@@ -1,12 +1,20 @@
 package com.sst.libkotlin
 
+import androidx.annotation.IntDef
 import java.io.IOException
-import java.lang.NullPointerException
 import kotlin.jvm.Throws
 
 //kotlin中的注解
 //
 class MAnnotation {
+
+    //抛出Java的IOException
+    //翻译为
+    //String readFile(String name) throws IOException {...}
+    @Throws(IOException::class)
+    fun getAStr() {
+        "11"
+    }
 
     //加锁 等同Java的Synchronized关键字
     @Synchronized
@@ -50,13 +58,24 @@ class MAnnotation {
 //
 //            var0.overloads(var1);
 //        }
+
+
+       //自定义注解
+        @IntDef(SLOW, NORMAL, FAST)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Speed
+        const val SLOW = 0
+        const val NORMAL = 1
+        const val FAST = 2
+
+        @Speed
+        private var speed: Int=SLOW
+        public fun setSpeed(@Speed speed: Int) {
+            this.speed = speed
+        }
     }
 
-    //抛出Java的IOException
-    //翻译为
-    //String readFile(String name) throws IOException {...}
-    @Throws(IOException::class)
-    fun getAStr() {
-        "11"
-    }
+
+
+
 }

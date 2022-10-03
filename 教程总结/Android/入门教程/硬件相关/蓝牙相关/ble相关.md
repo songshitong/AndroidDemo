@@ -231,7 +231,17 @@ https://blog.csdn.net/LoveDou0816/article/details/98508612
 
 当应用完成对 BLE 设备的使用后，其应调用 close()，以便系统可以适当地释放资源
 ```
-public void close() {
+private void disconnectDevice(){
+   if(null != bluetooth4Adapter){
+          bluetooth4Adapter.cancelDiscovery();
+        }
+   if (bluetoothGatt == null) {
+        return;
+    }
+    bluetoothGatt.disconnect();
+}
+
+private void close() {
     if (bluetoothGatt == null) {
         return;
     }
@@ -301,15 +311,6 @@ characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         }
       }
 
-      public void close() {
-        if(null != bluetooth4Adapter){
-          bluetooth4Adapter.cancelDiscovery();
-        }
-        if (bluetoothGatt != null) {
-          bluetoothGatt.disconnect();
-          bluetoothGatt.close();
-        }
-      }
       
 /**
    * Clears the internal cache and forces a refresh of the services from the	 * remote device.
@@ -371,6 +372,7 @@ BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
 检查设备是否连接
 ```
 public boolean getConnected() {
+    //手动close的标记
     if (null == bluetoothGatt) {
       return false;
     }
@@ -381,4 +383,27 @@ public boolean getConnected() {
     return BluetoothProfile.STATE_CONNECTED == bluetoothManager.getConnectionState(device,
         BluetoothProfile.GATT);
   }
+```
+
+https://github.com/aicareles/Android-BLE/blob/f31981c99048321037e023eb4b619947049cf320/core/src/main/java/cn/com/heaton/blelibrary/ble/BleRequestImpl.java
+检查设备是否正忙
+```
+ public boolean isDeviceBusy(T device) {
+        boolean state = false;
+        try {
+            BluetoothGatt gatt = getBluetoothGatt(device.getBleAddress());
+            if (gatt != null){
+                Field field = gatt.getClass().getDeclaredField("mDeviceBusy");
+                field.setAccessible(true);
+                state = (boolean) field.get(gatt);
+                BleLog.i(TAG, "isDeviceBusy state:"+state);
+                return state;
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return state;
+    }
 ```

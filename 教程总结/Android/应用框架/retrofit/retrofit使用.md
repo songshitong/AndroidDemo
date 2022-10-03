@@ -368,3 +368,22 @@ Call<ResponseBody> downloadFile(@Url String fileUrl)
  InputStream is = response.body().byteStream(); //获取下载输入流
   long totalLength = response.body().contentLength(); 
 ```
+
+给每个请求设置不同的超时时长   可以使用header或者自定义注解
+https://stackoverflow.com/questions/46845206/how-to-change-timeout-for-a-request-in-okhttp
+```
+class TimeoutInterceptor : Interceptor {
+
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+
+        return request.header("Custom-Timeout")?.let {
+            val newTimeout = it.toInt()
+            chain.withReadTimeout(newTimeout, TimeUnit.MILLISECONDS)
+                .withConnectTimeout(newTimeout, TimeUnit.MILLISECONDS)
+                .withWriteTimeout(newTimeout, TimeUnit.MILLISECONDS)
+                .proceed(request)
+        } ?: chain.proceed(request)
+    }
+}
+```

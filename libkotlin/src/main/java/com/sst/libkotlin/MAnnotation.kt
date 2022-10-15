@@ -2,11 +2,12 @@ package com.sst.libkotlin
 
 import androidx.annotation.IntDef
 import java.io.IOException
+import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.jvm.Throws
 
 //kotlin中的注解
 //
-class MAnnotation {
+class MAnnotation private constructor(){
 
     //抛出Java的IOException
     //翻译为
@@ -24,9 +25,15 @@ class MAnnotation {
     @Volatile
     var strVolatile ="Volatile"
     companion object{
+      @JvmStatic //使用JvmStatic注解生成单例
+      val instance: MAnnotation by lazy(mode = SYNCHRONIZED) {
+        MAnnotation() //声明构造器为私有的
+      }
+
         @JvmStatic
         val a="a"
         //只能用在伴生对象，修饰伴生对象的属性和函数  告诉编译器编译为真正的JVM静态成员(字节码层面处理)
+        //如果用在属性上自动生成get/set方法
         @JvmStatic
         fun main(args: Array<String>) {
         }

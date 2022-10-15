@@ -9,7 +9,7 @@ package com.sst.libkotlin.clasz
 // 位于其中一个 外围类型中或者位于相同文件的顶层的属性
 //lateinit修饰仍然需要判空，否则报错kotlin.UninitializedPropertyAccessException: lateinit property intA has
 // not been initialized
-//
+////缺点：如果app后台重建了，没有走初始化方法，这不就出错了
 //
 // by lazy 委托属性  该属性调用的时候才会初始化，且 lazy 后面的 Lambda 表达式只会执行一次
 // 实现看委托属性  只能作用于 val 属性，val只初始化一次

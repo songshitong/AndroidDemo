@@ -1,6 +1,7 @@
 package com.sst.libkotlin.function
 
 import org.jetbrains.annotations.NotNull
+import java.util.logging.Handler
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -32,6 +33,8 @@ class MFunction {
             Thread {
                 println(this.javaClass) //this class com.sst.libkotlin.function.MFunction$Companion
             }.start()
+            //模拟handler中的写法
+            postDelay({},10000)
             run {
                println(this.javaClass) //this class com.sst.libkotlin.function.MFunction$Companion
             }
@@ -39,6 +42,10 @@ class MFunction {
                 println(this.javaClass)//this 为class java.lang.String
             }
         }
+
+      fun postDelay(runnable: Runnable,delay:Long){
+        println("this is postDelay")
+      }
     }
     //定义一个函数
     // 模板：
@@ -155,4 +162,6 @@ class MFunction {
           println("arr $it index ${arr.indexOf(it)}")
         }
     }
+
+
 }

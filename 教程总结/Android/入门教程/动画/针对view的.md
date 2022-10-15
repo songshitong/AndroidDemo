@@ -44,6 +44,7 @@ valueAnim.addListener(new AnimatorListenerAdapter() {
 ```
 ObjectAnimator
 对象动画，继承ValueAnimator, 允许指定target object，并且target object需要有setter方法。 例如setAlpha()
+也可以使用View.TRANSLATION_Y，View.ALPHA等
 ```
 ObjectAnimator anim = ObjectAnimator.ofFloat(targetObject, "alpha", 0f, 1f);
 anim.setDuration(1000);

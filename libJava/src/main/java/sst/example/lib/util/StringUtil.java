@@ -1,8 +1,13 @@
 package sst.example.lib.util;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Pattern;
 
 public class StringUtil {
+  public static void main(String[] args) {
+    System.out.println("md5 is "+md5("齐东强，齐德龙"));
+  }
 
   //https://github.com/Blankj/AndroidUtilCode/blob/66a4c0488ca6da273098058d70dabb0fe9b9bd8d/lib/utilcode/src/main/java/com/blankj/utilcode/constant/RegexConstants.java
   public static final String REGEX_MOBILE_EXACT  = "^((13[0-9])|(14[579])|(15[0-35-9])|(16[2567])|(17[0-35-8])|(18[0-9])|(19[0-35-9]))\\d{8}$";
@@ -23,4 +28,28 @@ public class StringUtil {
   public static String hideMobileMiddle(String phone){
     return phone.replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2");
   }
+
+  public static String md5(String string) {
+    if (null == string || string.isEmpty()) {
+      return "";
+    }
+    MessageDigest md5 = null;
+    try {
+      md5 = MessageDigest.getInstance("MD5");
+      byte[] bytes = md5.digest(string.getBytes());
+      StringBuilder result = new StringBuilder();
+      for (byte b : bytes) {
+        String temp = Integer.toHexString(b & 0xff);
+        if (temp.length() == 1) {
+          temp = "0" + temp;
+        }
+        result.append(temp);
+      }
+      return result.toString();
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    }
+    return "";
+  }
+
 }

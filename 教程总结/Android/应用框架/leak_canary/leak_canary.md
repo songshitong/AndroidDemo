@@ -193,6 +193,7 @@ destroyed Activity instances
 destroyed Fragment instances
 destroyed fragment View instances
 cleared ViewModel instances
+RootView的监测，例如tooltip,toast 从window中移除view会触发
 可以看到,检测的都是些Android开发中容易被泄露的东西.那么它是如何检测的,下面我们来分析一下
 Activity检测   
    ActivityWatcher.kt   
@@ -874,7 +875,47 @@ internal class ViewModelClearedWatcher(
   }
 }
 ```
-//todo RootViewWatcher.kt  
+
+ RootViewWatcher.kt  监测window中view的泄漏情况
+main/java/leakcanary/RootViewWatcher.kt
+```
+private val listener = OnRootViewAddedListener { rootView ->
+    //需要监听的view有tooltip,toast等
+    val trackDetached = when(rootView.windowType) {
+      PHONE_WINDOW -> {
+        when (rootView.phoneWindow?.callback?.wrappedCallback) {
+          is Activity -> false
+          is Dialog -> {
+            //根据配置
+            val resources = rootView.context.applicationContext.resources
+            resources.getBoolean(R.bool.leak_canary_watcher_watch_dismissed_dialogs)
+          }
+          else -> true
+        }
+      }
+      POPUP_WINDOW -> false
+      TOOLTIP, TOAST, UNKNOWN -> true
+    }
+    if (trackDetached) {
+      rootView.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
+        val watchDetachedView = Runnable {
+          //执行对象监测
+          reachabilityWatcher.expectWeaklyReachable(
+            rootView, "${rootView::class.java.name} received View#onDetachedFromWindow() callback"
+          )
+        }
+        override fun onViewAttachedToWindow(v: View) {
+          mainHandler.removeCallbacks(watchDetachedView)
+        }
+        //监听view从window中移除
+        override fun onViewDetachedFromWindow(v: View) {
+          mainHandler.post(watchDetachedView)
+        }
+      })
+    }
+  }
+```
+todo OnRootViewAddedListener的添加在哪
 
 //todo 反射+动态代理
 service的检测ServiceWatcher.kt

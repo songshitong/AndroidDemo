@@ -30,7 +30,7 @@ BluetoothAdapter 代表设备自身的蓝牙适配器（蓝牙无线装置）。
 private BluetoothAdapter bluetoothAdapter;
 final BluetoothManager bluetoothManager =
         (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-bluetoothAdapter = bluetoothManager.getAdapter();
+bluetoothAdapter = bluetoothManager.getAdapter();//BluetoothAdapter.getDefaultAdapter();
 ```
 BluetoothAdapter的关键方法
 ```
@@ -40,33 +40,8 @@ public BluetoothLeScanner getBluetoothLeScanner()
 //扫描设备 可能被废弃了
 public boolean startLeScan(BluetoothAdapter.LeScanCallback callback)  //内部调用Scanner的方法
 public void stopLeScan(BluetoothAdapter.LeScanCallback callback) 
-//使用scanner
-ScanSettings settings = new ScanSettings.Builder().setCallbackType(
-                        ScanSettings.CALLBACK_TYPE_ALL_MATCHES)  //匹配所有
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY) //高频率，低延迟适用于前台app
-                        .build();
-List<ScanFilter> filters = new ArrayList<ScanFilter>();
-if (serviceUuids != null && serviceUuids.length > 0) {
-    ScanFilter filter =
-            new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUuids[0])) //final UUID[] serviceUuids 过滤设备的service uuid
-                    .build();
-    //filter.setDeviceName(name)过滤设备名称  .setDeviceAddress(address)                
-    filters.add(filter);
-}
-scanner.startScan(filters, settings, scanCallback);
-```
-scanMode相关  https://juejin.cn/post/7046328465108402207
-4.1.1 SCAN_MODE_LOW_POWER
-这个是Android默认的扫描模式，耗电量最小。如果扫描不再前台，则强制执行此模式。
-在这种模式下， Android会扫喵0.5s,暂停4.5s.
-4.1.2 SCAN_MODE_BALANCED
-平衡模式， 平衡扫描频率和耗电量的关系。
-在这种模式下，Android会扫描2s, 暂停3s。 这是一种妥协模式。
-4.1.3 SCAN_MODE_LOW_LATENCY
-连续不断的扫描， 建议应用在前台时使用。但会消耗比较多的电量。 扫描结果也会比较快一些。
-4.1.4 SCAN_MODE_OPPORTUNISTIC
-这种模式下， 只会监听其他APP的扫描结果回调。它无法发现你想发现的设备。
 
+```
 
 
 2.启用蓝牙
@@ -152,7 +127,7 @@ BluetoothGatt关键方法
 public boolean connect()
 bluetoothGatt.discoverServices() //发现服务
 bluetoothGatt.getServices//获取服务
-public boolean readCharacteristic(BluetoothGattCharacteristic characteristic)
+public boolean readCharacteristic(BluetoothGattCharacteristic characteristic)//读取描述，触发回调 BluetoothGattCallback.onCharacteristicRead 
 public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic)
 ```
 监听到连接成功需要发现服务和获取服务
@@ -252,7 +227,7 @@ private void close() {
 9.给蓝牙设备发送命令
 ```
  boolean b = writeCharacteristic.setValue(bytes);
- //极端情况存在写入失败
+ //极端情况存在写入失败 还有就是onCharacteristicWrite的status判断是否写入成功
  boolean result = bluetoothGatt.writeCharacteristic(writeCharacteristic);
 ```
 发送无响应的配置
@@ -355,6 +330,22 @@ BleManager.this.readGattCharacteristic = gattService.getCharacteristic(READ_UUID
 BleManager.this.writeGattCharacteristic = gattService.getCharacteristic(WRITE_UUID);
 
 
+监听蓝牙写入
+```
+      public void onCharacteristicWrite(BluetoothGatt gatt,
+          BluetoothGattCharacteristic characteristic, int status) {
+        super.onCharacteristicWrite(gatt, characteristic, status);
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+          if (null != characteristic.getValue()) {
+            Logger.i("写入成功 " + XGEncode.bytes2Hex(characteristic.getValue()));
+          } else {
+            Logger.i("写入成功 但是value 是null");
+          }
+        } else {
+          Logger.e("写入失败");
+        }
+      }
+```
 
 蓝牙设备返回
 ```

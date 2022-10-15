@@ -2,6 +2,7 @@ package sst.example.androiddemo.feature
 
 import android.Manifest
 import android.app.ActivityManager
+import android.app.Application.getProcessName
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -10,10 +11,12 @@ import android.content.pm.ResolveInfo
 import android.media.MediaPlayer
 import android.os.*
 import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.provider.Settings
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -51,6 +54,7 @@ import java.io.StringWriter
 class  MainActivity : AppCompatActivity()  {
 
     private val TAG ="MainActivity"
+    @RequiresApi(VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -440,7 +444,27 @@ class  MainActivity : AppCompatActivity()  {
         getRunningAppProcessInfos(this).forEach {
           Log.i(TAG,"当前包含的进程有${it.processName}")
         }
+
+        Log.i(TAG,"当前是否是主进程：${isMainProcess(context = this)}")
+        Log.i(TAG,"当前是否是主进程：${ packageName.equals(applicationContext.applicationInfo.processName)}")
     }
+
+  fun isMainProcess(context:Context?):Boolean {
+    try {
+      if (null != context) {
+        return if (VERSION.SDK_INT >= VERSION_CODES.P) {
+          context.packageName.equals(getProcessName())
+        } else {
+          //低版本不可用
+          context.packageName.equals(applicationInfo.processName)
+        }
+      }
+    } catch ( e:Exception) {
+      return false
+    }
+    return true
+  }
+
 
   //获取方法调用栈
   private fun getMethodTrace(){

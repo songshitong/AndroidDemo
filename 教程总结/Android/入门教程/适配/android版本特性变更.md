@@ -57,6 +57,19 @@ Android 10.0	29	Q	引入分区存储
   以及本应用所创建的特定类型的媒体文件。一般有图片，视频，音频，Download/等
 https://developer.android.com/training/data-storage/app-specific?hl=zh-cn
 可以访问应用自身的沙盒和特定的外部存储(高版本不需要权限，低版本需要)
+```
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+if(Build.VERSION.SDK_INT<Build.VERSION_CODES.Q){
+      ActivityCompat.requestPermissions(
+        this, arrayOf(
+          permission.WRITE_EXTERNAL_STORAGE,
+          permission.READ_EXTERNAL_STORAGE
+        ), 1
+      )
+ }
+android10以后自动获取沙盒权限 
+```
 可能会遇到无法保存图片到本地，或者造成Permission denied等问题，具体解决方案参考：《关于安卓open failed: EACCES (Permission denied)》
   https://myhub.blog.csdn.net/article/details/108701706
   使用，新增媒体文件使用ContentProvider https://developer.android.com/training/data-storage/shared/media#java
@@ -74,13 +87,27 @@ while (cursor.moveToNext()) {
    
 }
 ```
-打开文件
+打开文件,然后保存
 ```
 ContentResolver resolver = getApplicationContext()
         .getContentResolver();
 try (InputStream stream = resolver.openInputStream(content-uri)) {
     // Perform operations on "stream".
 }
+```
+插入文件
+```
+  val value = ContentValues()
+      value.put(Downloads.DISPLAY_NAME,fileName) //指定插入的名字
+ Uri insertUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, value);
+    try {
+      if (insertUri != null){
+        OutputStream outputStream = getContentResolver().openOutputStream(insertUri, "rw");
+        toBitmap.compress(JPEG, 90, outputStream);
+      }
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
 ```
 启用手势导航。用户启用后，手势导航会影响设备上的所有应用
 新增了一个系统级的深色主题

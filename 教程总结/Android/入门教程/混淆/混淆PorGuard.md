@@ -40,6 +40,9 @@ keep规则用于标识程序入口，被keep规则修饰的类及其成员会被
 ```
 -keep public class com.example.MyMain {
     public static void main(java.lang.String[]);
+    
+    #保留所有的public方法
+    # public *;  
 }
 ```
 
@@ -214,3 +217,9 @@ classname(argumenttype,...):另一种指代构造方法的方式，因为只有�
 ***	匹配所有的数据类型，（原型类型或非原型类型，数组或非数组）
 ...	匹配任意长度的任意类型参数列表
 
+
+属性配置https://www.guardsquare.com/manual/configuration/attributes
+attribute   异常，内部类，泛型，废弃，行表，注解，闭包等
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,
+SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+SourceFile class的来源，配置后名称上报到stack traces

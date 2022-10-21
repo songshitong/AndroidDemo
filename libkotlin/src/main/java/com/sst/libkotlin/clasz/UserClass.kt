@@ -169,7 +169,7 @@ data class UserData(var userName: String, var age: Int)
 val userData1: UserData = UserData("li", 20)
 val userData2: UserData = userData1.copy(age = 30)
 
-//android中 使用注解@Parcelize并实现接口Parcelable，可以自动生成接口所需方法
+//android中 使用注解@Parcelize并实现接口Parcelable，可以自动生成接口所需方法  需要使用插件plugin id 'kotlin-parcelize'
 //@Parcelize
 //data class TestD(val name: String?):Parcelable {
 //}

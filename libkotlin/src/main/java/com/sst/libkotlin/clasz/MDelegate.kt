@@ -68,6 +68,11 @@ class MDelegate {
     //返回实例
     //处理 dao  greendao room 单例对象
     //activity  延迟初始化view(findview/createview) 优化性能
+    //lazy 接口 一个是值value，一个是否需要初始化
+    // public interface Lazy<out T> {
+    //     public val value: T
+    //     public fun isInitialized(): Boolean
+    // }
 
     //todo 查看lazy的重载函数  根据线程mode执行不同的方法
     //查看lazy代理的实现  LazyJVM.kt

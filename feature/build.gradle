@@ -34,10 +34,7 @@ android {
 //    }
 
 //    build出错不停止
-    lintOptions {
-        abortOnError false
-    }
-    compileOptions {
+  compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
         ///kotlin 编译版本
@@ -49,8 +46,12 @@ android {
         ///移除重复文件，非打包文件
 //       exclude '重复文件'
     }
+  lint {
+    abortOnError false
+  }
+  namespace 'sst.example.androiddemo.feature'
 
-    //  使用子module的libs的文件与下面的fileTree 配合使用
+  //  使用子module的libs的文件与下面的fileTree 配合使用
     // repositories {
     //    flatDir {
     //        dirs project(':rammus').file('libs')

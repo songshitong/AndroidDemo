@@ -1,5 +1,7 @@
 package sst.example.androiddemo.feature.activity;
 
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.WindowMetrics;
 import android.widget.ImageView;
 
+import androidx.recyclerview.widget.DiffUtil;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -38,7 +41,6 @@ public class BigPictureActivity extends AppCompatActivity {
                  Log.d(TAG,"bitmap size: "+bitmap.getByteCount()/1000/1000+"M");
                  imageView.setImageBitmap(bitmap);
              }
-
         } catch (IOException e) {
             e.printStackTrace();
         }finally {

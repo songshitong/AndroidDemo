@@ -29,4 +29,12 @@
             android:max="100"
             android:progress="0"
     />
+    <TextView
+        android:id="@+id/textBitmapSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/textDrawableSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

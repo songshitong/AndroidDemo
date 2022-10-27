@@ -25,6 +25,7 @@ public class TestOrientationActivity extends AppCompatActivity  {
         Log.d(TAG," onCreate ==== ");
         Button btn = findViewById(R.id.normal_btn);
         btn.setOnClickListener(v -> {
+            //android没有全局配置全屏，只能在xml每个配置/基类/application中监听activity创建
             if(getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
                 //切换竖屏
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

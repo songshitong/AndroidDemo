@@ -11,6 +11,8 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.AdaptiveIconDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -22,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.collection.LruCache;
@@ -91,6 +94,25 @@ public class BitmapActivity extends AppCompatActivity {
 
       }
     });
+    Bitmap bitmap1 = BitmapFactory.decodeResource(getResources(),R.drawable.ic_launcher_round);
+    TextView bitmapText = findViewById(R.id.textBitmapSize);
+    bitmapText.setText("bitmap1 : "+bitmap1.getByteCount());
+    Bitmap bitmap2 = null;
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+      bitmap2 = getBitmapFromAdaptiveIconDrawable(
+          (AdaptiveIconDrawable) getDrawable(R.mipmap.ic_launcher_round));
+    }
+    TextView drawableText =findViewById(R.id.textDrawableSize);
+    drawableText.setText("bitmap2 "+bitmap2.getByteCount());
+  }
+
+  //https://blog.csdn.net/ecjtuhq/article/details/84674295
+  public static Bitmap getBitmapFromAdaptiveIconDrawable(AdaptiveIconDrawable drawable){
+    Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(bitmap);
+    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+    drawable.draw(canvas);
+    return bitmap;
   }
 
   public static Bitmap getBitmap(Context context, int vectorDrawableId) {

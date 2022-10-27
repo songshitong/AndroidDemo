@@ -88,7 +88,7 @@ public class MCoroutines{
 //              cost: 1024 ms.
           }
       }
-
+      //todo viewmodel中的viewModelScope
       private fun testAsync() {
           val coroutineScope = CoroutineScope(Dispatchers.Default)
           coroutineScope.launch {

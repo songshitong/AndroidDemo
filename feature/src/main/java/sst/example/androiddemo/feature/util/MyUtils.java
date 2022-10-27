@@ -90,6 +90,7 @@ public class MyUtils {
     public static Intent getSystemMultipleAlbumIntent(){
         Intent getImage = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         getImage.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        //允许选择多个
         getImage.putExtra(EXTRA_ALLOW_MULTIPLE,true);
         return getImage;
     }
@@ -101,15 +102,24 @@ public class MyUtils {
         if (Build.VERSION.SDK_INT < 19) {
             //intent = new Intent(Intent.ACTION_GET_CONTENT);
             //intent.setType("image/* video/*");
+            //ACTION_PICK存在多个选择器，需要手动选择原生相册，系统相册，三方相册等
              intent = new Intent(Intent.ACTION_PICK);
             intent.setDataAndType(android.provider
                 .MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/jpg video/mp4");
         } else {
             intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            //CATEGORY_OPENABLE 只选择能通过ContentResolver.openFileDescriptor(Uri, String)打开的文件
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("image/jpg");
             intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"image/jpg", "video/mp4"});
         }
+        return intent;
+    }
+
+    //选择文件
+    public Intent getFileIntent() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("audio/ogg");
         return intent;
     }
 

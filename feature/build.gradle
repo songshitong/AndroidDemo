@@ -9,7 +9,7 @@ apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'com.sst.plugin'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 32
     defaultConfig {
         applicationId "sst.example.androiddemo.feature"
         minSdkVersion 21

@@ -1,5 +1,5 @@
-https://developer.android.com/guide/topics/connectivity/bluetooth-le?hl=zh-cn
-https://developer.android.com/guide/topics/connectivity/bluetooth/find-ble-devices 中文版可能落后
+https://developer.android.com/guide/topics/connectivity/bluetooth-le?hl=zh-cn  中文版可能落后
+https://developer.android.com/guide/topics/connectivity/bluetooth/find-ble-devices  新的版本
 
 Android 4.3 （API 18 ）引入了低功耗蓝牙，应用可以查询周围设备、查询设备的服务、传输信息
 
@@ -30,7 +30,7 @@ BluetoothAdapter 代表设备自身的蓝牙适配器（蓝牙无线装置）。
 private BluetoothAdapter bluetoothAdapter;
 final BluetoothManager bluetoothManager =
         (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-bluetoothAdapter = bluetoothManager.getAdapter();
+bluetoothAdapter = bluetoothManager.getAdapter();//BluetoothAdapter.getDefaultAdapter();
 ```
 BluetoothAdapter的关键方法
 ```
@@ -38,9 +38,12 @@ public BluetoothLeScanner getBluetoothLeScanner()
  public BluetoothDevice getRemoteDevice(String address)
 
 //扫描设备 可能被废弃了
-public boolean startLeScan(BluetoothAdapter.LeScanCallback callback)
+public boolean startLeScan(BluetoothAdapter.LeScanCallback callback)  //内部调用Scanner的方法
 public void stopLeScan(BluetoothAdapter.LeScanCallback callback) 
+
 ```
+
+
 2.启用蓝牙
 ```
 if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
@@ -124,7 +127,7 @@ BluetoothGatt关键方法
 public boolean connect()
 bluetoothGatt.discoverServices() //发现服务
 bluetoothGatt.getServices//获取服务
-public boolean readCharacteristic(BluetoothGattCharacteristic characteristic)
+public boolean readCharacteristic(BluetoothGattCharacteristic characteristic)//读取描述，触发回调 BluetoothGattCallback.onCharacteristicRead 
 public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic)
 ```
 监听到连接成功需要发现服务和获取服务
@@ -203,7 +206,17 @@ https://blog.csdn.net/LoveDou0816/article/details/98508612
 
 当应用完成对 BLE 设备的使用后，其应调用 close()，以便系统可以适当地释放资源
 ```
-public void close() {
+private void disconnectDevice(){
+   if(null != bluetooth4Adapter){
+          bluetooth4Adapter.cancelDiscovery();
+        }
+   if (bluetoothGatt == null) {
+        return;
+    }
+    bluetoothGatt.disconnect();
+}
+
+private void close() {
     if (bluetoothGatt == null) {
         return;
     }
@@ -214,7 +227,7 @@ public void close() {
 9.给蓝牙设备发送命令
 ```
  boolean b = writeCharacteristic.setValue(bytes);
- //极端情况存在写入失败
+ //极端情况存在写入失败 还有就是onCharacteristicWrite的status判断是否写入成功
  boolean result = bluetoothGatt.writeCharacteristic(writeCharacteristic);
 ```
 发送无响应的配置
@@ -239,21 +252,40 @@ characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             close();
             //开始重连的逻辑
             this.bluetoothAdapter.startLeScan(new UUID[] { SERVICE_UUID }, this.leScanCallback);
+            //也可以判断此时的状态status
+            if (status == 133) {
+          //无法连接
+           } else if (status == 62) {
+          //成功连接没有发现服务断开
+          if (onBleConnectListener != null) {
+            gatt.close();
+            //62没有发现服务 异常断开
+            Log.e(TAG, "连接成功服务未发现断开status:" + status);
+          }
+        } else if (status == 0) {
+          if (onBleConnectListener != null) {
+            onBleConnectListener.onDisConnectSuccess(gatt, bluetoothDevice, status); //0正常断开 回调
+          }
+        } else if (status == 8) {
+          //因为距离远或者电池无法供电断开连接
+          // 已经成功发现服务
+        } else if (status == 34) {
+        } else {
+          //其它断开连接...
+        }
+            break;
+           case BluetoothProfile.STATE_CONNECTING:
+            Logger.i(TAG+" 连接中====");
+            break;
+          case BluetoothProfile.STATE_DISCONNECTING:
+            Logger.i(TAG+" 断开连接中 ");
             break;
           default:
+            Logger.i(TAG+" 蓝牙状态变更 未知状态："+status);
             break;
         }
       }
 
-      public void close() {
-        if(null != bluetooth4Adapter){
-          bluetooth4Adapter.cancelDiscovery();
-        }
-        if (bluetoothGatt != null) {
-          bluetoothGatt.disconnect();
-          bluetoothGatt.close();
-        }
-      }
       
 /**
    * Clears the internal cache and forces a refresh of the services from the	 * remote device.
@@ -298,6 +330,22 @@ BleManager.this.readGattCharacteristic = gattService.getCharacteristic(READ_UUID
 BleManager.this.writeGattCharacteristic = gattService.getCharacteristic(WRITE_UUID);
 
 
+监听蓝牙写入
+```
+      public void onCharacteristicWrite(BluetoothGatt gatt,
+          BluetoothGattCharacteristic characteristic, int status) {
+        super.onCharacteristicWrite(gatt, characteristic, status);
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+          if (null != characteristic.getValue()) {
+            Logger.i("写入成功 " + XGEncode.bytes2Hex(characteristic.getValue()));
+          } else {
+            Logger.i("写入成功 但是value 是null");
+          }
+        } else {
+          Logger.e("写入失败");
+        }
+      }
+```
 
 蓝牙设备返回
 ```
@@ -310,4 +358,43 @@ BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
             }
         };
 
+```
+
+检查设备是否连接
+```
+public boolean getConnected() {
+    //手动close的标记
+    if (null == bluetoothGatt) {
+      return false;
+    }
+    BluetoothDevice device = bluetoothGatt.getDevice();
+    if (null == device) {
+      return false;
+    }
+    return BluetoothProfile.STATE_CONNECTED == bluetoothManager.getConnectionState(device,
+        BluetoothProfile.GATT);
+  }
+```
+
+https://github.com/aicareles/Android-BLE/blob/f31981c99048321037e023eb4b619947049cf320/core/src/main/java/cn/com/heaton/blelibrary/ble/BleRequestImpl.java
+检查设备是否正忙
+```
+ public boolean isDeviceBusy(T device) {
+        boolean state = false;
+        try {
+            BluetoothGatt gatt = getBluetoothGatt(device.getBleAddress());
+            if (gatt != null){
+                Field field = gatt.getClass().getDeclaredField("mDeviceBusy");
+                field.setAccessible(true);
+                state = (boolean) field.get(gatt);
+                BleLog.i(TAG, "isDeviceBusy state:"+state);
+                return state;
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return state;
+    }
 ```

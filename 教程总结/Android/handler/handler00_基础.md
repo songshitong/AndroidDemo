@@ -60,6 +60,9 @@ handler的looper通过ThreadLocal保存在Thread的ThreadLocalMap中，同一线
 为什么不同线程不共享looper？
 线程之间产生了联系，复杂性提升，可能出现死锁，内存泄露
 
+Message的what需要唯一吗？
+不需要，只要message发送的handler里面唯一即可，多个主线程的handler，可以有相同what的msg，这些在分发时会发送给自己对应的handler
+
 可以多次创建Looper吗？
 不可以  prepare进行了校验
 ```

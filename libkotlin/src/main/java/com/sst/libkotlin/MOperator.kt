@@ -42,8 +42,8 @@ class MOperator {
 
 
 //            判断一个对象与指定的类型是否一致 is !is
-            print(any is String)
-            print(any !is Int)
+            println(any is String)
+            println(any !is Int)
             //编译为!(any instanceof Integer)
 
             //双冒号::  代表引用一个方法
@@ -61,7 +61,7 @@ class MOperator {
             ///非空类型
             val aa :String="a"
             ///可空类型
-            val bb :String?=null
+            var bb :String?=null
             //使用!! 操作符  !!操作符将任何值转换为非空类型，若该值为空则抛出异常   最好确定非空再使用!!，不然会NPE
             //表示告诉Kotlin我这里一定不会为空,你不用进行检测了，如果为空，则抛出空指针异常
             //同时要提醒一下自己，是否存在更好的实现方式，因为使用这种操作符，还是会存在潜在的空指针异常
@@ -75,8 +75,25 @@ class MOperator {
             bb?.lowercase(Locale.ROOT)
             //与let结合
             bb?.let {
-                print(it)
+                println(it)
             }
+            //安全调用操作符的缺点，只处理了安全的情况，对于异常场景丢弃了
+            //同时处理有值和异常
+            bb = null
+            //1
+            if(null == bb?.run {
+                  println("this has value")
+                }){
+               println("this is null")
+            }
+            //2
+            bb?.let {  }?: kotlin.run {
+                println("this is null in run")
+            }
+            //3
+            bb?.let {  }?:fun(){}()
+            bb?.let {  }?:fun(){}.invoke()
+
 
             //?:  Elvis操作符  变量为空时使用默认值
             val aNu =null

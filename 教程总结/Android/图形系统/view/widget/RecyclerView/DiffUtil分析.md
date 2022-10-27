@@ -1,6 +1,7 @@
 https://www.jianshu.com/p/3a0d0ce4e649
 
-//todo
+AsyncDifferConfig用来配置线程池
+
 优点
 1 性能好
 2 不用区分notifyItem或者notifyAll

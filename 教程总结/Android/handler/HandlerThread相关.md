@@ -85,7 +85,7 @@ public void run() {
 }
 ```
 
-Looper退出
+Looper退出  如果lopper不退出，这个thread就会一直存活
 ```
 public boolean quit() {
     Looper looper = getLooper();

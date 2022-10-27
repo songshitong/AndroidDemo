@@ -87,7 +87,13 @@ https://source.android.com/setup/build/initializing  初始化配置参考
 
 系统下载脚本
 将export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/' 添加到~/.bashrc
-#export REPO_URL='https://mirrors.bfsu.edu.cn/git/git-repo'
+#export REPO_URL='https://mirrors.bfsu.edu.cn/git/git-repo'  北京外国语
+#https://gerrit-googlesource.proxy.ustclug.org/git-repo  科大源  
+
+https://lug.ustc.edu.cn/wiki/mirrors/help/aosp/
+第一次同步数据量特别大，如果网络不稳定，中间失败就要从头再来了。所以我们提供了打包的 AOSP 镜像，为一个 tar 包，大约 16G（单文件 16G，注意你的磁盘格式要支持）。
+这样你 就可以通过 HTTP 的方式下载，该方法支持断点续传。
+不推荐使用 HTTP 协议同步，因为 HTTP 服务器不支持 repo sync 的 --depth 选项，可能导致部分仓库同步失败。
 
 sudo apt-get update
 sudo apt-get install git

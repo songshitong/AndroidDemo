@@ -17,7 +17,7 @@ class MCollection {
 
            //list集合
            //不可变list      与Array区分，arrayOf创建数组
-           val list1 = listOf("apple","banana")
+           val list1 = listOf("apple","banana","coco")
            //编译为CollectionsKt.listOf(new String[]{"apple", "banana"}); 返回List
            //list1只能读取
            //可变list
@@ -100,6 +100,17 @@ class MCollection {
           for(item in filterList){
               print(" $item ")
           }
+
+          //排序相关
+          println("sortedBy: 长度正序 ${
+            list1.sortedBy{it->it.length}
+          }")
+          println("sortedBy: 长度降序 ${
+            list1.sortedByDescending{it->it.length}
+          }")
+          println("sortWith: 长度正序${
+            list1.sortedWith(Comparator { a, b -> a.length-b.length })
+          }")
         }
     }
 }

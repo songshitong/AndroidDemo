@@ -38,6 +38,7 @@ import sst.example.lib.metadata.MyAnnotation;
 //全部的信息你可以查看相应的文档 JavaDoc for java.lang.Class 里面有详尽的描述。
 public class ReflectDemo {
     public static void main(String[] args) throws NoSuchMethodException, NoSuchFieldException {
+        System.out.println("全部名称+ "+ReflectDemo.class.getCanonicalName());
 
 //        在你想检查一个类的信息之前，你首先需要获取类的 Class 对象
         //获取class 对象

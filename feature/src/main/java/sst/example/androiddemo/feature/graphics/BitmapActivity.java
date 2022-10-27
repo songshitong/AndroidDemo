@@ -1,5 +1,6 @@
 package sst.example.androiddemo.feature.graphics;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -31,10 +32,14 @@ import androidx.collection.LruCache;
 import androidx.recyclerview.widget.RecyclerView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.widget.MatrixView;
+
+import static android.graphics.Bitmap.CompressFormat.JPEG;
 
 public class BitmapActivity extends AppCompatActivity {
   private static final String TAG = BitmapActivity.class.getName();
@@ -241,7 +246,7 @@ public class BitmapActivity extends AppCompatActivity {
 
   public byte[] getBitmapByte(Bitmap bitmap) {   //将bitmap转化为byte[]类型也就是转化为二进制
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+    bitmap.compress(JPEG, 100, out);
     try {
       out.flush();
       out.close();
@@ -289,7 +294,7 @@ public class BitmapActivity extends AppCompatActivity {
       try {
         FileOutputStream saveImgOut = new FileOutputStream(saveFile);
         // compress - 压缩的意思
-        bm.compress(Bitmap.CompressFormat.JPEG, 80, saveImgOut);
+        bm.compress(JPEG, 80, saveImgOut);
         //存储完成后需要清除相关的进程
         saveImgOut.flush();
         saveImgOut.close();
@@ -313,7 +318,7 @@ public class BitmapActivity extends AppCompatActivity {
       }
       FileOutputStream fos = new FileOutputStream(file);
       //通过io流的方式来压缩保存图片
-      boolean isSuccess = bmp.compress(Bitmap.CompressFormat.JPEG, 60, fos);
+      boolean isSuccess = bmp.compress(JPEG, 60, fos);
       fos.flush();
       fos.close();
 
@@ -333,6 +338,20 @@ public class BitmapActivity extends AppCompatActivity {
       e.printStackTrace();
     }
     return false;
+  }
+
+  //使用新api
+  private void saveImage(Bitmap toBitmap) {
+    //开始一个新的进程执行保存图片的操作
+    Uri insertUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
+    try {
+      if (insertUri != null){
+        OutputStream outputStream = getContentResolver().openOutputStream(insertUri, "rw");
+        toBitmap.compress(JPEG, 90, outputStream);
+      }
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
   }
 
   @RequiresApi(api = Build.VERSION_CODES.O)

@@ -107,6 +107,7 @@ public class ProgressRequestBody extends RequestBody {
   private UploadCallbacks mListener;
   private String content_type;
   private static final int DEFAULT_BUFFER_SIZE = 2048;
+  Handler handler = new Handler(Looper.getMainLooper());
 
   public interface UploadCallbacks {
     void onProgressUpdate(int percentage);
@@ -141,7 +142,6 @@ public class ProgressRequestBody extends RequestBody {
 
     try {
       int read;
-      Handler handler = new Handler(Looper.getMainLooper());
       while ((read = in.read(buffer)) != -1) {
         //读完了
         uploaded += read;
@@ -151,14 +151,19 @@ public class ProgressRequestBody extends RequestBody {
       }
 
     } catch (Exception e) {
-       if(null != mListener){
-        mListener.onError();
-      }
+       callListenerError();
     } finally {
       in.close();
     }
   }
-
+  
+  //切换到主线程
+  private void callListenerError() {
+    if (null != mListener) {
+      handler.post(()-> mListener.onError());
+    }
+  }
+  
   private class ProgressUpdater implements Runnable {
     private long mUploaded;
     private long mTotal;
@@ -336,3 +341,49 @@ https://stackoverflow.com/questions/47760861/retrofit-2-custom-annotations-for-c
 自定义注解YourAnnotation
 获取注解
 request.tag(Invocation.class).getClass().getAnnotation(YourAnnotation.class)
+
+
+下载文件  https://juejin.cn/post/6844903601341464589
+```
+@Streaming //大文件时要加不然会OOM
+@GET
+Call<ResponseBody> downloadFile(@Url String fileUrl)
+
+ mCall = mApi.downloadFile(url);
+            mCall.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull final Response<ResponseBody> response) {
+                    //下载文件放在子线程
+                    mThread = new Thread() {
+                        @Override
+                        public void run() {
+                            super.run();
+                            //保存到本地
+                            writeFile2Disk(response, mFile, downloadListener);
+                        }
+                    };
+                    mThread.start();
+                }
+//后续的读写流
+ InputStream is = response.body().byteStream(); //获取下载输入流
+  long totalLength = response.body().contentLength(); 
+```
+
+给每个请求设置不同的超时时长   
+1 可以使用header或者自定义注解  缺点不能设置callTimeout也就是整个请求的超时
+2 配置不同的okhttpClient
+https://stackoverflow.com/questions/46845206/how-to-change-timeout-for-a-request-in-okhttp
+```
+class TimeoutInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        return request.header("Custom-Timeout")?.let {
+            val newTimeout = it.toInt()
+            chain.withReadTimeout(newTimeout, TimeUnit.MILLISECONDS)
+                .withConnectTimeout(newTimeout, TimeUnit.MILLISECONDS)
+                .withWriteTimeout(newTimeout, TimeUnit.MILLISECONDS)
+                .proceed(request)
+        } ?: chain.proceed(request)
+    }
+}
+```

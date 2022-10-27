@@ -1,12 +1,21 @@
 package com.sst.libkotlin
 
+import androidx.annotation.IntDef
 import java.io.IOException
-import java.lang.NullPointerException
+import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.jvm.Throws
 
 //kotlin中的注解
 //
-class MAnnotation {
+class MAnnotation private constructor(){
+
+    //抛出Java的IOException
+    //翻译为
+    //String readFile(String name) throws IOException {...}
+    @Throws(IOException::class)
+    fun getAStr() {
+        "11"
+    }
 
     //加锁 等同Java的Synchronized关键字
     @Synchronized
@@ -16,9 +25,15 @@ class MAnnotation {
     @Volatile
     var strVolatile ="Volatile"
     companion object{
+      @JvmStatic //使用JvmStatic注解生成单例
+      val instance: MAnnotation by lazy(mode = SYNCHRONIZED) {
+        MAnnotation() //声明构造器为私有的
+      }
+
         @JvmStatic
         val a="a"
         //只能用在伴生对象，修饰伴生对象的属性和函数  告诉编译器编译为真正的JVM静态成员(字节码层面处理)
+        //如果用在属性上自动生成get/set方法
         @JvmStatic
         fun main(args: Array<String>) {
         }
@@ -50,13 +65,24 @@ class MAnnotation {
 //
 //            var0.overloads(var1);
 //        }
+
+
+       //自定义注解
+        @IntDef(SLOW, NORMAL, FAST)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Speed
+        const val SLOW = 0
+        const val NORMAL = 1
+        const val FAST = 2
+
+        @Speed
+        private var speed: Int=SLOW
+        public fun setSpeed(@Speed speed: Int) {
+            this.speed = speed
+        }
     }
 
-    //抛出Java的IOException
-    //翻译为
-    //String readFile(String name) throws IOException {...}
-    @Throws(IOException::class)
-    fun getAStr() {
-        "11"
-    }
+
+
+
 }

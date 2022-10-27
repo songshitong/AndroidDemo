@@ -1,4 +1,4 @@
-package sst.example.lib;
+package sst.example.lib.collection;
 
 import java.util.HashMap;
 import java.util.Iterator;

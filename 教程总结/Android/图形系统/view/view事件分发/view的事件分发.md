@@ -198,7 +198,7 @@ public boolean dispatchTouchEvent(MotionEvent event) {
        if (onFilterTouchEventForSecurity(event)) {
            //noinspection SimplifiableIfStatement
            ListenerInfo li = mListenerInfo;
-           //mOnTouchListener的类型是OnTouchListener 
+           //mOnTouchListener的类型是OnTouchListener  view必须为enable的，可以通过setEnable()设置
            if (li != null && li.mOnTouchListener != null
                    && (mViewFlags & ENABLED_MASK) == ENABLED
                    && li.mOnTouchListener.onTouch(this, event)) {
@@ -229,7 +229,7 @@ public boolean onTouchEvent(MotionEvent event) {
                 || (viewFlags & LONG_CLICKABLE) == LONG_CLICKABLE)
                 || (viewFlags & CONTEXT_CLICKABLE) == CONTEXT_CLICKABLE;
 
-        if ((viewFlags & ENABLED_MASK) == DISABLED) {
+        if ((viewFlags & ENABLED_MASK) == DISABLED) {  //view必须为enable的，可以通过setEnable()设置
             if (action == MotionEvent.ACTION_UP && (mPrivateFlags & PFLAG_PRESSED) != 0) {
                 setPressed(false);
             }

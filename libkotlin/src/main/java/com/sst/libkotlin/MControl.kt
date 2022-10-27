@@ -56,6 +56,10 @@ class MControl {
         for(i in 1..4){
            println(i)
         }
+        val paramI = 2
+        if(paramI in 1 .. 5){
+          println("paramI 在1到5之间")
+        }
         //!in
         val arr = intArrayOf(1,2,3)
         if (2 !in arr)

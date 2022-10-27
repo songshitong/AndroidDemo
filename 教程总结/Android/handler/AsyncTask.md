@@ -220,10 +220,12 @@ public abstract class AsyncTask<Params, Progress, Result> {
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {           
             synchronized (this) {
                 if (sBackupExecutor == null) {
+                    //被拒绝后使用备用线程池重新执行
                     sBackupExecutorQueue = new LinkedBlockingQueue<Runnable>();
                     sBackupExecutor = new ThreadPoolExecutor(
                             BACKUP_POOL_SIZE, BACKUP_POOL_SIZE, KEEP_ALIVE_SECONDS,
                             TimeUnit.SECONDS, sBackupExecutorQueue, sThreadFactory);
+                    //被拒绝后运行核心线程超时        
                     sBackupExecutor.allowCoreThreadTimeOut(true);
                 }
             }

@@ -1,7 +1,11 @@
 
+注意：dialog中不要进行计时，dialog会隐藏，又显示，计时的进度不好保存，
+最好跟随页面或者其他
+
+
 优点 
 1 横竖屏切换保存dialog状态
-2 管理生命周期，使得dialog可以跟随activity
+2 管理生命周期，使得dialog可以跟随activity   dialog忘记消失很容易窗口泄漏
 
 缺点：消失后再次显示走onCreateView，如果想保存消失前的内容比较繁琐
 解决 避免每次解析view
@@ -41,9 +45,10 @@ getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_A
 }
 设置大小，其他与dialog类似
 onResume{
-ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
+WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
 params.width = LayoutParams.MATCH_PARENT;
 params.height = LayoutParams.MATCH_PARENT;
+params.gravity = Gravity.BOTTOM; //布局在底部
 getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
 }
 移除边距
@@ -59,9 +64,9 @@ getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) 
     <item name="android:windowNoTitle">true</item>
   </style>    
 ```
-editNameDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen);
+editNameDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen); //onCreate中设置style也可以
 editNameDialogFragment.show(getSupportFragmentManager(), "edit");
-onCreate中设置边距
+onCreate中设置边距/style
 ```
  @Override public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

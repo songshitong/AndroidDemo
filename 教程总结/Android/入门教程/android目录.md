@@ -1,8 +1,23 @@
 
 
+外部公共文档
+Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+androidQ val insertUri = contentResolver.insert(Downloads.EXTERNAL_CONTENT_URI, value)
+/storage/emulated/0/Download
+
+Environment.getExternalStorageDirectory().path
+/storage/emulated/0
 
 context.getExternalCacheDir()
-目录在/storage/emulated
+目录在/storage/emulated  例如/storage/emulated/0/Android/data/com.example.xx/cache
+
+外部文档
+getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) 
+/storage/emulated/0/Android/data/com.example.xx/files/Documents
+
+getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+/storage/emulated/0/Android/data/com.example.aibadge/files/Download
+
 context.getCacheDir()目录在/data/data/       Cache目录在部分手机升级时文件会被丢弃，不要存放重要文件，只存放缓存
 /data/user/0/包名/cache
 ```

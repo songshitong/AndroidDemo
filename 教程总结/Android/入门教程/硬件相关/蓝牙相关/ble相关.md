@@ -16,6 +16,11 @@ Android 4.3 （API 18 ）引入了低功耗蓝牙，应用可以查询周围设�
 5. Service — 服务是一系列特征。例如，您可能拥有名为“心率监测器”的服务，其中包括“心率测量”等特征。
  您可以在 bluetooth.org 上找到基于 GATT 的现有配置文件和服务的列表
 
+
+https://developer.android.com/guide/topics/connectivity/bluetooth-le?hl=zh-cn
+//只能安装在支持ble的设备
+<uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+
 关键代码
 1.检查是否支持BLE
 ```

@@ -7,6 +7,7 @@
 1 横竖屏切换保存dialog状态
 2 管理生命周期，使得dialog可以跟随activity   dialog忘记消失很容易窗口泄漏
 
+
 缺点：消失后再次显示走onCreateView，如果想保存消失前的内容比较繁琐
 解决 避免每次解析view
 全局DialogFragment df;

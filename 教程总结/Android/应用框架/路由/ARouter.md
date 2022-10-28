@@ -2,6 +2,16 @@ https://mp.weixin.qq.com/s/sFM3OCorZ8HzV0R89cUAEw
 
 版本1.5.2
 
+Arouter缺点：
+1 没有结束activity的能力，只有跳转
+2 没有处理onActivityResult
+只有通过传入requestCode，没有处理onActivityResult，可以通过添加一个隐藏的fragment做为中转和回调
+```
+arouter.navigation(Activity mContext, int requestCode)
+```
+https://blog.csdn.net/sinat_33680954/article/details/117322797
+3 没有适配androidX的ActivityResultLauncher
+
 初始化
 ```
 fun initRouter(application: Application,isDebug: Boolean){

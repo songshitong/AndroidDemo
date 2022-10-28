@@ -214,7 +214,17 @@ https://stackoverflow.com/questions/40691610/retrofit-2-requestbody-writeto-meth
 writeTo可能被其他日志拦截器调用，从而多次调用
 1.移除HttpLoggingInterceptor或更改基本为 HEADERS, BASIC or NONE 或者重写HttpLoggingInterceptor
     重写时默认的request.header的Content-Type为null 
-    可以使用requestBody.contentType()?.subtype  != "multipart"
+    可以使用requestBody.contentType()?.type  != "multipart"
+```
+else if(requestBody is MultipartBody) { //multipart只输出header
+          //文件上传 写入header
+          requestBody.parts.forEach {
+            it.headers?.forEach { header->
+              logger.log(header.toString())
+            }
+          }
+        }
+```
 2. 判断调用次数，一个拦截器，第二次是自己的逻辑if(firstTimeCounter==2){}
 
 

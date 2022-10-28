@@ -28,6 +28,9 @@ LiveData一般用在ViewModel中,用于存放一些数据啥的,然后我们可�
 阅读本文需要读者了解Lifecycle原理,下面的很多东西都和Lifecycle的很多类相关
 其实谷歌出的Lifecycle和ViewModel,LiveData这些,都特别好用,设计得特别好,特别值得我们深入学习.
 
+livedata缺点
+只切换到主线程，不支持多线程切换
+
 下面我将带大家走进LiveData的世界.
 一、使用
 ```

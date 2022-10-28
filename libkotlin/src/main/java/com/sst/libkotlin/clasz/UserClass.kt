@@ -1,5 +1,7 @@
 package com.sst.libkotlin.clasz
 
+import kotlin.jvm.internal.Intrinsics
+
 //kotlin常量 编译期常量
 //1 定义一个顶层的常量，这个常量不放在任何的类中
 const val CONSTANT = "This is a constant"
@@ -164,15 +166,29 @@ class UserChild : User(), UserInterface, UserInterface2 {
 // 1. 主构造方法至少要有一个参数，且参数必须标记为val或var
 // 2. 数据类不能用open、abstract、sealed(封闭类)、inner标识
 data class UserData(var userName: String, var age: Int)
+//equal方法判断
+// if (this !== var1){ //不是同一个对象，对比属性
+//   if (var1 is UserData) {
+//     val (userName, age) = var1 as UserData
+//     if (Intrinsics.areEqual(this.userName, userName) && this.age == age) {
+//       return true
+//     }
+//   }
+//   return false
+// } else { 同一个对象，地址引用相同
+//   return true
+// }
 
 //使用copy方法
 val userData1: UserData = UserData("li", 20)
 val userData2: UserData = userData1.copy(age = 30)
 
 //android中 使用注解@Parcelize并实现接口Parcelable，可以自动生成接口所需方法  需要使用插件plugin id 'kotlin-parcelize'
+//注意：：import kotlinx.parcelize.Parcelize
 //@Parcelize
 //data class TestD(val name: String?):Parcelable {
 //}
+
 
 
 public class TestClass{

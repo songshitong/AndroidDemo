@@ -18,6 +18,17 @@ getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
 getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
 /storage/emulated/0/Android/data/com.example.aibadge/files/Download
 
+获取所有外部目录 https://juejin.cn/post/6844904013515718664
+```
+File[] files = getExternalFilesDirs(Environment.MEDIA_MOUNTED);
+            for (File file : files) {
+                Log.d("file_dir", file.getAbsolutePath());
+            }
+```
+
+File.createTempFile("123",".db").path
+/data/user/0/com.example.xx/cache/1234973583266288289376.db
+
 context.getCacheDir()目录在/data/data/       Cache目录在部分手机升级时文件会被丢弃，不要存放重要文件，只存放缓存
 /data/user/0/包名/cache
 ```

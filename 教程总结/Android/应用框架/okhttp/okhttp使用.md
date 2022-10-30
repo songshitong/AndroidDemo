@@ -85,3 +85,40 @@ okhttp3/internal/platform/AndroidPlatform.kt
     ...
   }
 ```
+
+
+okhttp有三种RequestBody
+RequestBody.kt   okhttp3/RequestBody.kt  普通的请求体，传入MediaType，将string转为RequestBody
+```
+ fun String.toRequestBody(contentType: MediaType? = null): RequestBody {
+      var charset: Charset = UTF_8
+      var finalContentType: MediaType? = contentType
+      if (contentType != null) {
+        val resolvedCharset = contentType.charset()
+        if (resolvedCharset == null) {
+          charset = UTF_8
+          finalContentType = "$contentType; charset=utf-8".toMediaTypeOrNull()
+        } else {
+          charset = resolvedCharset
+        }
+      }
+      val bytes = toByteArray(charset)
+      return bytes.toRequestBody(finalContentType, 0, bytes.size)
+    }
+```
+FormBody  okhttp3/FormBody.kt  表单结构的请求
+```
+  companion object {
+    private val CONTENT_TYPE: MediaType = "application/x-www-form-urlencoded".toMediaType()
+  }
+```
+MultipartBody okhttp3/MultipartBody.kt
+支持上传下载的请求体
+```
+//默认类型
+val FORM = "multipart/form-data".toMediaType()
+//为contentType增加boundary
+private val contentType: MediaType = "$type; boundary=$boundary".toMediaType()
+//默认的boundary由UUID生成
+class Builder @JvmOverloads constructor(boundary: String = UUID.randomUUID().toString()) {}
+```

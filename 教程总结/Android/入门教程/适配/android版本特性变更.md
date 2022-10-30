@@ -73,6 +73,17 @@ android10以后自动获取沙盒权限
 可能会遇到无法保存图片到本地，或者造成Permission denied等问题，具体解决方案参考：《关于安卓open failed: EACCES (Permission denied)》
   https://myhub.blog.csdn.net/article/details/108701706
   使用，新增媒体文件使用ContentProvider https://developer.android.com/training/data-storage/shared/media#java
+https://developer.android.com/training/data-storage/shared/documents-files?hl=zh-cn
+申请所有文件访问权限
+https://developer.android.com/training/data-storage/manage-all-files?hl=zh-cn
+```
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    val intent = Intent()
+    intent.action= Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+    startActivity(intent)
+    //判断是否获取MANAGE_EXTERNAL_STORAGE权限：
+    val isHasStoragePermission= Environment.isExternalStorageManager()
+```
 访问
 ```
 Cursor cursor = getApplicationContext().getContentResolver().query(

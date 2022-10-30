@@ -11,7 +11,14 @@ GreenDao的优缺点？
 5 数据库加密：greenDAO支持SQLCipher，以确保用户的数据安全;
 
 版本
-implementation 'org.greenrobot:greendao:3.2.2'
+implementation 'org.greenrobot:greendao:3.3.0'
+implementation 'org.greenrobot:greendao-generator:3.3.0' //生成器
+classpath("org.greenrobot:greendao-gradle-plugin:3.3.0")
+```
+plugins {
+  id("org.greenrobot.greendao")
+}
+```
 数据库配置
 ```
 greendao {
@@ -22,6 +29,13 @@ greendao {
     generateTests false //设置为true以自动生成单元测试。
     targetGenDirTests 'src/main/java' //应存储生成的单元测试的基本目录。默认为 src / androidTest / java。
 }
+
+kotlin
+  greendao {
+    schemaVersion = 1
+    daoPackage = "com.xx.xx.sql.gen"
+    targetGenDir = File(projectDir,"src/main/java")
+  }
 ```
 
 
@@ -33,7 +47,9 @@ Entities ：可持久化对象。通常, 实体对象代表一个数据库行使
 
 
 
-创建存储对象实体类
+创建存储对象实体类  
+3.3.0 class必须为java对象，不支持kt的data class 可以查看https://greenrobot.org/greendao/documentation/modelling-entities/
+
 ```
 @Entity
 public class Student {

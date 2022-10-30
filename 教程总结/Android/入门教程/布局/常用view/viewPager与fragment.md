@@ -1,4 +1,10 @@
 
+fragment
+1 fragment比activity轻量,创建快  一个activity多个fragment的好处
+  处理onActivityResult方便，直接用callBack就行
+缺点
+1 需要手动处理
+
 指示器配置  
 viewPager+tabLayout 默认等比布局，不好调边距等
 tab_selector.xml配置不同的drawable即可android:state_selected

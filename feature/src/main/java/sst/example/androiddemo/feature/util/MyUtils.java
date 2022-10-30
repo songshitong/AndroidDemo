@@ -90,7 +90,7 @@ public class MyUtils {
     public static Intent getSystemMultipleAlbumIntent(){
         Intent getImage = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         getImage.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        //允许选择多个
+        //允许选择多个  部分相册，点击直接返回单个，长按开始文件选择
         getImage.putExtra(EXTRA_ALLOW_MULTIPLE,true);
         return getImage;
     }

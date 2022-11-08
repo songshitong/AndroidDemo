@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ResolveInfo
 import android.media.MediaPlayer
+import android.opengl.GLSurfaceView
 import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES

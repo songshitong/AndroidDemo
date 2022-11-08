@@ -331,8 +331,15 @@ this.leScanCallback = new BluetoothAdapter.LeScanCallback() {
 
 gatt获取对应service和getCharacteristic
 BluetoothGattService gattService = gatt.getService(SERVICE_UUID);
+if(null != gattService){ //获取不到service  vivox20，频繁重启app可能发送
 BleManager.this.readGattCharacteristic = gattService.getCharacteristic(READ_UUID);
 BleManager.this.writeGattCharacteristic = gattService.getCharacteristic(WRITE_UUID);
+}else{
+  // 尝试重连
+  此时执行gatt.close，此时不回调onConnectionStateChange
+  延迟1S后继续扫描
+}
+
 
 
 监听蓝牙写入

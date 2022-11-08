@@ -114,7 +114,7 @@ String channelId = "";
         //添加下列代码将后台Service变成前台Service
         //构建"点击通知后打开MainActivity"的Intent对象
         Intent notificationIntent = new Intent(this,MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,notificationIntent,0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,notificationIntent,PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         //新建Builer对象
         Notification.Builder builer = new Notification.Builder(this,channelId);
@@ -123,7 +123,7 @@ String channelId = "";
         builer.setSmallIcon(R.mipmap.ic_launcher);//设置通知的图标
         builer.setContentIntent(pendingIntent);//设置点击通知后的操作
 
-        Notification notification = builer.gbuiler.build();//将Builder对象转变成普通的notification
+        Notification notification = builer.build();//将Builder对象转变成普通的notification
         startForeground(1, notification);//让Service变成前台Service,并在系统的状态栏显示出来
     }
     
@@ -153,6 +153,7 @@ if (Build.VERSION.SDK_INT >= 26) {
 }
 ```
 停止服务service.stopForeground(boolean removeNotification)
+或者context.stopService(intent)
    
    远程服务  使用隐式intent
    aidl：android interface definition language 安卓接口定义语言。

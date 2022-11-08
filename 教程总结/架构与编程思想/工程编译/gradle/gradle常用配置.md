@@ -51,6 +51,8 @@ manifest使用
             keyPassword '22'
             storeFile file('ebug.jks')
             storePassword 'a333'
+            enableV2Signing true //指定签名版本
+            enableV1Signing true
         }
     }
     buildTypes {

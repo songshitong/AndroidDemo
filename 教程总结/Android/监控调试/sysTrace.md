@@ -1,3 +1,6 @@
+btrace 支持线上使用
+https://github.com/bytedance/btrace/blob/master/README.zh-CN.md
+
 http://gityuan.com/2016/01/17/systrace/
 
 默认的事件是系统插入的，想获取业务代码的耗时可以自己插入

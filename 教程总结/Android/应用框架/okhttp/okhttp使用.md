@@ -1,3 +1,5 @@
+Dispatcher().maxRequestsPerHost
+默认为5，一个域名同时并发为5个，多个会异常
 
 
 callTimeout 整个网络请求，请求需要重定向和重试需要走完整个周期   默认0，没有限制
@@ -9,9 +11,11 @@ connecting a TCP socket to the target host
 
 readTimeout 读response的io 默认10秒
 the TCP socket and for individual read IO operations including on Source of the Response.
+0代表没有超时，值必须在1-int.maxValue
 
 writeTimeout 写io 默认10秒
 individual write IO operations
+0代码没有超时，值必须在1-int.maxValue
 
 
 

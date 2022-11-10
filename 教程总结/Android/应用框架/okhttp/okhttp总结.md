@@ -13,7 +13,7 @@ okhttp设置连接池
 OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
 clientBuilder.connectionPool(new ConnectionPool(5, 180, TimeUnit.SECONDS));  //连接池数量，连接池里面空闲连接的存活时间
 //需要与后端复用时间统一，  假如客户端存活为5分钟，服务器3分钟
-服务器连接死掉之后，客户端仍然认为是存活的进行复用，此时连接出错
+服务器连接死掉之后，客户端仍然认为是存活的进行复用，此时连接出错   Socket closed/java.net.SocketException: Connection reset
 
 
 https://blog.csdn.net/jaynm/article/details/112002901

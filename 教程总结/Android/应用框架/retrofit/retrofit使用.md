@@ -20,7 +20,7 @@ Call<User> getUser(@HeaderMap Map<String, String> headers)
 
 get方法
 @GET("users/list")
-get中path是参数 id为占位符，可以动态改变url
+get中path是参数
 ```
 @GET("group/{id}/users")
 Call<List<User>> groupList(@Path("id") int groupId);
@@ -154,7 +154,6 @@ public class ProgressRequestBody extends RequestBody {
         // update progress on UI thread
         handler.post(new ProgressUpdater(uploaded, fileLength));
         sink.write(buffer, 0, read);
-        sink.flush();//不使用flush，进度一下就更新到100了
       }
 
     } catch (Exception e) {

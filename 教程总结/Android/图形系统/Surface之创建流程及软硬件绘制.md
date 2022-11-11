@@ -1055,6 +1055,80 @@ void CanvasContext::draw() {
 1 通过 mRenderPipeline->draw, 将 RenderNode 中的 DisplayList 记录的数据绘制到 Surface 的缓冲区
 2 通过 mRenderPipeline->swapBuffers 将缓冲区的数据推送到 Surface 的缓冲区中, 等待 SurfaceFlinger 的合成操作
 todo surface缓冲区？？mGraphicBufferProducer
+todo draw的操作，离屏缓冲https://juejin.cn/post/7063810632289615885#heading-4
+
+/frameworks/base/libs/hwui/renderthread/OpenGLPipeline.cpp
+```
+  bool OpenGLPipeline::swapBuffers(const Frame& frame, bool drew, const SkRect& screenDirty,
+                                   FrameInfo* currentFrameInfo, bool* requireSwap) {
+       ...
+      // Even if we decided to cancel the frame, from the perspective of jank
+      // metrics the frame was swapped at this point
+      currentFrameInfo->markSwapBuffers();
+      *requireSwap = drew || mEglManager.damageRequiresSwap();
+      if (*requireSwap && (CC_UNLIKELY(!mEglManager.swapBuffers(frame, screenDirty)))) {
+          return false;
+      }
+      return *requireSwap;
+  }
+```
+mEglManager.swapBuffers
+/frameworks/base/libs/hwui/renderthread/EglManager.cpp
+```
+ bool EglManager::swapBuffers(const Frame& frame, const SkRect& screenDirty) {
+      ...
+      EGLint rects[4];
+      frame.map(screenDirty, rects);
+      eglSwapBuffersWithDamageKHR(mEglDisplay, frame.mSurface, rects, screenDirty.isEmpty() ? 0 : 1);
+      ....
+  }
+```
+/frameworks/native/opengl/libs/EGL/eglApi.cpp
+```
+ EGLBoolean eglSwapBuffersWithDamageKHR(EGLDisplay dpy, EGLSurface draw,
+          EGLint *rects, EGLint n_rects)
+  {
+       ... sync有关
+      if (CC_UNLIKELY(dp->traceGpuCompletion)) {
+          EGLSyncKHR sync = eglCreateSyncKHR(dpy, EGL_SYNC_FENCE_KHR, NULL);
+          if (sync != EGL_NO_SYNC_KHR) {
+              FrameCompletionThread::queueSync(sync);
+          }
+      }
+  
+      if (CC_UNLIKELY(dp->finishOnSwap)) {
+          uint32_t pixel;
+          egl_context_t * const c = get_context( egl_tls_t::getContext() );
+          if (c) {
+              // glReadPixels() ensures that the frame is complete
+              s->cnx->hooks[c->version]->gl.glReadPixels(0,0,1,1,
+                      GL_RGBA,GL_UNSIGNED_BYTE,&pixel);
+          }
+      }
+  
+      if (!sendSurfaceMetadata(s)) {
+          native_window_api_disconnect(s->getNativeWindow(), NATIVE_WINDOW_API_EGL);
+          return setError(EGL_BAD_NATIVE_WINDOW, (EGLBoolean)EGL_FALSE);
+      }
+  
+      if (n_rects == 0) {
+          return s->cnx->egl.eglSwapBuffers(dp->disp.dpy, s->surface);
+      }
+    ...
+  }
+```
+/frameworks/native/opengl/libagl/egl.cpp
+```
+  EGLBoolean eglSwapBuffers(EGLDisplay dpy, EGLSurface draw)
+  {
+      ...
+      // post the surface
+      d->swapBuffers();
+      return EGL_TRUE;
+  }
+```
+后面可以查看glsurfaceview的有关eglSwapBuffers操作
+
 
 小结
 硬件加速可以从两个阶段来看：

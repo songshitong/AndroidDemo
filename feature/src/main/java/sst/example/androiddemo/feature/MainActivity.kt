@@ -483,6 +483,12 @@ class  MainActivity : AppCompatActivity()  {
     println("getMethodTrace use Throwable end ==================================")
   }
 
+  fun exceptionToString(e:Exception):String{
+    val sw = StringWriter()
+    e.printStackTrace(PrintWriter(sw))
+    return sw.toString()
+  }
+
   //获取所有的进程
   public fun getRunningAppProcessInfos( context:Context):List<ActivityManager.RunningAppProcessInfo> {
     val am:ActivityManager  = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager

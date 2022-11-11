@@ -29,13 +29,16 @@ if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) 
     finish();
 }
 ```
-2.获取 BluetoothAdapter
+2.获取 BluetoothAdapter 可用于检测蓝牙属性是否支持
 BluetoothAdapter 代表设备自身的蓝牙适配器（蓝牙无线装置）。整个系统有一个蓝牙适配器，并且您的应用可使用此对象与之进行交互
 ```
 private BluetoothAdapter bluetoothAdapter;
 final BluetoothManager bluetoothManager =
         (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 bluetoothAdapter = bluetoothManager.getAdapter();//BluetoothAdapter.getDefaultAdapter();
+isDiscovering() 是否扫描设备中
+getDiscoverableTimeout() 超时时间
+getMaxConnectedAudioDevices() 最大连接音频设备
 ```
 BluetoothAdapter的关键方法
 ```

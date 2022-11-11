@@ -3,4 +3,5 @@ include ':libkotlin'
 include ':BuildSrc'
 include ':GradlePlugin'
 include ':feature', ':libJava', ':associatedapp'
-// new
+
+include ':libOpengl'

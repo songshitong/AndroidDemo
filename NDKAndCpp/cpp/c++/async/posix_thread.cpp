@@ -48,6 +48,9 @@
 //第一个一般为pthread_once_t once = PTHREAD_ONCE_INIT;
 //第二个参数为回调函数
 
+
+//pthread_getpecific和pthread_setspecific提供了在同一个线程中不同函数间共享数据即线程存储的一种方法
+
 #include <iostream>
 // 必须的头文件
 #include <pthread.h>

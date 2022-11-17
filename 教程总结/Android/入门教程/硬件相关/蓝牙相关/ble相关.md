@@ -240,7 +240,9 @@ private void close() {
 ```
 发送无响应的配置
 ```
+characteristic.setWriteType(BluetoothGattCharacteristic.PROPERTY_WRITE);
 characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+characteristic.setWriteType(BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE);
 ```
 
 

@@ -54,3 +54,22 @@ https://www.itranslater.com/qa/details/2582595927299064832
 ```
 webView.loadUrl("about:blank")
 ```
+
+打印webview的log
+```
+public void onConsoleMessage(String message, int lineNumber, String sourceID) {
+    Log.d("MyApplication", message + " -- From line "
+                         + lineNumber + " of "
+                         + sourceID);
+    return true;
+  }
+```
+远程调试  webview debug
+https://developer.chrome.com/docs/devtools/remote-debugging/webviews/
+```
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+    if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE))
+    { WebView.setWebContentsDebuggingEnabled(true); }
+}
+chrome查看 chrome://inspect 选择usb设备还是network设备
+```

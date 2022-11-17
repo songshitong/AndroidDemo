@@ -5,6 +5,7 @@ https://mp.weixin.qq.com/s/sFM3OCorZ8HzV0R89cUAEw
 Arouter缺点：
 1 没有结束activity的能力，只有跳转
 2 没有处理onActivityResult
+3 activity的跳转逻辑分散在各处，如果多次处理输入参数，容易造成异常，最好有个中转站，不用每次调用arouter封装参数 
 只有通过传入requestCode，没有处理onActivityResult，可以通过添加一个隐藏的fragment做为中转和回调
 ```
 arouter.navigation(Activity mContext, int requestCode)

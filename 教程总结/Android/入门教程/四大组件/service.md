@@ -122,7 +122,10 @@ String channelId = "";
         builer.setContentText("前台服务通知的内容");//设置通知的内容
         builer.setSmallIcon(R.mipmap.ic_launcher);//设置通知的图标
         builer.setContentIntent(pendingIntent);//设置点击通知后的操作
-
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+           //设置通知是立即显示，还是一定的延迟显示
+          builer.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+         }
         Notification notification = builer.build();//将Builder对象转变成普通的notification
         startForeground(1, notification);//让Service变成前台Service,并在系统的状态栏显示出来
     }

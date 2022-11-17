@@ -24,6 +24,8 @@ LiveData是一个类,将数据放在它里面我们可以观察数据的变化.�
   我们可以用它来更新UI的数据,当且仅当activity、fragment或者Service是处于活动状态时。
 LiveData一般用在ViewModel中,用于存放一些数据啥的,然后我们可以在Activity或者Fragment中观察其数据的变化(可能是访问数据库或者请求网络)展示数据到相应的UI上.
    这就是数据驱动视图,是MVVM模式的重要思想.
+另外activity中监听viewmodel的数据是生命周期感知的，在onStop后自动不响应，也就是activity后台不展示dialogFragment等,在前台时自动处理
+这也是viewmodel处理逻辑，activity展示页面的好处,如果需要后台处理的，使用observeForever
 
 阅读本文需要读者了解Lifecycle原理,下面的很多东西都和Lifecycle的很多类相关
 其实谷歌出的Lifecycle和ViewModel,LiveData这些,都特别好用,设计得特别好,特别值得我们深入学习.

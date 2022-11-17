@@ -169,17 +169,70 @@ static class GLThread extends Thread {
         }     
 }
 ```
+调用 mEglHelper.start 初始化 GL 的环境
+调用 mEglHelper.createSurface 创建缓冲帧 EGLSurface
+回调 Renderer 的生命周期  onSurfaceCreated,onSurfaceChanged,onDrawFrame
+调用 mEglHelper.swap 将 EGLSurface 中的数据推入 SurfaceFlinger
 
 
-
-
-其他方法
+mEglHelper.start
 ```
-//运行在glthread
- public void queueEvent(Runnable r) {
-        mGLThread.queueEvent(r);
+ private static class EglHelper {
+     public void start() {
+            ......
+            // 获取 EGL10 对象
+            mEgl = (EGL10) EGLContext.getEGL();
+
+            // 1. 创建 EGLDisplay 描述本地窗口的连接
+            mEglDisplay = mEgl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
+            ......
+            // 1.2 初始化 EGLDisplay
+            int[] version = new int[2];
+            if(!mEgl.eglInitialize(mEglDisplay, version)) {
+                throw new RuntimeException("eglInitialize failed");
+            }
+            
+            GLSurfaceView view = mGLSurfaceViewWeakRef.get();
+            if (view == null) {
+                mEglConfig = null;
+                mEglContext = null;
+            } else {
+                // 2. 创建 EGLConfig
+                mEglConfig = view.mEGLConfigChooser.chooseConfig(mEgl, mEglDisplay);
+                // 3. 创建 EGLContext
+                mEglContext = view.mEGLContextFactory.createContext(mEgl, mEglDisplay, mEglConfig);
+            }
+            ......
+
+            mEglSurface = null;
+        }
+ }
+```
+EglHelper.start 中的流程是非常清晰, 主要有三个步骤
+1 创建 EGLDisplay 用于描述硬件屏幕
+  初始化 EGL, 获取主次版本号信息
+2 创建 EGLConfig
+3 创建 EGLContext
+
+Egl创建 android 
+EGLContext.getEGL() 是EGLImpl
+
+
+创建 EGLDisplay
+frameworks/base/opengl/java/com/google/android/gles_jni/EGLImpl.java
+```
+public synchronized EGLDisplay eglGetDisplay(Object native_display) {
+    long value = _eglGetDisplay(native_display);
+    if (value == 0) {
+        return EGL10.EGL_NO_DISPLAY;
     }
+    if (mDisplay.mEGLDisplay != value)
+        mDisplay = new EGLDisplayImpl(value);
+    return mDisplay;
+}
 ```
+
+
 
 android-8.0_r36
 /frameworks/base/core/jni/com_google_android_gles_jni_EGLImpl.cpp
@@ -729,3 +782,14 @@ swapBuffers 的主要任务, 即将绘制到 Buffer 中的数据, 推送到 Surf
 
 todo anative_window相关
 https://www.cnblogs.com/roger-yu/p/15773010.html
+
+
+
+
+其他方法
+```
+//运行在glthread
+ public void queueEvent(Runnable r) {
+        mGLThread.queueEvent(r);
+    }
+```

@@ -78,6 +78,11 @@ inline fun <reified T> get(id: Long): T = Store.box.boxFor(T::class.java).get(id
         return info
     }   
 ```
+属性查询 查询某个属性的最大值，类似还有min,sum(),avg(),count()
+```
+Store.box.boxFor(T::class.java).query().build().property(XX_.startTime).max()
+```
+
 新增/更新
 ```
 inline fun <reified T> put(bean: T) {

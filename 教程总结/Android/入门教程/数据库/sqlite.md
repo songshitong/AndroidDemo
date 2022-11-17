@@ -1,5 +1,5 @@
 
-数据库配置 名称/路径，版本号
+数据库配置 名称/路径(name包含路径可以指定数据库位置)，版本号
 ```
 class MySqlHelper(context: Context,name:String) : SQLiteOpenHelper(context,name,null,1) {
   override fun onCreate(db: SQLiteDatabase?) {

@@ -38,7 +38,7 @@ class MAnnotation private constructor(){
         fun main(args: Array<String>) {
         }
 
-        //不对该属性生成getter/setter，并将其暴露为Java的属性
+        //不对该属性生成getter/setter，并将其暴露为Java的属性 java使用a.field，没有该注解是a.getField()
         @JvmField
         val field="f"
 

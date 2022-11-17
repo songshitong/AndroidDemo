@@ -13,6 +13,8 @@ team: datatech.front  AND  project: mainengine-xiaoguan-android  AND custom_msg:
 字符串包含匹配。 举例2- QueryString: _appId
 Q: 为什么上面两个例子语法一模一样，第一个是精确匹配，第二个是包含匹配？
 A: 因为Project字段存储时不分词，QueryString字段分词.所有字符串查询都遵循这一原则，后面不做特殊说明
+匹配 xxkeywordxx 不进行分词
+custom_msg : "\""+停止+"\""
 
 OR 语法
 同一字段多值查询。 举例3- Level: (ERROR OR FATAL)

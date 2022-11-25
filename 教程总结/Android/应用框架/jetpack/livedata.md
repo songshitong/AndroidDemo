@@ -27,6 +27,8 @@ LiveData一般用在ViewModel中,用于存放一些数据啥的,然后我们可�
 另外activity中监听viewmodel的数据是生命周期感知的，在onStop后自动不响应，也就是activity后台不展示dialogFragment等,在前台时自动处理
 这也是viewmodel处理逻辑，activity展示页面的好处,如果需要后台处理的，使用observeForever
 
+todo livedata去除粘性，这样就不接收默认值，或者初始化时不设置默认值？
+
 阅读本文需要读者了解Lifecycle原理,下面的很多东西都和Lifecycle的很多类相关
 其实谷歌出的Lifecycle和ViewModel,LiveData这些,都特别好用,设计得特别好,特别值得我们深入学习.
 

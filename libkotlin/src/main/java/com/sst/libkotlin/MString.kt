@@ -1,5 +1,9 @@
 package com.sst.libkotlin
 
+import java.math.BigInteger
+import java.security.MessageDigest
+import java.util.Base64
+
 class MString {
 
     companion object{
@@ -40,7 +44,19 @@ class MString {
             //编译为(new StringBuilder()).append("this is ").append(a).append("  length is ").append(a.length()).toString();
             var b = "this is $a  length is ${a.length}"
 
+          //base64
+          val encoder = Base64.getEncoder()
+          val encoded: String = encoder.encodeToString("this is base64".toByteArray())
+          println("Encoded Data: $encoded")
 
+          val decoder: Base64.Decoder = Base64.getDecoder()
+          val decoded = String(decoder.decode(encoded))
+          println("Decoded Data: $decoded")
+
+          //md5
+          val md = MessageDigest.getInstance("MD5")
+          val mdStr = BigInteger(1, md.digest("this is md5 ".toByteArray())).toString(16).padStart(32, '0').uppercase()
+          println("mdstr: $mdStr")
         }
     }
 }

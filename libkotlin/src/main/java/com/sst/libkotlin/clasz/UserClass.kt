@@ -121,6 +121,7 @@ init {
   inner class User2 {
 
   }
+
 }
 
 ///接口  关键字interface声明

@@ -74,8 +74,13 @@ Model与View完全分离，可以修改View而不影响Model
 把逻辑放在Presenter中，就可以脱离UI来测试这些逻辑（单元测试）
 
 MVP缺点：
-Presenter作为桥梁协调View和Model，会导致Presenter变得很臃肿，维护比较困难
-
+1 Presenter作为桥梁协调View和Model，会导致Presenter变得很臃肿，维护比较困难
+2 Presenter（以下简称P）层与View（以下简称V）层是通过接口进行交互的，接口粒度不好控制。粒度太小，就会存在大量接口的情况，
+使代码太过碎版化；粒度太大，解耦效果不好。同时对于UI的输入和数据的变化，需要手动调用V层或者P层相关的接口，相对来说缺乏自动性、
+  监听性。如果数据的变化能自动响应到UI、UI的输入能自动更新到数据，那该多好！
+3 MVP是以UI为驱动的模型，更新UI都需要保证能获取到控件的引用，同时更新UI的时候要考虑当前是否是UI线程，也要考虑Activity的生命周期（是否已经销毁等）
+4 MVP是以UI和事件为驱动的传统模型，数据都是被动地通过UI控件做展示，但是由于数据的时变性，我们更希望数据能转被动为主动，
+  希望数据能更有活性，由数据来驱动UI。
 
 适用场景：视图界面不是很多的项目中
 内存消耗：activity,presenter,model
@@ -116,6 +121,10 @@ class TestViewModel : ViewModel() {
 2 View层与ViewModel层的交互比较分散零乱，不成体系
 
 优点：
+数据驱动
+在常规的开发模式中，数据变化需要更新UI的时候，需要先获取UI控件的引用，然后再更新UI。获取用户的输入和操作也需要通过UI控件的引用。
+ 在MVVM中，这些都是通过数据驱动来自动完成的，数据变化后会自动更新UI，UI的改变也能自动反馈到数据层，数据成为主导因素。
+ 这样MVVM层在业务逻辑处理中只要关心数据，不需要直接和UI打交道，在业务处理过程中简单方便很多
 低耦合
 View可以独立于Model变化和修改，一个ViewModel可以绑定到不同的View上，当View变化的时候Model可以不变，当Model变化的时候View也可以不变。
 可重用性
@@ -134,6 +143,113 @@ View可以独立于Model变化和修改，一个ViewModel可以绑定到不同�
 
 适用场景：适用于界面展示的数据较多的项目。
 内存消耗：activity,viewModel,model,dataBinding
+
+
+MVI
+MVI 与 MVVM 很相似，其借鉴了前端框架的思想，更加强调数据的单向流动和唯一数据源
+Model: 与MVVM中的Model不同的是，MVI的Model主要指UI状态（State）。例如页面加载状态、控件位置等都是一种UI状态
+View: 与其他MVX中的View一致，可能是一个Activity或者任意UI承载单元。MVI中的View通过订阅Model的变化实现界面刷新
+Intent: 此Intent不是Activity的Intent，用户的任何操作都被包装成Intent后发送给Model层进行数据请求
+数据流动
+1 用户操作以Intent的形式通知Model
+2 Model基于Intent更新State
+3 View接收到State变化刷新UI。
+数据永远在一个环形结构中单向流动，不能反向流动
+
+总体设计
+Model层承载UI状态，并暴露出ViewState供View订阅，ViewState是个data class,包含所有页面状态
+View层通过Action更新ViewState，替代MVVM通过调用ViewModel方法交互的方式
+
+优点：
+1 强调数据单向流动，很容易对状态变化进行跟踪和回溯
+2 使用ViewState对State集中管理，只需要订阅一个 ViewState 便可获取页面的所有状态，相对 MVVM 减少了不少模板代码
+3 ViewModel通过ViewState与Action通信，通过浏览ViewState 和 Aciton 定义就可以理清 ViewModel 的职责，可以直接拿来作为接口文档使用。
+缺点：
+1 所有的操作最终都会转换成State，所以当复杂页面的State容易膨胀
+2 state是不变的，因此每当state需要更新时都要创建新对象替代老对象，这会带来一定内存开销  //每一帧页面有对应状态类，对比flutter，这很合理
+
+代码：
+```
+data class MainViewState(val fetchStatus: FetchStatus, val newsList: List<NewsItem>)  
+
+sealed class MainViewEvent {
+    data class ShowSnackbar(val message: String) : MainViewEvent()
+    data class ShowToast(val message: String) : MainViewEvent()
+}
+```
+1 ViewState只定义了两个，一个是请求状态，一个是页面数据
+2 ViewEvent也很简单，一个简单的密封类，显示Toast与SnackBar
+//个人：一个代表动作，一个代表数据？
+
+ViewState更新
+```
+class MainViewModel : ViewModel() {
+    private val _viewStates: MutableLiveData<MainViewState> = MutableLiveData()
+    val viewStates = _viewStates.asLiveData()
+    private val _viewEvents: SingleLiveEvent<MainViewEvent> = SingleLiveEvent()
+    val viewEvents = _viewEvents.asLiveData()
+
+    init {
+        emit(MainViewState(fetchStatus = FetchStatus.NotFetched, newsList = emptyList()))
+    }
+
+    private fun fabClicked() {
+        count++
+        emit(MainViewEvent.ShowToast(message = "Fab clicked count $count"))
+    }
+
+    private fun emit(state: MainViewState?) {
+        _viewStates.value = state
+    }
+
+    private fun emit(event: MainViewEvent?) {
+        _viewEvents.value = event
+    }
+}
+```
+1 ViewEvents是一次性的，通过SingleLiveEvent实现，当然你也可以用Channel当来实现
+2 当状态更新时，通过emit来更新状态
+
+
+View监听ViewState
+```
+  private fun initViewModel() {
+        viewModel.viewStates.observe(this) {
+            renderViewState(it)
+        }
+        viewModel.viewEvents.observe(this) {
+            renderViewEvent(it)
+        }
+    }
+```
+MVI 使用 ViewState 对 State 集中管理，只需要订阅一个 ViewState 便可获取页面的所有状态，相对 MVVM 减少了不少模板代码
+//个人：页面状态多了，viewSate是不是很大
+
+View通过Action更新State
+```
+class MainActivity : AppCompatActivity() {
+	private fun initView() {
+        fabStar.setOnClickListener {
+            viewModel.dispatch(MainViewAction.FabClicked)
+        }
+    }
+}
+class MainViewModel : ViewModel() {
+    fun dispatch(action: MainViewAction) =
+        reduce(viewStates.value, action)
+
+    private fun reduce(state: MainViewState?, viewAction: MainViewAction) {
+        when (viewAction) {
+            is MainViewAction.NewsItemClicked -> newsItemClicked(viewAction.newsItem)
+            MainViewAction.FabClicked -> fabClicked()
+            MainViewAction.OnSwipeRefresh -> fetchNews(state)
+            MainViewAction.FetchNews -> fetchNews(state)
+        }
+    }
+}
+```
+View通过Action与ViewModel交互，通过 Action 通信，有利于 View 与 ViewModel 之间的进一步解耦，同时所有调用以 Action 的形式汇总到一处，
+也有利于对行为的集中分析和监控
 
 
 mvc的发展

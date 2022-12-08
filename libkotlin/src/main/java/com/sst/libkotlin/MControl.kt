@@ -88,6 +88,11 @@ class MControl {
         for(i in array1.indices){
 
         }
+
+        //index和value
+        for ((index, value) in array1.withIndex()) {
+            println("the element at $index is $value")
+        }
     }
 
     //while语句

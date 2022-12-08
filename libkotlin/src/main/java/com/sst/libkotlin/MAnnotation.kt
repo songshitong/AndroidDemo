@@ -19,7 +19,13 @@ class MAnnotation private constructor(){
 
     //加锁 等同Java的Synchronized关键字
     @Synchronized
-    fun getStr():String{return "aa"}
+    fun getStr():String{
+      //锁函数
+      synchronized(this){
+        println("in synchronized function ==")
+      }
+      return "aa"
+    }
 
     ///可见性 效果等同Java的Volatile关键字
     @Volatile

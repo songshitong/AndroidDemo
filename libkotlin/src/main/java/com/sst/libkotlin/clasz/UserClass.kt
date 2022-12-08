@@ -161,7 +161,7 @@ class UserChild : User(), UserInterface, UserInterface2 {
 //      1. getter/setter方法；
 //      2. equals() / hashCode() 对；
 //      3. toString() ：输出"类名(参数+参数值)"；
-//      4. copy() 函数：复制一个对象&改变它的一些属性，但其余部分保持不变 浅克隆
+//      4. copy() 函数：复制一个对象&改变它的一些属性，但其余部分保持不变 浅克隆 注意使用copy()后某些场景不能使用list.indexOf，此时引用变了
 // 特别注意
 // 1. 主构造方法至少要有一个参数，且参数必须标记为val或var
 // 2. 数据类不能用open、abstract、sealed(封闭类)、inner标识

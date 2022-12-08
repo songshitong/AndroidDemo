@@ -111,6 +111,9 @@ class MCollection {
           println("sortWith: 长度正序${
             list1.sortedWith(Comparator { a, b -> a.length-b.length })
           }")
+
+          //join  支持多种方式
+          println("join ${list1.joinToString(",")}")
         }
     }
 }

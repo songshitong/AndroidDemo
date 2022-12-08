@@ -95,6 +95,10 @@ https://lug.ustc.edu.cn/wiki/mirrors/help/aosp/
 这样你 就可以通过 HTTP 的方式下载，该方法支持断点续传。
 不推荐使用 HTTP 协议同步，因为 HTTP 服务器不支持 repo sync 的 --depth 选项，可能导致部分仓库同步失败。
 
+
+python版本查看
+https://android.googlesource.com/platform/system/sepolicy/+/6e60287a1f73c4f792350f7c86dc7bb3e1d6d623/build/Android.bp
+
 sudo apt-get update
 sudo apt-get install git
 mkdir ~/bin
@@ -103,7 +107,7 @@ sudo apt-get install curl
 curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo > ~/bin/repo
 curl https://mirrors.bfsu.edu.cn/git/git-repo  > ~/bin/repo
 chmod a+x ~/bin/repo
-#到Android11  aosp使用的Python脚本为python2   python3需要单独安装
+#到Android11  aosp使用的Python脚本为python2   python3需要单独安装  python3
 sudo apt-get install python
 mkdir aosp
 cd aosp

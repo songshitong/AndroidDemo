@@ -73,3 +73,9 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 }
 chrome查看 chrome://inspect 选择usb设备还是network设备
 ```
+
+webview chrome变更
+https://web.dev/appcache-removal/#android-webview
+Chrome 85 开始，默认情况下，Chrome 中将不再提供 AppCache,建议用Service Workers替代
+https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
+settings.setAppCacheEnabled(false);

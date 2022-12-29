@@ -37,9 +37,10 @@ https://www.jianshu.com/p/0861ee5b9028
 展示
 new DialogFragment(supportFragmentManager,"dialog").show
 
-设置dialog相关属性
+设置dialog相关属性,点击外部可以取消
 onCreateView{
 getDialog().setCanceledOnTouchOutside(true);
+dialog.setCancelable(false);
 
 软键盘尺寸的调整
 getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);

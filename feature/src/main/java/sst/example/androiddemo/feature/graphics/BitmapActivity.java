@@ -13,7 +13,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.AdaptiveIconDrawable;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -99,21 +98,22 @@ public class BitmapActivity extends AppCompatActivity {
 
       }
     });
-    Bitmap bitmap1 = BitmapFactory.decodeResource(getResources(),R.drawable.ic_launcher_round);
+    Bitmap bitmap1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_round);
     TextView bitmapText = findViewById(R.id.textBitmapSize);
-    bitmapText.setText("bitmap1 : "+bitmap1.getByteCount());
+    bitmapText.setText("bitmap1 : " + bitmap1.getByteCount());
     Bitmap bitmap2 = null;
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
       bitmap2 = getBitmapFromAdaptiveIconDrawable(
           (AdaptiveIconDrawable) getDrawable(R.mipmap.ic_launcher_round));
     }
-    TextView drawableText =findViewById(R.id.textDrawableSize);
-    drawableText.setText("bitmap2 "+bitmap2.getByteCount());
+    TextView drawableText = findViewById(R.id.textDrawableSize);
+    drawableText.setText("bitmap2 " + bitmap2.getByteCount());
   }
 
   //https://blog.csdn.net/ecjtuhq/article/details/84674295
-  public static Bitmap getBitmapFromAdaptiveIconDrawable(AdaptiveIconDrawable drawable){
-    Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+  public static Bitmap getBitmapFromAdaptiveIconDrawable(AdaptiveIconDrawable drawable) {
+    Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
+        Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
     drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
     drawable.draw(canvas);
@@ -343,9 +343,10 @@ public class BitmapActivity extends AppCompatActivity {
   //使用新api
   private void saveImage(Bitmap toBitmap) {
     //开始一个新的进程执行保存图片的操作
-    Uri insertUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
+    Uri insertUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        new ContentValues());
     try {
-      if (insertUri != null){
+      if (insertUri != null) {
         OutputStream outputStream = getContentResolver().openOutputStream(insertUri, "rw");
         toBitmap.compress(JPEG, 90, outputStream);
       }
@@ -391,7 +392,7 @@ public class BitmapActivity extends AppCompatActivity {
    * 3.放置在canvas的位置矩形，bitmap会被放置在该矩形的位置上
    * 4.画笔
    */
-  public static Bitmap mergeBitmap(Bitmap topBitmap, Bitmap bottomBitmap) {
+  public static Bitmap connectBitmap(Bitmap topBitmap, Bitmap bottomBitmap) {
     int width = topBitmap.getWidth();
     int height = topBitmap.getHeight() + bottomBitmap.getHeight();
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -401,6 +402,19 @@ public class BitmapActivity extends AppCompatActivity {
     RectF rectBottomDes = new RectF(0, topBitmap.getHeight(), width, height);
     canvas.drawBitmap(topBitmap, rectTop, rectTop, null);
     canvas.drawBitmap(bottomBitmap, rectBottomRes, rectBottomDes, null);
+    return bitmap;
+  }
+
+  //合并两个bitmap bitmap1,bitmap2
+  //bitmap的哪部分进行合并bitmap1Rect，bitmap2Rect
+  //bitmap的部分绘制到canvas的位置，bitmap1DrawRect，bitmap2DrawRect
+  //画布的大小，最后的bitmap大小canvasRect
+  public static Bitmap mergeBitmap(Bitmap bitmap1, Bitmap bitmap2, Rect bitmap1Rect,
+      Rect bitmap2Rect, Rect bitmap1DrawRect, Rect bitmap2DrawRect,Rect canvasRect) {
+    Bitmap bitmap = Bitmap.createBitmap(canvasRect.width(), canvasRect.height(), Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(bitmap);
+    canvas.drawBitmap(bitmap1, bitmap1Rect, bitmap1DrawRect, null);
+    canvas.drawBitmap(bitmap2, bitmap2Rect, bitmap2DrawRect, null);
     return bitmap;
   }
 }

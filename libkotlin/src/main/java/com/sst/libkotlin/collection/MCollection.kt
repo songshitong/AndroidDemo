@@ -56,6 +56,8 @@ class MCollection {
             for ((key,value) in map2) {
                 print("$key: $value ")
             }
+            println("测试不存在的值 map1 3 ${map1["3"]}")
+            map1.getValue("1")//如果不存在会抛出异常，返回值不为空所以不存在会抛出异常
             println("")
 //            Kotlin 中的 FlatMap 和 Map 有什么区别？
 //            FlatMap 用于将列表的所有项目组合成一个列表。

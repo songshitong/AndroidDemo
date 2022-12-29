@@ -12,6 +12,10 @@
     <item android:drawable="@drawable/ic_launcher"/>
 <!-- 也可以设置颜色,用于不同的状态控件的颜色，要支持ColorStateList，例如textColor
    <item android:color="@android:color/transparent"/>-->
+<!--如果只有颜色，selector应放在res/color目录 ColorStateList  如果有drawable属性，放到res/drawable目录 StateListDrawable
+   https://developer.android.com/guide/topics/resources/color-list-resource.html
+   https://developer.android.com/guide/topics/resources/drawable-resource#StateList
+   -->
 </selector>
 
         <!--不写状态是默认状态-->

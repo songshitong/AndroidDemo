@@ -1,7 +1,9 @@
-https://juejin.cn/post/6844903507749765134#heading-17
-https://juejin.cn/post/6844903566902067207
 
+如何写业务代码  需要了解代码整洁指导  ddd领域驱动设计
+https://github.com/alibaba/COLA
+https://mp.weixin.qq.com/s/DpTRZs8-7Mzd18JgbYWkUQ
 
+https://mp.weixin.qq.com/s/SAFpBfLQR9IynrQdyE6oJw
 
 如何从底层杀出
 https://www.zhihu.com/question/487990120/answer/2295005139
@@ -20,7 +22,7 @@ https://www.zhihu.com/question/487990120/answer/2295005139
 
 看不懂Kotlin源码？从Contracts 函数说起~
 https://blog.csdn.net/huangliniqng/article/details/125210444
-
+https://www.kotlincn.net/docs/reference/whatsnew13.html
 
 mediacodec
 https://www.jianshu.com/p/f5a1c9318524

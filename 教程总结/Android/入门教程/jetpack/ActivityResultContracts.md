@@ -14,8 +14,11 @@ onActivityResult缺点必须在activity或fragment里面，不能脱离
 https://blog.csdn.net/guolin_blog/article/details/121063078
 https://www.xlgz520.com/index.php/archives/26/
 ```
-ActivityResultLauncher<Intent> launcher;//java声明，调用launch方法一般要求参数是intent
+ActivityResultLauncher<Intent> requestDataLauncher;//java声明，调用launch方法一般要求参数是intent
 
+//ActivityResultContracts.RequestPermission
+//ActivityResultContracts.TakePicture
+//ActivityResultContracts.GetContent
  private val requestDataLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data?.getStringExtra("data")

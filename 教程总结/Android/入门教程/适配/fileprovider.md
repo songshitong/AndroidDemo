@@ -1,5 +1,9 @@
 
 https://blog.csdn.net/yingaizhu/article/details/118972148
+Android 7.0强制启用了被称作 StrictMode的策略，带来的影响就是你的App对外无法暴露file://类型的URI了。
+如果你使用Intent携带这样的URI去打开外部App(比如：打开系统相机拍照)，那么会抛出FileUriExposedException异常。
+官方给出解决这个问题的方案，就是使用FileProvider：
+
 FileProvider 是 ContentProvider 的一个特殊子类
 定义 FileProvider
 ```
@@ -47,4 +51,30 @@ path：需要共享文件所在的子目录详细路径，这个值是真实存�
         android:name="android.support.FILE_PROVIDER_PATHS"
         android:resource="@xml/file_paths" />
 </provider>
+```
+
+指定相机的拍照路径，拍照成功后，照片会存储在picFile文件中
+使用fileProvider之前
+```
+String cachePath = getApplicationContext().getExternalCacheDir().getPath();
+File picFile = new File(cachePath, "test.jpg");
+Uri picUri = Uri.fromFile(picFile);
+Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+intent.putExtra(MediaStore.EXTRA_OUTPUT, picUri);
+startActivityForResult(intent, 100);
+```
+使用fileProvider后
+```
+// 重新构造Uri：content://
+File imagePath = new File(Context.getFilesDir(), "images");
+if (!imagePath.exists()){imagePath.mkdirs();}
+File newFile = new File(imagePath, "default_image.jpg");
+Uri contentUri = FileProvider.getUriForFile(getContext(), 
+                 "com.mydomain.fileprovider", newFile);
+Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
+// 授予目录临时共享权限
+intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+               | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+startActivityForResult(intent, 100);
 ```

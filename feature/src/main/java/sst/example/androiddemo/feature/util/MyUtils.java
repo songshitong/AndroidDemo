@@ -5,6 +5,8 @@ import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,6 +25,7 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static android.content.Intent.EXTRA_ALLOW_MULTIPLE;
 
@@ -63,8 +66,22 @@ public class MyUtils {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dp, dm);
     }
 
-
-
+    //部分手机打开外部intent，找不到对应的activity，可以用此方法判断
+    //https://developer.android.com/training/package-visibility
+    //<queries>  需要增加query，android api 30以后
+    //<intent>
+    //    <action android:name="android.intent.action.VIEW" />
+    //    <category android:name="android.intent.category.BROWSABLE" />
+    //    <data android:scheme="choose-scheme-goes-here" />
+    //</intent>
+    //</queries>
+    public static boolean checkIntentOpen(Context context,Intent intent){
+        //intent.resolveActivity(context.getPackageManager());
+        List<ResolveInfo>
+            info = context.getPackageManager().queryIntentActivities(intent,PackageManager.MATCH_DEFAULT_ONLY);
+        //return null != intent.resolveActivityInfo(context.getPackageManager(), PackageManager.MATCH_DEFAULT_ONLY);
+        return info.size() > 0;
+    }
 
     /**
      * Get system album intent intent.
@@ -183,6 +200,7 @@ public class MyUtils {
         intent.putExtra("return-data", false);
         intent.putExtra("noFaceDetection", true);
         intent.putExtra("circleCrop", true);
+        //指定输出位置
         intent.putExtra(MediaStore.EXTRA_OUTPUT, out);
 
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());

@@ -50,4 +50,23 @@ GradientDrawable gradientDrawable = new GradientDrawable(
 
 padding
 表示内容或子标签边距，4个属性top、bottom、left、right，需要注意的是这个标签的作用是为内容设置与当前应用此shape的View的边距，而不是设置当前View与父元素的边距
-        -->
+
+
+案例-实现三角形  将一个矩形旋转后得到
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <rotate
+            android:fromDegrees="45"
+            android:pivotX="-40%"
+            android:pivotY="80%">
+            <shape android:shape="rectangle">
+                <size
+                    android:width="15dp"
+                    android:height="15dp" />
+                <solid android:color="#ffffff" />
+            </shape>
+        </rotate>
+    </item>
+</layer-list>
+
+-->

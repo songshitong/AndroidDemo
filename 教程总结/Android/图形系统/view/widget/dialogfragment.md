@@ -78,7 +78,7 @@ Dialog mDialog;
     }
 ```
 
-dialog展示
+dialog展示  DialogFragment执行onStart时，调用dialog的show方法
 ```
     public void showNow(@NonNull FragmentManager manager, @Nullable String tag) {
         mDismissed = false;

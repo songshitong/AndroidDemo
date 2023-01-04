@@ -53,6 +53,7 @@ params.height = LayoutParams.MATCH_PARENT;
 params.gravity = Gravity.BOTTOM; //布局在底部
 getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
 }
+
 移除边距
 ```
  <style name="Dialog.FullScreen" parent="Theme.AppCompat.Dialog">
@@ -66,7 +67,7 @@ getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) 
     <item name="android:windowNoTitle">true</item>
   </style>    
 ```
-editNameDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen); //onCreate中设置style也可以
+editNameDialogFragment.setStyle(DialogFragment.setStyle, R.style.Dialog_FullScreen); //onCreate中设置style也可以
 editNameDialogFragment.show(getSupportFragmentManager(), "edit");
 onCreate中设置边距/style
 ```
@@ -79,3 +80,97 @@ onCreate中设置边距/style
 https://www.cnblogs.com/mr-wang1/p/13265827.html   
 软键盘布局上顶
 setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+
+
+设置位置和大小,控制window
+```
+ public void onStart() {
+        super.onStart();
+        Window win = getDialog().getWindow();
+        // 一定要设置Background，如果不设置，window属性设置无效
+        win.setBackgroundDrawable( new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams params = win.getAttributes();
+        params.gravity = Gravity.BOTTOM;
+        // 使用ViewGroup.LayoutParams，以便Dialog 宽度充满整个屏幕
+        params.width =  ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        win.setAttributes(params);
+    }
+```
+示例，显示在某个view的正下方
+```
+  public void showOnViewBottom(FragmentManager manager, View anchor, Window window) {
+    int[] location = new int[2];
+    anchor.getLocationOnScreen(location);
+    int windowWidth = window.getWindowManager().getDefaultDisplay().getWidth();
+    int windowHeight = window.getWindowManager().getDefaultDisplay().getHeight();
+    int anchorCenterX = location[0] + anchor.getWidth() / 2;
+    //dialog默认在屏幕的中间，将此window的中心与view的中心对齐  
+    anchorX = -(windowWidth / 2 - anchorCenterX);  //移动位置是差距的负数
+    anchorY = -(windowHeight / 2 - location[1]-anchor.getHeight());
+    show(manager, SHOW_TAG);
+  }
+
+ @Override public void onStart() {
+    super.onStart();
+    WindowManager.LayoutParams lp = getDialog().getWindow().getAttributes();
+    lp.width = VIScreenUtils.dpToPxInt(getContext(),408f);
+    lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+    lp.x = anchorX;
+    View root = getDialog().getWindow().getDecorView();
+    root.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+    //位置修正 多减了一个root的一半高度
+    lp.y = anchorY+root.getMeasuredHeight()/2;
+    getDialog().getWindow().setAttributes(lp);
+  }
+```
+
+
+dialogFragment改变动画
+1 设置theme
+```
+AlertDialog.Builder builder = 
+            new AlertDialog.Builder( getActivity(), R.style.MyCustomTheme );
+<style name="MyCustomTheme" parent="@android:style/Theme.Panel">
+    <item name="android:windowAnimationStyle">@style/MyAnimation.Window</item>
+</style>
+<style name="MyAnimation.Window" parent="@android:style/Animation.Activity"> 
+    <item name="android:windowEnterAnimation">@anim/anim_in</item>
+    <item name="android:windowExitAnimation">@anim/anim_out</item>
+</style>    
+
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <scale
+        android:interpolator="@android:anim/linear_interpolator"
+        android:fromXScale="0.0"
+        android:toXScale="1.0"
+        android:fromYScale="0.0"
+        android:toYScale="1.0"
+        android:fillAfter="false"
+        android:startOffset="200"
+        android:duration="200" 
+        android:pivotX = "50%"
+        android:pivotY = "-90%"
+    />
+    <translate
+        android:fromYDelta="50%"
+        android:toYDelta="0"
+        android:startOffset="200"
+        android:duration="200"
+    />
+</set>          
+```
+2 通过window的decorView
+```
+final View decorView = getDialog()
+            .getWindow()
+            .getDecorView();
+
+    decorView.animate().translationY(-100)
+            .setStartDelay(300)
+            .setDuration(300)
+            .start();
+```

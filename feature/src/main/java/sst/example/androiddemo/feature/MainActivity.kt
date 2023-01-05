@@ -483,9 +483,10 @@ class  MainActivity : AppCompatActivity()  {
     println("getMethodTrace use Throwable end ==================================")
   }
 
-  fun exceptionToString(e:Exception):String{
+  //支持Throwable和子类exception
+  fun exceptionToString(tr:Throwable):String{
     val sw = StringWriter()
-    e.printStackTrace(PrintWriter(sw))
+    tr.printStackTrace(PrintWriter(sw))
     return sw.toString()
   }
 

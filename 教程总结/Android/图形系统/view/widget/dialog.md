@@ -249,3 +249,55 @@ dismiss方法
           }
       }
 ```
+
+
+
+点击外部消失
+```
+    public void setCanceledOnTouchOutside(boolean cancel) {
+        if (cancel && !mCancelable) {
+            mCancelable = true;
+        }
+        mWindow.setCloseOnTouchOutside(cancel);
+    }
+```
+https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r24/core/java/android/view/Window.java
+window进行记录
+```
+ public void setCloseOnTouchOutside(boolean close) {
+        mCloseOnTouchOutside = close;
+        mSetCloseOnTouchOutside = true;
+    }
+    
+ //window点击是否应该关闭  
+ public boolean shouldCloseOnTouch(Context context, MotionEvent event) {
+        final boolean isOutside =
+                event.getAction() == MotionEvent.ACTION_UP && isOutOfBounds(context, event)
+                || event.getAction() == MotionEvent.ACTION_OUTSIDE;
+        if (mCloseOnTouchOutside && peekDecorView() != null && isOutside) {
+            return true;
+        }
+        return false;
+    }    
+    
+ //判断点击事件是否处于外部
+ private boolean isOutOfBounds(Context context, MotionEvent event) {
+        final int x = (int) event.getX();
+        final int y = (int) event.getY();
+        final int slop = ViewConfiguration.get(context).getScaledWindowTouchSlop();
+        final View decorView = getDecorView();
+        return (x < -slop) || (y < -slop)
+                || (x > (decorView.getWidth()+slop))
+                || (y > (decorView.getHeight()+slop));
+    }   
+```
+dialog中的处理 查询window中记录的可关闭及相关逻辑后，执行取消方法
+```
+ public boolean onTouchEvent(@NonNull MotionEvent event) {
+        if (mCancelable && mShowing && mWindow.shouldCloseOnTouch(mContext, event)) {
+            cancel();
+            return true;
+        }
+        return false;
+    }
+```

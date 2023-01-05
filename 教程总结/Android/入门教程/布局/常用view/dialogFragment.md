@@ -9,7 +9,7 @@
 
 
 缺点：消失后再次显示走onCreateView，如果想保存消失前的内容比较繁琐
-解决 避免每次解析view
+1 解决 避免每次解析view
 全局DialogFragment df;
 if(df == null){
   df = new DialogFragment();
@@ -27,6 +27,7 @@ if(df == null){
     return mRootView;
   }
 ```
+2 基于dialog，创建新的window，相当于新建了一个图层，需要处理焦点，window样式等繁琐
 
 https://www.jianshu.com/p/0861ee5b9028
 创建 DialogFragment 有两种方式：
@@ -113,7 +114,6 @@ setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Ful
   }
 
  @Override public void onStart() {
-    super.onStart();
     WindowManager.LayoutParams lp = getDialog().getWindow().getAttributes();
     lp.width = VIScreenUtils.dpToPxInt(getContext(),408f);
     lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -124,6 +124,8 @@ setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Ful
     //位置修正 多减了一个root的一半高度
     lp.y = anchorY+root.getMeasuredHeight()/2;
     getDialog().getWindow().setAttributes(lp);
+    //dialog show之前显示
+    super.onStart();
   }
 ```
 
@@ -173,4 +175,24 @@ final View decorView = getDialog()
             .setStartDelay(300)
             .setDuration(300)
             .start();
+```
+
+隐藏导航栏
+```
+  @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
+    Dialog dialog = super.onCreateDialog(savedInstanceState);
+    
+    dialog.getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    
+    //设置焦点，部分手机存在焦点会唤起导航栏  style_no_input也可以
+    //设置后，点击外部无法取消,内部无法点击  显示后需要设置焦点，但是部分手机只要获取焦点就拉起导航栏
+    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+    return dialog;
+  }
 ```

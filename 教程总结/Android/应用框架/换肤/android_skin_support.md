@@ -1,6 +1,14 @@
 
 https://github.com/xfhy/Android-Notes/blob/master/Blogs/Android/%E4%B8%89%E6%96%B9%E5%BA%93%E5%8E%9F%E7%90%86/Android-skin-support%E6%8D%A2%E8%82%A4%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3.md
 
+
+简单总结一下原理
+1 监听APP所有Activity的生命周期(registerActivityLifecycleCallbacks())
+2 在每个Activity的onCreate()方法调用时setFactory(),设置创建View的工厂.将创建View的琐事交给SkinCompatViewInflater去处理.
+3 库中自己重写了系统的控件(比如View对应于库中的SkinCompatView),实现换肤接口(接口里面只有一个applySkin()方法),表示该控件是支持换肤的.并且将这些控件在创建之后收集起来,方便随时换肤.
+4 在库中自己写的控件里面去解析出一些特殊的属性(比如:background, textColor),并将其保存起来
+5 在切换皮肤的时候,遍历一次之前缓存的View,调用其实现的接口方法applySkin(),在applySkin()中从皮肤资源(可以是从网络或者本地获取皮肤包)中获取资源.获取资源后设置其控件的background或textColor等,就可实现换肤
+
 androidx appcompat  1.4.2
 android-skin-support release-v4.0.1
 1 先看一下AppCompatActivity

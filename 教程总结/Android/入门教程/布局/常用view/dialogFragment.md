@@ -28,6 +28,7 @@ if(df == null){
   }
 ```
 2 基于dialog，创建新的window，相当于新建了一个图层，需要处理焦点，window样式等繁琐
+不适合做悬浮窗类的效果，需要自己处理位置,window样式，不唤起导航。。。
 
 https://www.jianshu.com/p/0861ee5b9028
 创建 DialogFragment 有两种方式：

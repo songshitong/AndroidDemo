@@ -1,4 +1,4 @@
-package sst.example.lib;
+package sst.example.lib.io;
 
 
 import java.io.File;

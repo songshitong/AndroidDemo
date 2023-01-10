@@ -396,7 +396,7 @@ int Looper::pollOnce(int timeoutMillis, int* outFd, int* outEvents, void** outDa
     }
 }
 
-
+//mPolling 可以通过Handler.getLooper().getQueue().isPolling()获得，handler处于空闲等待事件的状态
 int Looper::pollInner(int timeoutMillis) {
     ......
     int result = POLL_WAKE;

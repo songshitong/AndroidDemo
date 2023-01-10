@@ -44,6 +44,7 @@ class MOperator {
 //            判断一个对象与指定的类型是否一致 is !is
             println(any is String)
             println(any !is Int)
+            println("null is String ${null is String}")
             //编译为!(any instanceof Integer)
 
             //双冒号::  代表引用一个方法

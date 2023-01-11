@@ -32,6 +32,7 @@ import sst.example.androiddemo.feature.activity.scrollNested.ScrollNestedActivit
 import sst.example.androiddemo.feature.activity.testAnr.TestAnrActivity
 import sst.example.androiddemo.feature.animation.KeyFrameActivity
 import sst.example.androiddemo.feature.animation.LayoutAnimationActivity
+import sst.example.androiddemo.feature.animation.MotionLayoutActivity
 import sst.example.androiddemo.feature.animation.RevealAnimatorActivity
 import sst.example.androiddemo.feature.animation.activity.ActivityAnimation
 import sst.example.androiddemo.feature.animation.activity.ActivityTransition
@@ -59,6 +60,7 @@ class  MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Looper
         getAndroidInfo()
         getMethodTrace()
         // ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)
@@ -394,6 +396,9 @@ class  MainActivity : AppCompatActivity()  {
       viewOutlineProviderBtn.setOnClickListener {
         startActivity(Intent(this,
           ViewOutlineProviderActivity::class.java))
+      }
+      motionLayoutBtn.setOnClickListener {
+        startActivity(Intent(this,MotionLayoutActivity::class.java))
       }
 
         //测试livedata连续调用

@@ -1,4 +1,19 @@
 
+fragment传参
+```
+      val fragment = Fragment()
+      val bundle = Bundle()
+      bundle.putString(DATA_TYPE, type)
+      bundle.putSerializable(KEY_INTENT_STORE_NAME, dept)
+      fragment.arguments = bundle
+ 
+//参数获取
+arguments?.let {
+      it.getString(DATA_TYPE),
+      it.getSerializable(KEY_INTENT_STORE_NAME) as Dept
+    }      
+```
+
 
 fragment的view查找是从容器开始的
 ```

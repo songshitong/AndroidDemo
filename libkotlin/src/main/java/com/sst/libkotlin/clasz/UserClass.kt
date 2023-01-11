@@ -12,14 +12,14 @@ const val CONSTANT = "This is a constant"
 //}
 //2 定义一个 object 修饰的单例类，类中定义一个常量
 object SingeTon {
-  const val CONSTANT = "This is a constant"
+    const val CONSTANT = "This is a constant"
 }
 
 class KotlinPractice {
-  //3 定义一个 companion object 修饰的伴生对象，里面定义一个常量
-  companion object {
-    const val CONSTANT = "This is a constant"
-  }
+    //3 定义一个 companion object 修饰的伴生对象，里面定义一个常量
+    companion object {
+        const val CONSTANT = "This is a constant"
+    }
 }
 
 // 主构造器constructor   age是默认参数
@@ -43,54 +43,55 @@ class KotlinPractice {
 open class User1(name: String, age: Int) {} //省略constructor的情况
 
 //声明一个私有构造器
-open class User private constructor(userName: String, age: Int = 10) : User1(userName, age) {//10为默认参数
+open class User private constructor(userName: String, age: Int = 10) :
+    User1(userName, age) {//10为默认参数
 //主构造器的代码必须放到init代码块
 //init块是在主构造函数执行后立即执行的初始化块。一个类文件可以有一个或多个将串行执行的初始化块。如果你想在主构造函数中执行一些操作，
 // 那么在 Kotlin 中是不可能的，为此你需要使用init块
 init {
-  //...   没有主构造器，init也调用，查看TestClass
-  println("this is user init")
+    //...   没有主构造器，init也调用，查看TestClass
+    println("this is user init")
 }
 
 
-  //当使用辅助构造函数时，您需要显式调用主构造函数
-  //构造器默认公开的
-  // 次构造函数1：可通过this调主构造函数
-  constructor() : this("hjc")
+    //当使用辅助构造函数时，您需要显式调用主构造函数
+    //构造器默认公开的
+    // 次构造函数1：可通过this调主构造函数
+    constructor() : this("hjc")
 
-  // 次构造函数2：可通过this调主构造函数
-  constructor(age: Int) : this("hjc") {
-    println(age)
-  }
+    // 次构造函数2：可通过this调主构造函数
+    constructor(age: Int) : this("hjc") {
+        println(age)
+    }
 
-  // 次构造函数3：通过this调主构造函数
-  constructor(sex: String, age: Int, like: String) : this("hjc") {
-    println("$sex$age$like")
-  }
+    // 次构造函数3：通过this调主构造函数
+    constructor(sex: String, age: Int, like: String) : this("hjc") {
+        println("$sex$age$like")
+    }
 
-  //也可以调用父类构造器,没有主构造器时
-  // constructor(userName: String, age: Int = 10,sex: Long) : super(userName, age) {}
+    //也可以调用父类构造器,没有主构造器时
+    // constructor(userName: String, age: Int = 10,sex: Long) : super(userName, age) {}
 
-  ///variable变量   User().userName = "hjc"  // 设置该属性 = Java的setter方法
-  lateinit var userName1: String
+    ///variable变量   User().userName = "hjc"  // 设置该属性 = Java的setter方法
+    lateinit var userName1: String
 
-  ///value 只读    User().sex  // 使用该属性 = Java的getter方法
-  private var sex: String = "男"
+    ///value 只读    User().sex  // 使用该属性 = Java的getter方法
+    private var sex: String = "男"
 
-  //声明一个属性的完整语法 []代表可选  只读属性不允许 setter   get/set可以限制可见范围
+    //声明一个属性的完整语法 []代表可选  只读属性不允许 setter   get/set可以限制可见范围
 //    var <propertyName>[: <PropertyType>] [= <property_initializer>]
 //    [<getter>]
 //    [<setter>]
-  var sexValue: String = ""
-    //对外公开sex
-    get() = "sex is $sex"
-    protected set(value) {
-      //更新sex
-      this.sex = value
-      //field指向seValue
-      field = value
-    }
-  //编译为对应的get,set方法
+    var sexValue: String = ""
+        //对外公开sex
+        get() = "sex is $sex"
+        protected set(value) {
+            //更新sex
+            this.sex = value
+            //field指向seValue
+            field = value
+        }
+    //编译为对应的get,set方法
 //    public final String getSexValue() {
 //        return "sex is " + this.sex;
 //    }
@@ -99,37 +100,37 @@ init {
 //        this.sex = value;
 //    }
 
-  ///方法默认不可以重写，子类重写使用override关键字，并且父类的方法使用open
-  open fun signIn() {
-  }
+    ///方法默认不可以重写，子类重写使用override关键字，并且父类的方法使用open
+    open fun signIn() {
+    }
 
-  fun signIn2() {
-  }
+    fun signIn2() {
+    }
 
-  //**
-  // * 嵌套类（内部类）
-  // * 标识：关键字inner
-  // * 使用：通过外部类的实例调用嵌套类
-  // */
-  //编译为 User里面 public final class User2
-  //内部类的继承
-  // class ExClass : AbClass() {  //外部继承，内部也继承
-  //   private inner class T : AbClass.Test() {
-  //
-  //   }
-  // }
-  inner class User2 {
+    //**
+    // * 嵌套类（内部类）
+    // * 标识：关键字inner
+    // * 使用：通过外部类的实例调用嵌套类,外部类需要先实例化才能使用   User().User2()
+    // */
+    //编译为 User里面 public final class User2
+    //内部类的继承
+    // class ExClass : AbClass() {  //外部继承，内部也继承
+    //   private inner class T : AbClass.Test() {
+    //
+    //   }
+    // }
+    inner class User2 {
 
-  }
+    }
 
 }
 
 ///接口  关键字interface声明
 interface UserInterface {
-  fun getName(): String // 无默认方法体，必须重写
-  fun getAge(): Int {    // 有默认方法体，可不重写
-    return 22
-  }
+    fun getName(): String // 无默认方法体，必须重写
+    fun getAge(): Int {    // 有默认方法体，可不重写
+        return 22
+    }
 }
 
 interface UserInterface2 {}
@@ -144,13 +145,13 @@ interface UserInterface2 {}
 //}
 class UserChild : User(), UserInterface, UserInterface2 {
 
-  override fun signIn() {
-    super.signIn()
-  }
+    override fun signIn() {
+        super.signIn()
+    }
 
-  override fun getName(): String {
-    return "aa"
-  }
+    override fun getName(): String {
+        return "aa"
+    }
 }
 
 /**
@@ -159,14 +160,15 @@ class UserChild : User(), UserInterface, UserInterface2 {
  * 标识：关键字data
  */
 // 使用：创建类时会自动创建以下方法：
-//      1. getter/setter方法；
+//      1. getter/setter方法；   boolean的isEnable isEnable()和setEnable   boolean的enable对应为getEnable()和setEnable
+//              boolean的命名最好不带is
 //      2. equals() / hashCode() 对；
 //      3. toString() ：输出"类名(参数+参数值)"；
 //      4. copy() 函数：复制一个对象&改变它的一些属性，但其余部分保持不变 浅克隆 注意使用copy()后某些场景不能使用list.indexOf，此时引用变了
 // 特别注意
 // 1. 主构造方法至少要有一个参数，且参数必须标记为val或var
 // 2. 数据类不能用open、abstract、sealed(封闭类)、inner标识
-data class UserData(var userName: String, var age: Int)
+data class UserData(var userName: String, var age: Int, var enable:Boolean=true)
 //equal方法判断
 // if (this !== var1){ //不是同一个对象，对比属性
 //   if (var1 is UserData) {
@@ -180,6 +182,9 @@ data class UserData(var userName: String, var age: Int)
 //   return true
 // }
 
+
+
+
 //使用copy方法
 val userData1: UserData = UserData("li", 20)
 val userData2: UserData = userData1.copy(age = 30)
@@ -191,26 +196,29 @@ val userData2: UserData = userData1.copy(age = 30)
 //}
 
 
+public class TestClass {
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            val noConstruct = NoConstructClass("aa", 10)
+            `in`("2233")
+        }
 
-public class TestClass{
-  companion object{
-    @JvmStatic
-    fun main(args: Array<String>) {
-      val noConstruct = NoConstructClass("aa",10)
-      `in`("2233")
+        //声明关键字的方法，使用``
+        fun `in`(name: String) {
+            println("this is in function $name")
+        }
     }
-    //声明关键字的方法，使用``
-    fun `in`(name:String){
-      println("this is in function $name")
+}
+
+open class Class1 {
+    constructor(name: String)
+}
+
+class NoConstructClass : Class1 {
+    constructor(name: String, age: Int) : super(name)
+
+    init {
+        println("this is init method")
     }
-  }
-}
-open class Class1{
-  constructor(name: String)
-}
-class NoConstructClass : Class1{
-  constructor(name: String,age: Int):super(name)
-  init {
-    println("this is init method")
-  }
 }

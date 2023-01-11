@@ -23,6 +23,8 @@ public class RecyclerView{
   //如果对requestLayout的调用被截获并阻止正常执行，并且我们计划稍后继续正常执行，则为True。 
   boolean mLayoutWasDefered;
   //告诉此RecyclerView抑制所有布局和滚动调用，直到稍后调用suppressLayout（false）禁用布局抑制。
+  //一般用于滚动列表嵌套，例如scrollView嵌套recyclerview，只滑动scrollview，设置recyclerview.supressLayout(true)
+  //使用后adapter失效，择时调用supressLayout(false)
   boolean mLayoutSuppressed;
 
     //用来记录RV的children在onLayout中是否需要布局和测量

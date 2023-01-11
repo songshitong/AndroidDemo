@@ -40,6 +40,16 @@ Call<User> createUser(@Body User user);
 ```
 当请求为json,body为String mobile时，格式化为"18111111"，需要将其包装为对象或者放进HashMap
 
+post改变url
+```
+    @Multipart
+    @POST()
+    fun uploadFile(
+        @Url url:String,
+        @Part file: MultipartBody.Part?
+    ): Call<String>
+```
+
 参数
 @Field  field只能用于@FormUrlEncoded
 ```

@@ -211,7 +211,7 @@ mLooper->addFd(mReceiver.getFd(), 0, Looper::EVENT_INPUT, this, NULL) 用来监�
 然后回调到 DisplayEventDispatcher 中的 handleEvent 方法，具体源码参考 SurfaceFlinger 启动与工作流程 中 addFd 的解析
 
 
-请求Vsync信号
+请求Vsync信号   todo 其他类型的callBack
 上面已经注册了一个对 Vsync 信号感兴趣的连接，在 Vsync 信号到来后，会回调到 DisplayEventDispatcher.handleEvent 方法。
 于是接下来我们需要请求 Vsync 信号。看一下上面调用的代码：
 mChoreographer.postCallback(Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, null)，

@@ -14,7 +14,7 @@ team: datatech.front  AND  project: mainengine-xiaoguan-android  AND custom_msg:
 Q: 为什么上面两个例子语法一模一样，第一个是精确匹配，第二个是包含匹配？
 A: 因为Project字段存储时不分词，QueryString字段分词.所有字符串查询都遵循这一原则，后面不做特殊说明
 匹配 xxkeywordxx 不进行分词
-custom_msg : "\""+停止+"\""
+custom_msg : "\""+停止+"\""   "*停止*"
 对于特殊字符的处理：custom_msg : user\/login
 
 OR 语法

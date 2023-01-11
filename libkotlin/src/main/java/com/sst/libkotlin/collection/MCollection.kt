@@ -28,6 +28,31 @@ class MCollection {
            for(item in list2){
                print("list2: $item")
             }
+          println("=====")
+          //处理indexOutOfBound异常
+          try {
+            val index10000= list1[10000]
+          }catch (e:Exception){
+            e.printStackTrace()
+          }
+          //超过后返回null
+          println("选择超过length ${list1.getOrNull(10000)}")
+          //超过后返回自定义的默认值
+          val index1000 = list1.getOrElse(10000){
+            "默认值"
+          }
+          println("选择超过length $index1000")
+
+          //first()和firstOrNull()
+          //first()在集合为空的情况下会抛出异常NoSuchElementException
+          try {
+            val first = arrayListOf<String>().first()
+          }catch (e:Exception){
+            e.printStackTrace()
+          }
+          //firstOrNull在集合为空的情况下返回null
+          val firstOrNull = arrayListOf<String>().firstOrNull()
+          println("firstOrNull : $firstOrNull")
 
             //Set 集合和 List 集合用法完全一样
            //定义一个不可变 Set 集合
@@ -45,11 +70,17 @@ class MCollection {
 
             //map集合
             //不可变map
-            val map1 = mapOf("1" to "1","2" to "2")
+            val map1 = mapOf("1" to "1","2" to "2") //生成LinkedHashMap  map接口只能读
+//          map1["3"]="3"
             //编为Map map1 = MapsKt.mapOf(new Pair[]{TuplesKt.to("1", "1"), TuplesKt.to("2", "2")}) 返回map
+
             //可变map
-            val map2 = mutableMapOf("1" to "1","2" to "2")
+            val map2 = mutableMapOf("1" to "1","2" to "2") //LinkedHashMap MutableMap接口可读可写
             //编为 Map map2 = MapsKt.mutableMapOf(new Pair[]{TuplesKt.to("1", "1"), TuplesKt.to("2", "2")}); 返回MutableMap
+
+            val linkedMap = linkedMapOf("2" to "2","1" to "1")//LinkedHashMap
+            val hashMap = hashMapOf("1" to "1")//hashMap
+
             //当前 key 存在则修改元素，不存在则添加元素
             map2["Watermelon"] = ""
             println("map2 ")
@@ -68,6 +99,40 @@ class MCollection {
                 listOf("seven", "eight")
             )
             println("flatmap ${containers.flatMap { it }}")//flatmap [one, two, three, four, five, six, seven, eight]
+
+            //fold和reduce  两个函数都是对集合的遍历，只是遍历完成之后能得到一个结果
+//            reduce的返回值类型必须和集合的元素类型相符。
+//            fold的返回值类型则不受约束
+            val numbers = listOf(1, 1, 1)
+            val result = numbers.reduce { a: Int, b: Int -> a + b }
+            println("reduceResult=$result")//result=3
+
+            val numbersFold = listOf(1, 1, 1)
+            val resultFold = numbersFold.fold(StringBuilder()) {
+                    str: StringBuilder, i: Int -> str.append(i).append(" ")
+            }
+            println("foldResult=$resultFold")
+
+            //runningFold
+            val runningFoldList = listOf(1,2,3,4)
+            println("runningFold ${runningFoldList.runningFold(-1){a,b -> a+b}}")
+            //[-1, 0, 2, 5, 9]  -1,1-1,1+2-1,1+2+3-1,1+2+3+4-1
+
+            //associateWith  转为关联的map
+            val associateWithList = listOf("one","two")
+            println("associateWith ${associateWithList.associateWith { it.uppercase() }}") //{one=ONE, two=TWO}
+
+            //list分割 chunked
+            val chunkedList = listOf(1,2,3,4)
+            println("chunkedList ${chunkedList.chunked(2)}") //每两个元素一组
+
+            //zip函数 将两个list配对
+            val zip1 = listOf(1,2,3)
+            val zip2 = listOf("红","绿","蓝")
+            println("zip ${zip1.zip(zip2)}") //[(1, 红), (2, 绿), (3, 蓝)]
+            //unzip 将pair分割
+            val unzipList = listOf("one" to 1, "two" to 2, "three" to 3, "four" to 4)
+            println("unzipList ${unzipList.unzip()}")  //([one, two, three, four], [1, 2, 3, 4])
 
             //函数式API
             var maxLengthFruit = list1.maxByOrNull {

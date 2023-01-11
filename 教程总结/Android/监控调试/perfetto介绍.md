@@ -125,7 +125,52 @@ CPU选项是经常使用的，基本上除了syscalls不打开，前面三个都
 这个是Android 12（S）的新功能，具体如何使用可以参考这个网址的官方视频
 https://www.youtube.com/playlist?list=PLWz5rJ2EKKc-xjSI-rWn9SViXivBhQUnp
 可以看到SF某一帧是合成的APP的哪一帧，已经合成的状态，具体作用，大家可以参考上面的链接视频
+SurfaceFlinger进程
+可以看到v-sync,每一帧surfaceFlinger做的事情
+浅黄绿色 Runnable表示等待cpu执行，深黄绿色running是执行
+runnable长可能CPU繁忙
+Running长 1 代码复杂的过高，还有可能是厂商定制代码系统导致的
+  为了进一步判断具体是哪个函数耗时，可使用 AS CPU Profiler、simpleperf，或者自己通过 Trace.begin/end() API 添加更多 tracepoint 点
+2 代码以解释方式执行 trace中有compiling字样
+3 cpu调度不合理
+sleeping状态 中间没有执行的空白
 
+https://perfetto.dev/docs/data-sources/frametimeline
+打开某个进程
+expectedTimeLine 预期的帧率
+actual TimeLine 实际的帧率
+jankType 卡顿类型
+frameworks/native/libs/gui/include/gui/JankInfo.h
+```
+enum JankType {
+    // No Jank
+    None = 0x0,
+    // Jank that occurs in the layers below SurfaceFlinger
+    DisplayHAL = 0x1,
+    // SF took too long on the CPU
+    SurfaceFlingerCpuDeadlineMissed = 0x2,
+    // SF took too long on the GPU
+    SurfaceFlingerGpuDeadlineMissed = 0x4,
+    // Either App or GPU took too long on the frame
+    AppDeadlineMissed = 0x8,
+    // Vsync predictions have drifted beyond the threshold from the actual HWVsync
+    PredictionError = 0x10,
+    // Janks caused due to the time SF was scheduled to work on the frame
+    // Example: SF woke up too early and latched a buffer resulting in an early present
+    SurfaceFlingerScheduling = 0x20,
+    // A buffer is said to be stuffed if it was expected to be presented on a vsync but was
+    // presented later because the previous buffer was presented in its expected vsync. This
+    // usually happens if there is an unexpectedly long frame causing the rest of the buffers
+    // to enter a stuffed state.
+    BufferStuffing = 0x40,
+    // Jank due to unknown reasons.
+    Unknown = 0x80,
+    // SF is said to be stuffed if the previous frame ran longer than expected resulting in the case
+    // where the previous frame was presented in the current frame's expected vsync. This pushes the
+    // current frame to the next vsync. The behavior is similar to BufferStuffing.
+    SurfaceFlingerStuffing = 0x100,
+};
+```
 
 九、Chrome
 这个选项，主要是分析webview相关的性能问题，我也用的不多，大家如果遇到需要分析webview相关的性能问题，可以尝试开启这些功能。
@@ -253,7 +298,7 @@ switch legacy ui 切换到systrace类似的页面
 
 快捷键
 w/s 放大缩小   a/d 左右移动
-选择区域点击后拖动   选中后可以在底部查看详细信息
+选择区域 点击后拖动   选中后可以在底部查看详细信息
 m 临时标记区域
 ctrl+b 是否展示侧边栏
 置顶功能 选择某个线程，旁边有五角星，选中后可以置顶

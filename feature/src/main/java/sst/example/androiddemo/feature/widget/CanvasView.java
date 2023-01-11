@@ -168,9 +168,10 @@ public class CanvasView extends View {
 //        clipRegion被废弃不使用
 //        canvas.clipRegion
 
-        //定制bitmap
+        //定制bitmap 绘制这个bitmap到某个位置
         canvas.drawBitmap(bitmap,0,0,mPaint);
-        //取源bitmap一部分绘制道目标路径   src为null表示绘制整张图片    dst是目标绘制位置
+        //取源bitmap一部分绘制到目标路径   src为null表示绘制整张图片    dst是目标绘制位置
+        //可以进行缩放
         canvas.drawBitmap(bitmap,new Rect(100,100,50,50),new Rect(200,200,300,300),mPaint);
         canvas.restore();
         canvas.drawRect(0,0,50,50,mPaint);

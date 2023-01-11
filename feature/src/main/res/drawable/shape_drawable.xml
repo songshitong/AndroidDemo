@@ -22,6 +22,7 @@ android:shape  rectangle 长方形 /默认,oval 椭圆,line 线,ring 环形
 
 radius设置四周的圆角， bottomLeftRadius 左下
 
+//ring时生效
 android:innerRadius  圆环的半径   innerRadius优先级大于innerRadiusRatio
 android:innerRadiusRatio   内半径占整个Drawable宽度的比例，默认值为9.如果为n，那么半径=宽度/n
 android:thickness  圆环的厚度

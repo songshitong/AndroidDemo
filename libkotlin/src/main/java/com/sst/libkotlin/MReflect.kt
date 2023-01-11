@@ -57,8 +57,11 @@ class MReflect {
                 it.name =="pFun"
             }
            //由于pFun是私有的，需要设置isAccessible为true
-           pFun.first().isAccessible=true
-           pFun.first().call(mReflect,"hhhh")
+           if(pFun.isNotEmpty()){
+             pFun.first().isAccessible=true
+             pFun.first().call(mReflect,"hhhh")
+           }
+
 
            //通过::获取KCallable
            val norInt:KCallable<Int> = MReflect::norInt

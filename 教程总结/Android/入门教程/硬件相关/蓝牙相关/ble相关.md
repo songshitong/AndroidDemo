@@ -130,6 +130,27 @@ bluetoothGatt = device.connectGatt(this, false, gattCallback);
 ```
 这将连接到由 BLE 设备托管的 GATT 服务器，并返回 BluetoothGatt 实例，然后您可使用该实例执行 GATT 客户端操作
 BluetoothGattCallback会有状态变化的监听onConnectionStateChange，onServicesDiscovered服务发现，onCharacteristicRead。。。
+```
+public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+        super.onServicesDiscovered(gatt, status);
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+        
+        }else{
+          //服务失败
+        }
+}
+```
+有些设备，在 onServicesDiscovered 回调中，返回的 status 是 129，133时，在关闭，重新打开蓝牙，无法解决问题时，建议更换设备，
+这些问题大多是设备底层gatt 服务异常，重新连接，进行discoverServices();
+```
+// 出现129，133时。关闭蓝牙
+mBluetoothAdapter.disable();
+// 关闭蓝牙后，延时1s，重新开启蓝牙
+mBluetoothAdapter.enable();
+//重新连接
+```
+
+
 BluetoothGatt关键方法
 ```
 public boolean connect()
@@ -137,6 +158,7 @@ bluetoothGatt.discoverServices() //发现服务
 bluetoothGatt.getServices//获取服务
 public boolean readCharacteristic(BluetoothGattCharacteristic characteristic)//读取描述，触发回调 BluetoothGattCallback.onCharacteristicRead 
 public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic)
+onCharacteristicWrite中处理写入的结果，写入失败进行处理
 ```
 监听到连接成功需要发现服务和获取服务
 ```

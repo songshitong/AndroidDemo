@@ -6,7 +6,7 @@ import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.jvm.Throws
 
 //kotlin中的注解
-//
+//  @JvmSuppressWildcards todo
 class MAnnotation private constructor(){
 
     //抛出Java的IOException

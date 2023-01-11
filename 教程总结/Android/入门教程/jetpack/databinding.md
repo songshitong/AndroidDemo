@@ -12,7 +12,7 @@ DataBinding 能够省去我们一直以来的 findViewById() 步骤，大量减�
 ```
 android {
     dataBinding {
-        enabled = true
+        enabled = true   //启用后即便不用默认给module生成一个databindingimpl
     }
 }
 ```

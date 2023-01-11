@@ -113,8 +113,8 @@ mkdir aosp
 cd aosp
 git config --global user.email "1295208856@qq.com"
 git config --global user.name "songshitong"
-repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-8.0.0_r36  #不指定版本，默认最新  android-11.0.0_r1
-#repo init -u https://mirrors.bfsu.edu.cn/git/AOSP/platform/manifest -b android-8.0.0_r36 
+repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-8.0.0_r36   #不指定版本，默认最新  android-11.0.0_r1
+#repo init -u https://mirrors.bfsu.edu.cn/git/AOSP/platform/manifest -b android-12.0.0_r3 
 
 repo sync -j4  #不要过大，清华镜像限制了速度
 #可以写个脚本循环下载，容易因为网络失败
@@ -172,7 +172,7 @@ out/target/product/generic_x86/目录生成了三个重要的镜像文件： sys
 
 编译脚本
 sudo apt-get update
-sudo apt-get install openjdk-8-jdk
+sudo apt-get install openjdk-8-jdk  //master aosp自带jdk，可以不用安装 https://source.android.com/docs/setup/start/requirements
 sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip
 #初始化环境，这个脚本会引入其他的执行脚本
 source build/envsetup.sh

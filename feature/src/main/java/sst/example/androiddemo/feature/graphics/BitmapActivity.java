@@ -18,10 +18,14 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.PixelCopy;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -147,8 +151,31 @@ public class BitmapActivity extends AppCompatActivity {
     return result;
   }
 
+  //DrawingCache被废弃，建议使用view.draw(canvas(bitmap))，但是这种形式存在兼容bug，建议使用PixelCopy
+  //使用PixelCopy替换DrawingCache
+  @RequiresApi(Build.VERSION_CODES.O)
+  private void convertLayoutToBitmap(
+          Window window, View view, Bitmap dest,
+          PixelCopy.OnPixelCopyFinishedListener listener
+  ) {
+    //获取layout的位置
+    int[] location = new int[2];
+    view.getLocationInWindow(location);
+    //请求转换  window用于获取绘制的surface  Handler从绘制线程切换到使用的主线程
+    PixelCopy.request(
+            window,
+            new Rect(location[0], location[1], location[0] + view.getWidth(), location[1] + view.getHeight()),
+            dest, listener, new Handler(Looper.getMainLooper())
+    );
+  }
+
+
+
   public static Bitmap getViewBp(View v) {
     if (null == v) {
+      return null;
+    }
+    if(v.getVisibility() != View.VISIBLE){ //不可见，退出
       return null;
     }
     v.setDrawingCacheEnabled(true);
@@ -176,6 +203,8 @@ public class BitmapActivity extends AppCompatActivity {
   //滚动拼接参考 https://link.csdn.net/?target=https%3A%2F%2Fgithub.com%2FPGSSoft%2Fscrollscreenshot
   //ScrollView或者LinearLayout等ViewGroup的长截图：
   //不适用recyclerView 对于recyclerView，由于缓存复用机制，实际绘制的只有几个，viewGroup.getChildCount()的结果也只有几个
+  //截图后背景是黑的 1，检查图片格式为png 2 绘制背景色canvas.drawColor(Color.WHITE);
+  //不可见的不进行绘制v.getVisibility() != View.VISIBLE
   public static Bitmap getViewGroupBitmap(ViewGroup viewGroup) {
     //viewGroup的总高度
     int h = 0;
@@ -207,9 +236,11 @@ public class BitmapActivity extends AppCompatActivity {
       // Use 1/8th of the available memory for this memory cache.
       final int cacheSize = maxMemory / 8;
       LruCache<String, Bitmap> bitmaCache = new LruCache<>(cacheSize);
+      int itemMarginLeft =0;
       for (int i = 0; i < size; i++) {
         RecyclerView.ViewHolder holder = adapter.createViewHolder(view, adapter.getItemViewType(i));
         adapter.onBindViewHolder(holder, i);
+        // 如果 View 没有在屏幕上显示过，那么一定要执行这行，否则画出来是空白的
         holder.itemView.measure(
             View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY),
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -219,10 +250,12 @@ public class BitmapActivity extends AppCompatActivity {
         holder.itemView.buildDrawingCache();
         Bitmap drawingCache = holder.itemView.getDrawingCache();
         if (drawingCache != null) {
-
+          //存在某些情况item的背景缺失等，需要自己绘制
           bitmaCache.put(String.valueOf(i), drawingCache);
         }
         height += holder.itemView.getMeasuredHeight();
+        //简单支持item的位置，所有位置是对齐的
+        itemMarginLeft= ((ViewGroup.MarginLayoutParams)holder.itemView.getLayoutParams()).leftMargin;
       }
 
       bigBitmap = Bitmap.createBitmap(view.getMeasuredWidth(), height, Bitmap.Config.ARGB_8888);
@@ -236,7 +269,7 @@ public class BitmapActivity extends AppCompatActivity {
 
       for (int i = 0; i < size; i++) {
         Bitmap bitmap = bitmaCache.get(String.valueOf(i));
-        bigCanvas.drawBitmap(bitmap, 0f, iHeight, paint);
+        bigCanvas.drawBitmap(bitmap, itemMarginLeft, iHeight, paint);
         iHeight += bitmap.getHeight();
         bitmap.recycle();
       }
@@ -343,8 +376,9 @@ public class BitmapActivity extends AppCompatActivity {
   //使用新api
   private void saveImage(Bitmap toBitmap) {
     //开始一个新的进程执行保存图片的操作
-    Uri insertUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        new ContentValues());
+    ContentValues cv =new ContentValues();
+    cv.put(MediaStore.Images.ImageColumns.DISPLAY_NAME,"aaa.jpg");
+    Uri insertUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
     try {
       if (insertUri != null) {
         OutputStream outputStream = getContentResolver().openOutputStream(insertUri, "rw");

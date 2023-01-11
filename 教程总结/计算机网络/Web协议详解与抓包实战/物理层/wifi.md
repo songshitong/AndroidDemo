@@ -16,3 +16,8 @@ http://www.52im.net/thread-2402-1-1.html
 
 电磁波频率越高穿透越强，那为什么 Wi-Fi 可以穿墙，太阳光却不能？ - 灵剑的回答 - 知乎
 https://www.zhihu.com/question/51073615/answer/124484551
+
+https://baike.baidu.com/item/SSID/10823867
+共享热点-ssid
+SSID是Service Set Identifier的缩写，意思是：服务集标识。SSID技术可以将一个无线局域网分为几个需要不同身份验证的子网络，
+每一个子网络都需要独立的身份验证，只有通过身份验证的用户才可以进入相应的子网络，防止未被授权的用户进入本网络。

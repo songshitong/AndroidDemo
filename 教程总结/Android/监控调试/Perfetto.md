@@ -17,9 +17,11 @@ $ adb shell perfetto --config :test --out /data/misc/perfetto-traces/trace
 //使用内置的test配置，然后输出到/data/misc/perfetto-traces/trace
 
 adb shell perfetto --app com.appName -o /data/misc/perfetto-traces/trace -t 20s view sched freq idle am wm gfx view binder_driver hal dalvik camera input res memory
+adb shell perfetto --app com.cubic.VIcar -o /data/misc/perfetto-traces/trace -t 20s view sched freq idle am wm gfx view binder_driver hal dalvik camera input res memory
 
 取出
-adb pull /data/misc/perfetto-traces/trace  C:\Users\songshitong\Desktop
+adb pull /data/misc/perfetto-traces/trace  C:\Users\xx\Desktop
+adb pull /data/misc/perfetto-traces/trace  /home/sst/Desktop
 使用https://ui.perfetto.dev/#!/record 查看
 
 

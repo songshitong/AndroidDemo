@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".animation.MotionLayoutActivity"
+    >
+  <androidx.constraintlayout.motion.widget.MotionLayout
+      android:id="@+id/motionLayoutFold"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      app:layoutDescription="@xml/activity_motion_layout_scene"
+      >
+   <Button
+       android:id="@+id/fold_btn"
+       android:text="开始/结束"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+   <androidx.appcompat.widget.AppCompatTextView
+       android:id="@+id/fold_text"
+       android:text="点击这段文字实现折叠动画： \n 141341234134141340134134-1；发建安费；夹；的房间啊；发建安费多久啊；大家都是；发酵的发酵法；
+       简繁大富大贵哈；你分局案件发；放假啊；发动机ad发建安费多久啊开发大；大飞机阿发；记得发电费"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+  </androidx.constraintlayout.motion.widget.MotionLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

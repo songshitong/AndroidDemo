@@ -147,14 +147,62 @@ frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.ja
     }
 ```
 
-用于window animations
+用于window animations  android.anim
 frameworks/base/services/core/java/com/android/server/AnimationThread.java
 ```
   private AnimationThread() {
         super("android.anim", THREAD_PRIORITY_DISPLAY, false /*allowIo*/);
     }
 ```
+/frameworks/base/services/core/java/com/android/server/wm/SurfaceAnimationRunner.java
+```
+private final Handler mAnimationThreadHandler = AnimationThread.getHandler();
+private void startAnimationLocked(RunningAnimation a) {
+ anim.addListener(new AnimatorListenerAdapter() {
+              ...
+              @Override
+              public void onAnimationEnd(Animator animation) {
+                  synchronized (mLock) {
+                      mRunningAnimations.remove(a.mLeash);
+                      synchronized (mCancelLock) {
+                          if (!a.mCancelled) {
+                              // Post on other thread that we can push final state without jank.
+                              mAnimationThreadHandler.post(a.mFinishCallback);
+                          }
+                      }
+                  }
+              }
+          });
+}
+```
 
+SurfaceAnimationThread 用于SurfaceAnimationRunner，不持有windowmanager的锁
+/frameworks/base/services/core/java/com/android/server/wm/SurfaceAnimationThread.java
+```
+  private SurfaceAnimationThread() {
+          super("android.anim.lf", THREAD_PRIORITY_DISPLAY, false /*allowIo*/);
+      }
+```
+使用
+/frameworks/base/services/core/java/com/android/server/wm/SurfaceAnimationRunner.java
+```
+void onAnimationCancelled(SurfaceControl leash) {
+          synchronized (mLock) {
+              ....
+              final RunningAnimation anim = mRunningAnimations.get(leash);
+              if (anim != null) {
+                  mRunningAnimations.remove(leash);
+                  synchronized (mCancelLock) {
+                      anim.mCancelled = true;
+                  }
+                  mSurfaceAnimationHandler.post(() -> {
+                      anim.mAnim.cancel();
+                      applyTransaction();
+                  });
+              }
+          }
+      }
+```
 
 frameworks/base/services/core/java/com/android/server/Watchdog.java
 ```

@@ -17,3 +17,5 @@ Kotlin 代码转 Java 代码
 
 
 todo nullable  nonnull
+java的API没有声明可空和非空
+kotlin不提示空的风险？？？

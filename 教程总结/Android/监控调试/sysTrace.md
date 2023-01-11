@@ -10,9 +10,24 @@ java framework层
 import android.os.Trace;
 Trace.traceBegin(long traceTag, String methodName)
 Trace.traceEnd(long traceTag)
+
+Trace.beginSection(String sectionName) 
+Trace.endSection()
 ```
 在代码中必须成对出现，一般将traceEnd放入到finally语句块，另外，必须在同一个线程。
 这里默认的traceTag为TRACE_TAG_APP，systrace命令通过指定app参数即
+
+例如recyclerview的onLayout的监控
+```
+private static final String TRACE_ON_LAYOUT_TAG = "RV OnLayout";
+protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        TraceCompat.beginSection(TRACE_ON_LAYOUT_TAG);
+        dispatchLayout();
+        TraceCompat.endSection();
+        mFirstLayoutComplete = true;
+    }
+```
+//上述例子监控了recyclerview onLayout的耗时，如果耗时过长，可以在trace文件的分析中看到[RV OnLayout]的标志
 
 native framework层
 ```

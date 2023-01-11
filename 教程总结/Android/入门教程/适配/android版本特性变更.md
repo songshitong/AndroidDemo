@@ -159,6 +159,9 @@ https://juejin.cn/post/6985806802831015950
 PendingIntent pendingActivityIntent = PendingIntent.getActivity(Application.getContext(), R.drawable.ic_launcher, intent,
 PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 ```
+滚动列表增加拉伸效果
+在 Android 11 及更低版本中，滚动事件会使视觉元素发光。在 Android 12 及更高版本中，发生拖动事件时，视觉元素会拉伸和反弹；
+发生快速滑动事件时，它们会快速滑动和反弹   停用：android:overScrollMode="never"
 
 
 android 13

@@ -1,7 +1,8 @@
 package com.sst.libkotlin.IO
 
+import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
+import java.io.FileReader
 import java.net.URL
 
 class MIO {
@@ -13,45 +14,45 @@ class MIO {
             //读取终端 LineReader.readLine(System.`in`, Charset.default
             readLine()
             //获取文件流
-            val fileIo = File("11")
+            val mFile = File("11")
 //            InputStreamReader
-            fileIo.reader()
+            mFile.reader()
             //OutputStreamWriter
-            fileIo.writer()
+            mFile.writer()
 
             //buffer流
-            fileIo.bufferedReader()
-            fileIo.bufferedWriter()
+            mFile.bufferedReader()
+            mFile.bufferedWriter()
 
             //读写文件
-            fileIo.writeText("aa")
-            fileIo.writeBytes(kotlin.ByteArray(1024))
-            fileIo.readText()
-            fileIo.readBytes()
+            mFile.writeText("aa")
+            mFile.writeBytes(kotlin.ByteArray(1024))
+            mFile.readText()
+            mFile.readBytes()
             //追加
-            fileIo.appendBytes(kotlin.byteArrayOf(1,2,3))
-            fileIo.appendText("append")
+            mFile.appendBytes(kotlin.byteArrayOf(1,2,3))
+            mFile.appendText("append")
 
             //读取行
-            fileIo.useLines{lines->{}}
-            fileIo.forEachLine {  }
+            mFile.useLines{ lines->{}}
+            mFile.forEachLine {  }
 
            //文件遍历  遍历深度1  文件名不能为XX
             //FileTreeWalk的实现
-            fileIo.walk().maxDepth(1).onEnter { it.name!="XX" }.filter { file->file.isFile  }.forEach {
+            mFile.walk().maxDepth(1).onEnter { it.name!="XX" }.filter { file->file.isFile  }.forEach {
 
             }
 
 
             //复制
-            fileIo.copyTo(File("222"))
+            mFile.copyTo(File("222"))
             //递归复制
-            fileIo.copyRecursively(File("222"))
+            mFile.copyRecursively(File("222"))
 
             //删除
-            fileIo.delete()
+            mFile.delete()
             //递归删除
-            fileIo.deleteRecursively()
+            mFile.deleteRecursively()
 
             //网络读取  通过url自己的openStream获取input流
 //            public final InputStream openStream() throws IOException {
@@ -59,6 +60,12 @@ class MIO {
 //            }
             URL("url").readBytes()
 
+            //kotlin对closeable的封装： use  use是Closeable的扩展方法，使用完后自动关闭
+            //上面的方法如mFile.writeText已经使用了use函数，可以放心使用，不用担心关闭问题
+            val reader = BufferedReader(FileReader(""))
+            reader.use {
+                reader.lineSequence().sumOf { it.length }
+            }
         }
     }
 }

@@ -11,6 +11,6 @@ binding.setVariable(initVariableId(), viewModel);
  <data>
         <variable
             name="loginVM"
-            type="com.autohome.aibadgesdk.login.AHLoginViewModel"/>
+            type="login.LoginViewModel"/>
     </data>
 ```

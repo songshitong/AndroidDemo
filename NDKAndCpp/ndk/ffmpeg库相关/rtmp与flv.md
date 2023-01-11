@@ -3,7 +3,7 @@
 rtmp 推流   视频格式flv
 
 从网页中拿到flv地址   network->media->查找flv相关文件
-https://hdllive-main.autohome.com.cn/athmlive-main/z1_athmlive-main_231451.flv
+https://hdllive-main.xxx.com.cn/xxx.flv
 
 
 https://www.cnblogs.com/chyingp/p/flv-getting-started.html

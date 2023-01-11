@@ -11,7 +11,7 @@
 ```
 09:40:57.586 Blueto...dapter  D  stopLeScan()
 09:40:57.586 Blueto...dapter  D  isLeEnabled(): ON
-09:40:57.592 BtGatt...ervice  E  onScanResult appName: com.autohome.aibadge, scannerId: 9
+09:40:57.592 BtGatt...ervice  E  onScanResult appName: xxx, scannerId: 9
 09:40:57.595 BluetoothGatt    D  connect() - device: DC:45:94:CB:DA:95, auto: false, eattSupport: false
 09:40:57.595 BluetoothGatt    D  registerApp()
 09:40:57.596 BluetoothGatt    D  registerApp() - UUID=bc4c4d82-ab61-4158-98a0-b822cf4ce145

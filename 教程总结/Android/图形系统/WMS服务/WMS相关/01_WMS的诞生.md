@@ -167,7 +167,6 @@ public final boolean runWithScissors(final Runnable r, long timeout) {
    }
 ```
 Scissors [ˈsɪzəz]  剪刀   剪断，删除  交叉
-//todo 这个线程说的啥。。
 开头对传入的Runnable和timeout进行了判断，如果Runnable为null或者timeout小于0则抛出异常。
 注释1处根据每个线程只有一个Looper的原理来判断当前的线程（”system_server”线程）是否是Handler所指向的线程（”android.display”线程），
 如果是则直接执行Runnable的run方法，如果不是则调用BlockingRunnable的postAndWait方法，并将当前线程的Runnable作为参数传进去 ，

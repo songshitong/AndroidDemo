@@ -78,7 +78,7 @@
     <activity android:name=".activity.StartForResultActivity" />
     <activity android:name=".widget.ViewOutlineProviderActivity" />
     <activity android:name=".camera.CameraActivity" />
-    <activity android:name=".activity.LinearLayoutActivity" />
+    <activity android:name=".widget.layout.LinearLayoutActivity" />
     <activity android:name=".activity.launchmode.OtherActivity" />
     <activity android:name=".activity.launchmode.LaunchActivity" />
     <activity android:name=".activity.launchmode.StandardActivity" />

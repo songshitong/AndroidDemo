@@ -9,7 +9,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ResolveInfo
 import android.media.MediaPlayer
-import android.opengl.GLSurfaceView
 import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -23,7 +22,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.MutableLiveData
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
@@ -42,12 +40,12 @@ import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
 import sst.example.androiddemo.feature.util.MyUtils
-import sst.example.androiddemo.feature.util.ToastUtil
 import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
 import sst.example.androiddemo.feature.widget.ViewOutlineProviderActivity
 import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
+import sst.example.androiddemo.feature.widget.layout.LinearLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
 import java.io.PrintWriter
@@ -60,7 +58,6 @@ class  MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Looper
         getAndroidInfo()
         getMethodTrace()
         // ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)

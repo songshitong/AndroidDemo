@@ -22,6 +22,7 @@
                 android:background="@android:color/holo_green_light"
                 android:layout_height="100dp">
                 <View
+                    android:id="@+id/constrain_view1"
                     android:background="@android:color/holo_red_light"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"

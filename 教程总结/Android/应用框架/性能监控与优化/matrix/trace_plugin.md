@@ -430,7 +430,11 @@ private void dispatchEnd() {
             long intendedFrameTimeNs = startNs;
             if (isVsyncFrame) {
                 doFrameEnd(token);
+                //获取FrameDisplayEventReceiver的mTimestampNanos vsync执行的时间
                 intendedFrameTimeNs = getIntendedFrameTimeNs(startNs);
+                ...
+                //每帧回调
+                observer.doFrame(AppActiveMatrixDelegate.INSTANCE.getVisibleScene(), startNs, endNs, isVsyncFrame, intendedFrameTimeNs, queueCost[CALLBACK_INPUT], queueCost[CALLBACK_ANIMATION], queueCost[CALLBACK_TRAVERSAL]);
             }
           ....
         }
@@ -586,4 +590,472 @@ LooperPrinter
             }
         }
     }   
+```
+
+
+FrameTracer
+matrix-trace-canary\src\main\java\com\tencent\matrix\trace\tracer\FrameTracer.java
+```
+public class FrameTracer extends Tracer implements Application.ActivityLifecycleCallbacks {
+ @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onActivityResumed(Activity activity) {
+        lastResumeTimeMap.put(activity.getClass().getName(), System.currentTimeMillis());
+        //android 26以上使用window,帧率监听 不使用looper消息监听
+        if (useFrameMetrics) {
+            if (frameListenerMap.containsKey(activity.hashCode())) {
+                return;
+            }
+            this.refreshRate = (int) activity.getWindowManager().getDefaultDisplay().getRefreshRate();
+            this.frameIntervalNs = Constants.TIME_SECOND_TO_NANO / (long) refreshRate;
+            Window.OnFrameMetricsAvailableListener onFrameMetricsAvailableListener = new Window.OnFrameMetricsAvailableListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void onFrameMetricsAvailable(Window window, FrameMetrics frameMetrics, int dropCountSinceLastInvocation) {
+                    FrameMetrics frameMetricsCopy = new FrameMetrics(frameMetrics);
+                    long vsynTime = frameMetricsCopy.getMetric(FrameMetrics.VSYNC_TIMESTAMP);
+                    long intendedVsyncTime = frameMetricsCopy.getMetric(FrameMetrics.INTENDED_VSYNC_TIMESTAMP);
+                    frameMetricsCopy.getMetric(FrameMetrics.DRAW_DURATION);
+                    notifyListener(ProcessUILifecycleOwner.INSTANCE.getVisibleScene(), intendedVsyncTime, vsynTime, true, intendedVsyncTime, 0, 0, 0);
+                }
+            };
+            this.frameListenerMap.put(activity.hashCode(), onFrameMetricsAvailableListener);
+            activity.getWindow().addOnFrameMetricsAvailableListener(onFrameMetricsAvailableListener, new Handler());
+            MatrixLog.i(TAG, "onActivityResumed addOnFrameMetricsAvailableListener");
+        }
+    }
+
+
+
+ //focusedActivity 可见的activity
+ //start  Message执行前的时间   end Message执行完毕，调用LooperObserver#doFrame时的时间
+  //intendedFrameTimeNs  如果调用执行dispatchEnd时，UIThreadMonitor#run执行过了，那么该值为上面的end-start的值；否则为0
+  //inputCostNs、animationCostNs、traversalCostNs执行三种CallbackQueue的耗时
+    @Override
+    public void doFrame(String focusedActivity, long startNs, long endNs, boolean isVsyncFrame, long intendedFrameTimeNs, long inputCostNs, long animationCostNs, long traversalCostNs) {
+        if (isForeground()) {
+            notifyListener(focusedActivity, startNs, endNs, isVsyncFrame, intendedFrameTimeNs, inputCostNs, animationCostNs, traversalCostNs);
+        }
+    }
+   
+
+    private void notifyListener(final String focusedActivity, final long startNs, final long endNs, final boolean isVsyncFrame,
+                                final long intendedFrameTimeNs, final long inputCostNs, final long animationCostNs, final long traversalCostNs) {
+        long traceBegin = System.currentTimeMillis();
+        try {
+            final long jitter = endNs - intendedFrameTimeNs; //抖动=结束时间-vsync结束的时间
+            final int dropFrame = (int) (jitter / frameIntervalNs);
+            if (dropFrameListener != null) {
+                if (dropFrame > dropFrameListenerThreshold) {
+                    try {
+                        if (MatrixUtil.getTopActivityName() != null) {
+                            //activity resume时间
+                            long lastResumeTime = lastResumeTimeMap.get(MatrixUtil.getTopActivityName());
+                            //回调掉帧
+                            dropFrameListener.dropFrame(dropFrame, jitter, MatrixUtil.getTopActivityName(), lastResumeTime);
+                        }
+                    }...
+                }
+            }
+
+            droppedSum += dropFrame;
+            durationSum += Math.max(jitter, frameIntervalNs);
+             ...
+             //帧率的收集，回调
+             listener.collect(focusedActivity, startNs, endNs, dropFrame, isVsyncFrame,
+                                    intendedFrameTimeNs, inputCostNs, animationCostNs, traversalCostNs);
+             ...
+              listener.doFrameSync(focusedActivity, startNs, endNs, dropFrame, isVsyncFrame,
+                                intendedFrameTimeNs, inputCostNs, animationCostNs, traversalCostNs);                       
+             ...
+            }
+        } ...
+    } 
+}
+```
+FPSCollector 帧率的收集以及上报
+```
+java/com/tencent/matrix/trace/listeners/IDoFrameListener.java
+ @CallSuper
+    public void collect(String focusedActivity, long startNs, long endNs, int dropFrame, boolean isVsyncFrame,
+                        long intendedFrameTimeNs, long inputCostNs, long animationCostNs, long traversalCostNs) {
+        FrameReplay replay = FrameReplay.create();
+        replay.focusedActivity = focusedActivity;
+        ....
+        list.add(replay);
+        if (list.size() >= intervalFrame && getExecutor() != null) {
+            final List<FrameReplay> copy = new LinkedList<>(list);
+            list.clear();
+            getExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    doReplay(copy);
+                    for (FrameReplay record : copy) {
+                        record.recycle();
+                    }
+                }
+            });
+        }
+    }
+ 
+ java/com/tencent/matrix/trace/tracer/FrameTracer.java   
+ private class FPSCollector extends IDoFrameListener {
+       @Override
+        public void doReplay(List<FrameReplay> list) {
+            super.doReplay(list);
+            for (FrameReplay replay : list) {
+                doReplayInner(replay.focusedActivity, replay.startNs, replay.endNs, replay.dropFrame, replay.isVsyncFrame,
+                        replay.intendedFrameTimeNs, replay.inputCostNs, replay.animationCostNs, replay.traversalCostNs);
+            }
+        }
+
+        public void doReplayInner(String visibleScene, long startNs, long endNs, int droppedFrames,
+                                  boolean isVsyncFrame, long intendedFrameTimeNs, long inputCostNs,
+                                  long animationCostNs, long traversalCostNs) {
+            ...
+            if (!isVsyncFrame) return; //不是在vsync内跳过
+            FrameCollectItem item = map.get(visibleScene);
+            if (null == item) {
+                item = new FrameCollectItem(visibleScene);
+                //每个activity存储一个item
+                map.put(visibleScene, item);
+            }
+            //收集帧率信息
+            item.collect(droppedFrames);
+            if (item.sumFrameCost >= timeSliceMs) { // report 默认超过10s
+                map.remove(visibleScene);
+                item.report(); //上报
+            }
+        }
+    }
+    
+    private class FrameCollectItem {
+        void collect(int droppedFrames) {
+            float frameIntervalCost = 1f * FrameTracer.this.frameIntervalNs
+                    / Constants.TIME_MILLIS_TO_NANO;
+            sumFrameCost += (droppedFrames + 1) * frameIntervalCost; //累计掉帧耗时
+            sumDroppedFrames += droppedFrames; //累计掉帧
+            sumFrame++; //累计帧率
+            if (droppedFrames >= frozenThreshold) { //42
+                dropLevel[DropStatus.DROPPED_FROZEN.index]++;
+                dropSum[DropStatus.DROPPED_FROZEN.index] += droppedFrames;
+            } else if (droppedFrames >= highThreshold) { //24
+                dropLevel[DropStatus.DROPPED_HIGH.index]++;
+                dropSum[DropStatus.DROPPED_HIGH.index] += droppedFrames;
+            } else if (droppedFrames >= middleThreshold) { //9
+                dropLevel[DropStatus.DROPPED_MIDDLE.index]++;
+                dropSum[DropStatus.DROPPED_MIDDLE.index] += droppedFrames;
+            } else if (droppedFrames >= normalThreshold) {//3
+                dropLevel[DropStatus.DROPPED_NORMAL.index]++;
+                dropSum[DropStatus.DROPPED_NORMAL.index] += droppedFrames;
+            } else { //1-2帧
+                dropLevel[DropStatus.DROPPED_BEST.index]++;
+                dropSum[DropStatus.DROPPED_BEST.index] += Math.max(droppedFrames, 0);
+            }
+        }
+    }
+    
+    void report() {
+            //当前的fps 
+            float fps = Math.min(refreshRate, 1000.f * sumFrame / sumFrameCost);
+            MatrixLog.i(TAG, "[report] FPS:%s %s", fps, toString());
+            try {
+                TracePlugin plugin = Matrix.with().getPluginByClass(TracePlugin.class);
+                ...                
+                Issue issue = new Issue();
+                issue.setTag(SharePluginInfo.TAG_PLUGIN_FPS);
+                issue.setContent(resultObject);
+                //回调给plugin
+                plugin.onDetectIssue(issue);
+
+            },,,
+        }
+ }
+```
+开箱即用
+matrix-trace-canary中有一个FrameDecorator的类，可以悬浮窗展示实时帧率，开箱即用，无需自己写逻辑。其底层实现与FrameTracer类似。
+
+
+
+慢方法监控EvilMethodTracer
+java/com/tencent/matrix/trace/tracer/EvilMethodTracer.java
+```
+public class EvilMethodTracer extends Tracer {
+ @Override
+    public void dispatchBegin(long beginNs, long cpuBeginMs, long token) {
+        super.dispatchBegin(beginNs, cpuBeginMs, token);
+        indexRecord = AppMethodBeat.getInstance().maskIndex("EvilMethodTracer#dispatchBegin");
+    }
+
+
+    @Override
+    public void doFrame(String focusedActivity, long startNs, long endNs, boolean isVsyncFrame, long intendedFrameTimeNs, long inputCostNs, long animationCostNs, long traversalCostNs) {
+        queueTypeCosts[0] = inputCostNs;
+        queueTypeCosts[1] = animationCostNs;
+        queueTypeCosts[2] = traversalCostNs;
+    }
+
+    @Override
+    public void dispatchEnd(long beginNs, long cpuBeginMs, long endNs, long cpuEndMs, long token, boolean isVsyncFrame) {
+        super.dispatchEnd(beginNs, cpuBeginMs, endNs, cpuEndMs, token, isVsyncFrame);
+        long start = config.isDevEnv() ? System.currentTimeMillis() : 0;
+        long dispatchCost = (endNs - beginNs) / Constants.TIME_MILLIS_TO_NANO;
+        try {
+            if (dispatchCost >= evilThresholdMs) { //默认700ms
+               // 则解析出这段时间内函数的调用堆栈
+                long[] data = AppMethodBeat.getInstance().copyData(indexRecord);
+                long[] queueCosts = new long[3];
+                System.arraycopy(queueTypeCosts, 0, queueCosts, 0, 3);
+                String scene = AppActiveMatrixDelegate.INSTANCE.getVisibleScene();
+                //queueCosts input,animation,traversal的耗时
+                //子线程分析
+                MatrixHandlerThread.getDefaultHandler().post(new AnalyseTask(isForeground(), scene, data, queueCosts, cpuEndMs - cpuBeginMs, dispatchCost, endNs / Constants.TIME_MILLIS_TO_NANO));
+            }
+        } 。。。
+    }
+    
+   private class AnalyseTask implements Runnable {
+    @Override
+        public void run() {
+            analyse();
+        }
+      
+       void analyse() {
+            //获取进程的priority以及nice，原理是读取/proc/<pid>/stat中的数据
+            int[] processStat = Utils.getProcessPriority(Process.myPid());
+            String usage = Utils.calculateCpuUsage(cpuCost, cost);
+            LinkedList<MethodItem> stack = new LinkedList();
+            if (data.length > 0) {
+               //获取stack信息
+                TraceDataUtils.structuredDataToStack(data, stack, true, endMs);
+                TraceDataUtils.trimStack(stack, Constants.TARGET_EVIL_METHOD_STACK, new TraceDataUtils.IStructuredDataFilter() {
+                    @Override
+                    public boolean isFilter(long during, int filterCount) {
+                        return during < filterCount * Constants.TIME_UPDATE_CYCLE_MS;
+                    }
+
+                    @Override
+                    public int getFilterMaxCount() {
+                        return Constants.FILTER_STACK_MAX_COUNT;
+                    }
+
+                    @Override
+                    public void fallback(List<MethodItem> stack, int size) {
+                        MatrixLog.w(TAG, "[fallback] size:%s targetSize:%s stack:%s", size, Constants.TARGET_EVIL_METHOD_STACK, stack);
+                        Iterator iterator = stack.listIterator(Math.min(size, Constants.TARGET_EVIL_METHOD_STACK));
+                        while (iterator.hasNext()) {
+                            iterator.next();
+                            iterator.remove();
+                        }
+                    }
+                });
+            }
+            
+            //生成stackKey
+            long stackCost = Math.max(cost, TraceDataUtils.stackToString(stack, reportBuilder, logcatBuilder));
+            String stackKey = TraceDataUtils.getTreeKey(stack, stackCost);
+
+            //打印queueCost
+            MatrixLog.w(TAG, "%s", printEvil(scene, processStat, isForeground, logcatBuilder, stack.size(), stackKey, usage, queueCost[0], queueCost[1], queueCost[2], cost)); // for logcat
+
+            // report 上报问题
+            try {
+                TracePlugin plugin = Matrix.with().getPluginByClass(TracePlugin.class);
+                ...
+                JSONObject jsonObject = new JSONObject();
+                jsonObject = DeviceUtil.getDeviceInfo(jsonObject, Matrix.with().getApplication());
+                jsonObject.put(SharePluginInfo.ISSUE_STACK_TYPE, Constants.Type.NORMAL);
+                ...
+                Issue issue = new Issue();
+                issue.setTag(SharePluginInfo.TAG_PLUGIN_EVIL_METHOD);
+                issue.setContent(jsonObject);
+                plugin.onDetectIssue(issue);
+            } ...
+        }  
+   }   
+}
+```
+在dispatchBegin方法中，记录下AppMethodBeat中目前的index，记为start；
+在dispatchEnd中，读取目前AppMethodBeat中目前的index，记为end。这两者中间的数据则为这段时间内执行的方法的入栈、出栈信息。
+当这个Message执行时间超过指定的阈值（默认700ms）时，认为可能发生了慢方法，此时会进行进一步的分析。
+至于doFrame中记录的数据，没有啥具体的用处，这是在最后打印了log而已
+
+todo 堆栈相关 stackkey
+
+
+
+ANR监控AnrTracer
+ANR如何进行判定。我们在Message执行开始时抛出一个定时任务，若该任务执行到了，则可以认为发生了ANR。若该任务在Message执行完毕之后被主动清除了，
+  则说明没有ANR发生。这种思想与系统ANR的判定有相似之处。
+在ANR监控中，若发生了ANR，则需要解析这段时间内的调用堆栈
+matrix-trace-canary/src/main/java/com/tencent/matrix/trace/tracer/LooperAnrTracer.java
+```
+public class LooperAnrTracer extends Tracer {
+  public void dispatchBegin(long beginNs, long cpuBeginMs, long token) {
+        super.dispatchBegin(beginNs, cpuBeginMs, token);
+        anrTask.beginRecord = AppMethodBeat.getInstance().maskIndex("AnrTracer#dispatchBegin");
+        anrTask.token = token;
+        ...
+        long cost = (System.nanoTime() - token) / Constants.TIME_MILLIS_TO_NANO;
+        //添加定时任务 5秒减去方法执行的时间  anrTask和lagTask为执行的runnable
+        anrHandler.postDelayed(anrTask, Constants.DEFAULT_ANR - cost);  //5000-cost
+        lagHandler.postDelayed(lagTask, Constants.DEFAULT_NORMAL_LAG - cost);//2000-cost
+    }
+    
+  @Override
+    public void dispatchEnd(long beginNs, long cpuBeginMs, long endNs, long cpuEndMs, long token, boolean isBelongFrame) {
+        super.dispatchEnd(beginNs, cpuBeginMs, endNs, cpuEndMs, token, isBelongFrame);
+      ....
+        //移除定时任务
+        anrHandler.removeCallbacks(anrTask);
+        lagHandler.removeCallbacks(lagTask);
+    }   
+    
+     class AnrHandleTask implements Runnable {
+          @Override
+        public void run() {
+            long curTime = SystemClock.uptimeMillis();
+            boolean isForeground = isForeground();
+            // process 进程状态
+            int[] processStat = Utils.getProcessPriority(Process.myPid());
+            long[] data = AppMethodBeat.getInstance().copyData(beginRecord);
+            beginRecord.release();
+            String scene = AppActiveMatrixDelegate.INSTANCE.getVisibleScene();
+
+            // memory 内存信息
+            long[] memoryInfo = dumpMemory();
+
+            // Thread state  线程状态
+            Thread.State status = Looper.getMainLooper().getThread().getState();
+            StackTraceElement[] stackTrace = Looper.getMainLooper().getThread().getStackTrace();
+            String dumpStack;
+            if (traceConfig.getLooperPrinterStackStyle() == TraceConfig.STACK_STYLE_WHOLE) {
+                dumpStack = Utils.getWholeStack(stackTrace, "|*\t\t");
+            } else {
+                dumpStack = Utils.getStack(stackTrace, "|*\t\t", 12);
+            }
+
+
+            // frame  input,animation,traversal耗时
+            UIThreadMonitor monitor = UIThreadMonitor.getMonitor();
+            long inputCost = monitor.getQueueCost(UIThreadMonitor.CALLBACK_INPUT, token);
+            long animationCost = monitor.getQueueCost(UIThreadMonitor.CALLBACK_ANIMATION, token);
+            long traversalCost = monitor.getQueueCost(UIThreadMonitor.CALLBACK_TRAVERSAL, token);
+
+            // trace 堆栈
+            LinkedList<MethodItem> stack = new LinkedList();
+            if (data.length > 0) {
+                TraceDataUtils.structuredDataToStack(data, stack, true, curTime);
+                TraceDataUtils.trimStack(stack, Constants.TARGET_EVIL_METHOD_STACK, new TraceDataUtils.IStructuredDataFilter() {
+                    @Override
+                    public boolean isFilter(long during, int filterCount) {
+                        return during < filterCount * Constants.TIME_UPDATE_CYCLE_MS;
+                    }
+
+                    @Override
+                    public int getFilterMaxCount() {
+                        return Constants.FILTER_STACK_MAX_COUNT;
+                    }
+
+                    @Override
+                    public void fallback(List<MethodItem> stack, int size) {
+                        MatrixLog.w(TAG, "[fallback] size:%s targetSize:%s stack:%s", size, Constants.TARGET_EVIL_METHOD_STACK, stack);
+                        Iterator iterator = stack.listIterator(Math.min(size, Constants.TARGET_EVIL_METHOD_STACK));
+                        while (iterator.hasNext()) {
+                            iterator.next();
+                            iterator.remove();
+                        }
+                    }
+                });
+            }
+            ...
+            // stackKey
+            String stackKey = TraceDataUtils.getTreeKey(stack, stackCost);
+            ....
+            // report
+            try {
+                TracePlugin plugin = Matrix.with().getPluginByClass(TracePlugin.class);
+                 ...
+                plugin.onDetectIssue(issue);
+            } ...
+        }
+     }
+}
+```
+IdleHandlerLagTracer idlehandler超时检测
+替换looper的mIdleHandlers列表，替换为自己的idlehandler，在queueIdle()前添加定时器，执行后移除定时器，定时器触(2s)发后抛出问题
+com/tencent/matrix/trace/tracer/IdleHandlerLagTracer.java
+```
+public class IdleHandlerLagTracer extends Tracer {
+ @Override
+    public void onAlive() {
+        super.onAlive();
+        if (traceConfig.isIdleHandlerTraceEnable()) {
+            idleHandlerLagHandlerThread = new HandlerThread("IdleHandlerLagThread");
+            idleHandlerLagRunnable = new IdleHandlerLagRunable();
+            detectIdleHandler();
+        }
+    }
+    
+      private static void detectIdleHandler() {
+        try {
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+                return;
+            }
+            MessageQueue mainQueue = Looper.getMainLooper().getQueue();
+            Field field = MessageQueue.class.getDeclaredField("mIdleHandlers");
+            field.setAccessible(true);
+            //替换idleHandler的list
+            MyArrayList<MessageQueue.IdleHandler> myIdleHandlerArrayList = new MyArrayList<>();
+            field.set(mainQueue, myIdleHandlerArrayList);
+            idleHandlerLagHandlerThread.start();
+            idleHandlerLagHandler = new Handler(idleHandlerLagHandlerThread.getLooper());
+        } ...
+    }
+    
+     static class MyArrayList<T> extends ArrayList {
+        Map<MessageQueue.IdleHandler, MyIdleHandler> map = new HashMap<>();
+        @Override
+        public boolean add(Object o) {
+            if (o instanceof MessageQueue.IdleHandler) {
+               //替换为自己的MyIdleHandler
+                MyIdleHandler myIdleHandler = new MyIdleHandler((MessageQueue.IdleHandler) o);
+                map.put((MessageQueue.IdleHandler) o, myIdleHandler);
+                return super.add(myIdleHandler);
+            }
+            return super.add(o);
+        }
+    }   
+    
+    static class MyIdleHandler implements MessageQueue.IdleHandler {
+        private final MessageQueue.IdleHandler idleHandler;
+        MyIdleHandler(MessageQueue.IdleHandler idleHandler) {
+            this.idleHandler = idleHandler;
+        }
+        @Override
+        public boolean queueIdle() {
+             //装饰器，在原有idleHandler增加功能
+            //添加定时器，定时器触发执行IdleHandlerLagRunable 
+            idleHandlerLagHandler.postDelayed(idleHandlerLagRunnable, traceConfig.idleHandlerLagThreshold);
+            boolean ret = this.idleHandler.queueIdle();
+            //移除定时器
+            idleHandlerLagHandler.removeCallbacks(idleHandlerLagRunnable);
+            return ret;
+        }
+    } 
+    
+    
+    static class IdleHandlerLagRunable implements Runnable {
+        @Override
+        public void run() {
+            try {
+                //上报异常
+                TracePlugin plugin = Matrix.with().getPluginByClass(TracePlugin.class);
+                ....
+                plugin.onDetectIssue(issue);
+            } ...
+        }
+    }
+ 
+}
 ```

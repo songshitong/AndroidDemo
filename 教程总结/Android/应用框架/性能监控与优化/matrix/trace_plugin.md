@@ -1059,3 +1059,301 @@ public class IdleHandlerLagTracer extends Tracer {
  
 }
 ```
+
+
+
+StartupTracer
+java/com/tencent/matrix/trace/tracer/StartupTracer.java
+```
+  firstMethod.i       LAUNCH_ACTIVITY   onWindowFocusChange   LAUNCH_ACTIVITY    onWindowFocusChange
+  ^                         ^                   ^                     ^                  ^
+  |                         |                   |                     |                  |
+  |---------app---------|---|---firstActivity---|---------...---------|---careActivity---|
+  |<--applicationCost-->|
+  |<--------------firstScreenCost-------------->|
+  |<---------------------------------------coldCost------------------------------------->|
+  .                         |<-----warmCost---->|
+```
+插件在编译器为 Activity#onWindowFocusChanged 织入 AppMethodBeat.at 方法，这样可以获取每个 Activity 的 onWindowFocusChanged 回调时间。
+然后在第一个 AppMethodBeat.i 方法调用时，记录此时的时间作为进程 zygote 后的时间；hook ActivityThread 中的 mH 中的 Callback ，
+通过检查第一个 Activity 或 Service 或 Receiver 的 what，以此时的时间作为 Application 创建结束时间，该时间与上面的时间之差记为 Application创建耗时。
+在第一个 Activity 的 onWindowFocusChange 回调时，此时的时间减去 zygote 时间即为 首屏启动耗时 ；
+第二个 Activity 的 onWindowFocusChange 回调时，时间减去 zygote 的时间即为 整个冷启动的时间。
+
+我们顺着上面的这个线理一下代码，首先是AppMethBeat.i方法里面的相关代码
+matrix-trace-canary\src\main\java\com\tencent\matrix\trace\core\AppMethodBeat.java
+```
+ public static void i(int methodId) {
+      ...
+        if (status == STATUS_DEFAULT) {
+            synchronized (statusLock) {
+                if (status == STATUS_DEFAULT) {
+                    realExecute();
+                    status = STATUS_READY;
+                }
+            }
+        }
+       ...
+    }
+    
+  private static void realExecute() {
+        ...
+        sCurrentDiffTime = SystemClock.uptimeMillis() - sDiffTime;
+
+        sHandler.removeCallbacksAndMessages(null);
+        sHandler.postDelayed(sUpdateDiffTimeRunnable, Constants.TIME_UPDATE_CYCLE_MS);
+        sHandler.postDelayed(checkStartExpiredRunnable = new Runnable() {
+            @Override
+            public void run() {
+                synchronized (statusLock) {
+                     ...
+                    if (status == STATUS_DEFAULT || status == STATUS_READY) {
+                        status = STATUS_EXPIRED_START;
+                    }
+                }
+            }
+        }, Constants.DEFAULT_RELEASE_BUFFER_DELAY);
+
+        ActivityThreadHacker.hackSysHandlerCallback();
+        LooperMonitor.register(looperMonitorListener);
+    }
+```
+status默认状态是STATUS_DEFAULT，因此第一次执行AppMethodBeat#i方法肯定会执行到realExecute()方法，
+  这里面相当于
+1 初始化AppMethodBeat
+2  hook了mH 的 mCallback，可以拿到Application 初始化结束的时间
+3 初始化LooperMonitor
+java/com/tencent/matrix/trace/hacker/ActivityThreadHacker.java
+```
+//进程启动的时间
+ private static long sApplicationCreateBeginTime = 0L;
+//四大组件首次执行到的时间
+ private static long sApplicationCreateEndTime = 0L;
+  public static void hackSysHandlerCallback() {
+        try {
+            //第一次执行方法，记录application创建的时间
+            sApplicationCreateBeginTime = SystemClock.uptimeMillis();
+            sApplicationCreateBeginMethodIndex = AppMethodBeat.getInstance().maskIndex("ApplicationCreateBeginMethodIndex");
+            Class<?> forName = Class.forName("android.app.ActivityThread");
+            Field field = forName.getDeclaredField("sCurrentActivityThread");
+            field.setAccessible(true);
+            Object activityThreadValue = field.get(forName);
+            Field mH = forName.getDeclaredField("mH");
+            mH.setAccessible(true);
+            Object handler = mH.get(activityThreadValue);
+            Class<?> handlerClass = handler.getClass().getSuperclass();
+            if (null != handlerClass) {
+                Field callbackField = handlerClass.getDeclaredField("mCallback");
+                callbackField.setAccessible(true);
+                Handler.Callback originalCallback = (Handler.Callback) callbackField.get(handler);
+                //替换为HackCallback
+                HackCallback callback = new HackCallback(originalCallback);
+                callbackField.set(handler, callback);
+            }
+....
+
+ private final static class HackCallback implements Handler.Callback {
+  @Override
+        public boolean handleMessage(Message msg) {
+            if (IssueFixConfig.getsInstance().isEnableFixSpApply()) {
+                if (Build.VERSION.SDK_INT >= 21 && Build.VERSION.SDK_INT <= 25) {
+                    if (msg.what == SERIVCE_ARGS || msg.what == STOP_SERVICE
+                            || msg.what == STOP_ACTIVITY_SHOW || msg.what == STOP_ACTIVITY_HIDE
+                            || msg.what == SLEEPING) {
+                            MatrixLog.i(TAG, "Fix SP ANR is enabled");
+                            fix(); //修复sp的anr
+                        }
+                }
+            }
+            ...
+            //消息类型是否为activity启动
+            boolean isLaunchActivity = isLaunchActivity(msg);
+
+            if (hasPrint > 0) {
+                MatrixLog.i(TAG, "[handleMessage] msg.what:%s begin:%s isLaunchActivity:%s SDK_INT=%s", msg.what, SystemClock.uptimeMillis(), isLaunchActivity, Build.VERSION.SDK_INT);
+                hasPrint--;
+            }
+
+            if (!isCreated) {
+                if (isLaunchActivity || msg.what == CREATE_SERVICE
+                        || msg.what == RECEIVER) { // 待办： for provider  这里还需要增加provider相关
+                    //记录application创建结束的时间    
+                    ActivityThreadHacker.sApplicationCreateEndTime = SystemClock.uptimeMillis();
+                    ActivityThreadHacker.sApplicationCreateScene = msg.what;
+                    isCreated = true;
+                    sIsCreatedByLaunchActivity = isLaunchActivity;
+                    ...
+                    synchronized (listeners) {
+                        for (IApplicationCreateListener listener : listeners) {
+                            //回调
+                            listener.onApplicationCreateEnd();
+                        }
+                    }
+                }
+            }
+            //原有callBack的处理
+            return null != mOriginalCallback && mOriginalCallback.handleMessage(msg);
+        }
+        
+        //todo 结合源码查看
+        private boolean isLaunchActivity(Message msg) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O_MR1) {
+                if (msg.what == EXECUTE_TRANSACTION && msg.obj != null) {
+                    try {
+                        if (null == method) {
+                            Class clazz = Class.forName("android.app.servertransaction.ClientTransaction");
+                            method = clazz.getDeclaredMethod("getCallbacks");
+                            method.setAccessible(true);
+                        }
+                        List list = (List) method.invoke(msg.obj);
+                        if (!list.isEmpty()) {
+                            return list.get(0).getClass().getName().endsWith(".LaunchActivityItem");
+                        }
+                    } catch (Exception e) {
+                        MatrixLog.e(TAG, "[isLaunchActivity] %s", e);
+                    }
+                }
+                return msg.what == LAUNCH_ACTIVITY;
+            } else {
+                return msg.what == LAUNCH_ACTIVITY || msg.what == RELAUNCH_ACTIVITY;
+            }
+        }
+ }
+```
+
+activity耗时统计
+onActivityFocused是通过插庄得到的  当执行到特定方法时，调用AppMethodBeat.at(Activity activity, boolean isFocus)
+java/com/tencent/matrix/trace/core/AppMethodBeat.java
+```
+ public static void at(Activity activity, boolean isFocus) {
+        String activityName = activity.getClass().getName();
+        if (isFocus) {
+            if (sFocusActivitySet.add(activityName)) {
+                synchronized (listeners) {
+                    for (IAppMethodBeatListener listener : listeners) {
+                        listener.onActivityFocused(activity);
+                    }
+                }
+                ...
+            }
+        }...
+    }
+```
+java/com/tencent/matrix/trace/tracer/StartupTracer.java
+```
+  @Override
+    public void onActivityFocused(Activity activity) {
+        ...
+        String activityName = activity.getClass().getName();
+        // 若coldCost为初始值0，则说明这段代码从来没有运行过，那么认为是冷启动
+        if (isColdStartup()) {
+            boolean isCreatedByLaunchActivity = ActivityThreadHacker.isCreatedByLaunchActivity();
+            ...
+            String key = activityName + "@" + activity.hashCode();
+            Long createdTime = createdTimeMap.get(key);
+            if (createdTime == null) {
+                createdTime = 0L;
+            }
+            //每次onActivityCreated()会将创建时间记录到createdTimeMap
+            createdTimeMap.put(key, uptimeMillis() - createdTime);
+
+            //若firstScreenCost为初始值0，则说明这是第一个获取焦点的Activity，记录时间差为首屏启动耗时
+            if (firstScreenCost == 0) {
+                this.firstScreenCost = uptimeMillis() - ActivityThreadHacker.getEggBrokenTime();
+            }
+            if (hasShowSplashActivity) {
+               //若已经展示过了首屏Activity，则此Activity是真正的MainActivity，记录此时时间差为冷启动耗时
+                coldCost = uptimeMillis() - ActivityThreadHacker.getEggBrokenTime();
+            } else {
+                //splashActivities是用户配置的闪屏页
+                if (splashActivities.contains(activityName)) {
+                    //标记为闪屏页已经展示
+                    hasShowSplashActivity = true;
+                } else if (splashActivities.isEmpty()) { //process which is has activity but not main UI process
+                    if (isCreatedByLaunchActivity) {
+                      // 声明的首屏Activity列表为空，则整个冷启动耗时就为首屏启动耗时
+                        coldCost = firstScreenCost;
+                    } else {
+                        //启动时间不是通过activity创建记录获得 首屏时间为0，冷启动为进程创建时间
+                        firstScreenCost = 0;
+                        coldCost = ActivityThreadHacker.getApplicationCost();
+                    }
+                } else {
+                    //splashActivities 非空但不包含activityName
+                    if (isCreatedByLaunchActivity) {
+                        ...
+                        coldCost = firstScreenCost;
+                    } else {
+                        firstScreenCost = 0;
+                        coldCost = ActivityThreadHacker.getApplicationCost();
+                    }
+                }
+            }
+            if (coldCost > 0) { // 分析冷启动耗时
+                Long betweenCost = createdTimeMap.get(key);
+                if (null != betweenCost && betweenCost >= 30 * 1000) {
+                    //activity创建时间异常，不进行分享
+                    MatrixLog.e(TAG, "%s cost too much time[%s] between activity create and onActivityFocused, "
+                            + "just throw it.(createTime:%s) ", key, uptimeMillis() - createdTime, createdTime);
+                    return;
+                }
+                analyse(ActivityThreadHacker.getApplicationCost(), firstScreenCost, coldCost, false);
+            }
+
+        } else if (isWarmStartUp()) {
+        // 是否是温启动，这里isWarmStartUp标志位还依赖于监听ActivityLifecycleCallbacks
+        // 温启动时间是当前时间减去上一次launch Activity 的时间
+            isWarmStartUp = false;
+            long warmCost = uptimeMillis() - lastCreateActivity;
+            ...
+            if (warmCost > 0) {
+                analyse(0, 0, warmCost, true);
+            }
+        }
+
+    }
+    
+   @Override
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        if (activeActivityCount == 0 && coldCost > 0) {
+            //上一次launch Activity时间
+            lastCreateActivity = uptimeMillis();
+            isWarmStartUp = true; //activity为0，但是coldCost已经存在，当前为温启动
+        }
+        activeActivityCount++;
+        if (isShouldRecordCreateTime) { //记录每个activity的创建时间
+            createdTimeMap.put(activity.getClass().getName() + "@" + activity.hashCode(), uptimeMillis());
+        }
+    }  
+  
+  
+    @Override
+    public void onApplicationCreateEnd() {
+        if (!isHasActivity) {
+            long applicationCost = ActivityThreadHacker.getApplicationCost();
+            ...
+            analyse(applicationCost, 0, applicationCost, false);
+        }
+    }   
+ 
+  private void analyse(long applicationCost, long firstScreenCost, long allCost, boolean isWarmStartUp) {
+        ...
+        long[] data = new long[0];
+        if (!isWarmStartUp && allCost >= coldStartupThresholdMs) { // for cold startup  默认10S
+            data = AppMethodBeat.getInstance().copyData(ActivityThreadHacker.sApplicationCreateBeginMethodIndex);
+            ActivityThreadHacker.sApplicationCreateBeginMethodIndex.release();
+
+        } else if (isWarmStartUp && allCost >= warmStartupThresholdMs) { //温启动  默认4S
+            data = AppMethodBeat.getInstance().copyData(ActivityThreadHacker.sLastLaunchActivityMethodIndex);
+            ActivityThreadHacker.sLastLaunchActivityMethodIndex.release();
+        }
+        //子线程分析   AnalyseTask是获取栈信息，stackKey，构建issue，抛出异常
+        MatrixHandlerThread.getDefaultHandler().post(new AnalyseTask(data, applicationCost, firstScreenCost, allCost, isWarmStartUp, ActivityThreadHacker.sApplicationCreateScene));
+    }  
+    
+ private class AnalyseTask implements Runnable {
+    。。。
+ }     
+```
+Matrix方案的实用性
+Matrix的方案适用于多Activity的架构，不适用于单Activity多Fragment的架构。对于后者，在使用上还需要一定的修改来进行适配。

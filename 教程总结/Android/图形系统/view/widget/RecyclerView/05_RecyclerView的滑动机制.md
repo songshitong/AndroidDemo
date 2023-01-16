@@ -673,6 +673,7 @@ public void fling(int velocityX, int velocityY) {
 
 在ViewFlinger的fling方法里面,先是调用了OverScroller的fling来计算fling相关的参数，包括fling的距离和fling的时间。
   这里就不深入的分析计算相关的代码，因为这里面都是一些数学和物理的计算。最后就是调用了postOnAnimation方法
+//todo fling的计算
 ```
 void postOnAnimation() {
             if (mEatRunOnAnimationRequest) {

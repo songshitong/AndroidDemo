@@ -69,6 +69,12 @@ public class ParticleView extends View {
         });
     }
 
+    @Override protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        valueAnimator.cancel();
+        valueAnimator = null;
+    }
+
     private void initBall(Bitmap bitmap, int i, int j, Ball ball) {
         //设置每个小球的dr 即每个像素放大dr倍，整张图片放大dr*dr倍数
         ball.r = dr;

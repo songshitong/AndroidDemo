@@ -245,5 +245,9 @@
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:text="Motion layout"
         />
+    <Button  android:id="@+id/viewPropertyBtn"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="view property"
+        />
 </LinearLayout>
 </ScrollView>

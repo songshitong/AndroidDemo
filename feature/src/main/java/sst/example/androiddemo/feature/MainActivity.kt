@@ -1,6 +1,7 @@
 package sst.example.androiddemo.feature
 
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.app.ActivityManager
 import android.app.Application.getProcessName
 import android.content.Context
@@ -14,6 +15,7 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.provider.Settings
 import android.util.Log
+import android.view.Choreographer
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -32,6 +34,7 @@ import sst.example.androiddemo.feature.animation.KeyFrameActivity
 import sst.example.androiddemo.feature.animation.LayoutAnimationActivity
 import sst.example.androiddemo.feature.animation.MotionLayoutActivity
 import sst.example.androiddemo.feature.animation.RevealAnimatorActivity
+import sst.example.androiddemo.feature.animation.ViewPropertyAnimatorActivity
 import sst.example.androiddemo.feature.animation.activity.ActivityAnimation
 import sst.example.androiddemo.feature.animation.activity.ActivityTransition
 import sst.example.androiddemo.feature.animation.dynamicanimation.DynamicAnimaitonActivity
@@ -396,6 +399,9 @@ class  MainActivity : AppCompatActivity()  {
       }
       motionLayoutBtn.setOnClickListener {
         startActivity(Intent(this,MotionLayoutActivity::class.java))
+      }
+      viewPropertyBtn.setOnClickListener {
+        startActivity(Intent(this, ViewPropertyAnimatorActivity::class.java))
       }
 
         //测试livedata连续调用

@@ -114,6 +114,12 @@ public class BitmapActivity extends AppCompatActivity {
     drawableText.setText("bitmap2 " + bitmap2.getByteCount());
   }
 
+  public static Bitmap getThumnail(){
+    //1 Bitmap.createScaledBitmap(bmp, 50, 50, true)
+    //2 ThumbnailUtils.extractThumbnail()
+    return null;
+  }
+
   //https://blog.csdn.net/ecjtuhq/article/details/84674295
   public static Bitmap getBitmapFromAdaptiveIconDrawable(AdaptiveIconDrawable drawable) {
     Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
@@ -199,6 +205,7 @@ public class BitmapActivity extends AppCompatActivity {
     v.destroyDrawingCache();
     return b;
   }
+
 
   //滚动拼接参考 https://link.csdn.net/?target=https%3A%2F%2Fgithub.com%2FPGSSoft%2Fscrollscreenshot
   //ScrollView或者LinearLayout等ViewGroup的长截图：

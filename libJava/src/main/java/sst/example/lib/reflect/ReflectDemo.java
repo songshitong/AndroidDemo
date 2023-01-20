@@ -299,9 +299,9 @@ public class ReflectDemo {
 //         （译者注：这类的 setter 方法必须要有返回值），因此你不应该妄自假设 setter 方法的返回值，一切应该视情况而定
         Method[] methods1 = reflectTest.getMethods();
         for (Method method : methods1) {
-            if(ReflectUtil.isGetter(method)){
+            if(MReflectUtil.isGetter(method)){
                 System.out.println("getter 方法 "+method);
-            }else if (ReflectUtil.isSetter(method)){
+            }else if (MReflectUtil.isSetter(method)){
                 System.out.println("setter 方法 "+method);
             }
         }
@@ -434,13 +434,13 @@ public class ReflectDemo {
             Class aClass = classLoader.loadClass("com.jenkov.MyClass");
             System.out.println("aClass.getName() = " + aClass.getName());
         } catch (ClassNotFoundException e) {
-            System.out.println("class not found "+e.toString());
+            System.out.println("class not found "+ e);
         }
 
         ReflectDemo reflectDemo = new ReflectDemo();
-        Class<?> clazz = null;
+        Class<?> clazz;
         try {
-            clazz = Class.forName("sst.example.lib.reflect.ReflectDemo");
+            clazz = Class.forName("sst.example.lib.reflect.ReflectDemo"); //获取类的类型
             Method methodShow = clazz.getMethod("show", int.class);
             methodShow.invoke(null, 0);
         } catch (ClassNotFoundException e) {

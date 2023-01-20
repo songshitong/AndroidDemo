@@ -179,7 +179,7 @@ source build/envsetup.sh
 #清除缓存
 make clobber
 lunch aosp_x86-eng
-#并行任务数   任务数越大速度越快，需要的内存和机器配置越高
+#并行任务数   任务数越大速度越快，需要的内存和机器配置越高  不指定数字，自动选择，防止太大内存溢出
 make -j6
 #启动模拟器
 emulator

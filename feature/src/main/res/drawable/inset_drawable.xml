@@ -8,8 +8,8 @@
 
 
 </inset>
-
-        <!--android:inset="100dp" 嵌入距离-->
+<!--         控制drawable与view的距离-->
+    <!--android:inset="100dp" 嵌入距离-->
 
         <!--android:insetTop="50dp"-->
 

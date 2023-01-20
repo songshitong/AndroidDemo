@@ -2,7 +2,7 @@ package sst.example.lib.reflect;
 
 import java.lang.reflect.Method;
 
-public class ReflectUtil {
+public class MReflectUtil {
     public static boolean isGetter(Method method){
         if(!method.getName().startsWith("get"))       return false;
         if(method.getParameterTypes().length != 0)    return false;

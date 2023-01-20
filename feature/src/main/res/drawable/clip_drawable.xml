@@ -7,7 +7,8 @@
 
 </clip>
 
-        <!--clipOrientation表示裁剪的方向（水平和垂直两种），gravity比较复杂必须和clipOrientation一起才能起作用
+        <!-- level值控制裁剪的大小[0,10000]
+        clipOrientation表示裁剪的方向（水平和垂直两种），gravity比较复杂必须和clipOrientation一起才能起作用
           top	将这个对象放在容器的顶部，不改变其大小。当clipOrientation 是”vertical”，裁剪从底部开始
           bottom	将这个对象放在容器的底部，不改变其大小。当clipOrientation 是 “vertical”，裁剪从顶部（top）开始
           left	将这个对象放在容器的左部，不改变其大小。当clipOrientation 是 “horizontal”，裁剪从drawable的右边（right）开始，默认值

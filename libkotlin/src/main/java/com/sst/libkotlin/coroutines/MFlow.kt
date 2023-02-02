@@ -38,8 +38,8 @@ class MFlow {
             }
             //冷流和热流
             //默认构建的flow是冷流，如果不执行 每次collect都执行一次，类似控制水龙头的开关
-//   冷流中的代码直到流被收集的时候才会执行。
-//   热流中的代码会立即执行，不管有没有被收集
+            //   冷流中的代码直到流被收集的时候才会执行。
+            //   热流中的代码会立即执行，不管有没有被收集
             runBlocking {
                 getFlow().collect { value -> println("start collect1 $value") }
                 getFlow().collect { value -> println("start collect2 $value") }

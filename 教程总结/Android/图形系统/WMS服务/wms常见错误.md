@@ -21,3 +21,13 @@ public LayoutParams(int _type, int _flags) {
  ...
         }
 ```
+
+
+android.view.WindowManager$InvalidDisplayException: Unable to add window android.view.ViewRootImpl$W@9bf57b2 -- the specified window type -2 is not valid
+addView需要指定type
+```
+WindowManager wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
+WindowManager.LayoutParams lp = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
+ lp.type = WindowManager.LayoutParams.TYPE_APPLICATION; //部分类型需要权限申请
+wm.addView(tv,lp);
+```

@@ -3,6 +3,16 @@ build.gradle.kts
 https://developer.android.google.cn/studio/build/maven-publish-plugin
 https://docs.gradle.org/current/userguide/publishing_customization.html#sec:publishing_custom_artifacts_to_maven
 ```
+android{
+   publishing {
+        singleVariant("officialRelease") {
+            // if you don't want sources/javadoc, remove these lines
+            withSourcesJar()  //提供source文件
+            // withJavadocJar()
+        }
+    }
+}
+
 afterEvaluate {
     publishing {
         publications {

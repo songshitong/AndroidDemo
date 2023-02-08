@@ -1,7 +1,6 @@
 package sst.example.androiddemo.feature
 
 import android.Manifest
-import android.animation.ObjectAnimator
 import android.app.ActivityManager
 import android.app.Application.getProcessName
 import android.content.Context
@@ -9,14 +8,16 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ResolveInfo
+import android.graphics.Point
 import android.media.MediaPlayer
 import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.provider.Settings
+import android.util.DisplayMetrics
 import android.util.Log
-import android.view.Choreographer
 import android.view.KeyEvent
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -53,6 +54,8 @@ import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestAc
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
 import java.io.PrintWriter
 import java.io.StringWriter
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class  MainActivity : AppCompatActivity()  {
 
@@ -61,6 +64,7 @@ class  MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.d(TAG,"PhysicsScreenSize: ${getPhysicsScreenSize(applicationContext)}")
         getAndroidInfo()
         getMethodTrace()
         // ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)
@@ -414,6 +418,35 @@ class  MainActivity : AppCompatActivity()  {
 
         getProcessInfo()
     }
+
+  /**
+   * 计算方法：获取到屏幕的分辨率:point.x和point.y，再取出屏幕的DPI（每英寸的像素数量），计算长和宽有多少英寸，即：point.x / dm.xdpi，point.y / dm.ydpi，
+   * 屏幕的长和宽算出来了，再用勾股定理，计算出斜角边的长度，即屏幕尺寸。
+   *
+   * 注意： 此处displayMetrics不要使用context.getApplicationContext().getResources().getDisplayMetrics()来获取。
+  上面说到，DPI是由设备出厂时写死到设备里的，如果写入的DPI值不准确，当然计算不出准确的屏幕尺寸。所以计算出的屏幕尺寸只做参考
+   *
+   * 得到屏幕的物理尺寸，由于该尺寸是在出厂时，厂商写死的，所以仅供参考
+   * 计算方法：获取到屏幕的分辨率:point.x和point.y，再取出屏幕的DPI（每英寸的像素数量），
+   * 计算长和宽有多少英寸，即：point.x / dm.xdpi，point.y / dm.ydpi，屏幕的长和宽算出来了，
+   * 再用勾股定理，计算出斜角边的长度，即屏幕尺寸。
+   * @param context
+   * @return  例如6.67英寸
+   */
+  fun getPhysicsScreenSize(context: Context): Double {
+    val manager: WindowManager =
+      context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    val point = Point()
+    manager.getDefaultDisplay().getRealSize(point)
+    val dm: DisplayMetrics = context.resources.displayMetrics
+    val densityDpi: Int = dm.densityDpi //得到屏幕的密度值，但是该密度值只能作为参考，因为他是固定的几个密度值。
+    val x =
+      (point.x / dm.xdpi).toDouble().pow(2.0) //dm.xdpi是屏幕x方向的真实密度值，比上面的densityDpi真实。
+    val y =
+      (point.y / dm.ydpi).toDouble().pow(2.0) //dm.xdpi是屏幕y方向的真实密度值，比上面的densityDpi真实。
+    Log.d(TAG,"getPhysicsScreenSize x:$x y:$y")
+    return sqrt(x + y)
+  }
 
   private fun getAndroidInfo() {
     //android 版本 其他信息 https://blog.csdn.net/chyychfchx/article/details/59484332

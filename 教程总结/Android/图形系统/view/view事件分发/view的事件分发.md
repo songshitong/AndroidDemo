@@ -345,7 +345,27 @@ CLICKABLE和LONG_CLICKABLE代表View可以被点击和长按点击，可以通�
     }
 ```
 如果View设置了点击事件OnClickListener，那么它的onClick()方法就会被执行。
-
+performClick()事件会通知Accessibility
+如果拦截了事件并触发某个view，可以这样调用，来触发click事件
+```
+ @Override public boolean dispatchTouchEvent(MotionEvent ev) {
+    requestDisallowInterceptTouchEvent(true);
+    int[] quitLocation = new int[2];
+    quitView.getLocationInWindow(quitLocation);
+    if (MotionEvent.ACTION_DOWN == ev.getAction()) {
+      float x = ev.getX();
+      float y = ev.getY();
+      if (x >= quitLocation[0]
+          && x <= (quitLocation[0] + quitView.getWidth())
+          && y >= quitLocation[1]
+          && y <= (quitLocation[1] + quitView.getHeight())) {
+        quitView.performClick();
+      }
+    }
+    //屏蔽事件并转发给quitView
+    return true;
+  }
+```
 
 
 2.点击事件分发的传递规则

@@ -1,4 +1,4 @@
-package sst.example.lib;
+package sst.example.lib.mclass;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,6 +42,11 @@ public class MGeneric {
     }
 
     public <T> void getName1(){
+        System.out.println("11");
+    }
+
+    //声明边界
+    public <T extends Object> void getName2(){
         System.out.println("11");
     }
 
@@ -289,7 +294,7 @@ public class MGeneric {
 //        parentGeneric1: null
 //        parentGeneric2: class java.lang.String
         //ParentGeneric的字节码
-//        class sst.example.lib.MGeneric$ParentGeneric<T extends java.lang.Object> extends java.lang.Object
+//        class sst.example.lib.mclass.MGeneric$ParentGeneric<T extends java.lang.Object> extends java.lang.Object
 //        ParentGeneric 声明的泛型 T 在编译的时候其实是保留在了字节码文件中，parentGeneric1 是在运行时创建的，由于泛型擦除，
 //        我们无法通过反射获取其中的类型，因此打印了 null
 //        这个地方可能大家又会有个疑问了，你既然保留了泛型类型为 T，那么我获取的时候应该为 T 才是，为啥打印的结果是 null 呢？

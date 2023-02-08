@@ -833,4 +833,453 @@ fileResMap的kv经过反混淆之后，保存到了nonValueReferences中。value
 第一步：读取mapping文件
 com/tencent/matrix/apk/model/task/UnusedResourcesTask.java
 ```
+ @Override
+    public TaskResult call() throws TaskExecuteException {
+        try {
+            TaskResult taskResult = TaskResultFactory.factory(type, TaskResultFactory.TASK_RESULT_TYPE_JSON, config);
+            long startTime = System.currentTimeMillis();
+            readMappingTxtFile();
+            readResourceTxtFile();
+            unusedResSet.addAll(resourceDefMap.values());
+            Log.i(TAG, "find resource declarations %d items.", unusedResSet.size());
+            decodeCode();
+            Log.i(TAG, "find resource references in classes: %d items.", resourceRefSet.size());
+            decodeResources();
+            Log.i(TAG, "find resource references %d items.", resourceRefSet.size());
+            unusedResSet.removeAll(resourceRefSet);
+            Log.i(TAG, "find unused references %d items", unusedResSet.size());
+            Log.d(TAG, "find unused references %s", unusedResSet.toString());
+           ....//结果处理
+    }
+    
+
+private void readMappingTxtFile() throws IOException {
+         //matrix给出的mapping示例
+        // com.tencent.mm.R$string -> com.tencent.mm.R$l:    
+        //      int fade_in_property_anim -> aRW
+
+        if (mappingTxt != null) {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(mappingTxt));
+            String line = bufferedReader.readLine();
+            boolean readRField = false;
+            String beforeClass = "", afterClass = "";
+            try {
+                while (line != null) {
+                    if (!line.startsWith(" ")) { //读取类信息
+                        String[] pair = line.split("->");
+                        if (pair.length == 2) {
+                            beforeClass = pair[0].trim(); //混淆前的信息和混淆后的
+                            afterClass = pair[1].trim();
+                            afterClass = afterClass.substring(0, afterClass.length() - 1); //去掉最后的:
+                            if (!Util.isNullOrNil(beforeClass) && !Util.isNullOrNil(afterClass) && ApkUtil.isRClassName(ApkUtil.getPureClassName(beforeClass))) {
+                                Log.d(TAG, "before:%s,after:%s", beforeClass, afterClass);
+                                readRField = true;
+                            } else {
+                                readRField = false;
+                            }
+                        } else {
+                            readRField = false;
+                        }
+                    } else { //方法信息
+                        if (readRField) {
+                            String[] entry = line.split("->");
+                            if (entry.length == 2) {
+                                String key = entry[0].trim();
+                                String value = entry[1].trim();
+                                if (!Util.isNullOrNil(key) && !Util.isNullOrNil(value)) {
+                                    String[] field = key.split(" ");
+                                    if (field.length == 2) {
+                                        Log.d(TAG, "%s -> %s", afterClass.replace('$', '.') + "." + value, ApkUtil.getPureClassName(beforeClass).replace('$', '.') + "." + field[1]);
+                                        //存储方法信息
+                                        rclassProguardMap.put(afterClass.replace('$', '.') + "." + value, ApkUtil.getPureClassName(beforeClass).replace('$', '.') + "." + field[1]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    line = bufferedReader.readLine();
+                }
+            } finally {
+                bufferedReader.close();
+            }
+        }
+    }    
 ```
+第二步：读取R文件
+```
+ //示例：int dimen vip_text_size_small 0x7f070468
+ private void readResourceTxtFile() throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(resourceTxt));
+        String line = bufferedReader.readLine();
+        try {
+            while (line != null) {
+                String[] columns = line.split(" ");
+                if (columns.length >= 4) {
+                    //名称
+                    final String resourceName = "R." + columns[1] + "." + columns[2];
+                    if (!columns[0].endsWith("[]") && columns[3].startsWith("0x")) {
+                        //非数组资源
+                        if (columns[3].startsWith("0x01")) {//系统资源
+                            Log.d(TAG, "ignore system resource %s", resourceName);
+                        } else { //存放资源id和名字
+                            final String resId = parseResourceId(columns[3]);
+                            if (!Util.isNullOrNil(resId)) {
+                                resourceDefMap.put(resId, resourceName);
+                            }
+                        }
+                    } else {
+                       //数组资源
+                       //int[] styleable AppCompatTheme { 0x01010057, 0x010100ae, 0x7f040000, 0x7f040001, 0x7f040002, 0x7f040003, 0x7f040004, 0x7f040005, 0x7f040006, 0x7f040007, 0x7f040008, 0x7f040009, 0x7f04000a, 0x7f04000b, 0x7f04000c, 0x7f04000e, 0x7f04000f, 0x7f040010, 0x7f040011, 0x7f040012, 0x7f040013, 0x7f040014, 0x7f040015, 0x7f040016, 0x7f040017, 0x7f040018, 0x7f040019, 0x7f04001a, 0x7f04001b, 0x7f04001c, 0x7f04001d, 0x7f04001e, 0x7f04001f, 0x7f040020, 0x7f040024, 0x7f040027, 0x7f040028, 0x7f040029, 0x7f04002a, 0x7f04003a, 0x7f040066, 0x7f04007b, 0x7f04007c, 0x7f04007d, 0x7f04007e, 0x7f04007f, 0x7f040084, 0x7f040085, 0x7f040092, 0x7f04009c, 0x7f0400ce, 0x7f0400cf, 0x7f0400d0, 0x7f0400d2, 0x7f0400d3, 0x7f0400d4, 0x7f0400d5, 0x7f0400e6, 0x7f0400e8, 0x7f0400f2, 0x7f04010e, 0x7f04013a, 0x7f04013b, 0x7f04013c, 0x7f040140, 0x7f040145, 0x7f040156, 0x7f040157, 0x7f04015a, 0x7f04015b, 0x7f04015c, 0x7f0401f2, 0x7f040200, 0x7f040297, 0x7f040298, 0x7f040299, 0x7f04029a, 0x7f04029d, 0x7f04029e, 0x7f04029f, 0x7f0402a0, 0x7f0402a1, 0x7f0402a2, 0x7f0402a3, 0x7f0402a4, 0x7f0402a5, 0x7f04032f, 0x7f040330, 0x7f040331, 0x7f040347, 0x7f040349, 0x7f040354, 0x7f040356, 0x7f040357, 0x7f040358, 0x7f040385, 0x7f040386, 0x7f040387, 0x7f040388, 0x7f0403c7, 0x7f0403c8, 0x7f0403ef, 0x7f040428, 0x7f04042a, 0x7f04042b, 0x7f04042c, 0x7f04042e, 0x7f04042f, 0x7f040430, 0x7f040431, 0x7f040437, 0x7f040438, 0x7f040468, 0x7f040469, 0x7f04046b, 0x7f04046c, 0x7f040491, 0x7f04049a, 0x7f04049b, 0x7f04049c, 0x7f04049d, 0x7f04049e, 0x7f04049f, 0x7f0404a0, 0x7f0404a1, 0x7f0404a2, 0x7f0404a3 }
+                        Log.d(TAG, "ignore resource %s", resourceName);
+                        if (columns[0].endsWith("[]") && columns.length > 5) {
+                            Set<String> attrReferences = new HashSet<String>();
+                            for (int i = 4; i < columns.length; i++) {
+                                if (columns[i].endsWith(",")) {
+                                    attrReferences.add(columns[i].substring(0, columns[i].length() - 1));
+                                } else {
+                                    attrReferences.add(columns[i]);
+                                }
+                            }
+                            styleableMap.put(resourceName, attrReferences);
+                        }
+                    }
+                }
+                line = bufferedReader.readLine();
+            }
+        } finally {
+            bufferedReader.close();
+        }
+    }
+```
+第三步：初始化待移除资源池
+unusedResSet.addAll(resourceDefMap.values());
+
+第四步：找出代码中的资源引用
+```
+ private void decodeCode() throws IOException {
+        for (String dexFileName : dexFileNameList) {
+            //apktool加载dex
+            MultiDexContainer<? extends DexBackedDexFile> dexFiles = DexFileFactory.loadDexContainer(new File(inputFile, dexFileName), Opcodes.forApi(15));
+
+            for (String dexEntryName : dexFiles.getDexEntryNames()) {
+                MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry = dexFiles.getEntry(dexEntryName);
+                BaksmaliOptions options = new BaksmaliOptions();
+                List<? extends ClassDef> classDefs = Ordering.natural().sortedCopy(dexEntry.getDexFile().getClasses());
+
+                for (ClassDef classDef : classDefs) {
+                    //apktool 读取类的samli
+                    String[] lines = ApkUtil.disassembleClass(classDef, options);
+                    if (lines != null) {
+                        readSmaliLines(lines);
+                    }
+                }
+            }
+        }
+    }
+    
+
+/*
+
+        1. const
+        const v6, 0x7f0c0061
+
+        2. sget
+        sget v6, Lcom/tencent/mm/R$string;->chatting_long_click_menu_revoke_msg:I
+        sget v1, Lcom/tencent/mm/libmmui/R$id;->property_anim:I
+
+        3. sput
+        sput-object v0, Lcom/tencent/mm/plugin_welab_api/R$styleable;->ActionBar:[I   //define resource in R.java
+
+        4. array-data
+        :array_0
+        .array-data 4
+            0x7f0a0022
+            0x7f0a0023
+        .end array-data
+    */
+
+    private void readSmaliLines(String[] lines) {
+        ...
+        boolean arrayData = false;
+        for (String line : lines) {
+            line = line.trim();
+            if (!Util.isNullOrNil(line)) {
+                if (line.startsWith("const")) { 读取const
+                    String[] columns = line.split(" ");
+                    if (columns.length >= 3) { //存储资源id对应的名字
+                        final String resId = parseResourceId(columns[2].trim());
+                        if (!Util.isNullOrNil(resId) && resourceDefMap.containsKey(resId)) {
+                            resourceRefSet.add(resourceDefMap.get(resId));
+                        }
+                    }
+                } else if (line.startsWith("sget")) { //解析sget
+                    String[] columns = line.split(" ");
+                    if (columns.length >= 3) {
+                        final String resourceRef = parseResourceNameFromProguard(columns[2].trim());
+                        if (!Util.isNullOrNil(resourceRef)) {
+                            Log.d(TAG, "find resource reference %s", resourceRef);
+                            if (styleableMap.containsKey(resourceRef)) {
+                                //reference of R.styleable.XXX
+                                for (String attr : styleableMap.get(resourceRef)) {
+                                    resourceRefSet.add(resourceDefMap.get(attr));
+                                }
+                            } else {
+                                resourceRefSet.add(resourceRef);
+                            }
+                        }
+                    }
+                } else if (line.startsWith(".array-data 4")) {
+                    arrayData = true;
+                } else if (line.startsWith(".end array-data")) {
+                    arrayData = false;
+                } else  {
+                    if (arrayData) { //解析数组
+                        String[] columns = line.split(" ");
+                        if (columns.length > 0) {
+                            final String resId = parseResourceId(columns[0].trim());
+                            if (!Util.isNullOrNil(resId) && resourceDefMap.containsKey(resId)) {
+                                Log.d(TAG, "array field resource, %s", resId);
+                                resourceRefSet.add(resourceDefMap.get(resId));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+```
+
+第五步：找出资源中的引用
+```
+ private void decodeResources() throws IOException, InterruptedException, AndrolibException, XmlPullParserException {
+        File manifestFile = new File(inputFile, ApkConstants.MANIFEST_FILE_NAME);
+        //resources.arsc
+        File arscFile = new File(inputFile, ApkConstants.ARSC_FILE_NAME);
+        //res
+        File resDir = new File(inputFile, ApkConstants.RESOURCE_DIR_NAME);
+        if (!resDir.exists()) {
+            //混淆的r
+            resDir = new File(inputFile, ApkConstants.RESOURCE_DIR_PROGUARD_NAME);
+        }
+
+        Map<String, Set<String>> fileResMap = new HashMap<>();
+        Set<String> valuesReferences = new HashSet<>();
+        //读取resources.arsc
+        ApkResourceDecoder.decodeResourcesRef(manifestFile, arscFile, resDir, fileResMap, valuesReferences);
+
+        Map<String, String> resguardMap = config.getResguardMap();
+        //拿到混淆前的名字
+        for (String resource : fileResMap.keySet()) {
+            Set<String> result = new HashSet<>();
+            for (String resName : fileResMap.get(resource)) {
+               if (resguardMap.containsKey(resName)) {
+                   result.add(resguardMap.get(resName));
+               } else {
+                   result.add(resName);
+               }
+            }
+            if (resguardMap.containsKey(resource)) {
+                nonValueReferences.put(resguardMap.get(resource), result);
+            } else {
+                nonValueReferences.put(resource, result);
+            }
+        }
+
+        for (String resource : valuesReferences) {
+            if (resguardMap.containsKey(resource)) {
+                resourceRefSet.add(resguardMap.get(resource));
+            } else {
+                resourceRefSet.add(resource);
+            }
+        }
+
+        for (String resource : unusedResSet) {
+            if (ignoreResource(resource)) { //--ignoreResources添加的忽略规则
+                resourceRefSet.add(resource);
+            }
+        }
+
+        for (String resource : resourceRefSet) {
+            readChildReference(resource);
+        }
+    }
+```
+todo resources.arsc
+
+第六步：收尾并上报
+```
+unusedResSet.removeAll(resourceRefSet); //所有资源移除引用的就剩下未引用的
+Log.i(TAG, "find unused references %d items", unusedResSet.size());
+Log.d(TAG, "find unused references %s", unusedResSet.toString());
+JsonArray jsonArray = new JsonArray();
+for (String name : unusedResSet) {
+    jsonArray.add(name);
+}
+((TaskJsonResult) taskResult).add("unused-resources", jsonArray);
+taskResult.setStartTime(startTime);
+taskResult.setEndTime(System.currentTimeMillis());
+return taskResult;
+```
+html描述Find out the unused resources
+
+
+
+
+
+UnusedAssetsTask
+可以检测出apk中未使用的assets文件
+实现方法：搜索smali文件中引用字符串常量的指令，判断引用的字符串常量是否某个assets文件的名称
+这里的方法与上面一个Task非常像，反编译dex文件到smali之后，判断引用的字符串常量是否某个assets文件的名称。
+com/tencent/matrix/apk/model/task/UnusedAssetsTask.java
+```
+ @Override
+    public TaskResult call() throws TaskExecuteException {
+        try {
+            TaskResult taskResult = TaskResultFactory.factory(type, TaskResultFactory.TASK_RESULT_TYPE_JSON, config);
+            long startTime = System.currentTimeMillis();
+            File assetDir = new File(inputFile, ApkConstants.ASSETS_DIR_NAME);
+            //遍历asset目录，保存文件到assetsPathSet
+            findAssetsFile(assetDir);
+            //去掉忽略文件
+            generateAssetsSet(assetDir.getAbsolutePath());
+            Log.i(TAG, "find all assets count: %d", assetsPathSet.size());
+            decodeCode();
+            Log.i(TAG, "find reference assets count: %d", assetRefSet.size());
+            assetsPathSet.removeAll(assetRefSet); //从所有文件移除使用的
+            JsonArray jsonArray = new JsonArray();
+            for (String name : assetsPathSet) {
+                jsonArray.add(name);
+            }
+            ((TaskJsonResult) taskResult).add("unused-assets", jsonArray);
+            taskResult.setStartTime(startTime);
+            taskResult.setEndTime(System.currentTimeMillis());
+            return taskResult;
+        } catch (Exception e) {
+            throw new TaskExecuteException(e.getMessage(), e);
+        }
+    }
+    
+ 
+   private void findAssetsFile(File dir) throws IOException {
+        if (dir != null && dir.exists() && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    findAssetsFile(file);
+                } else {
+                    Log.d(TAG, "find asset file %s", file.getAbsolutePath());
+                    assetsPathSet.add(file.getAbsolutePath());
+                }
+            }
+        }
+    }
+    
+
+ private void decodeCode() throws IOException {
+        for (String dexFileName : dexFileNameList) {
+            MultiDexContainer<? extends DexBackedDexFile> dexFiles = DexFileFactory.loadDexContainer(new File(inputFile, dexFileName), Opcodes.forApi(15));
+            for (String dexEntryName : dexFiles.getDexEntryNames()) {
+                MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry = dexFiles.getEntry(dexEntryName);
+                BaksmaliOptions options = new BaksmaliOptions();
+                List<? extends ClassDef> classDefs = Ordering.natural().sortedCopy(dexEntry.getDexFile().getClasses());
+
+                for (ClassDef classDef : classDefs) {
+                    String[] lines = ApkUtil.disassembleClass(classDef, options);
+                    if (lines != null) {
+                        //读取smali的const-string，保存到assetRefSet
+                        readSmaliLines(lines);
+                    }
+                }
+            }
+
+        }
+    }  
+    
+  private void readSmaliLines(String[] lines) {
+        if (lines == null) {
+            return;
+        }
+        for (String line : lines) {
+            line = line.trim();
+            if (!Util.isNullOrNil(line) && line.startsWith("const-string")) {
+                String[] columns = line.split(",");
+                if (columns.length == 2) {
+                    String assetFileName = columns[1].trim();
+                    assetFileName = assetFileName.substring(1, assetFileName.length() - 1);
+                    if (!Util.isNullOrNil(assetFileName)) {
+                        for (String path : assetsPathSet) {
+                            if (assetFileName.endsWith(path)) {
+                                assetRefSet.add(path);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }        
+```
+html描述 Find out the unused assets
+
+
+
+
+//todo so裁剪
+UnStrippedSoCheckTask
+可以检测出apk中未经裁剪的动态库文件
+实现方法：使用nm工具读取动态库文件的符号表，若输出结果中包含no symbols字样则表示该动态库已经过裁剪
+MacOS
+MacOS自带了nm命令，可以直接使用nm
+com/tencent/matrix/apk/model/task/UnStrippedSoCheckTask.java
+```
+ @Override
+    public TaskResult call() throws TaskExecuteException {
+        try {
+            ...
+            long startTime = System.currentTimeMillis();
+            List<File> libFiles = new ArrayList<>();
+            JsonArray jsonArray = new JsonArray();
+            //找到lib目录的so文件
+            if (libDir.exists() && libDir.isDirectory()) {
+                File[] dirs = libDir.listFiles();
+                for (File dir : dirs) {
+                    if (dir.isDirectory()) {
+                        File[] libs = dir.listFiles();
+                        for (File libFile : libs) {
+                            if (libFile.isFile() && libFile.getName().endsWith(ApkConstants.DYNAMIC_LIB_FILE_SUFFIX)) {
+                                libFiles.add(libFile);
+                            }
+                        }
+                    }
+                }
+            }
+            for (File libFile : libFiles) {
+                if (!isSoStripped(libFile)) {
+                    Log.i(TAG, "lib: %s is not stripped", libFile.getName());
+                    jsonArray.add(libFile.getName());
+                }
+            }
+           ...//输出结果
+    }
+    
+ //执行 nm xx.so
+ //window 执行nm结果
+ //Android\Sdk\ndk\21.4.7075529\toolchains\x86_64-4.9\prebuilt\windows-x86_64\bin\x86_64-linux-android-nm.exe: libavcodec.so: no symbols
+ private boolean isSoStripped(File libFile) throws IOException, InterruptedException {
+        ProcessBuilder processBuilder = new ProcessBuilder(toolnmPath, libFile.getAbsolutePath());
+        Process process = processBuilder.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        String line = reader.readLine();
+        boolean result = false;
+        if (!Util.isNullOrNil(line)) {
+            Log.d(TAG, "%s", line);
+            String[] columns = line.split(":");  //匹配最后一部分为no symbols
+            if (columns.length == 3 && columns[2].trim().equalsIgnoreCase("no symbols")) {
+                result = true;
+            }
+        }
+        reader.close();
+        process.waitFor();
+        return result;
+    }
+```
+html 描述Find out the unstripped shared library files

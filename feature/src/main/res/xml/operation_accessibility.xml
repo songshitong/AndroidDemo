@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeAllMask"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagReportViewIds|flagRequestAccessibilityButton"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="100"
+    android:packageNames="com.tencent.mm"
+    />
+<!--也可以代码设置-->
+<!--    override fun onServiceConnected() {-->
+<!--      super.onServiceConnected()-->
+<!--      val serviceInfo = AccessibilityServiceInfo()-->
+<!--      //辅助服务监听的事件类型-->
+<!--      serviceInfo.eventTypes = AccessibilityEvent.TYPES_ALL_MASK//typeNotificationStateChanged|typeWindowStateChanged|typeWindowContentChanged-->
+<!--      //事件的反馈类型，例如通用反馈FEEDBACK_GENERIC、声音反馈FEEDBACK_AUDIBLE、语音反馈FEEDBACK_SPOKEN等。-->
+<!--      serviceInfo.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC//feedbackGeneric-->
+<!--      serviceInfo.packageNames = arrayOf("com.tencent.mm")//com.tencent.mm  指定辅助的app,不填监听所有-->
+<!--      //两个同样类型的监听事件发给辅助类的最小时间间隔-->
+<!--      serviceInfo.notificationTimeout = 100-->
+<!--      //指定flag，例如FLAG_REPORT_VIEW_IDS，携带view的id-->
+<!--          flagRequestAccessibilityButton,设置无障碍按钮，不用频繁打开开关-->
+<!--      serviceInfo.flags = AccessibilityServiceInfo.DEFAULT-->
+<!--      //是否可以获取窗口内容，一般设置为true-->
+<!--      serviceInfo.canRetrieveWindowContent = true-->
+<!--      setServiceInfo(serviceInfo)-->
+<!--    }-->

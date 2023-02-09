@@ -92,6 +92,97 @@ xml  enabled为false，service不启动了
    startService + BoardCast/ EventBus 等方法。
 对于既使用startService，又使用bindService的情况，结束服务时需要注意的事项：Service的终止，
   需要unbindService和stopService都调用才行；
+通过handler通信
+1.在Service中的onCreate方法中创建Service端的Handler和Messenger对象，并且在handleMessage方法中获取Activity端的Messenger
+2.在Service的onBind方法中返回Messenger的Binder对象
+3.在Activity中创建一个Handler对象，用来处理消息
+4.在Activity中创建一个ServiceConnection对象，并且在onServiceConnected方法中，获取Service端的Messenger对象
+5.在Activity创建Messenger，并封装在Message中传递给Service端
+service中
+```
+  private Messenger mServiceMessenger;
+  private Messenger mActivityMessenger;
+  
+  @Override
+    public void onCreate() {
+     handler = new Handler(handlerThread.getLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                 if(mActivityMessenger == null) {
+                        mActivityMessenger = msg.replyTo;
+                    }
+                    ...
+                    //发送结果回Activity
+                    Message message = this.obtainMessage();
+                    message.what = 0x12;
+                    message.arg1 = msg.arg1 + msg.arg2;
+                    try {
+                        mActivityMessenger.send(message);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+            }
+        };
+
+    mServiceMessenger = new Messenger(handler);
+   }
+@Override
+    public IBinder onBind(Intent intent) {
+        Log.i("TAG","onBind()");
+        return mServiceMessenger.getBinder();
+    }
+
+```
+activity
+```
+ private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            //获取Service端的Messenger
+            mServiceMessenger = new Messenger(service);
+        }
+ 
+ 
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+ 
+        }
+    };
+    
+ /**
+     * Activity端的Handler处理Service中的消息
+     */
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == 0x12){
+                Toast.makeText(ScrollingActivity.this, "Service信息"+ msg.arg1,Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+
+ @Override
+    protected void onCreate(Bundle savedInstanceState) {
+     //绑定Service
+        Intent intent = new Intent(this, MessengerService.class);
+        bindService(intent, connection, Service.BIND_AUTO_CREATE);
+        
+    mActivityMessenger = new Messenger(handler);
+     //创建消息
+    Message message = Message.obtain();
+    message.what = 0x11;
+    message.arg1 = 2016;
+    message.arg2 = 1;
+
+    //设定消息要回应的Messenger
+    message.replyTo = mActivityMessenger;
+
+    //通过ServiceMessenger将消息发送到Service中的Handler
+     mServiceMessenger.send(message);
+
+ }
+```
 
 前台服务从android8.0开始支持
 前台服务与后台服务

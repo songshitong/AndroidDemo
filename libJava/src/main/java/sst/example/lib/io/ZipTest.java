@@ -8,7 +8,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ZipTest {
-  //https://www.cnblogs.com/0616--ataozhijia/p/5022028.html
+  //https://www.cnblogs.com/0616--ataozhijia/p/5022028.html todo
   public static void main(String[] args) {
     String helloPath = "D:\\workspace\\ForTest\\";
     zipSingleFile(helloPath+"hello.txt",helloPath);

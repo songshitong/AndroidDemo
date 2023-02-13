@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-    Log.d(TAG, "PhysicsScreenSize: ${getPhysicsScreenSize(applicationContext)}")
+      Log.d(TAG, "PhysicsScreenSize: ${getPhysicsScreenSize(applicationContext)}")
     getAndroidInfo()
     getMethodTrace()
     // ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)

@@ -143,7 +143,8 @@ external/sqlite	轻量型关系数据库SQLite的C++实现
 
 jdk在AOSP中的定义
 android6.0路径libcore/libart/src/main/java/java/lang/Thread.java
-Google后来迁移到了OpenJDK   ojluni是OpenJDK,java.lang/java.util/java.net/java.io OpenJDK核心库的意思
+Android 7.0 之前，Java 核心库源码在libcore/luni/
+Android 7.0 中 Google后来迁移到了OpenJDK   ojluni是OpenJDK,java.lang,java.util,java.net,java.io OpenJDK核心库的意思
 /libcore/ojluni/src/main/java/java/lang/Thread.java
 https://www.zhihu.com/question/39010777
 

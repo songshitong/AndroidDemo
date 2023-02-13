@@ -9,6 +9,9 @@ https://github.com/HuTianQi/SmartOpenCV
 
 
 
+https://www.bilibili.com/video/BV1JX4y1u7kV/?vd_source=16dbd3bff220c5634a2dd63f05cc4ea1 入门教程
+
+
 
 
 

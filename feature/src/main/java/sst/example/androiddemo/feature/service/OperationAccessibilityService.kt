@@ -5,6 +5,7 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.accessibilityservice.GestureDescription
 import android.accessibilityservice.GestureDescription.StrokeDescription
+import android.app.Instrumentation
 import android.graphics.Path
 import android.graphics.Rect
 import android.os.Build.VERSION_CODES
@@ -93,6 +94,22 @@ class OperationAccessibilityService : AccessibilityService() {
     }
   }
 
+  //方向轮盘
+  //布局： 一个是外面的圆盘，一个就随手指移动的滑块
+  //交互规则：
+  // 1 滑块不能到圆盘外面，手指移动滑块，人物按照一定速度移动
+  // 2 滑块与圆心的角度，是人物移动的方向
+  // 3 手指松开，滑块回到圆心  手指不松开，滑块一直在手指的位置
+  // 4 直接点园的某一部分，滑块会移动吗？？
+
+  //根据文字找到node
+  fun findNodeByText(text: String, rootNode: AccessibilityNodeInfo): List<AccessibilityNodeInfo>{
+   return rootNode.findAccessibilityNodeInfosByText(text)
+  }
+  fun findNodeById(viewId: String, rootNode: AccessibilityNodeInfo): List<AccessibilityNodeInfo>{
+    return rootNode.findAccessibilityNodeInfosByViewId(viewId)
+  }
+
   fun findNode(name: String, rootNode: AccessibilityNodeInfo): AccessibilityNodeInfo? {
     // Log.d("findNode", "name $name  text:${rootNode.text}")
     var result:AccessibilityNodeInfo?=null
@@ -129,6 +146,7 @@ class OperationAccessibilityService : AccessibilityService() {
   @RequiresApi(VERSION_CODES.N) fun click(x: Float, y: Float) {
     val path = Path()
     path.moveTo(x, y)
+    //startTime多久后开始点击
     val stroke = StrokeDescription(path, 0, 100L)
     val builder = GestureDescription.Builder()
     builder.addStroke(stroke)

@@ -4,22 +4,21 @@ import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.app.ActivityManager
 import android.app.Application.getProcessName
+import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ResolveInfo
 import android.graphics.Point
-import android.media.ImageReader
 import android.media.MediaPlayer
-import android.media.MediaRecorder
-import android.media.projection.MediaProjection
 import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.provider.Settings
+import android.provider.Settings.Secure
 import android.text.TextUtils
-import android.util.CloseGuard
+import android.text.TextUtils.SimpleStringSplitter
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
@@ -60,9 +59,6 @@ import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.LinearLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
-import java.io.FileInputStream
-import java.io.InputStream
-import java.io.ObjectOutputStream
 import java.io.PrintWriter
 import java.io.StringWriter
 import kotlin.math.pow
@@ -479,6 +475,8 @@ class MainActivity : AppCompatActivity() {
       open()
     }
   }
+
+
 
   fun open(){
     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))

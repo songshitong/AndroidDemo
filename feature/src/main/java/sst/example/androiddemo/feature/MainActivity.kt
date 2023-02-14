@@ -460,6 +460,9 @@ class MainActivity : AppCompatActivity() {
     recorderBtn.setOnClickListener {
       startActivity(Intent(this, RecorderActivity::class.java))
     }
+    blackWhitePictureBtn.setOnClickListener {
+      startActivity(Intent(this, BlackWhitePictureActivity::class.java))
+    }
 
     //测试livedata连续调用
     val ld = MutableLiveData<String>()

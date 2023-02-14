@@ -1,4 +1,28 @@
 
+
+dialogFragment会监听声明周期，后台时隐藏dialog，切换到前台时显示dialog
+```
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mDialog != null) {
+            mViewDestroyed = false;
+            mDialog.show();
+        }
+    }
+  
+      @Override
+    public void onStop() {
+        super.onStop();
+        if (mDialog != null) {
+            mDialog.hide();
+        }
+    }  
+```
+如果控制DialogFragment，隐藏建议使用dismiss而不是getDialog().hide，后者后台切换到前台会重新显示
+
+
+
 https://www.jianshu.com/p/50ae2531c9cc
 fragment-1.1.0-sources.jar!\androidx\fragment\app\DialogFragment.java
 

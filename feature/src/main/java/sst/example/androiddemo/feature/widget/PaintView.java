@@ -265,7 +265,9 @@ public class PaintView extends View {
 
 //        Xfermode 指的是你要绘制的内容和 Canvas 的目标位置的内容应该怎样结合计算出最终的颜色。
 //        但通俗地说，其实就是要你以绘制的内容作为源图像，以 View 中已有的内容作为目标图像，选取一个  PorterDuff.Mode 作为绘制内容的颜色处理方案
-//        要想使用 setXfermode() 正常绘制，必须使用离屏缓存 (Off-screen Buffer)(savelayer和restorecount) 把内容绘制在额外的层上，再把绘制好的内容贴回 View 中
+//        要想使用 setXfermode() 正常绘制，必须使用离屏缓存 (Off-screen Buffer)(savelayer和restorecount) 把内容绘制在额外的层上，
+        //        再把绘制好的内容贴回 View 中
+         //saveLayer生成新的bitmap图层，后续的绘制内容在这上面  调用restoreToCount后会将离屏内容绘制到以前的内容上
         int saved = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);
 //        PorterDuff.Mode.SRC 只保留src
 //          PorterDuff.Mode.DST 只保留DST

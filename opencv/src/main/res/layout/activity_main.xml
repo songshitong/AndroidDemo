@@ -26,6 +26,11 @@
           android:text="模板匹配"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"/>
+      <Button
+          android:id="@+id/imgFilterBtn"
+          android:text="图像滤镜"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"/>
 
    </androidx.appcompat.widget.LinearLayoutCompat>
 

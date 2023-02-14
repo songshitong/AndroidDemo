@@ -20,24 +20,29 @@
       android:supportsRtl="true"
       android:theme="@style/AppTheme.NoActionBar"
       tools:replace="android:allowBackup">
+    <activity
+        android:name=".graphics.BlackWhitePictureActivity"
+        android:exported="false" />
+
     <service
         android:name=".service.OperationAccessibilityService"
         android:enabled="true"
         android:exported="true"
         android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
       <intent-filter>
-        <action android:name="android.accessibilityservice.AccessibilityService"/>
+        <action android:name="android.accessibilityservice.AccessibilityService" />
       </intent-filter>
+
       <meta-data
           android:name="android.accessibilityservice"
-          android:resource="@xml/operation_accessibility"/>
+          android:resource="@xml/operation_accessibility" />
     </service>
     <service
         android:name=".video.recorder.RecorderService"
         android:enabled="true"
         android:exported="false"
-        android:foregroundServiceType="mediaProjection"
-        />
+        android:foregroundServiceType="mediaProjection" />
+
     <activity
         android:name=".video.recorder.RecorderActivity"
         android:exported="false" />

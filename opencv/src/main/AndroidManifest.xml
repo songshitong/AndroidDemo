@@ -8,6 +8,9 @@
       android:supportsRtl="true"
       android:theme="@style/Theme.AndroidDemo">
     <activity
+        android:name=".PictureFilterActivity"
+        android:exported="false" />
+    <activity
         android:name=".ImgSplitActivity"
         android:exported="false" />
     <activity

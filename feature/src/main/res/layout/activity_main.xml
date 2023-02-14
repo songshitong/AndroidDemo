@@ -108,6 +108,12 @@
             android:layout_height="wrap_content"
     />
     <TextView
+        android:text="黑白画"
+        android:id="@+id/blackWhitePictureBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <TextView
             android:text="QQDragBubbleActivity"
             android:id="@+id/qqDragBubbleActivity"
             android:layout_width="wrap_content"

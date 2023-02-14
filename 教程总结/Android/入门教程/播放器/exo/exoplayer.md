@@ -32,3 +32,50 @@ stop方法 版本com.google.android.exoplayer:exoplayer:2.18.0
 seekto方法
 拖动进度条seekto自动播放，pasue不好使
 解决 拖动进度条播放状态seekto，停止状态记录进度，播放按钮时再seekto
+
+
+
+exoplayer常用监听
+```
+ interface EventListener {
+
+    //播放总时间线改变，这里可用于设置播放总时长
+    default void onTimelineChanged(Timeline timeline, @TimelineChangeReason int reason) { 
+    }
+
+    //播放资源有改变
+    default void onStaticMetadataChanged(List<Metadata> metadataList) {}
+
+    
+    //是否在加载
+    default void onIsLoadingChanged(boolean isLoading) {
+      onLoadingChanged(isLoading);
+    }
+ 
+    //播放器播放状态改变，查看 State 有IDLE，BUFFERING加载中， READY 资源准备好， ENDED 已结束 
+    default void onPlaybackStateChanged(@State int state) {}
+
+   //视频资源准备好就播放的设置改变    
+    default void onPlayWhenReadyChanged(
+        boolean playWhenReady, @PlayWhenReadyChangeReason int reason) {}
+ 
+    //播放状态改变，开始播放或暂停
+    default void onIsPlayingChanged(boolean isPlaying) {}
+
+    //重复播放的模式改变 
+    default void onRepeatModeChanged(@RepeatMode int repeatMode) {}
+ 
+    default void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {}
+
+    //播放器报错
+    default void onPlayerError(ExoPlaybackException error) {}
+ 
+
+ 	//参数改变    
+    default void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {}
+ 
+     
+    default void onEvents(Player player, Events events) {}
+  }
+
+```

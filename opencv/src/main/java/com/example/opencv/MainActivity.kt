@@ -38,6 +38,9 @@ class MainActivity : AppCompatActivity() {
     findViewById<View>(R.id.ContoursBtn).setOnClickListener {
       startActivity(Intent(this,ContoursActivity::class.java))
     }
+    findViewById<View>(R.id.imgFilterBtn).setOnClickListener {
+      startActivity(Intent(this,PictureFilterActivity::class.java))
+    }
 
 
   }

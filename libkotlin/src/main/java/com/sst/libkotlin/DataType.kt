@@ -63,6 +63,8 @@ class DataType {
             //编译为  Integer[] var10000 = new Integer[]{1, 2, 3};
             //2 使用工厂函数创建
             val b = Array(3,{i->(i*2)})
+            //4个null的byte数组
+            val cArray = arrayOfNulls<Byte>(4)
 
             //工厂函数public inline constructor(size: Int, init: (Int) -> T)
             //参数1 = 数组长度，花括号内是一个初始化值的代码块，给出数组下标 & 初始化值

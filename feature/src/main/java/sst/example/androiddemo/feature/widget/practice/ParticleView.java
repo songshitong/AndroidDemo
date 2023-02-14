@@ -1,14 +1,23 @@
 package sst.example.androiddemo.feature.widget.practice;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.Choreographer;
+import android.view.Display;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.graphics.BitmapActivity;
@@ -16,15 +25,20 @@ import sst.example.androiddemo.feature.graphics.BitmapActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-//自定义粒子效果
-public class ParticleView extends View {
+//自定义粒子爆炸效果
+public class ParticleView extends SurfaceView implements SurfaceHolder.Callback,Runnable{
     //粒子集合
     List<Ball> balls = new ArrayList<>();
     //默认小球半径 default r
     static final int dr = 5;
     Paint mPaint = new Paint();
-    ValueAnimator valueAnimator;
     boolean isShowBitmap = true;
+
+    //false 动画是否在执行
+    boolean isRunning;
+    Thread thread;
+    SurfaceHolder surfaceHolder;
+    float freshRate = 60;
     Bitmap  bitmap;
      public ParticleView(Context context) {
         this(context, null);
@@ -40,6 +54,12 @@ public class ParticleView extends View {
     }
 
     private void init() {
+        freshRate = ((WindowManager) getContext()
+            .getSystemService(Context.WINDOW_SERVICE))
+            .getDefaultDisplay()
+            .getRefreshRate();
+        surfaceHolder = getHolder();
+        surfaceHolder.addCallback(this);
         mPaint.setAntiAlias(true);
         bitmap = BitmapActivity.getBitmap(getContext(), R.drawable.ic_launcher);
         int width = bitmap.getWidth();
@@ -52,27 +72,14 @@ public class ParticleView extends View {
             }
         }
 
-        valueAnimator = ValueAnimator.ofFloat(0,1);
-        valueAnimator.setDuration(2);
-        //重复运行
-        valueAnimator.setRepeatCount(-1);
-        valueAnimator.setInterpolator(new LinearInterpolator());
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                //当前进度
-                float current = animation.getAnimatedFraction();
-
-                updateBall();
-                invalidate();
-            }
-        });
     }
 
     @Override protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        valueAnimator.cancel();
-        valueAnimator = null;
+        isRunning = false;
+        if(null != thread){
+            thread.interrupt();
+        }
     }
 
     private void initBall(Bitmap bitmap, int i, int j, Ball ball) {
@@ -80,7 +87,7 @@ public class ParticleView extends View {
         ball.r = dr;
         ball.x = i*dr+dr;
         ball.y = j*dr+dr;
-        //获取像素的argb
+        //获取像素的argb  会多次调用jni
         ball.color = bitmap.getPixel(i,j);
         //初始化速度(-20,20)
         ball.vx = (float)(Math.pow(-1,Math.ceil(Math.random()*1000))*20*Math.random());
@@ -118,7 +125,6 @@ public class ParticleView extends View {
         if(MotionEvent.ACTION_DOWN == event.getAction()){
             //截断点击
             isShowBitmap = false;
-            valueAnimator.start();
             return  true;
         }
         return super.onTouchEvent(event);
@@ -127,17 +133,69 @@ public class ParticleView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.translate(300,300);
-        if(!isShowBitmap){
-            //用小球组合成图片     每个像素的颜色值拼接起来就是图片   图片就是不同颜色的像素值
-            for (Ball ball : balls) {
-                mPaint.setColor(ball.color);
-                canvas.drawCircle(ball.x,ball.y,ball.r,mPaint);
+
+
+    }
+
+    @Override public void surfaceCreated(@NonNull SurfaceHolder holder) {
+        isRunning = true;
+        (thread = new Thread(this)).start();
+    }
+
+    @Override
+    public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
+        surfaceHolder = holder;
+    }
+
+    @Override public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
+        //资源回收
+        surfaceHolder=null;
+        isRunning = false;
+    }
+
+    @Override public void run() {
+
+        try {
+            while(isRunning){
+                drawView();
+                try {
+                    Thread.sleep((long) (1000/freshRate));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }else {
-            canvas.drawBitmap(bitmap,0,0,mPaint);
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
+    }
+
+    private void drawView() {
+         Canvas mCanvas = null;
+        try {
+            if(surfaceHolder != null){
+                mCanvas = surfaceHolder.lockCanvas();
+                mCanvas.drawColor(Color.WHITE);
+                mCanvas.translate(300,300);
+                if(!isShowBitmap){
+                    updateBall();//子线程更新数据
+                    //用小球组合成图片     每个像素的颜色值拼接起来就是图片   图片就是不同颜色的像素值
+                    for (Ball ball : balls) {
+                        mPaint.setColor(ball.color);
+                        mCanvas.drawCircle(ball.x,ball.y,ball.r,mPaint);
+                    }
+                }else {
+                    mCanvas.drawBitmap(bitmap,0,0,mPaint);
+                }
+                mCanvas.restore();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(null != mCanvas && null!=surfaceHolder){
+                surfaceHolder.unlockCanvasAndPost(mCanvas); //提交更新
+            }
+        }
     }
 
     //定义小粒子的对象

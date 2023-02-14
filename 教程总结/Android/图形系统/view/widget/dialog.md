@@ -222,6 +222,15 @@ show
       }          
 ```
 
+hide方法  将decor设置为隐藏
+```
+   public void hide() {
+        if (mDecor != null) {
+            mDecor.setVisibility(View.GONE);
+        }
+    }
+```
+
 dismiss方法
 ```
  public void dismiss() {

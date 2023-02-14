@@ -427,10 +427,10 @@ private void dispatchEnd() {
         ...
         if (config.isFPSEnable() && !useFrameMetrics) {
             long startNs = token;
-            long intendedFrameTimeNs = startNs;
+            long intendedFrameTimeNs = startNs; //开始时间
             if (isVsyncFrame) {
                 doFrameEnd(token);
-                //获取FrameDisplayEventReceiver的mTimestampNanos vsync执行的时间
+                //获取FrameDisplayEventReceiver的mTimestampNanos vsync的当前时间
                 intendedFrameTimeNs = getIntendedFrameTimeNs(startNs);
                 ...
                 //每帧回调
@@ -643,7 +643,7 @@ public class FrameTracer extends Tracer implements Application.ActivityLifecycle
                                 final long intendedFrameTimeNs, final long inputCostNs, final long animationCostNs, final long traversalCostNs) {
         long traceBegin = System.currentTimeMillis();
         try {
-            final long jitter = endNs - intendedFrameTimeNs; //抖动=结束时间-vsync结束的时间
+            final long jitter = endNs - intendedFrameTimeNs; //抖动=结束时间-vsync开始时间
             final int dropFrame = (int) (jitter / frameIntervalNs);
             if (dropFrameListener != null) {
                 if (dropFrame > dropFrameListenerThreshold) {

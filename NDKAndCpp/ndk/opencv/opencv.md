@@ -1,10 +1,34 @@
 https://juejin.cn/post/7082320749977042980
 
+jpeg算法
+https://www.thecodeway.com/?p=69
 
-https://github.com/nihui/opencv-mobile  提供了opencv的裁剪包以及编译过程
+https://github.com/nihui/opencv-mobile  提供了opencv的裁剪包(哪些裁剪了)以及编译过程
+不提供JavaAPI，包含模块
+opencv_core	Mat, matrix operations, etc
+opencv_imgproc	resize, cvtColor, warpAffine, etc
+opencv_highgui	imread, imwrite
+opencv_features2d	keypoint feature and matcher, etc (not included in opencv 2.x package)
+opencv_photo	inpaint, etc
+opencv_video	opticalflow, etc
 
 
-https://github.com/HuTianQi/SmartOpenCV
+https://github.com/HuTianQi/SmartOpenCV  摄像头相关
+
+
+官方
+https://opencv.org/releases/
+https://github.com/opencv/opencv/tree/master
+https://learnopencv.com/getting-started-with-opencv/
+
+中文文档
+https://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/tutorials.html
+
+
+文字识别  opencv处理图片，tesseract识别文字 
+https://github.com/adaptech-cz/Tesseract4Android
+
+
 
 
 

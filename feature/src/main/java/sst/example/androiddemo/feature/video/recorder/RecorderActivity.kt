@@ -16,8 +16,17 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.os.Messenger
+import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import org.opencv.android.OpenCVLoader
+import org.opencv.android.Utils
+import org.opencv.core.Core
+import org.opencv.core.Mat
+import org.opencv.core.MatOfPoint
+import org.opencv.core.Point
+import org.opencv.core.Scalar
+import org.opencv.imgproc.Imgproc
 import sst.example.androiddemo.feature.R
 
 //录屏思路
@@ -38,6 +47,7 @@ class RecorderActivity : AppCompatActivity() {
   var serviceMessenger: Messenger?=null
   var activityMessenger: Messenger?=null
   private var connection: ServiceConnection? =null
+  private val tag = "RecorderActivity"
   private val mainHandler = object :Handler(Looper.getMainLooper()){
     override fun dispatchMessage(msg: Message) {
       super.dispatchMessage(msg)
@@ -52,6 +62,7 @@ class RecorderActivity : AppCompatActivity() {
     imageView = findViewById(R.id.recorder_show)
     activityMessenger = Messenger(mainHandler)
     startActivityForResult(Intent(createProjectionIntent()), mRequestCode)
+    OpenCVLoader.initDebug()
   }
 
   private fun createProjectionIntent(): Intent {
@@ -87,14 +98,55 @@ class RecorderActivity : AppCompatActivity() {
 
 
   private fun save(data: Bitmap) {
-    if(null == bitmap){
+    // if(null == bitmap){
       val pain = Paint()
       pain.color = Color.RED
       bitmap = data
       val canvas = Canvas(data)
       canvas.drawCircle(0f,0f,50f,pain)
       imageView.setImageBitmap(data)
-    }
+
+    // }
+
+    // val loadMat = Mat()
+    // Utils.bitmapToMat(bitmap,loadMat)
+    //
+    // val inMat = Mat()
+    // val thresMat = Mat()
+    // Imgproc.cvtColor( loadMat,inMat, Imgproc.COLOR_RGBA2GRAY)
+    // Imgproc.threshold(inMat,thresMat, 0.0, 255.0, Imgproc.THRESH_BINARY_INV+ Imgproc.THRESH_OTSU)
+    // val contours = mutableListOf<MatOfPoint>()
+    // val outMat = Mat()
+    // //轮廓查找
+    // Imgproc.findContours(thresMat,
+    //   contours,
+    //   outMat,
+    //   Imgproc.RETR_TREE,
+    //   Imgproc.CHAIN_APPROX_SIMPLE)
+    // Log.d(tag,"轮廓数量：${contours.size}")
+
+    findBitmap(data)
+  }
+
+  fun findBitmap(allBitmap:Bitmap):Bitmap{
+    val imgMat = Mat()
+    Utils.bitmapToMat(allBitmap,imgMat)
+    val templMat = Utils.loadResource(this,R.drawable.skill_mingwang)
+    val templGray = Mat()
+    val grayMat = Mat()
+    Imgproc.cvtColor(imgMat,grayMat,Imgproc.COLOR_RGB2GRAY)
+    Imgproc.cvtColor(templMat,templGray,Imgproc.COLOR_RGB2GRAY)
+    val resultMat = Mat()
+    Imgproc.matchTemplate(grayMat,templGray,resultMat,Imgproc.TM_SQDIFF_NORMED)
+    val mmr = Core.minMaxLoc(resultMat)
+    val point = mmr.minLoc
+    Log.d(tag,"point is $point")
+    Imgproc.rectangle(
+      imgMat, point, Point(point.x + templMat.cols(), point.y + templMat.rows()),
+      Scalar(255.0,0.0,0.0,255.0), 5)
+    val bitmap = Bitmap.createBitmap(imgMat.width(),imgMat.height(),Bitmap.Config.ARGB_8888)
+    Utils.matToBitmap(imgMat,bitmap)
+    return bitmap
   }
 
 

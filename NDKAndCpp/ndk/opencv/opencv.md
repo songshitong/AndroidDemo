@@ -14,7 +14,7 @@ opencv_video	opticalflow, etc
 
 
 https://github.com/HuTianQi/SmartOpenCV  摄像头相关
-
+https://github.com/QuickBirdEng/opencv-android  android gradle集成opencv
 
 官方
 https://opencv.org/releases/
@@ -30,13 +30,7 @@ https://github.com/adaptech-cz/Tesseract4Android
 
 
 
-
-
-
 https://www.bilibili.com/video/BV1JX4y1u7kV/?vd_source=16dbd3bff220c5634a2dd63f05cc4ea1 入门教程
-
-
-
 
 
 

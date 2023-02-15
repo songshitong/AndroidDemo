@@ -38,7 +38,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.function.Consumer;
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.widget.MatrixView;
 
@@ -112,6 +116,33 @@ public class BitmapActivity extends AppCompatActivity {
     }
     TextView drawableText = findViewById(R.id.textDrawableSize);
     drawableText.setText("bitmap2 " + bitmap2.getByteCount());
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.N)
+  public static void getBitmapFromUrl(String path, Consumer<Bitmap> callBack) {
+    new Thread(()->{
+      Bitmap bitmap=null;
+      if(null != path && ! path.isEmpty()){
+        try {
+          URL url = new URL(path);
+          HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+          conn.setConnectTimeout(5000);
+          conn.setRequestMethod("GET");
+          if(conn.getResponseCode() == 200){
+            InputStream inputStream = conn.getInputStream();
+            bitmap = BitmapFactory.decodeStream(inputStream);
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        Log.d("FileUtil","getBitmap url is "+path);
+      }else{
+        Log.d("FileUtil","getBitmap url is null");
+      }
+      Log.d("FileUtil","getBitmap bitmap is:"+(null==bitmap?"bitmap is null":"bitmap get success"));
+      callBack.accept(bitmap);
+    }).start();
+
   }
 
   public static Bitmap getThumnail(){

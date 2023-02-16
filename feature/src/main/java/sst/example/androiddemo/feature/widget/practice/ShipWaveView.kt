@@ -18,6 +18,7 @@ import android.widget.FrameLayout
 import sst.example.androiddemo.feature.R
 
 //小船随波浪流动
+//https://blog.csdn.net/jiaruihua_blog/article/details/50013665
 class ShipWaveLayout : FrameLayout {
   //几条波浪线
   val waveCount = 3

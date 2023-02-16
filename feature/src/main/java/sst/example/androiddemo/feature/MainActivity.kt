@@ -463,6 +463,9 @@ class MainActivity : AppCompatActivity() {
     blackWhitePictureBtn.setOnClickListener {
       startActivity(Intent(this, BlackWhitePictureActivity::class.java))
     }
+    shipWaveBtn.setOnClickListener {
+      startActivity(Intent(this, ShipWaveActivity::class.java))
+    }
 
     //测试livedata连续调用
     val ld = MutableLiveData<String>()

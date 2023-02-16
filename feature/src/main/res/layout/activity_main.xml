@@ -136,6 +136,10 @@
                android:layout_width="wrap_content" android:layout_height="wrap_content"
                android:text="生长树"
     />
+    <Button  android:id="@+id/shipWaveBtn"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="波浪船"
+        />
     <Button  android:id="@+id/xmlParserBtn"
              android:layout_width="wrap_content" android:layout_height="wrap_content"
              android:text="xml parse"

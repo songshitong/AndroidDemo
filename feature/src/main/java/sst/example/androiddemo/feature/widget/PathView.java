@@ -67,8 +67,8 @@ public class PathView extends View {
         pathA.lineTo(200, 200); //lineTo(x, y) 的参数是绝对坐标
 //        rLineTo(x, y) 的参数是相对当前位置的相对坐标 （前缀 r 指的就是  relatively 「相对地」)。
 //        当前位置：所谓当前位置，即最后一次调用画 Path 的方法的终点位置。初始值为原点 (0, 0)。
-        pathA.rLineTo(50,20);
-//        画二次贝塞尔曲线   二次贝塞尔曲线的起点就是当前位置，上一次绘制的终点
+        pathA.rLineTo(50,20);  //起点
+//        画二次贝塞尔曲线   二次贝塞尔曲线的起点就是当前位置，上一次绘制的终点   两个点分别是控制点和结束点
         pathA.quadTo(300,300,300,350);
         pathA.rQuadTo(50,50,50,100);//相对上一次坐标坐标
 //       画三次贝塞尔曲线
@@ -204,6 +204,8 @@ public class PathView extends View {
         float[] pos = new float[5];
         float[] tan = new float[5];
         pm.getPosTan(5,pos,tan);
+        //tan转为角度
+        Math.toDegrees(tan[0]);
 
 //        如果Path由多条曲线组成且彼此不连接，则getLength getSegment getMatrix getPosTan方法都是针对当前正在操作的，
 //        比如：如果Path由多条曲线组成且彼此不连接，getLength()返回的只是当前操作的曲线的长度，并不是所有曲线的长度，那么怎么跳转到下一条曲线上呢？

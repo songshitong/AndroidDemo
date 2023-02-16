@@ -21,6 +21,9 @@
       android:theme="@style/AppTheme.NoActionBar"
       tools:replace="android:allowBackup">
     <activity
+        android:name=".graphics.ShipWaveActivity"
+        android:exported="false" />
+    <activity
         android:name=".graphics.BlackWhitePictureActivity"
         android:exported="false" />
 

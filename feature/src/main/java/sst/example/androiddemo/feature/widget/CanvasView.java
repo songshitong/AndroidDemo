@@ -119,7 +119,8 @@ public class CanvasView extends View {
         canvas.translate(100,100);
         //旋转
         canvas.rotate(90);
-        // 改变旋转点
+        // 改变旋转点  围绕某个点旋转  中心，支点
+        //围绕某个点旋转，也可以平移过去，绕着0,0旋转，也可以使用矩阵
         canvas.rotate(90,10,10);
         //// 参数 sx = tan a ，sx>0时表示向X正方向倾斜（即向左）
         //// 参数 sy = tan b ，sy>0时表示向Y正方向倾斜（即向下）

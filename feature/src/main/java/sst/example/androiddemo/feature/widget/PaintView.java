@@ -290,7 +290,7 @@ public class PaintView extends View {
         canvas.drawBitmap(bitmapB, 0, 0, mPaint); // 画方
         mPaint.setXfermode(xfermode); // 设置 Xfermode
         canvas.drawBitmap(bitmapC, 0, 0, mPaint); // 画圆
-        mPaint.setXfermode(null); // 用完及时清除 Xfermode
+        mPaint.setXfermode(null); // 用完及时清除 Xfermode  否则影响其他paint的使用
         canvas.restoreToCount(saved);
 
 

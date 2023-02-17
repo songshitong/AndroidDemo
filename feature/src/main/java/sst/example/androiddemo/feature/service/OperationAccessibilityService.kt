@@ -16,6 +16,11 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.Observer
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import sst.example.androiddemo.feature.common.LiveEventBus
 
 //https://developer.android.com/guide/topics/ui/accessibility/service?hl=zh-cn
 class OperationAccessibilityService : AccessibilityService() {
@@ -29,7 +34,19 @@ class OperationAccessibilityService : AccessibilityService() {
     }
   }
 
-  @RequiresApi(VERSION_CODES.O)
+  init {
+    EventBus.getDefault().register(this)
+  }
+
+  @RequiresApi(VERSION_CODES.N)
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun onMessageEvent( event:String)
+  {
+    Log.d("receiveEvent","event $event")
+    swipe(600f,1500f,200f,1500f)
+  }
+
+    @RequiresApi(VERSION_CODES.O)
   override fun onServiceConnected() {
     super.onServiceConnected()
     mAccessibilityButtonController = accessibilityButtonController
@@ -157,10 +174,21 @@ class OperationAccessibilityService : AccessibilityService() {
     val path = Path()
     path.moveTo(startX, startY)
     path.lineTo(endX, endY)
-    val stroke = StrokeDescription(path, 0, 1000L)
+    val stroke = StrokeDescription(path, 20, 200)
     val builder = GestureDescription.Builder()
     builder.addStroke(stroke)
-    dispatchGesture(builder.build(), null, null)
+    dispatchGesture(builder.build(), object :GestureResultCallback(){
+      override fun onCancelled(gestureDescription: GestureDescription?) {
+        super.onCancelled(gestureDescription)
+        Log.d("swipe","send swipe Cancelled")
+      }
+
+      override fun onCompleted(gestureDescription: GestureDescription?) {
+        super.onCompleted(gestureDescription)
+        Log.d("swipe","send swipe onCompleted")
+      }
+
+                                                                    } , null)
   }
 
   override fun onInterrupt() {

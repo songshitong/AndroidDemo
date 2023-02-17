@@ -54,6 +54,7 @@ import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.video.recorder.RecorderActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
+import sst.example.androiddemo.feature.widget.SystemView
 import sst.example.androiddemo.feature.widget.ViewOutlineProviderActivity
 import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.LinearLayoutActivity
@@ -480,6 +481,7 @@ class MainActivity : AppCompatActivity() {
     if (!isAccessibilityServiceOn()) {
       open()
     }
+    SystemView.init(this,windowManager)
   }
 
 

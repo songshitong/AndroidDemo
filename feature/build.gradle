@@ -82,6 +82,7 @@ dependencies {
     api 'androidx.core:core-ktx:1.7.0-alpha01'
     //    视频编辑
     implementation 'com.github.yangjie10930:EpMedia:v0.9.5'
+    implementation("org.greenrobot:eventbus:3.3.1")
 
 
 

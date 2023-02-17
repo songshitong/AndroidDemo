@@ -6,8 +6,12 @@
     android:canRetrieveWindowContent="true"
     android:notificationTimeout="100"
     android:packageNames="com.tencent.mm"
+    android:canPerformGestures="true"
     />
 <!--也可以代码设置-->
+<!--    android:description="@string/description"//无障碍的文字描述，展示在系统设置界面-->
+<!--    android:canPerformGestures="true"//允许模拟手势-->
+
 <!--    override fun onServiceConnected() {-->
 <!--      super.onServiceConnected()-->
 <!--      val serviceInfo = AccessibilityServiceInfo()-->

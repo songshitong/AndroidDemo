@@ -21,6 +21,8 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import sst.example.androiddemo.feature.common.LiveEventBus
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 //https://developer.android.com/guide/topics/ui/accessibility/service?hl=zh-cn
 class OperationAccessibilityService : AccessibilityService() {
@@ -43,7 +45,8 @@ class OperationAccessibilityService : AccessibilityService() {
   fun onMessageEvent( event:String)
   {
     Log.d("receiveEvent","event $event")
-    swipe(600f,1500f,200f,1500f)
+//    swipe(600f,1500f,200f,1500f)
+    click(2110f+ Random.Default.nextInt(-20,30), 798f+Random.Default.nextInt(-30,50))
   }
 
     @RequiresApi(VERSION_CODES.O)
@@ -117,7 +120,37 @@ class OperationAccessibilityService : AccessibilityService() {
   // 1 滑块不能到圆盘外面，手指移动滑块，人物按照一定速度移动
   // 2 滑块与圆心的角度，是人物移动的方向
   // 3 手指松开，滑块回到圆心  手指不松开，滑块一直在手指的位置
-  // 4 直接点园的某一部分，滑块会移动吗？？
+  // 4 直接点园的某一部分，滑块可以移动
+  // 5 人的行为是按住滑块，在外圆拖动
+
+  //轮盘位置 调节   方便不同用户使用
+
+  //轮盘类型
+  //固定型  外圆整体固定不动
+  //移动型  外圆跟随手指移动，松手后回到原位
+  //悬浮性 一直跟随手指
+
+  //摇杆类型
+  //触控板  中间为滑块
+  //键盘  类似手柄的四个方向键   是否支持同时两个方向取决于游戏是否支持
+  //控制棒 与触控板类似，外圆小点，内园更大 类似一个大按钮在里面移动
+
+  //控制方向 8个方向 16个方向 32个方向 控制方向移动的精度
+  //移动敏感度  轮盘移动距离与人物移动距离的映射
+
+  //移动方向引导线  显示人物移动方向  对于2D游戏距离判断有好处
+  //攻击距离引导线  攻击时才显示，有一定误差， 不处于攻击状态时不显示，用户攻击距离与方向不好判断
+
+  //技能触发方式
+  // 点按  长按   拖拽    攻击键拖拽触发上挑，直刺，攻击并后跳等
+
+  //按键半透明
+  //按键空白区域是否为半透明还是纯色   纯色有利于脚本识别
+
+  //技能排布
+  //标准型  扇形(围绕攻击键，攻击键比较大,其他技能扇形)
+  // 按键排列(排列紧凑，攻击键小，技能一排一排的)  容易误触，但是技能多时，操作区域更适合手小的
+  // 组合型(某个位置放置一系列技能，减少技能栏数量，方便操作)      自由配置，用户调整整体技能区域
 
   //根据文字找到node
   fun findNodeByText(text: String, rootNode: AccessibilityNodeInfo): List<AccessibilityNodeInfo>{

@@ -2,6 +2,7 @@ package sst.example.androiddemo.feature.widget
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.PixelFormat
 import android.os.Build.VERSION_CODES
 import android.provider.Settings
 import android.util.AttributeSet
@@ -36,8 +37,10 @@ class SystemView : FrameLayout {
             it.width = WindowManager.LayoutParams.WRAP_CONTENT
             it.height = WindowManager.LayoutParams.WRAP_CONTENT
             it.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            it.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-            it.alpha = 0.95f //整个window的透明度
+            it.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL+WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+              //设置foucus的状态，不然键盘和部分弹窗无法弹出  WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            it.format = PixelFormat.TRANSLUCENT //设置为半透明
+//            it.alpha = 0.95f //整个window的透明度
           }
         )
       } else {
@@ -69,7 +72,7 @@ class SystemView : FrameLayout {
     }
 
     findViewById<View>(R.id.system_gesture).setOnClickListener {
-      // EventBus.getDefault().post("event")
+       EventBus.getDefault().post("event")
     }
   }
 

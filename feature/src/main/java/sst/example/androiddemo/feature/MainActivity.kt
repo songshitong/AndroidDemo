@@ -500,6 +500,8 @@ class MainActivity : AppCompatActivity() {
         splitter.setString(settingValue)
         while (splitter.hasNext()) {
           var accessibilityService = splitter.next()
+          //例如打开QQ的无障碍服务 com.tencent.qqpinyin/.accessibility.EmotionHelperService
+          Log.d(TAG,"用户开启的无障碍服务有： $accessibilityService")
           if (accessibilityService.equals(service, ignoreCase = true)) {
             return true
           }

@@ -12,6 +12,11 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent">
       <Button
+          android:id="@+id/textRecognitionBtn"
+          android:text="文字识别"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"/>
+      <Button
           android:id="@+id/imgSplitBtn"
           android:text="图像切割"
           android:layout_width="wrap_content"

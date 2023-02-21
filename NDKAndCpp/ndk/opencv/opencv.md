@@ -25,10 +25,11 @@ https://learnopencv.com/getting-started-with-opencv/
 https://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/tutorials.html
 
 
-文字识别  opencv处理图片，tesseract识别文字 
+文字识别  opencv处理图片，tesseract识别文字  中文支持不好
 https://github.com/adaptech-cz/Tesseract4Android   不支持Tesseract OCR
-PaddleOCR
 
+PaddleOCR  中文识别  
+https://github.com/PaddlePaddle/PaddleOCR
 
 https://www.bilibili.com/video/BV1JX4y1u7kV/?vd_source=16dbd3bff220c5634a2dd63f05cc4ea1 入门教程
 

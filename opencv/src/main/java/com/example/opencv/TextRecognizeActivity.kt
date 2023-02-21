@@ -39,14 +39,14 @@ class TextRecognizeActivity : AppCompatActivity() {
     }
     // java.lang.IllegalArgumentException: Data path must contain subfolder tessdata!
     //需要下载对应语言的traineddata https://github.com/tesseract-ocr/tessdata
-    val path = extractAssets(this,"chi_sim.traineddata").path
+    val path = extractAssets(this,"eng.traineddata").path
     Log.d(tag,"data is $path")
     //路径不包括tessdata，SDK会自动拼接   OEM_LSTM_ONLY为精准模式
-    val init = tessAPI.init(cacheDir.path,"chi_sim",TessBaseAPI.OEM_LSTM_ONLY)
+    val init = tessAPI.init(cacheDir.path,"eng",TessBaseAPI.OEM_LSTM_ONLY)
     Log.d(tag,"Tess api init:$init")
 
 
-    val loadMat = Utils.loadResource(this,R.drawable.text_pic)
+    val loadMat = Utils.loadResource(this,R.drawable.text_pic_eng)
     val inMat = Mat()
     val thresMat = Mat()
     Imgproc.cvtColor( loadMat,inMat, Imgproc.COLOR_RGBA2GRAY)
@@ -64,7 +64,6 @@ class TextRecognizeActivity : AppCompatActivity() {
       Log.d(tag,"recognize text $text")
       tessAPI.stop()
     }.start()
-    //todo PaddleOCR
 
 
     ActivityCompat.requestPermissions(
@@ -90,8 +89,8 @@ class TextRecognizeActivity : AppCompatActivity() {
       // step 3: 准备待预测的图像，必须为 Bitmap.Config.ARGB_8888 格式，一般为默认格式
       val image: Bitmap = BitmapFactory.decodeResource(resources,R.drawable.text_pic)
 
-      // step 4: 预测图像
-      val results = manager.classify(image, 0.3f)
+      // step 4: 识别图像
+      val results = manager.ocr(image, 0.3f)
 
       // step 5: 解析结果
       for (resultModel in results) {

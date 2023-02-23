@@ -20,6 +20,7 @@ public  class StartService : Service(){
         super.onCreate()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onStart(intent: Intent?, startId: Int) {
         Log.d(TAG,"onStart ====")
         super.onStart(intent, startId)

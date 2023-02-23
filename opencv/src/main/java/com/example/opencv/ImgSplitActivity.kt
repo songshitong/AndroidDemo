@@ -21,9 +21,21 @@ class ImgSplitActivity : AppCompatActivity() {
     val splitMat = Mat(initMat,splitRect)
     val rgbMat = Mat()
     //颜色转换为rgb
-    Imgproc.cvtColor(splitMat,rgbMat,Imgproc.COLOR_BGR2RGB)
+    Imgproc.cvtColor(splitMat,rgbMat,Imgproc.COLOR_BGRA2RGB)
     val bitmap = Bitmap.createBitmap(rgbMat.width(),rgbMat.height(),Bitmap.Config.ARGB_8888)
     Utils.matToBitmap(rgbMat,bitmap)
     findViewById<ImageView>(R.id.split_img).setImageBitmap(bitmap)
+
+    //自动切割
+    // 自动切割的原理是对整个图进行轮廓搜索，将搜索出来的结果按轮廓面积进行分析，将面积最合适的那个作为识别区与进行切割。
+    // 这种方法的优点在于不用手动去确定切割点坐标，缺点是由于画面内容比较复杂，找到的轮廓可能会很多，分析轮廓的运算较大对Android设备带来较大的运算负担，
+  // 造成处理速度慢。
+    //
+    // ROI(region of interest)——感兴趣区域。
+    //
+    // 这个区域是图像分析所关注的重点。圈定这个区域，以便进行进一步的处理。而且，使用ROI指定想读入的目标，可以减少处理时间，增加精度，
+  // 给图像处理带来不小的便利。
+
+
   }
 }

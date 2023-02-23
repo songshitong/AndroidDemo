@@ -25,7 +25,7 @@ class ContoursActivity : AppCompatActivity() {
 
     val inMat = Mat()
     val thresMat = Mat()
-    Imgproc.cvtColor( loadMat,inMat, Imgproc.COLOR_RGBA2GRAY)
+    Imgproc.cvtColor( loadMat,inMat, Imgproc.COLOR_BGRA2GRAY)
     Imgproc.threshold(inMat,thresMat, 0.0, 255.0, Imgproc.THRESH_BINARY_INV+ Imgproc.THRESH_OTSU)
     val contours = mutableListOf<MatOfPoint>()
     val outMat = Mat()

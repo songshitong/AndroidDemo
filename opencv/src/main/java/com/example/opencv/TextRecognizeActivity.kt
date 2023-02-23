@@ -6,6 +6,9 @@ import android.content.Intent
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -14,7 +17,6 @@ import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.FragmentActivity
 import com.baidu.ai.edge.core.infer.InferConfig
 import com.baidu.ai.edge.core.infer.InferManager
 import com.googlecode.tesseract.android.TessBaseAPI
@@ -49,7 +51,7 @@ class TextRecognizeActivity : AppCompatActivity() {
     val loadMat = Utils.loadResource(this,R.drawable.text_pic_eng)
     val inMat = Mat()
     val thresMat = Mat()
-    Imgproc.cvtColor( loadMat,inMat, Imgproc.COLOR_RGBA2GRAY)
+    Imgproc.cvtColor( loadMat,inMat, Imgproc.COLOR_BGRA2GRAY)
     Imgproc.threshold(inMat,thresMat, 0.0, 255.0, Imgproc.THRESH_BINARY_INV+ Imgproc.THRESH_OTSU)
     val bitmap = Bitmap.createBitmap(loadMat.width(),loadMat.height(),Bitmap.Config.ARGB_8888)
     Utils.matToBitmap(thresMat,bitmap)
@@ -87,20 +89,45 @@ class TextRecognizeActivity : AppCompatActivity() {
       val manager = InferManager(this, config, "")
 
       // step 3: 准备待预测的图像，必须为 Bitmap.Config.ARGB_8888 格式，一般为默认格式
-      val image: Bitmap = BitmapFactory.decodeResource(resources,R.drawable.text_pic)
+      val image: Bitmap = BitmapFactory.decodeResource(resources,R.drawable.shanji)
+      val imageMat = Mat()
+      Utils.bitmapToMat(image,imageMat)
+      val grayMat = Mat()
+      Imgproc.cvtColor(imageMat,grayMat,Imgproc.COLOR_BGRA2GRAY)
+      val tresMat = Mat()
+      Imgproc.adaptiveThreshold(
+        grayMat,
+        tresMat,
+        255.0,
+        Imgproc.ADAPTIVE_THRESH_MEAN_C,
+        Imgproc.THRESH_BINARY,
+        5,
+        5.0
+      )
+      val thresBitmap = Bitmap.createBitmap(image.width,image.height,Bitmap.Config.ARGB_8888)
+      Utils.matToBitmap(tresMat,thresBitmap)
 
+      // val paddleBitmap = Bitmap.createBitmap(image.width,image.height,Bitmap.Config.ARGB_8888)
       // step 4: 识别图像
       val results = manager.ocr(image, 0.3f)
+      val canvas = Canvas(thresBitmap)
+      // canvas.drawBitmap(image,0f,0f,null)
+      val paint = Paint()
+      paint.color = Color.GREEN
+      paint.style = Paint.Style.FILL_AND_STROKE
 
       // step 5: 解析结果
       for (resultModel in results) {
+        resultModel.points.forEach { //点是文字的四个角
+          canvas.drawCircle(it.x.toFloat(), it.y.toFloat(),3f,paint)
+        }
         Log.i(
          tag, "labelIndex=" + resultModel.labelIndex
             + ", labelName=" + resultModel.label
             + ", confidence=" + resultModel.confidence
         )
       }
-
+      findViewById<ImageView>(R.id.text_paddle_result).setImageBitmap(thresBitmap)
       // step 6: 释放资源。预测完毕请及时释放资源
       manager.destroy()
     } catch (e: Exception) {

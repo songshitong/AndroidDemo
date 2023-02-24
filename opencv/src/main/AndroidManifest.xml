@@ -14,6 +14,12 @@
       android:supportsRtl="true"
       android:theme="@style/Theme.AndroidDemo">
     <activity
+        android:name=".FaceDetectActivity"
+        android:exported="false" />
+    <activity
+        android:name=".MorphologyActivity"
+        android:exported="false" />
+    <activity
         android:name=".DrawActivity"
         android:exported="false" />
     <activity

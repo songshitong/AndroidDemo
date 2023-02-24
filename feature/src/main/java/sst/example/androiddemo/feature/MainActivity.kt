@@ -29,6 +29,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
@@ -306,7 +307,8 @@ class MainActivity : AppCompatActivity() {
     //todo 文字动画 https://github.com/aagarwal1012/Animated-Text-Kit
     //todo AsyncTask  AsyncTaskLoader Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)  Android线程调度
 
-    //todo handler原理为什么顺序是021  runnable运行的线程不是主线程吗  线程的创建需要时间，handler的唤醒需要时间
+    //handler原理为什么顺序是021  runnable运行的线程不是主线程吗
+    //02是在本次消息,runnable的1需要另外的消息发送处理和执行
     startHandler.setOnClickListener {
       val runnable = Runnable {
         Log.d(TAG, "1 runnable")
@@ -327,8 +329,6 @@ class MainActivity : AppCompatActivity() {
       permissions, 0
     )
 
-    //TODO docker  nginx(http://127.0.0.1/stat  nginx查看状态)
-    // http://www.joshuachou.ink/archives/395/
 
     //WindowManager.LayoutParams.FLAG_SECURE  禁止截屏
     //安全 监听截屏事件的产生  系统源码 TakeScreenshotService  GlobalScreenshot
@@ -691,7 +691,7 @@ class MainActivity : AppCompatActivity() {
   //todo 打日志总结  方法的出入口，日志不能有相同的描述，方便定位到具体代码行，相当于唯一标识？，尤其是同一个方法里面的
   //
 
-  //todo Android字体，苹果字体，字体压缩
+
 
   //项目根gradle
 //    buildscript {

@@ -46,6 +46,16 @@
           android:text="图像滤镜"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"/>
+      <Button
+          android:id="@+id/morphologyBtn"
+          android:text="形态学操作"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"/>
+      <Button
+          android:id="@+id/faceDetecBtn"
+          android:text="人脸检测"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"/>
 
    </androidx.appcompat.widget.LinearLayoutCompat>
 

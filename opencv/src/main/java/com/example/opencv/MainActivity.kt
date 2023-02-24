@@ -46,6 +46,13 @@ class MainActivity : AppCompatActivity() {
     findViewById<View>(R.id.imgFilterBtn).setOnClickListener {
       startActivity(Intent(this,PictureFilterActivity::class.java))
     }
+    findViewById<View>(R.id.morphologyBtn).setOnClickListener {
+      startActivity(Intent(this,MorphologyActivity::class.java))
+    }
+
+    findViewById<View>(R.id.faceDetecBtn).setOnClickListener {
+      startActivity(Intent(this,FaceDetectActivity::class.java))
+    }
 
     val config = RealmConfiguration.create(schema = setOf(Item::class))
     val realm: Realm = Realm.open(config)

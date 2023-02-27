@@ -26,6 +26,15 @@ class FaceDetectActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_face_detect)
+    // 人脸检测案例
+    // opencv中的人脸检测是基于训练好的LBP与HAAR的特征级联分类检测器完成的
+    // LBP特征：Local Binary Pattern 局部二值模式。LBP的引用中，如纹理分类、人脸分析等，一般采用LBP特征谱的统计直方图作为特征向量用于分类识别。
+    // HAAR特征：一种反映图像的灰度变化的，像素分模块求差值的一种特征。
+    // 级联分类器
+    // 基于LBP特征的分类器成为LBP级联分类器，基于HAAR特征的分类器成为HAAR级联分类器
+
+
+
     // 模型下载 data目录
     //https://github.com/opencv/opencv/tree/17234f82d025e3bbfbf611089637e5aa2038e7b8/data/haarcascades
     //https://github.com/opencv/opencv/tree/17234f82d025e3bbfbf611089637e5aa2038e7b8/data/lbpcascades

@@ -305,7 +305,7 @@ class MainActivity : AppCompatActivity() {
       Log.d(TAG, "index value  $index")
     }).start();
     //todo 文字动画 https://github.com/aagarwal1012/Animated-Text-Kit
-    //todo AsyncTask  AsyncTaskLoader Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)  Android线程调度
+
 
     //handler原理为什么顺序是021  runnable运行的线程不是主线程吗
     //02是在本次消息,runnable的1需要另外的消息发送处理和执行
@@ -677,8 +677,7 @@ class MainActivity : AppCompatActivity() {
 //        shareIntent.putExtra(Intent.EXTRA_STREAM, UriUtils.file2Uri(File(path)))//添加分享内容
     this.startActivity(Intent.createChooser(shareIntent, "分享title"))
   }
-  //todo lottie svga(yy ued 开源)
-  //不规则图形  点击图片就显色 bitmap.getPixel   1点击位置是否是不规则 2点击位置的颜色  需图片大小与控件大小  普通view加载背景图片的方式，fit?
+
   //dalvik system CloseGuard
   //ndk 稳定版16b  aiqiyi xhook elf hook原理
 

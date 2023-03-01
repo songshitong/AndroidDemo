@@ -1271,7 +1271,7 @@ ContentProvider情况
                         mNumCachedHiddenProcs++;
                         numCached++;
                         ...
-                        // 当cached进程超过上限(cachedProcessLimit)，则杀掉该进程
+                        // 当cached进程超过上限(cachedProcessLimit)，则杀掉该进程 app为ProcessRecord
                         if ((numCached - numCachedExtraGroup) > cachedProcessLimit) {
                             app.killLocked("cached #" + numCached,
                                     "too many cached",
@@ -1490,7 +1490,8 @@ frameworks/base/services/core/java/com/android/server/am/ProcessList.java
     }   
 ```
 
-进程杀掉
+进程杀掉  后续查看杀进程实现
+ProcessRecord.killLocked
 frameworks/base/services/core/java/com/android/server/am/ProcessRecord.java
 ```
  void killLocked(String reason, String description, @Reason int reasonCode,

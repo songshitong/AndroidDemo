@@ -122,6 +122,11 @@ class MFunction {
 
 //    函数类型  () -> Unit就是onClick的函数类型
      val onClick: () -> Unit = { }
+
+     //可空的类型
+     val onClick1 :(()->Unit)? = null
+
+
 //    类型别名给函数类型起一个别称
 //   typealias ClickHandler = (Button, ClickEvent) -> Unit
 
@@ -130,6 +135,7 @@ class MFunction {
    val stringPlus: (String, String) -> String = String::plus
 //    println(stringPlus.invoke("<-", "->"))
 //    println(stringPlus("Hello, ", "world!"))
+
 
 
 

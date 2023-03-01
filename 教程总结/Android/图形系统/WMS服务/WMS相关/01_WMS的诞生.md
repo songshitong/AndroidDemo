@@ -22,7 +22,6 @@ Surface管理
 WMS的职责可以简单总结为下图
 WMS的职责.png
 
-//todo bitmap 源码   Android如何管理bitmap   view体系
 2.WMS的诞生
 WMS的知识点非常多，在了解这些知识点前，我们十分有必要知道WMS是如何产生的。WMS是在SyetemServer进程中启动的，
 不了解SyetemServer进程的可以查看在Android系统启动流程（三）解析SyetemServer进程启动过程这篇文章。

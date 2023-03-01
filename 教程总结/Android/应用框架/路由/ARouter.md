@@ -478,7 +478,7 @@ DefaultPoolExecutor.java
         return instance;
     }
     
- //线程执行结束，顺便看一下有么有什么乱七八糟的异常    //todo 为什么要处理future  future的源码  
+ //线程执行结束，顺便看一下有么有什么乱七八糟的异常    future运行可能抛出异常
  protected void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
         if (t == null && r instanceof Future<?>) {

@@ -23,12 +23,14 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
@@ -62,6 +64,7 @@ import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestAc
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.util.function.Predicate
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -304,9 +307,10 @@ class MainActivity : AppCompatActivity() {
       Log.d(TAG, "index value  $index")
     }).start();
     //todo 文字动画 https://github.com/aagarwal1012/Animated-Text-Kit
-    //todo AsyncTask  AsyncTaskLoader Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)  Android线程调度
 
-    //todo handler原理为什么顺序是021  runnable运行的线程不是主线程吗  线程的创建需要时间，handler的唤醒需要时间
+
+    //handler原理为什么顺序是021  runnable运行的线程不是主线程吗
+    //02是在本次消息,runnable的1需要另外的消息发送处理和执行
     startHandler.setOnClickListener {
       val runnable = Runnable {
         Log.d(TAG, "1 runnable")
@@ -327,8 +331,6 @@ class MainActivity : AppCompatActivity() {
       permissions, 0
     )
 
-    //TODO docker  nginx(http://127.0.0.1/stat  nginx查看状态)
-    // http://www.joshuachou.ink/archives/395/
 
     //WindowManager.LayoutParams.FLAG_SECURE  禁止截屏
     //安全 监听截屏事件的产生  系统源码 TakeScreenshotService  GlobalScreenshot
@@ -677,8 +679,7 @@ class MainActivity : AppCompatActivity() {
 //        shareIntent.putExtra(Intent.EXTRA_STREAM, UriUtils.file2Uri(File(path)))//添加分享内容
     this.startActivity(Intent.createChooser(shareIntent, "分享title"))
   }
-  //todo lottie svga(yy ued 开源)
-  //不规则图形  点击图片就显色 bitmap.getPixel   1点击位置是否是不规则 2点击位置的颜色  需图片大小与控件大小  普通view加载背景图片的方式，fit?
+
   //dalvik system CloseGuard
   //ndk 稳定版16b  aiqiyi xhook elf hook原理
 
@@ -691,7 +692,7 @@ class MainActivity : AppCompatActivity() {
   //todo 打日志总结  方法的出入口，日志不能有相同的描述，方便定位到具体代码行，相当于唯一标识？，尤其是同一个方法里面的
   //
 
-  //todo Android字体，苹果字体，字体压缩
+
 
   //项目根gradle
 //    buildscript {

@@ -20,7 +20,10 @@ dialogFragment会监听声明周期，后台时隐藏dialog，切换到前台时
     }  
 ```
 如果控制DialogFragment，隐藏建议使用dismiss而不是getDialog().hide，后者后台切换到前台会重新显示
+执行dismiss 整体销毁
+执行hide后，前后切换没有根据记录状态，会自动显示
 
+可以自己记录，重写onStart方法
 
 
 https://www.jianshu.com/p/50ae2531c9cc

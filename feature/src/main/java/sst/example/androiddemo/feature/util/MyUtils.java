@@ -36,9 +36,6 @@ public class MyUtils {
     public static void log(String msg){
         Log.d(TAG,msg);
     }
-    //todo activity不显示后  bitmap 内存优化
-    //todo surfaceview 自定义view  opengl
-    //http://weishu.me/2016/12/23/dive-into-android-optimize-vm-heap/
 
 
 

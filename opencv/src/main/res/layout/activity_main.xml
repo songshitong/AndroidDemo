@@ -12,8 +12,18 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent">
       <Button
+          android:id="@+id/colorConvertBtn"
+          android:text="颜色转换"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"/>
+      <Button
           android:id="@+id/textRecognitionBtn"
           android:text="文字识别"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"/>
+      <Button
+          android:id="@+id/drawBtn"
+          android:text="opencv绘制"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"/>
       <Button
@@ -34,6 +44,16 @@
       <Button
           android:id="@+id/imgFilterBtn"
           android:text="图像滤镜"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"/>
+      <Button
+          android:id="@+id/morphologyBtn"
+          android:text="形态学操作"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"/>
+      <Button
+          android:id="@+id/faceDetecBtn"
+          android:text="人脸检测"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"/>
 

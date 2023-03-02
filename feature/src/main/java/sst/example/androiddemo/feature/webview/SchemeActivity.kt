@@ -3,8 +3,9 @@ package sst.example.androiddemo.feature.webview
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_scheme.*
 import sst.example.androiddemo.feature.R
 
 
@@ -48,7 +49,7 @@ class SchemeActivity : AppCompatActivity() {
         Log.d(TAG, "path: " + uri.path)
         Log.d(TAG, "queryString: " + uri.query)
         Log.d(TAG, "queryParameter: " + uri.getQueryParameter("key"))
-        schemeContent.text = "scheme ${uri.scheme} \n host  ${uri.host} \n port ${uri.port} \n path ${uri.path} \n queryString ${uri.query}"
+        findViewById<TextView>(R.id.schemeContent).text = "scheme ${uri.scheme} \n host  ${uri.host} \n port ${uri.port} \n path ${uri.path} \n queryString ${uri.query}"
     }
 
     override fun onStart() {

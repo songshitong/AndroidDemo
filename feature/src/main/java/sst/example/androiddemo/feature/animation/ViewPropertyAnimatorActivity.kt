@@ -1,8 +1,8 @@
 package sst.example.androiddemo.feature.animation
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_view_property_animator.btn_view_property_animator
 import sst.example.androiddemo.feature.R
 
 class ViewPropertyAnimatorActivity : AppCompatActivity() {
@@ -10,7 +10,7 @@ class ViewPropertyAnimatorActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_view_property_animator)
-
+    val btn_view_property_animator = findViewById<View>(R.id.btn_view_property_animator)
     btn_view_property_animator.setOnClickListener {
       btn_view_property_animator.let { button ->
         button.alpha = 0.3f //设置开始alpha

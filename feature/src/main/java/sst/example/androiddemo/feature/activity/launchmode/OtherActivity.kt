@@ -4,8 +4,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_other.*
 import sst.example.androiddemo.feature.R
 
 class OtherActivity : AppCompatActivity() {
@@ -14,19 +14,19 @@ class OtherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG," onCreate ==== ")
         setContentView(R.layout.activity_other)
-        standardOther.setOnClickListener {
+        findViewById<View>(R.id.standardOther).setOnClickListener {
             val intent = Intent(this, StandardActivity::class.java)
             startActivity(intent)
         }
-        singleTaskOther.setOnClickListener {
+          findViewById<View>(R.id.singleTaskOther).setOnClickListener {
             val intent = Intent(this, SingleTaskActivity::class.java)
             startActivity(intent)
         }
-        singleTopOther.setOnClickListener {
+          findViewById<View>(R.id.singleTopOther).setOnClickListener {
             val intent = Intent(this, SingleTopActivity::class.java)
             startActivity(intent)
         }
-        singleInstanceOther.setOnClickListener {
+          findViewById<View>(R.id.singleInstanceOther).setOnClickListener {
             val intent = Intent(this, SingleInstanceActivity::class.java)
             startActivity(intent)
         }

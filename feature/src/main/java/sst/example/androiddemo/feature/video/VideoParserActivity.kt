@@ -3,6 +3,7 @@ package sst.example.androiddemo.feature.video
 import VideoHandle.EpEditor
 import VideoHandle.EpVideo
 import VideoHandle.OnEditorListener
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -16,12 +17,15 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
+import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_video_parser.*
 import sst.example.androiddemo.feature.R
 import sst.example.androiddemo.feature.common.BaseHandler
 import sst.example.androiddemo.feature.util.BitmapUtils
@@ -41,9 +45,14 @@ class VideoParserActivity : AppCompatActivity() {
     var clipEnd: Float = 0f
     //videoview 的preparlistener 在拉起系统播放，返回后会出发
     var isVideoViewInit: Boolean = false
-
-
-
+    lateinit var videoView:VideoView
+    lateinit var showIv:ImageView
+    lateinit var frameRcy:RecyclerView
+    lateinit var stopIv : ImageView
+    lateinit var clipVideo: Button
+    lateinit var clipProgressBar:ClipProgressBar
+    lateinit var progressCurrent:TextView
+    lateinit var shareVideo:Button
     inner class MyHandler : BaseHandler {
         constructor(activity: Activity) : super(activity)
 
@@ -80,6 +89,7 @@ class VideoParserActivity : AppCompatActivity() {
         handler.removeCallbacksAndMessages(null)
     }
 
+    @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_parser)
@@ -97,8 +107,16 @@ class VideoParserActivity : AppCompatActivity() {
         MyUtils.initDirectory(outDirectory)
 //        todo FileUtils移除
 //        FileUtils.deleteFilesInDir(outDirectory)
+        frameRcy = findViewById<RecyclerView>(R.id.frameRcy)
         frameRcy.layoutManager =
             LinearLayoutManager(this, RecyclerView.HORIZONTAL, false) as RecyclerView.LayoutManager?
+        videoView = findViewById<VideoView>(R.id.videoView)
+        showIv = findViewById<ImageView>(R.id.showIv)
+        stopIv = findViewById<ImageView>(R.id.showIv)
+        clipVideo = findViewById(R.id.clipVideo)
+        clipProgressBar = findViewById(R.id.clipProgressBar)
+        progressCurrent = findViewById(R.id.progressCurrent)
+        shareVideo = findViewById(R.id.shareVideo)
         videoView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 if (stopIv.visibility == View.VISIBLE) {

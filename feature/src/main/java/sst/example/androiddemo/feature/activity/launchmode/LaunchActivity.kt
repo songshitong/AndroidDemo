@@ -4,8 +4,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_launch.*
 import sst.example.androiddemo.feature.R
 
 class LaunchActivity : AppCompatActivity() {
@@ -14,19 +14,19 @@ class LaunchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
-        standardActivity.setOnClickListener {
+        findViewById<View>(R.id.standardActivity).setOnClickListener {
             val intent = Intent(this, StandardActivity::class.java)
             startActivity(intent)
         }
-        singleTaskActivity.setOnClickListener {
+          findViewById<View>(R.id.singleTaskActivity).setOnClickListener {
             val intent = Intent(this, SingleTaskActivity::class.java)
             startActivity(intent)
         }
-        singleTopActivity.setOnClickListener {
+          findViewById<View>(R.id.singleTopActivity).setOnClickListener {
             val intent = Intent(this, SingleTopActivity::class.java)
             startActivity(intent)
         }
-        singleInstanceActivity.setOnClickListener {
+          findViewById<View>(R.id.singleInstanceActivity).setOnClickListener {
             val intent = Intent(this, SingleInstanceActivity::class.java)
             startActivity(intent)
         }

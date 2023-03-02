@@ -140,8 +140,11 @@ public class PaintView extends View {
         Paint.FontMetrics fm = mPaint.getFontMetrics();//获取 Paint 的 FontMetrics
 
         mPaint.getTextBounds("hhh",0,2,new Rect());//获取文字的显示范围
+        //getTextBounds的范围比 Paint.FontMetrics获取的更精确
+
 //        getTextBounds: 它测量的是文字的显示范围（关键词：显示）。形象点来说，你这段文字外放置一个可变的矩形，然后把矩形尽可能地缩小，一直小到这个矩形恰好紧紧包裹住文字，那么这个矩形的范围，就是这段文字的 bounds
-//        它测量的是文字绘制时所占用的宽度（关键词：占用）。前面已经讲过，一个文字在界面中，往往需要占用比他的实际显示宽度更多一点的宽度，以此来让文字和文字之间保留一些间距
+//        它测量的是文字绘制时所占用的宽度（关键词：占用）。前面已经讲过，一个文字在界面中，往往需要占用比他的实际显示宽度更多一点的宽度，
+        //        以此来让文字和文字之间保留一些间距
         mPaint.measureText("hhh");//测量文字的宽度并返回
         mPaint.getTextWidths("hhh",new float[3]);//获取字符串中每个字符的宽度，并把结果填入参数 widths
         //breakText() 是在给出宽度上限的前提下测量文字的宽度。如果文字的宽度超出了上限，那么在临近超限的位置截断文字

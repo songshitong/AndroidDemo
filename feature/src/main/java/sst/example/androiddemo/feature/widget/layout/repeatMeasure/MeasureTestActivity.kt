@@ -2,19 +2,19 @@ package sst.example.androiddemo.feature.widget.layout.repeatMeasure
 
 import android.app.Activity
 import android.os.Bundle
-import kotlinx.android.synthetic.main.activity_measure_test.*
+import android.view.View
 import sst.example.androiddemo.feature.R
 
 class MeasureTestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_measure_test)
-        measureLinear1.tag="measure Linear 1"
-        measureLinear2.tag="measure Linear 2"
-        measureLinear3.tag="measure Linear 3"
-        measureView1.tag="measure View 1"
-        measureView2.tag="measure View 2"
-        measureView0.tag="measure View 0"
+        findViewById<View>(R.id.measureLinear1).tag="measure Linear 1"
+          findViewById<View>(R.id.measureLinear2).tag="measure Linear 2"
+          findViewById<View>(R.id.measureLinear3).tag="measure Linear 3"
+          findViewById<View>(R.id.measureView1).tag="measure View 1"
+          findViewById<View>(R.id.measureView2).tag="measure View 2"
+          findViewById<View>(R.id.measureView0).tag="measure View 0"
     }
 }
 

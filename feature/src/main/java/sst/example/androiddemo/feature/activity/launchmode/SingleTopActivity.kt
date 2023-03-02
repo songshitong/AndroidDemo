@@ -4,8 +4,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_single_top.*
 import sst.example.androiddemo.feature.R
 
 //launch - singleTop - singleTop
@@ -58,11 +58,11 @@ class SingleTopActivity : AppCompatActivity() {
         setContentView(R.layout.activity_single_top)
         Log.d(TAG," onCreate ==== ")
         printActivityInfo()
-        singleTop2Other.setOnClickListener {
+        findViewById<View>(R.id.singleTop2Other).setOnClickListener {
             val intent = Intent(this, OtherActivity::class.java)
             startActivity(intent)
         }
-        singleTop2Self.setOnClickListener {
+          findViewById<View>(R.id.singleTop2Self).setOnClickListener {
             val intent = Intent(this, SingleTopActivity::class.java)
             startActivity(intent)
         }

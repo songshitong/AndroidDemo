@@ -4,8 +4,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_single_instance.*
 import sst.example.androiddemo.feature.R
 
 //SingleInstance模式启动的Activity在系统中具有全局唯一性
@@ -51,7 +51,7 @@ class SingleInstanceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_single_instance)
         Log.d(TAG," onCreate ==== ")
         printActivityInfo()
-        singleInstance2Other.setOnClickListener {
+        findViewById<View>(R.id.singleInstance2Other).setOnClickListener {
             val intent = Intent(this, OtherActivity::class.java)
             startActivity(intent)
         }

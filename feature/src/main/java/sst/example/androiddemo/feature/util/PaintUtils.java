@@ -18,4 +18,12 @@ public class PaintUtils {
         float distance = (fontMetrics.descent - fontMetrics.ascent) / 2 - fontMetrics.descent;
         return distance;
     }
+
+    /**
+    * @Description: 获取文字高度
+    */
+    public static float getFontHeight(Paint mPaint){
+        Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
+        return fontMetrics.descent - fontMetrics.ascent;
+    }
 }

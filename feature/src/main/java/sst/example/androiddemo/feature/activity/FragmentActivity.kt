@@ -3,8 +3,8 @@ package sst.example.androiddemo.feature.activity
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_fragment.*
 import sst.example.androiddemo.feature.R
 
 class FragmentActivity : AppCompatActivity() , NormalFragment.OnFragmentInteractionListener{
@@ -19,10 +19,10 @@ class FragmentActivity : AppCompatActivity() , NormalFragment.OnFragmentInteract
         setContentView(R.layout.activity_fragment)
         val fragment =NormalFragment()
         supportFragmentManager.beginTransaction().add(R.id.container_fragment,fragment).commit()
-        showFragment.setOnClickListener {
+        findViewById<View>(R.id.showFragment).setOnClickListener {
             supportFragmentManager.beginTransaction().show(fragment).commit()
         }
-        hideFragment.setOnClickListener {
+          findViewById<View>(R.id.hideFragment).setOnClickListener {
             supportFragmentManager.beginTransaction().hide(fragment).commit()
         }
     }

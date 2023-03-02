@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
 //自定义项目内插件
 //apply plugin: 'com.sst.projectplugin'
 ///自定义插件

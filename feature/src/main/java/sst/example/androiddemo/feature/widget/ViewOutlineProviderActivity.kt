@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.ViewOutlineProvider
-import kotlinx.android.synthetic.main.activity_view_outline_provider.outlineImage
 import sst.example.androiddemo.feature.R
 
 ///利用ViewOutlineProvider实现形状 https://developer.android.google.cn/training/material/shadows-clipping?hl=zh-cn
@@ -17,7 +16,7 @@ class ViewOutlineProviderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_outline_provider)
-        outlineImage.outlineProvider=object : ViewOutlineProvider(){
+        findViewById<View>(R.id.outlineImage).outlineProvider=object : ViewOutlineProvider(){
             override fun getOutline(view: View?, outline: Outline?) {
                 //矩形
                 // outline.setRect(Rect(0,0,view.width,view.width))
@@ -31,6 +30,6 @@ class ViewOutlineProviderActivity : AppCompatActivity() {
         }
 
 //将视图裁剪至其轮廓区域  xml中设置android:clipToOutline 也可以
-        outlineImage.clipToOutline = true
+        findViewById<View>(R.id.outlineImage).clipToOutline = true
     }
 }

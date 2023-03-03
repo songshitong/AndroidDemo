@@ -215,8 +215,8 @@ public class PaintView extends View {
 
         mPaint.setStyle(Paint.Style.FILL);
 
-        //todo 实现这个效果  渐变文字 https://blog.csdn.net/u010126792/article/details/85237085
-        //设置着色器Shader.TileMode.CLAMP 夹子  Shader.TileMode.repeat 重复    MIRROR镜像
+
+        //设置着色器Shader.TileMode.CLAMP 夹子(边缘拉伸，利用边缘的颜色，填充剩余部分)  Shader.TileMode.repeat 重复    MIRROR镜像
 //        BitmapShader：实现圆形图像
 //        LinearGradient：实现渐变文字  支持两个颜色以及多种，构造器不同
 //        SweepGradient：实现雷达效果

@@ -20,4 +20,28 @@
        android:id="@+id/animator_text_rotate"
        android:layout_width="wrap_content"
        android:layout_height="50dp"/>
+
+   <TextView
+       android:text="typer:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+   <sst.example.androiddemo.feature.widget.practice.textview.AnimatorText
+       android:layout_marginTop="20dp"
+       android:background="@android:color/darker_gray"
+       android:text="打字开始："
+       android:id="@+id/animator_text_typer"
+       android:layout_width="wrap_content"
+       android:layout_height="50dp"/>
+
+   <TextView
+       android:text="colorize:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+   <sst.example.androiddemo.feature.widget.practice.textview.AnimatorText
+       android:layout_marginTop="20dp"
+       android:background="@android:color/darker_gray"
+       android:text="颜色渐变："
+       android:id="@+id/animator_text_colorize"
+       android:layout_width="wrap_content"
+       android:layout_height="50dp"/>
 </androidx.appcompat.widget.LinearLayoutCompat>

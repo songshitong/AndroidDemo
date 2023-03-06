@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import sst.example.androiddemo.feature.R
 import sst.example.androiddemo.feature.widget.practice.textview.AnimatorText
 import sst.example.androiddemo.feature.widget.practice.textview.ColorizeText
+import sst.example.androiddemo.feature.widget.practice.textview.LiquidFillText
 import sst.example.androiddemo.feature.widget.practice.textview.RotateText
 import sst.example.androiddemo.feature.widget.practice.textview.TyperText
+import sst.example.androiddemo.feature.widget.practice.textview.WavyText
 
 class AnimatorTextActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +52,29 @@ class AnimatorTextActivity : AppCompatActivity() {
        animText.setOnClickListener {
          animText.startAnim()
        }
+    }
+
+    findViewById<AnimatorText>(R.id.animator_text_liquidfill).let {animText ->
+       animText.addTextList(
+         arrayListOf(
+           LiquidFillText("LIQUIDY")
+         )
+       )
+       animText.setOnClickListener {
+         animText.startAnim()
+       }
+    }
+
+    findViewById<AnimatorText>(R.id.animator_text_wavy).let { animText->
+      animText.addTextList(
+        arrayListOf(
+          WavyText("Hello World"),
+          WavyText("Look at the waves")
+        )
+      )
+      animText.setOnClickListener {
+        animText.startAnim()
+      }
     }
   }
 }

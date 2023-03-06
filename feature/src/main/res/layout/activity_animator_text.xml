@@ -44,4 +44,28 @@
        android:id="@+id/animator_text_colorize"
        android:layout_width="wrap_content"
        android:layout_height="50dp"/>
+
+   <TextView
+       android:text="LiquidFill:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+   <sst.example.androiddemo.feature.widget.practice.textview.AnimatorText
+       android:layout_marginTop="20dp"
+       android:background="@android:color/darker_gray"
+       android:text="液体填充文字："
+       android:id="@+id/animator_text_liquidfill"
+       android:layout_width="wrap_content"
+       android:layout_height="50dp"/>
+
+   <TextView
+       android:text="wavyText:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+   <sst.example.androiddemo.feature.widget.practice.textview.AnimatorText
+       android:layout_marginTop="20dp"
+       android:background="@android:color/darker_gray"
+       android:text="跳动文字："
+       android:id="@+id/animator_text_wavy"
+       android:layout_width="wrap_content"
+       android:layout_height="50dp"/>
 </androidx.appcompat.widget.LinearLayoutCompat>

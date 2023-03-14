@@ -8,14 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_menu.*
-
-
-
-
-
-
-
+import sst.example.androiddemo.feature.R
 
 //ContextMenu与OptionMenu的区别：
 //1、OptionMenu对应的是activity，一个activity只能拥有一个选项菜单；
@@ -30,8 +23,8 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(sst.example.androiddemo.feature.R.layout.activity_menu)
         Log.d(TAG,"onCreate ====")
-        registerForContextMenu(showContextMenu)
-        showContextMenu.setOnClickListener {
+        registerForContextMenu(findViewById<View>(R.id.showContextMenu))
+        findViewById<View>(R.id.showContextMenu).setOnClickListener {
             openContextMenu(it)
         }
     }

@@ -7,8 +7,9 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_services.*
+import sst.example.androiddemo.feature.R
 import sst.example.androiddemo.feature.service.StartService
 
 
@@ -24,18 +25,18 @@ class ServicesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(sst.example.androiddemo.feature.R.layout.activity_services)
         val serviceIntent = Intent(this,StartService::class.java)
-        startService.setOnClickListener {
+      findViewById<View>(R.id.startService).setOnClickListener {
             startService(serviceIntent)
         }
-        stopService.setOnClickListener {
+        findViewById<View>(R.id.stopService).setOnClickListener {
             stopService(serviceIntent)
         }
 
-        bindServiceBtn.setOnClickListener {
+        findViewById<View>(R.id.bindServiceBtn).setOnClickListener {
             bindService(serviceIntent,connection, Context.BIND_AUTO_CREATE)
         }
 
-        unbindServiceBtn.setOnClickListener {
+        findViewById<View>(R.id.unbindServiceBtn).setOnClickListener {
             unbindService(connection)
         }
     }

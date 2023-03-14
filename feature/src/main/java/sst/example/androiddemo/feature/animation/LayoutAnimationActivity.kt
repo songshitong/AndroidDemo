@@ -5,9 +5,10 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_layout_animation.*
 import sst.example.androiddemo.feature.R
 
 class LayoutAnimationActivity : AppCompatActivity() {
@@ -17,17 +18,17 @@ class LayoutAnimationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_layout_animation)
 //      xml的layout  animateLayoutChanges 开启Android自带layout动画
-        layoutAdd.setOnClickListener {
+        findViewById<View>(R.id.layoutAdd).setOnClickListener {
             count++
             val tv = TextView(this)
             tv.setText("layout " + count)
-            layoutAnimationRoot.addView(tv, 0)
+            findViewById<ViewGroup>(R.id.layoutAnimationRoot).addView(tv, 0)
         }
-        layoutRemove.setOnClickListener {
-            if (layoutAnimationRoot.childCount == 0) return@setOnClickListener
-            layoutAnimationRoot.removeViewAt(0)
+        findViewById<View>(R.id.layoutRemove).setOnClickListener {
+            if (findViewById<ViewGroup>(R.id.layoutAnimationRoot).childCount == 0) return@setOnClickListener
+            findViewById<ViewGroup>(R.id.layoutAnimationRoot).removeViewAt(0)
         }
-        groupBtn.setOnClickListener {
+          findViewById<View>(R.id.groupBtn).setOnClickListener {
             val intent = Intent(this, ViewGroupActivity::class.java)
             startActivity(intent)
         }
@@ -46,6 +47,6 @@ class LayoutAnimationActivity : AppCompatActivity() {
         lt.setAnimator(LayoutTransition.CHANGE_APPEARING,addOtherAnimator)
 
         lt.setAnimator(LayoutTransition.DISAPPEARING,addAnimator)
-        layoutAnimationRoot.layoutTransition = lt
+        findViewById<ViewGroup>(R.id.layoutAnimationRoot).layoutTransition = lt
     }
 }

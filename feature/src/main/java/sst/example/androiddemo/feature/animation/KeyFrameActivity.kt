@@ -5,10 +5,10 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.view.View
 import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_key_frame.btn_key_frame
 import sst.example.androiddemo.feature.R
 
 class KeyFrameActivity : AppCompatActivity() {
@@ -28,13 +28,13 @@ class KeyFrameActivity : AppCompatActivity() {
     val frame2 = Keyframe.ofFloat(1f, 60f);
     val holder = PropertyValuesHolder.ofKeyframe("translationY", frame1, frame2)
 
-    val animator = ObjectAnimator.ofPropertyValuesHolder(btn_key_frame, holder)
+    val animator = ObjectAnimator.ofPropertyValuesHolder(findViewById<View>(R.id.btn_key_frame), holder)
     // animator.interpolator = BounceInterpolator()
     //等同于     ObjectAnimator.ofFloat(btn_key_frame,"translationY",0f,300f,0f)
     animator.duration = 700
     animator.repeatCount = ValueAnimator.INFINITE
     animator.repeatMode = ValueAnimator.REVERSE
-    btn_key_frame.setOnClickListener {
+    findViewById<View>(R.id.btn_key_frame).setOnClickListener {
       animator.start()
     }
   }

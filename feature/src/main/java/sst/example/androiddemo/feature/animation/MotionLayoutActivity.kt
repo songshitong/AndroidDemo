@@ -3,8 +3,9 @@ package sst.example.androiddemo.feature.animation
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.motion.widget.MotionLayout
-import kotlinx.android.synthetic.main.activity_motion_layout.motionLayoutFold
 import sst.example.androiddemo.feature.R
 
 // https://developer.android.com/training/constraint-layout/motionlayout?hl=zh-cn
@@ -58,7 +59,7 @@ class MotionLayoutActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_motion_layout)
-    motionLayoutFold.setTransitionListener(object :MotionLayout.TransitionListener{
+    findViewById<MotionLayout>(R.id.motionLayoutFold).setTransitionListener(object :MotionLayout.TransitionListener{
       override fun onTransitionStarted(p0: MotionLayout?, p1: Int, p2: Int) {
         Log.i("MotionLayoutActivity","onTransitionStarted")
       }

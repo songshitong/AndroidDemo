@@ -11,10 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_view_group.*
 import sst.example.androiddemo.feature.R
 import sst.example.androiddemo.feature.R.layout.activity_view_group
- class ViewGroupActivity : AppCompatActivity() {
+import sst.example.androiddemo.feature.widget.practice.GridRecyclerView
+
+class ViewGroupActivity : AppCompatActivity() {
     val list = ArrayList<String>()
     lateinit var mContext: Context
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +37,7 @@ import sst.example.androiddemo.feature.R.layout.activity_view_group
         list.add("tom133333333")
         list.add("tom1444444444")
         list.add("tom155555")
-
+        val viewGroupRecyView = findViewById<GridRecyclerView>(R.id.viewGroupRecyView)
 //      xml  LayoutAnimation可以用在任何ViewGroup上
         viewGroupRecyView.layoutManager = LinearLayoutManager(mContext)
         viewGroupRecyView.adapter = Adapter()

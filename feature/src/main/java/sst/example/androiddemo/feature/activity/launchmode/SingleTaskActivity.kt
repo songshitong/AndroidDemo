@@ -4,8 +4,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_single_task.*
 import sst.example.androiddemo.feature.R
 
 //不指定taskAffinity
@@ -78,7 +78,7 @@ class SingleTaskActivity : AppCompatActivity() {
         setContentView(R.layout.activity_single_task)
         Log.d(TAG," onCreate ==== ")
         printActivityInfo()
-        singleTask2Other.setOnClickListener {
+        findViewById<View>(R.id.singleTask2Other).setOnClickListener {
             val intent = Intent(this, OtherActivity::class.java)
             startActivity(intent)
         }

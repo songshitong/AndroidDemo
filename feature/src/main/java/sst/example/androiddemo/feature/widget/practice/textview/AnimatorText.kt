@@ -1,15 +1,15 @@
 package sst.example.androiddemo.feature.widget.practice.textview
 
-import android.animation.Animator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.animation.addListener
 
+// https://github.com/aagarwal1012/Animated-Text-Kit/blob/master/lib/src/animated_text.dart
+
+//缺点： 文字太多，整体刷新，可能有性能问题
 class AnimatorText : AppCompatTextView {
   private val textList = mutableListOf<AnimatorTextItem>()
   private var animateIndex = 0
@@ -28,6 +28,7 @@ class AnimatorText : AppCompatTextView {
   }
 
   fun startAnim() {
+    animateIndex =0
     scheduleNext()
   }
 
@@ -37,48 +38,61 @@ class AnimatorText : AppCompatTextView {
       return
     }
     val textItem = textList[animateIndex]
-    textItem.setInvalidateCall {
-      invalidate()
-    }
-    val animator = textItem.getAnimator()
-    animator.addListener(onEnd = {
-      animateIndex++
-      scheduleNext()
+    textItem.setAnimatorTextListener(object : AnimatorTextListener{
+
+      override fun onUpdate(value: Float) {
+         invalidate()
+      }
+
+      override fun showNext() {
+        animateIndex++
+        scheduleNext()
+      }
     })
-    animator.start()
+    textItem.startAnim()
+  }
+
+  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    val tempText = text    //改变文字的宽度
+    textList.forEach {
+      text = text.toString()+it.text
+    }
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    text = tempText
   }
 
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
     if (null == canvas) return
+    val offset = paint.measureText(text.toString()) //需要优化，不要每次绘制都测量文字
+    canvas.translate(offset,0f)
     textList.forEach {
       it.drawText( canvas, paint)
     }
   }
 }
 
-// https://github.com/aagarwal1012/Animated-Text-Kit/blob/master/lib/src/animated_text.dart
-abstract class AnimatorTextItem {
+abstract class AnimatorTextItem(val text:String) {
   //这里使用回调刷新 Animator不能监听进度，使用ObjectAnimator限制太死，有可能使用动画集合
-  private var invalidateCall:(()->Unit)? = null
+  private var animatorTextListener: AnimatorTextListener? = null
 
-  fun setInvalidateCall(invalidateCall:()->Unit){
-    this.invalidateCall = invalidateCall
+  fun getAnimatorTextListener():AnimatorTextListener?{
+    return animatorTextListener
   }
 
-  abstract fun getAnimator(): Animator
-  abstract fun drawText( canvas: Canvas, paint: Paint)
+  fun setAnimatorTextListener(animatorTextListener: AnimatorTextListener){
+    this.animatorTextListener = animatorTextListener
+  }
 
+  abstract fun drawText( canvas: Canvas, paint: Paint)
+  abstract fun startAnim()
 }
 
-class RotateText : AnimatorTextItem() {
-  val animator: ValueAnimator = ValueAnimator.ofFloat(0f, 1f)
+interface AnimatorTextListener{
+  fun onStart(){}
+  fun onEnd(){}
 
-  override fun getAnimator(): Animator {
-    return animator
-  }
+  fun showNext(){}
 
-  override fun drawText(canvas: Canvas, paint: Paint) {
-    TODO("Not yet implemented")
-  }
+  fun onUpdate(value:Float){}
 }

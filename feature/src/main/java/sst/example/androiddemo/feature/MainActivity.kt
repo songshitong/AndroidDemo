@@ -22,6 +22,7 @@ import android.text.TextUtils.SimpleStringSplitter
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
+import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
@@ -32,7 +33,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
-import kotlinx.android.synthetic.main.activity_main.*
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
 import sst.example.androiddemo.feature.activity.launchmode.LaunchActivity
@@ -50,6 +50,7 @@ import sst.example.androiddemo.feature.animation.evaluator.TypeEvaluatorActivity
 import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
+import sst.example.androiddemo.feature.service.IntentServiceActivity
 import sst.example.androiddemo.feature.service.OperationAccessibilityService
 import sst.example.androiddemo.feature.util.MyUtils
 import sst.example.androiddemo.feature.video.VideoParserActivity
@@ -91,15 +92,15 @@ class MainActivity : AppCompatActivity() {
     Log.d(TAG, " onCreate ==== ")
     // Example of a call to a native method
 //        sample_text.text = stringFromJNI()
-    mainNormalActivity.setOnClickListener {
+    findViewById<View>(R.id.mainNormalActivity).setOnClickListener {
       val intent = Intent(this, TestOrientationActivity::class.java)
       startActivity(intent)
     }
-    launchActivity.setOnClickListener {
+    findViewById<View>(R.id.launchActivity).setOnClickListener {
       val intent = Intent(this, LaunchActivity::class.java)
       startActivity(intent)
     }
-    main_dialog.setOnClickListener {
+    findViewById<View>(R.id.main_dialog).setOnClickListener {
       val dialog = AlertDialog.Builder(this).create()
       dialog.setTitle("dialog")
       dialog.setButton(DialogInterface.BUTTON_POSITIVE, "确定") { dialogInterface, i ->
@@ -107,116 +108,116 @@ class MainActivity : AppCompatActivity() {
       }
       dialog.show()
     }
-    mainDialogActivity.setOnClickListener {
+    findViewById<View>(R.id.mainDialogActivity).setOnClickListener {
       val intent = Intent(this, DialogActivity::class.java)
       startActivity(intent)
     }
-    go2Fragment.setOnClickListener {
+    findViewById<View>(R.id.go2Fragment).setOnClickListener {
       val intent = Intent(this, FragmentActivity::class.java)
       startActivity(intent)
     }
-    go2Menu.setOnClickListener {
+    findViewById<View>(R.id.go2Menu).setOnClickListener {
       val intent = Intent(this, MenuActivity::class.java)
       startActivity(intent)
     }
 
-    go2Service.setOnClickListener {
+    findViewById<View>(R.id.go2Service).setOnClickListener {
       val intent = Intent(this, ServicesActivity::class.java)
       startActivity(intent)
     }
-    layoutWeight.setOnClickListener {
+      findViewById<View>(R.id.layoutWeight).setOnClickListener {
       val intent = Intent(this, LinearLayoutActivity::class.java)
       startActivity(intent)
     }
 
-    sample_text.text = "BitMap"
-    sample_text.setOnClickListener {
+      findViewById<TextView>(R.id.sample_text).text = "BitMap"
+      findViewById<View>(R.id.sample_text).setOnClickListener {
       val intent = Intent(this, BitmapActivity::class.java)
       startActivity(intent)
     }
 
-    pictureView.setOnClickListener {
+      findViewById<View>(R.id.pictureView).setOnClickListener {
       val intent = Intent(this, PictureDrawableActivity::class.java)
       startActivity(intent)
     }
-    canvasActivity.setOnClickListener {
+    findViewById<View>(R.id.canvasActivity).setOnClickListener {
       val intent = Intent(this, CanvasActivity::class.java)
       startActivity(intent)
     }
-    paintActivity.setOnClickListener {
+      findViewById<View>(R.id. paintActivity).setOnClickListener {
       val intent = Intent(this, PaintActivity::class.java)
       startActivity(intent)
     }
-    drawableActivity.setOnClickListener {
+      findViewById<View>(R.id.drawableActivity).setOnClickListener {
       val intent = Intent(this, DrawableActivity::class.java)
       startActivity(intent)
     }
-    pathActivity.setOnClickListener {
+      findViewById<View>(R.id.pathActivity).setOnClickListener {
       val intent = Intent(this, PathActivity::class.java)
       startActivity(intent)
     }
 
-    layoutAnimationActivity.setOnClickListener {
+      findViewById<View>(R.id.layoutAnimationActivity).setOnClickListener {
       val intent = Intent(this, LayoutAnimationActivity::class.java)
       startActivity(intent)
     }
-    particleActivity.setOnClickListener {
+    findViewById<View>(R.id.particleActivity).setOnClickListener {
       val intent = Intent(this, ParticleActivity::class.java)
       startActivity(intent)
     }
-    loadingActivity.setOnClickListener {
+      findViewById<View>(R.id.loadingActivity).setOnClickListener {
       val intent = Intent(this, LoadingActivity::class.java)
       startActivity(intent)
     }
-    qqDragBubbleActivity.setOnClickListener {
+      findViewById<View>(R.id.qqDragBubbleActivity).setOnClickListener {
       val intent = Intent(this, QQDragBubbleActivity::class.java)
       startActivity(intent)
     }
-    stickyRecyclerviewAct.setOnClickListener {
+      findViewById<View>(R.id.stickyRecyclerviewAct).setOnClickListener {
       val intent = Intent(this, StickyActivity::class.java)
       startActivity(intent)
     }
 
-    springAnimation.setOnClickListener {
+      findViewById<View>(R.id.springAnimation).setOnClickListener {
       val intent = Intent(this, DynamicAnimaitonActivity::class.java)
       startActivity(intent)
     }
-    oscillationView.setOnClickListener {
+    findViewById<View>(R.id.oscillationView).setOnClickListener {
       val intent = Intent(this, OscillationActivity::class.java)
       startActivity(intent)
     }
-    growingTreeView.setOnClickListener {
+      findViewById<View>(R.id.growingTreeView).setOnClickListener {
       val intent = Intent(this, GrowingTreeActivity::class.java)
       startActivity(intent)
     }
-    xmlParserBtn.setOnClickListener {
+      findViewById<View>(R.id.xmlParserBtn).setOnClickListener {
       val intent = Intent(this, XmlParserActivity::class.java)
       startActivity(intent)
     }
-    wallpaperBtn.setOnClickListener {
+      findViewById<View>(R.id.wallpaperBtn).setOnClickListener {
 //            val intent = Intent(this, SettingActivity::class.java)
 //            startActivity(intent)
       startActivity(MyUtils.getWallPaper(this, NormalWallpaperService::class.java))
 
     }
-    jumpBtn.setOnClickListener {
+    findViewById<View>(R.id.jumpBtn).setOnClickListener {
       val intent = Intent(this, JumpActivity::class.java)
       startActivity(intent)
     }
-    videoParser.setOnClickListener {
+      findViewById<View>(R.id.videoParser).setOnClickListener {
       val intent = Intent(this, VideoParserActivity::class.java)
       startActivity(intent)
     }
-    shareBtn.setOnClickListener {
+      findViewById<View>(R.id.shareBtn).setOnClickListener {
       shareText("这是内容")
     }
-    ffmpeg.setOnClickListener {
+      findViewById<View>(R.id.ffmpeg).setOnClickListener {
       val intent = Intent(this, FFmpegActivity::class.java)
       startActivity(intent)
     }
 
 //      系统铃声 RingtoneManager  https://blog.csdn.net/ch853199769/article/details/78721003
-    ringtone.setOnClickListener {
+      findViewById<View>(R.id.ringtone).setOnClickListener {
       val player: MediaPlayer = MediaPlayer.create(
         this,
         ///系统铃声
@@ -226,13 +227,13 @@ class MainActivity : AppCompatActivity() {
       )
       player.start()
     }
-    startActivityForResult.setOnClickListener {
+    findViewById<View>(R.id.startActivityForResult).setOnClickListener {
       val intent = Intent(this, StartForResultActivity::class.java)
       startActivity(intent)
 
     }
 
-    whatsapp.setOnClickListener {
+    findViewById<View>(R.id.whatsapp).setOnClickListener {
       val intentShareList: MutableList<Intent> = ArrayList()
       val shareIntent = Intent()
       shareIntent.action = Intent.ACTION_SEND
@@ -311,7 +312,7 @@ class MainActivity : AppCompatActivity() {
 
     //handler原理为什么顺序是021  runnable运行的线程不是主线程吗
     //02是在本次消息,runnable的1需要另外的消息发送处理和执行
-    startHandler.setOnClickListener {
+    findViewById<View>(R.id.startHandler).setOnClickListener {
       val runnable = Runnable {
         Log.d(TAG, "1 runnable")
       }
@@ -346,16 +347,16 @@ class MainActivity : AppCompatActivity() {
     //方法的注释带例子，json,表结构，HTML实例等
 
     //自定义相册 content provider 或其他？
-    testAnrActivity.setOnClickListener {
+    findViewById<View>(R.id.testAnrActivity).setOnClickListener {
       startActivity(Intent(this, TestAnrActivity::class.java))
     }
-    measureTestActivity.setOnClickListener {
+      findViewById<View>(R.id.measureTestActivity).setOnClickListener {
       startActivity(Intent(this, MeasureTestActivity::class.java))
     }
-    customLMActivity.setOnClickListener {
+      findViewById<View>(R.id.customLMActivity).setOnClickListener {
       startActivity(Intent(this, RVCutsomLayoutManagerActivity::class.java))
     }
-    scrollNestedActivity.setOnClickListener {
+      findViewById<View>(R.id.scrollNestedActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -364,7 +365,7 @@ class MainActivity : AppCompatActivity() {
       )
     }
 
-    toastBugActivity.setOnClickListener {
+    findViewById<View>(R.id.toastBugActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -373,7 +374,7 @@ class MainActivity : AppCompatActivity() {
       )
     }
 
-    bigPictureActivity.setOnClickListener {
+      findViewById<View>(R.id.bigPictureActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -382,7 +383,7 @@ class MainActivity : AppCompatActivity() {
       )
     }
 
-    IntentServiceActivity.setOnClickListener {
+    findViewById<View>(R.id.IntentServiceActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -390,7 +391,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-    IntentConstrainLayoutActivity.setOnClickListener {
+      findViewById<View>(R.id.IntentConstrainLayoutActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -398,7 +399,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-    IntentRevealAnimatorActivity.setOnClickListener {
+      findViewById<View>(R.id.IntentRevealAnimatorActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -406,7 +407,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-    IntentTypeEvaluatorActivity.setOnClickListener {
+    findViewById<View>(R.id.IntentTypeEvaluatorActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -414,7 +415,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-    IntentActivityAnimation.setOnClickListener {
+    findViewById<View>(R.id.IntentActivityAnimation).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -422,7 +423,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-    IntentActivityTransition.setOnClickListener {
+      findViewById<View>(R.id.IntentActivityTransition).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -430,7 +431,7 @@ class MainActivity : AppCompatActivity() {
         ), ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle()
       )
     }
-    ActivityKeyFrame.setOnClickListener {
+      findViewById<View>(R.id.ActivityKeyFrame).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -438,7 +439,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-    dialogFragmentBtn.setOnClickListener {
+    findViewById<View>(R.id.dialogFragmentBtn).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -446,7 +447,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-    viewOutlineProviderBtn.setOnClickListener {
+      findViewById<View>(R.id.viewOutlineProviderBtn).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -454,20 +455,23 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-    motionLayoutBtn.setOnClickListener {
+      findViewById<View>(R.id.motionLayoutBtn).setOnClickListener {
       startActivity(Intent(this, MotionLayoutActivity::class.java))
     }
-    viewPropertyBtn.setOnClickListener {
+      findViewById<View>(R.id. viewPropertyBtn).setOnClickListener {
       startActivity(Intent(this, ViewPropertyAnimatorActivity::class.java))
     }
-    recorderBtn.setOnClickListener {
+    findViewById<View>(R.id.recorderBtn).setOnClickListener {
       startActivity(Intent(this, RecorderActivity::class.java))
     }
-    blackWhitePictureBtn.setOnClickListener {
+    findViewById<View>(R.id.blackWhitePictureBtn).setOnClickListener {
       startActivity(Intent(this, BlackWhitePictureActivity::class.java))
     }
-    shipWaveBtn.setOnClickListener {
+      findViewById<View>(R.id.shipWaveBtn).setOnClickListener {
       startActivity(Intent(this, ShipWaveActivity::class.java))
+    }
+      findViewById<View>(R.id.animatorTextBtn).setOnClickListener {
+      startActivity(Intent(this, AnimatorTextActivity::class.java))
     }
 
     //测试livedata连续调用

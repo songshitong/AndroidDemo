@@ -4,9 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
-
+import androidx.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,6 +85,17 @@ public class BitmapUtils {
      */
     public static Bitmap getBitmapFromFile(String filePath) throws FileNotFoundException {
         return BitmapFactory.decodeFile(filePath);
+    }
+
+    /**
+    * @Description: base64 转为bitmap
+    */
+    public static @Nullable Bitmap base64ToBitmap(String base64Str){
+        if(TextUtils.isEmpty(base64Str)){
+            return null;
+        }
+        byte[] decodedString = Base64.decode(base64Str, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
 }

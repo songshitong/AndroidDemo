@@ -3,6 +3,7 @@ package sst.example.androiddemo.feature.util;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,8 +24,13 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import static android.content.Intent.EXTRA_ALLOW_MULTIPLE;
@@ -149,6 +155,48 @@ public class MyUtils {
         cursor.close();
     }
 
+    //读取content provider的URI到文件
+    public static void saveContentProviderUriToPath(ContentResolver contentResolver ,Uri uri,String savePath){
+        InputStream stream= null;
+        OutputStream outStream= null;
+        FileOutputStream fos = null;
+        byte[] buffer = new byte[4096];
+        try {
+            stream = contentResolver.openInputStream(uri);
+            fos = new FileOutputStream(savePath);
+            outStream = new BufferedOutputStream(fos);
+            while (stream.available()>0){
+                stream.read(buffer,0,buffer.length);
+                outStream.write(buffer);
+            }
+            outStream.flush();
+        } catch (IOException e ) {
+            e.printStackTrace();
+        } finally {
+            if(null != stream){
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(null != outStream){
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(null != fos){
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     //视频
     public static Intent getAlbumVideoIntent(){
         Intent getImage = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -172,18 +220,17 @@ public class MyUtils {
 
 
     /**
-     * Get sysstem img crop intent.
+     * 系统裁剪
      *
-     * @param uri the uri
-     * @param out the out
-     * @return the intent
      */
     public static Intent getSysstemImgCrop(Uri uri, Uri out) {
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             //添加这一句表示对目标应用临时授权该Uri所代表的文件
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            //| Intent.FLAG_GRANT_WRITE_URI_PERMISSION 只有读的权限,其他应用可能没有写的权限
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION );
+
         }
         // crop为true是设置在开启的intent中设置显示的view可以剪裁
         intent.putExtra("crop", "true");
@@ -198,6 +245,7 @@ public class MyUtils {
         intent.putExtra("noFaceDetection", true);
         intent.putExtra("circleCrop", true);
         //指定输出位置
+        // !!!注意android11后系统相机无法访问app私有目录，需要保存在download等私有目录然后读到app... 否则提示错误无法保存
         intent.putExtra(MediaStore.EXTRA_OUTPUT, out);
 
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());

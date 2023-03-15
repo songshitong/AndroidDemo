@@ -5,7 +5,7 @@ Android 7.0强制启用了被称作 StrictMode的策略，带来的影响就是�
 官方给出解决这个问题的方案，就是使用FileProvider：
 
 FileProvider 是 ContentProvider 的一个特殊子类
-定义 FileProvider
+定义 FileProvider   注意，最好自定义androidx.core.content.FileProvider，然后替换name，否则容易和三方的provider冲突
 ```
 <provider
     android:name="androidx.core.content.FileProvider"
@@ -36,6 +36,16 @@ FileProvider 只能为事先指定目录下的文件生成内容 URI
 
 name：内容 URI 路径片段。为了增强安全性，这个值用来隐藏文件子目录的详细路径信息，也就是在内容 URI 中，用这个属性值替代子目录的路径信息。
 path：需要共享文件所在的子目录详细路径，这个值是真实存在的路径。必须注意的是，这个属性值必须是一个子目录，而不能特定的文件或者一系列文件。你可以通过文件名共享单个文件，但是不能使用通配符指定多个文件
+```
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <files-path name="picture" path="internal/pic/"/>
+    <files-path name="database" path="internal/db/"/>
+    <external-path name="." path="."/>
+    <external-files-path name="picture" path="picture/"/>
+</paths>
+
+```
 
 
 
@@ -63,7 +73,7 @@ Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 intent.putExtra(MediaStore.EXTRA_OUTPUT, picUri);
 startActivityForResult(intent, 100);
 ```
-使用fileProvider后
+使用fileProvider后     注意！！！！：uri的生成使用FileProvider.getUriForFile，使用Uri.parse会报错FileNotFoundException
 ```
 // 重新构造Uri：content://
 File imagePath = new File(Context.getFilesDir(), "images");

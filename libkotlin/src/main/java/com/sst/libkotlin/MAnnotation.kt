@@ -6,8 +6,8 @@ import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.jvm.Throws
 
 //kotlin中的注解
-//  @JvmSuppressWildcards todo
 class MAnnotation private constructor(){
+
 
     //抛出Java的IOException
     //翻译为
@@ -88,7 +88,17 @@ class MAnnotation private constructor(){
         }
     }
 
+  class Box<out T>(val value: T)
 
+  interface Base
+  class Derived : Base
 
+  //@JvmSuppressWildcards
+  //用来注解类和方法，使得被标记元素的泛型参数不会被编译成通配符
+  fun unboxBase(box:Box<@JvmSuppressWildcards Base>): Base = box.value
+// 会翻译成
+// Base unboxBase(Box<Base> box) { …… }
 
+  //不使用注解翻译
+  // Base unboxBase(Box<? extends Base> box) { …… }
 }

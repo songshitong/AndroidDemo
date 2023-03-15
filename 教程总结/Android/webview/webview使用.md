@@ -33,11 +33,15 @@ WebView.loadUrl("javascript:js中的方法名")
   这种方法的优点是很简洁，缺点是没有返回值，如果需要拿到js方法的返回值则需要js调用Android中的方法来拿到这个返回值
 WebView.evaluateJavaScript("javascript:js中的方法名",ValueCallback)
   这种方法比 loadUrl 好的是可以通过 ValueCallback 这个回调拿到 js方法的返回值。缺点是这个方法 Android4.4 才有，兼容性较差。
+注意：需要在主线程调用！！！   unity->android->webview中 unity->android可能切换线程，需要注意
+
 
 js调Android
-WebView.addJavascriptInterface()。
+WebView.addJavascriptInterface(Object obj, String interfaceName)。
   这是官方解决 js 调用 Android 方法的方案，需要注意的是要在供 js 调用的 Android 方法上加上 @JavascriptInterface 注解，
   以避免安全漏洞。这种方案的缺点是 Android4.2 以前会有安全漏洞，不过在 4.2 以后已经修复了。
+  向js注入一个interfaceName的对象， js通过window.interfaceName调用相关方法
+   
 重写 WebViewClient的shouldOverrideUrlLoading()方法来拦截url， 拿到 url 后进行解析，如果符合双方的规定，即可调用 Android 方法。
   优点是避免了 Android4.2 以前的安全漏洞，缺点也很明显，无法直接拿到调用 Android 方法的返回值，
   只能通过 Android 调用 js 方法来获取返回值

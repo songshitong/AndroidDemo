@@ -1,5 +1,7 @@
 package com.sst.libkotlin
 
+import java.lang.reflect.Method
+import java.lang.reflect.Type
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -78,6 +80,24 @@ class MReflect {
            ageP.set(mReflect,111)
            println("ageP is ${ageP.get(mReflect)}")
         }
+
+        //获取方法注解的参数
+        //https://blog.csdn.net/zx_android/article/details/106236304
+        fun getParameterAnnotaion(method: Method, annotation: Annotation) {
+            val parameterAnnotations = method.parameterAnnotations
+            for (iss in parameterAnnotations) {
+                for (i in iss) {
+                    if(i.javaClass == annotation.javaClass){
+//                        println("参数注解的值：${i?.name},${i?.value}")
+                    }
+//                    val a = annotation::class
+//                    if (i is a) {
+//                        println("参数注解的值：${i?.name},${i?.value}")
+//                    }
+                }
+            }
+        }
+
     }
 }
 

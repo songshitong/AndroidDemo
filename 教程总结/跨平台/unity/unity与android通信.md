@@ -20,7 +20,7 @@ jo.SetStatic (method ,parameter );//设置静态变量
         if (GUI.Button(new Rect(150, 150, 250, 135), "调用Android原生方法"))
         {
             AndroidJavaClass ac = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            AndroidJavaObject ao = ac.CallStatic<AndroidJavaObject>("currentActivity");
+            AndroidJavaObject ao = ac.CallStatic<AndroidJavaObject>("currentActivity"); //可以声明一个activity的静态变量
             AndroidJavaObject androidClass = new AndroidJavaObject("cn.nutown.android_project.MyAndroidClass");//我们Android的类名
             androidClass.Call("showMassege",ao,"hi!");//对应我们Android的方法需要的参数
         } 

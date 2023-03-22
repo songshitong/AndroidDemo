@@ -20,6 +20,11 @@ onPageStarted
 onPageFinished
 onReceivedError 页面加载失败
 
+onPageFinished的多次调用
+https://www.jb51.net/article/183447.htm
+一般是由于重定向导致，可以通过url和webview.progress==100进行过滤
+
+
 WebChromeClient
 onReceivedTitle()
 onProgressChanged()
@@ -68,18 +73,38 @@ public void onConsoleMessage(String message, int lineNumber, String sourceID) {
     return true;
   }
 ```
-远程调试  webview debug
+远程调试  webview debug   
 https://developer.chrome.com/docs/devtools/remote-debugging/webviews/
 ```
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
     if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE))
     { WebView.setWebContentsDebuggingEnabled(true); }
 }
-chrome查看 chrome://inspect 选择usb设备还是network设备
 ```
+chrome查看 chrome://inspect 选择usb设备还是network设备
+点击设备的inspect
 
 webview chrome变更
 https://web.dev/appcache-removal/#android-webview
 Chrome 85 开始，默认情况下，Chrome 中将不再提供 AppCache,建议用Service Workers替代
 https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
 settings.setAppCacheEnabled(false);
+
+
+webview使用LocalStorage
+```
+ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            webView.evaluateJavascript("window.localStorage.setItem('"+ key +"','"+ val +"');", null);
+            webView.evaluateJavascript("window.localStorage.setItem('"+ key2 +"','"+ val2 +"');", null);
+        } else {
+            webView.loadUrl("javascript:localStorage.setItem('"+ key +"','"+ val +"');");
+            webView.loadUrl("javascript:localStorage.setItem('"+ key2 +"','"+ val2 +"');");
+        }
+```
+
+
+webview键盘相关
+1 无法弹出键盘
+window设置为softmode为可以获焦， 并且手动获取焦点requestFocus()
+2 布局遮挡
+  由h5进行移动

@@ -74,8 +74,11 @@ class MAnnotation private constructor(){
 
 
        //自定义注解
-        @IntDef(SLOW, NORMAL, FAST)
-        @Retention(AnnotationRetention.SOURCE)
+        @IntDef(SLOW, NORMAL, FAST)//限定注解的值
+        @Retention(AnnotationRetention.SOURCE) //其他类型 BINARY：保存在二进制但是反射不可见；RUNTIME：反射可见
+        @Target(AnnotationTarget.FIELD,AnnotationTarget.TYPE_PARAMETER,AnnotationTarget.VALUE_PARAMETER) //限定注解使用的位置
+        @Repeatable//注解可以多次使用
+        @MustBeDocumented //注解包含在生成的文档中
         annotation class Speed
         const val SLOW = 0
         const val NORMAL = 1
@@ -86,7 +89,22 @@ class MAnnotation private constructor(){
         public fun setSpeed(@Speed speed: Int) {
             this.speed = speed
         }
+
+      private  fun getMethodAnnotation(methodInterface:Any){
+        //所有声明的方法
+        methodInterface.javaClass.declaredMethods.forEach { method ->
+          //方法的所有注解
+          method.annotations.forEach {annotation ->
+            if(annotation is CustomMethod){//可以用泛型替代
+              annotation.name //拿到注解的name
+            }
+          }
+        }
+      }
     }
+
+  @Retention(AnnotationRetention.RUNTIME)
+  annotation class CustomMethod(val name:String)
 
   class Box<out T>(val value: T)
 

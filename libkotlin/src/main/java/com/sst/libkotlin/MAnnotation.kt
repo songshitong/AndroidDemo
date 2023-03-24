@@ -2,6 +2,8 @@ package com.sst.libkotlin
 
 import androidx.annotation.IntDef
 import java.io.IOException
+import java.lang.reflect.Method
+import java.lang.reflect.Parameter
 import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.jvm.Throws
 
@@ -76,7 +78,8 @@ class MAnnotation private constructor(){
        //自定义注解
         @IntDef(SLOW, NORMAL, FAST)//限定注解的值
         @Retention(AnnotationRetention.SOURCE) //其他类型 BINARY：保存在二进制但是反射不可见；RUNTIME：反射可见
-        @Target(AnnotationTarget.FIELD,AnnotationTarget.TYPE_PARAMETER,AnnotationTarget.VALUE_PARAMETER) //限定注解使用的位置
+        //限定注解使用的位置  TYPE_PARAMETER参数类型  VALUE_PARAMETER参数名称
+        @Target(AnnotationTarget.FIELD,AnnotationTarget.TYPE_PARAMETER,AnnotationTarget.VALUE_PARAMETER)
         @Repeatable//注解可以多次使用
         @MustBeDocumented //注解包含在生成的文档中
         annotation class Speed
@@ -90,16 +93,30 @@ class MAnnotation private constructor(){
             this.speed = speed
         }
 
-      private  fun getMethodAnnotation(methodInterface:Any){
-        //所有声明的方法
-        methodInterface.javaClass.declaredMethods.forEach { method ->
-          //方法的所有注解
-          method.annotations.forEach {annotation ->
-            if(annotation is CustomMethod){//可以用泛型替代
-              annotation.name //拿到注解的name
-            }
+
+      //方法的注解
+      private inline fun <reified T:Annotation> parseMethodAnnotation(method: Method): T? {
+        //方法的所有注解
+        // method.parameterAnnotations 这是参数的注解
+        for (annotation in method.annotations){
+          if (annotation is T) {
+            // if(annotation is CustomMethod){//可以用泛型替代
+            //   annotation.name //拿到注解的name
+            // }
+            return annotation
           }
         }
+        return null
+      }
+
+      //参数注解
+      private inline fun <reified T:Annotation> parseMethodParameter(param: Parameter): T? {
+        for (annotation in param.annotations){
+          if (annotation is T) {
+            return annotation
+          }
+        }
+        return null
       }
     }
 

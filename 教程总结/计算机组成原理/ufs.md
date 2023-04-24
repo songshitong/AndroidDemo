@@ -18,3 +18,6 @@ FLASH闪存是属于内存器件的一种，"Flash"。闪存则是一种非易�
 其存储特性相当于硬盘，这项特性正是闪存得以成为各类便携型数字设备的存储介质的基础。
 
 todo nand flash
+
+
+SSD（Solid-state drive 或 Solid-state disk，固态硬盘）、HDD（Hard Disk Drive，硬盘）

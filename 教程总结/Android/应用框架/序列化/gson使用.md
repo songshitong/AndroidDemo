@@ -112,3 +112,30 @@ alternate  alternative可供替代的
  @Until(1.1) private String emailAddress;
  @Until(1.1) private String password;
 ```
+
+直接将json的数字解析为Object时，默认为double类型
+"progress":1   中1会解析为1.0
+1 使用java自带的jsonObject解析
+2 自定义解析器
+https://blog.csdn.net/xiao_jun_0820/article/details/50232017
+```
+Gson gson = new GsonBuilder().
+                registerTypeAdapter(Double.class, new JsonSerializer<Double>() {
+ 
+                    @Override
+                    public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
+                        if (src == src.longValue())
+                            return new JsonPrimitive(src.longValue());
+                        return new JsonPrimitive(src);
+                    }
+                }).create();
+```
+即如果是Double类型的，判断一下它和它的longValue是否相等，如果相等则说明小数位是补了一个".0",那么我们就返回src.longValue,否则直接返回Double src
+
+
+gson统一设置时间格式
+```
+Gson gson = new GsonBuilder()
+        .setDateFormat("yyyy-MM-dd")  //"yyyy-MM-dd hh:mm:ss"
+        .create();
+```

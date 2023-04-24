@@ -1,5 +1,22 @@
 
 
+判断action是否在view内触发
+```
+ public static boolean isActionInView(View v, MotionEvent event){
+    int[] l = { 0, 0 };
+    //v.getLocationInWindow(l);//这取得是相对window的位置  如果window的大小和位置改变了，相对屏幕的位置就获取不到了
+    v.getLocationOnScreen(l); //这是取得屏幕的位置
+    int left = l[0], top = l[1], bottom = top + v.getHeight(), right = left + v.getWidth();
+    if (event.getX() > left && event.getX() < right && event.getY() > top
+        && event.getY() < bottom) {
+      // 点击EditText的事件，忽略它。
+      return true;
+    } else {
+      return false;
+    }
+  }
+```
+
 view截图
 https://blog.csdn.net/lou_liang/article/details/118296761
 

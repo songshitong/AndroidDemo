@@ -1,3 +1,10 @@
+webview设置背景色
+```
+在布局文件中的webview设置background（这个一定要设置）。然后在java代码中添加如下代码：
+wv.setBackgroundColor(0);//设置背景色
+wv.getBackground().setAlpha(0);//设置填充透明度（布局中一定要设置background，不然getbackground会是null）
+```
+
 销毁
 ```
  private void destroyWebView() {

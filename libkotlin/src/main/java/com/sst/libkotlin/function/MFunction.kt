@@ -77,6 +77,7 @@ class MFunction {
         1+2
     }
     //无返回值，但声明为Unit  Unit相当于Java的void
+    // 返回值不要声明为Void，没法返回  需要声明为Void?  然后返回null
     fun foo2():Unit{
         1+2
     }
@@ -121,7 +122,9 @@ class MFunction {
 //    print(sum)
 
 //    函数类型  () -> Unit就是onClick的函数类型
-     val onClick: () -> Unit = { }
+     val onClick: () -> Unit = {
+       1+1
+     }
 
      //可空的类型
      val onClick1 :(()->Unit)? = null

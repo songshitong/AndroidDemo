@@ -20,7 +20,7 @@ productFlavors {
             resValue "string", "authority", "com.facebook.app.FacebookContentProvider5435651423234"
         }
         development {
-            buildConfigField buildConfigField "boolean", "LOG_DEBUG", "true"//是否输出LOG信息
+            buildConfigField("boolean", "LOG_DEBUG", "true")//是否输出LOG信息
             applicationId = "com.myapp.development"
             resValue "string", "authority", "com.facebook.app.FacebookContentProvider2134564533421"
         }

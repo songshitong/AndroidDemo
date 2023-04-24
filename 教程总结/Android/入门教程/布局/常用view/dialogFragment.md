@@ -1,7 +1,7 @@
 
 注意：dialog中不要进行计时，dialog会隐藏，又显示，计时的进度不好保存，
 最好跟随页面或者其他
-
+dialogFragment销毁后 dialog为空，可以用来判断dialogFragment是否为空
 
 优点 
 1 横竖屏切换保存dialog状态
@@ -194,6 +194,10 @@ final View decorView = getDialog()
     //设置后，点击外部无法取消,内部无法点击  显示后需要设置焦点，但是部分手机只要获取焦点就拉起导航栏
     dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+    
+    //显示后清除不可获焦    
+     dialog.setOnShowListener(
+        dialogInterface -> dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE));    
     return dialog;
   }
 ```

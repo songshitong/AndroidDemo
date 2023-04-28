@@ -57,3 +57,16 @@ android:stateListAnimator="@null"
 //2
 elevation=0
 ```
+
+button去掉点击效果
+```
+1.
+android:stateListAnimator="@null"
+2.
+style="@style/Widget.AppCompat.Button.Borderless"
+3.
+主题添加
+<item name="buttonStyle">?android:attr/borderlessButtonStyle</item>
+或者
+<item name="buttonStyle">@style/Widget.AppCompat.Button.Borderless</item>-
+```

@@ -1,5 +1,7 @@
 package sst.example.lib;
 
+import java.util.Random;
+
 public class Array {
     //二维数组 http://c.biancheng.net/view/916.html
     //在 Java 中二维数组被看作数组的数组，即二维数组为一个特殊的一维数组，其每个元素又是一个一维数组。Java 并不直接支持二维数组，

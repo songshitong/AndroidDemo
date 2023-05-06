@@ -1,3 +1,14 @@
+
+创建context
+实例化webview的Context必须是activity，内部弹出alert需要activity context
+
+
+加载url  
+loadUrl 注意url不能太长
+Refusing to load URL as it exceeds 2097152 characters.
+//由loadUrl改为evaluateJavascript
+
+
 webview设置背景色
 ```
 在布局文件中的webview设置background（这个一定要设置）。然后在java代码中添加如下代码：

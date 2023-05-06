@@ -57,6 +57,7 @@ import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.video.recorder.RecorderActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
+import sst.example.androiddemo.feature.widget.CameraMatrixActivity
 import sst.example.androiddemo.feature.widget.SystemView
 import sst.example.androiddemo.feature.widget.ViewOutlineProviderActivity
 import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
@@ -307,7 +308,6 @@ class MainActivity : AppCompatActivity() {
       } while (time + 1000 >= System.currentTimeMillis())
       Log.d(TAG, "index value  $index")
     }).start();
-    //todo 文字动画 https://github.com/aagarwal1012/Animated-Text-Kit
 
 
     //handler原理为什么顺序是021  runnable运行的线程不是主线程吗
@@ -472,6 +472,9 @@ class MainActivity : AppCompatActivity() {
     }
       findViewById<View>(R.id.animatorTextBtn).setOnClickListener {
       startActivity(Intent(this, AnimatorTextActivity::class.java))
+    }
+    findViewById<View>(R.id.cameraMatrixBtn).setOnClickListener {
+      startActivity(Intent(this, CameraMatrixActivity::class.java))
     }
 
     //测试livedata连续调用
@@ -684,17 +687,6 @@ class MainActivity : AppCompatActivity() {
     this.startActivity(Intent.createChooser(shareIntent, "分享title"))
   }
 
-  //dalvik system CloseGuard
-  //ndk 稳定版16b  aiqiyi xhook elf hook原理
-
-  //webview  好用的webview
-  //todo loadUrl   Refusing to load URL as it exceeds 2097152 characters.
-  //由loadUrl改为evaluateJavascript
-  //实例化webviewcontext必须是activity，内部弹出alert需要activity context
-  // Android webview无法全屏
-
-  //todo 打日志总结  方法的出入口，日志不能有相同的描述，方便定位到具体代码行，相当于唯一标识？，尤其是同一个方法里面的
-  //
 
 
 
@@ -794,7 +786,7 @@ class MainActivity : AppCompatActivity() {
       println("HOME has been pressed yet ...")
       // android.os.Process.killProcess(android.os.Process.myPid());
       Toast.makeText(
-        getApplicationContext(), "HOME 键已被禁用...",
+        applicationContext, "HOME 键已被禁用...",
         Toast.LENGTH_LONG
       ).show()
     }

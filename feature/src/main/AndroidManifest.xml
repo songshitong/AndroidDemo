@@ -22,6 +22,9 @@
       android:theme="@style/AppTheme.NoActionBar"
       tools:replace="android:allowBackup">
     <activity
+        android:name=".widget.CameraMatrixActivity"
+        android:exported="false" />
+    <activity
         android:name=".graphics.AnimatorTextActivity"
         android:exported="false" />
     <activity

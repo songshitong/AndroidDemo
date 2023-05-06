@@ -88,6 +88,9 @@ class MotionLayoutActivity : AppCompatActivity() {
   // constraint.propertySet.alpha = 0.1f
 
 
+    //状态跳转
+    //motionLayout.jumpToState(R.id.scene_end)
+
     //recyclerview中使用motionLayout
 //    trigger.setOnClickListener {
 //      data.getOrNull(holder.adapterPosition)?.let {

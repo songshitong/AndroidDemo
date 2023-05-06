@@ -201,3 +201,11 @@ final View decorView = getDialog()
     return dialog;
   }
 ```
+
+DialogFragment事件拦截
+```
+dialog.window?.decorView?.setOnTouchListener { _, event ->
+      dispatchTouchEvent(event)
+      return@setOnTouchListener false
+    }
+```

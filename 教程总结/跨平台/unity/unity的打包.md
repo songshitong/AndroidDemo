@@ -11,8 +11,8 @@ IL的全称是 Intermediate Language，CIL（Common Intermediate Language，特�
 
 2022-07-26
 unityLibrary打包AAR
-1.修改gradle版本，可能出现不兼容的情况 gradle/wrapper/gradle-wrapper.properties
-2. unityLibrary修改manifest.xml，去掉launcher相关，否则会有多个桌面icon
-3. ndk版本设置，设置兼容的ndk
-4. unityLibrary-release.aar改为unityLibrary.aar
-5. aar进入主工程，clean，gradle sync
+1 修改gradle版本，可能出现不兼容的情况 gradle/wrapper/gradle-wrapper.properties
+2 unityLibrary修改manifest.xml，去掉launcher相关，否则会有多个桌面icon
+3 ndk版本设置，设置兼容的ndk
+4 unityLibrary-release.aar改为unityLibrary.aar
+5 aar进入主工程，clean，gradle sync

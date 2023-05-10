@@ -2,6 +2,8 @@ https://github.com/xfhy/Android-Notes/blob/master/Blogs/Android/%E7%B3%BB%E7%BB%
 
 androidx.lifecycle:lifecycle-runtime:2.3.1
 
+
+
 原理总结
 LiveData利用Lifecycle感知activity/fragment的生命周期，在销毁时移除观察者
 observe 保存观察者到SafeIterableMap  ObserverWrapper对Observer进行功能增强，一种是LifecycleBoundObserver跟随生命周期的，

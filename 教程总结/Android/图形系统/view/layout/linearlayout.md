@@ -138,7 +138,7 @@ onMeasure
 
             // Add in our padding
             mTotalLength += mPaddingTop + mPaddingBottom;
-            // TODO: Should we recompute the heightSpec based on the new total length?
+            //  Should we recompute the heightSpec based on the new total length?
         } else {
             alternativeMaxWidth = Math.max(alternativeMaxWidth,
                                            weightedMaxWidth);

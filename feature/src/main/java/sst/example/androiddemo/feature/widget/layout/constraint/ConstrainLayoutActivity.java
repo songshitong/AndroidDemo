@@ -1,7 +1,13 @@
-package sst.example.androiddemo.feature.widget.layout;
+package sst.example.androiddemo.feature.widget.layout.constraint;
 
+import android.animation.Animator;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewAnimationUtils;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.utils.widget.ImageFilterView;
+import androidx.constraintlayout.widget.ConstraintHelper;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.os.Bundle;
@@ -22,7 +28,6 @@ public class ConstrainLayoutActivity extends AppCompatActivity {
 
         //Flow和Layer都是ConstraintHelper的子类，当两者不满足需求时，可以通过继承ConstraintHelper来实现想要的约束效果  todo
         //https://juejin.cn/post/6854573221312725000#heading-4
-
         //代码动态设置属性
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) findViewById(R.id.constrain_view1).getLayoutParams();
         params.height = 100;
@@ -30,4 +35,7 @@ public class ConstrainLayoutActivity extends AppCompatActivity {
 //        params.rightToRight =  viewId;
 //        view.requestLayout(); 看情况调用
     }
+
+
+
 }

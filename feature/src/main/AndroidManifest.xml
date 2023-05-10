@@ -95,7 +95,7 @@
         android:name=".animation.RevealAnimatorActivity"
         android:exported="false" />
     <activity
-        android:name=".widget.layout.ConstrainLayoutActivity"
+        android:name=".widget.layout.constraint.ConstrainLayoutActivity"
         android:exported="false" />
     <activity
         android:name=".service.IntentServiceActivity"

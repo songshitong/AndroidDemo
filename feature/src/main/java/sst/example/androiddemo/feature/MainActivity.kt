@@ -4,7 +4,6 @@ import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.app.ActivityManager
 import android.app.Application.getProcessName
-import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -16,9 +15,7 @@ import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.provider.Settings
-import android.provider.Settings.Secure
 import android.text.TextUtils
-import android.text.TextUtils.SimpleStringSplitter
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
@@ -31,7 +28,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
@@ -51,7 +47,6 @@ import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
 import sst.example.androiddemo.feature.service.IntentServiceActivity
-import sst.example.androiddemo.feature.service.OperationAccessibilityService
 import sst.example.androiddemo.feature.util.MyUtils
 import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.video.recorder.RecorderActivity
@@ -60,13 +55,12 @@ import sst.example.androiddemo.feature.webview.JumpActivity
 import sst.example.androiddemo.feature.widget.CameraMatrixActivity
 import sst.example.androiddemo.feature.widget.SystemView
 import sst.example.androiddemo.feature.widget.ViewOutlineProviderActivity
-import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
+import sst.example.androiddemo.feature.widget.layout.constraint.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.LinearLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.util.function.Predicate
 import kotlin.math.pow
 import kotlin.math.sqrt
 

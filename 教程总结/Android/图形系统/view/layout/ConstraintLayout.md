@@ -147,7 +147,105 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 ```
 子view数量没有改变，child没有请求layout 宽高没变，直接设置宽高
 width为EXACTLY height为AT_MOST 设置宽高
+updateHierarchy 更新child约束
+resolveSystem 求解约束
 根据measure测量结果，设置宽高setMeasuredDimension
+
+
+updateHierarchy
+```
+private boolean updateHierarchy() {
+        final int count = getChildCount();
+        boolean recompute = false;
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.isLayoutRequested()) {
+                recompute = true;
+                break;
+            }
+        }
+        //子child requestLayout，更新布局约束
+        if (recompute) {
+            setChildrenConstraints();
+        }
+        return recompute;
+    }
+
+
+ private void setChildrenConstraints() {
+        ...
+        final int count = getChildCount();
+        // Make sure everything is fully reset before anything else
+        for (int i = 0; i < count; i++) {
+            View child = getChildAt(i);
+            //给每个child 创建ConstraintWidget，保存布局约束相关信息
+            ConstraintWidget widget = getViewWidget(child);
+            if (widget == null) {
+                continue;
+            }
+            //重置
+            widget.reset();
+        }
+        ....
+
+        if (USE_CONSTRAINTS_HELPER && mConstraintSetId != -1) {
+            for (int i = 0; i < count; i++) {
+                final View child = getChildAt(i);
+                if (child.getId() == mConstraintSetId && child instanceof Constraints) {
+                    mConstraintSet = ((Constraints) child).getConstraintSet();
+                }
+            }
+        }
+
+        if (mConstraintSet != null) {
+         //将约束相关设置到Barrier，Guideline，ConstraintHelper以及对应的view
+            mConstraintSet.applyToInternal(this, true);
+        }
+
+        mLayoutWidget.removeAllChildren();
+
+        final int helperCount = mConstraintHelpers.size();
+        //回调ConstraintHelper.updatePreLayout
+        if (helperCount > 0) {
+            for (int i = 0; i < helperCount; i++) {
+                ConstraintHelper helper = mConstraintHelpers.get(i);
+                helper.updatePreLayout(this);
+            }
+        }
+
+        //调用Placeholder.updatePreLayout
+        for (int i = 0; i < count; i++) {
+            View child = getChildAt(i);
+            if (child instanceof Placeholder) {
+                ((Placeholder) child).updatePreLayout(this);
+            }
+        }
+
+        mTempMapIdToWidget.clear();
+        mTempMapIdToWidget.put(PARENT_ID, mLayoutWidget);
+        mTempMapIdToWidget.put(getId(), mLayoutWidget);
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            ConstraintWidget widget = getViewWidget(child);
+            mTempMapIdToWidget.put(child.getId(), widget);
+        }
+
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            //获取view对应的ConstraintWidget
+            ConstraintWidget widget = getViewWidget(child);
+            if (widget == null) {
+                continue;
+            }
+            final LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
+            mLayoutWidget.add(widget);
+            //从LayoutParams获取约束信息
+            applyConstraintsFromLayoutParams(isInEditMode, child, widget, layoutParams, mTempMapIdToWidget);
+        }
+    }    
+```
+
+
 
 onLayout
 ```

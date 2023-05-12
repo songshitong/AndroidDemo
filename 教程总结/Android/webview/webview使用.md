@@ -8,6 +8,24 @@ loadUrl 注意url不能太长
 Refusing to load URL as it exceeds 2097152 characters.
 //由loadUrl改为evaluateJavascript
 
+常用配置
+```
+ settings.javaScriptEnabled = true
+    settings.setGeolocationEnabled(true)
+    settings.domStorageEnabled = true
+    // settings.setAppCacheEnabled(false)
+    //暂不用缓存，防止页面异常
+    settings.cacheMode = WebSettings.LOAD_NO_CACHE
+    //运行https的url加载http的内容，默认不允许
+    settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+    settings.databaseEnabled = true
+    settings.loadWithOverviewMode = true
+    settings.userAgentString = xxx
+    if(com.autohome.carbooksdk.BuildConfig.DEBUG){
+      setWebContentsDebuggingEnabled(true)
+    }
+```
+
 
 webview设置背景色
 ```

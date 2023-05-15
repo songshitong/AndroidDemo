@@ -109,7 +109,15 @@ class MDelegate {
          "lazyStr"
     }
 
-    //todo 实现
+    //name的get set 通过ReadWriteProperty
+    //编译为  name$delegate位ReadWriteProperty 实现类ObservableProperty，当setValue时调用afterChange和beforeChange
+    // public final String getName() {
+    //       return (String)this.name$delegate.getValue(this, $$delegatedProperties[1]);
+    //    }
+    //    public final void setName(@NotNull String var1) {
+    //       this.name$delegate.setValue(this, $$delegatedProperties[1], var1);
+    //    }
+    //
     var name: String by Delegates.observable("这是初始值") { prop, old, new ->
         println("旧值：$old -> 新值：$new")
     }

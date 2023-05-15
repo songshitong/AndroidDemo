@@ -255,7 +255,6 @@ public class PaintView extends View {
 //        为绘制设置颜色过滤
 //        模拟简单的光照效果的,
         //去掉红色
-        // TODO: 2018/12/11 数学？？？
         ColorFilter cf = new LightingColorFilter(0x00ffff, 0x000000);
         //PorterDuffColorFilter  使用一个指定的颜色和一种指定的 PorterDuff.Mode 来与绘制对象进行合成
         cf = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.SRC_OVER);

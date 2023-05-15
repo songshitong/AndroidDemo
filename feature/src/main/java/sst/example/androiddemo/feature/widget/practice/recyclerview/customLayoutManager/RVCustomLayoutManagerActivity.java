@@ -14,7 +14,7 @@ import java.util.List;
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.graphics.BitmapActivity;
 
-public class RVCutsomLayoutManagerActivity extends AppCompatActivity {
+public class RVCustomLayoutManagerActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
 
     List<Bean> mList = new ArrayList<>();

@@ -50,7 +50,6 @@ public class StickyItemDecoration extends RecyclerView.ItemDecoration {
 
         //4 出现问题，同一组要维持一个固定条 ---》前面可见position为0和后面可见组第一个才绘制固定条
         //获取可见view
-        //todo 区别各种getposition
         int visibleCount = parent.getChildCount();
         LinearLayoutManager layoutManager = (LinearLayoutManager) parent.getLayoutManager();
         for (int i = 0; i < visibleCount; i++) {
@@ -99,7 +98,7 @@ public class StickyItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
-        //todo 各个接口的调用时机？？ 每次绘制调用？？
+        //item的偏移
         int position = parent.getChildAdapterPosition(view);
         if (isGroupFirst(position,itemBeans)){
             outRect.top=100;

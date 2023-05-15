@@ -1,3 +1,23 @@
+
+
+gradle复用
+1 project目录建立文件 ext.gradle
+```
+ext {
+   dimEnv = 'env'
+}
+```
+2 project的build.gradle引入
+```
+apply from: 'flavor.gradle'
+```
+3 在app的build.gradle即可使用
+```
+def dimEnv = rootProject.ext.dimEnv
+```
+
+
+
 https://juejin.cn/post/6915258663342964744
 compileSdkVersion
 compileSdkVersion 告诉 Gradle 用哪个 Android SDK 版本编译你的应用。它纯粹只是在编译的时候使用。当你修改了 compileSdkVersion 的时候，

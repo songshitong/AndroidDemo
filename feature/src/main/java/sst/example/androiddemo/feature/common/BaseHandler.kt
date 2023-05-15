@@ -18,7 +18,6 @@ import java.lang.ref.WeakReference
  *  MyHandler handler = new MyHandler(this);
  */
 
-//todo 优化成lifeCycle的  destory时将消息移除mHandler.removeCallbacksAndMessages(null)
 abstract class BaseHandler : Handler {
 
     protected var activityWeakReference: WeakReference<Activity>? = null

@@ -260,7 +260,6 @@ void  initContext( char *path,JNIEnv *env,jobject surface){
     // 二级指针一般代表会改变地址，用寻址符*取到指针的指针
     av_dict_set(&options, "timeout", "30000000", 0);
     int ret = avformat_open_input(&formatContext, path, NULL, NULL);
-    //TODO c++ if
     if (ret) { //打开失败
         __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "打开失败 avformat_open_input error ");
         return;

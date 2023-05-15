@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity">
+        tools:context=".widget.practice.recyclerview.customLayoutManager.RVCustomLayoutManagerActivity">
     <Button
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

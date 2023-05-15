@@ -81,6 +81,12 @@ class MCollection {
             val linkedMap = linkedMapOf("2" to "2","1" to "1")//LinkedHashMap
             val hashMap = hashMapOf("1" to "1")//hashMap
 
+            //双键map  java可以使用guava的table Table<R,C,V>    一个数据需要两个或多个主键/关键字才能确定
+            //对于多个键的 可以data class MKey(val key1,val key2..)   val map = mapof<MKey,String>
+            val mapScore = mapOf<Pair<String,String>,Int>(("小明" to "数学") to 100, ("小明" to "语文") to 80,("小李" to "英语")to 88)
+            println(" ==========")
+            println("双键map $mapScore")
+
             //当前 key 存在则修改元素，不存在则添加元素
             map2["Watermelon"] = ""
             println("map2 ")

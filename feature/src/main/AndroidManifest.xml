@@ -110,7 +110,7 @@
         android:name=".activity.scrollNested.ScrollNestedActivity"
         android:exported="false" />
     <activity
-        android:name=".widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity"
+        android:name=".widget.practice.recyclerview.customLayoutManager.RVCustomLayoutManagerActivity"
         android:exported="false" />
     <activity
         android:name=".widget.layout.repeatMeasure.MeasureTestActivity"

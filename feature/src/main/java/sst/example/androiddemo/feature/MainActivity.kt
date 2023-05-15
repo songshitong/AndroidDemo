@@ -58,7 +58,7 @@ import sst.example.androiddemo.feature.widget.ViewOutlineProviderActivity
 import sst.example.androiddemo.feature.widget.layout.constraint.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.LinearLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
-import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
+import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCustomLayoutManagerActivity
 import java.io.PrintWriter
 import java.io.StringWriter
 import kotlin.math.pow
@@ -348,7 +348,7 @@ class MainActivity : AppCompatActivity() {
       startActivity(Intent(this, MeasureTestActivity::class.java))
     }
       findViewById<View>(R.id.customLMActivity).setOnClickListener {
-      startActivity(Intent(this, RVCutsomLayoutManagerActivity::class.java))
+      startActivity(Intent(this, RVCustomLayoutManagerActivity::class.java))
     }
       findViewById<View>(R.id.scrollNestedActivity).setOnClickListener {
       startActivity(

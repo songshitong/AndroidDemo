@@ -58,7 +58,6 @@ public class FFmpegActivity extends AppCompatActivity {
                 ffmpegCmd.startPlay(filePath);
             }
         });
-        //TODO texture he surfaceview
         recordAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

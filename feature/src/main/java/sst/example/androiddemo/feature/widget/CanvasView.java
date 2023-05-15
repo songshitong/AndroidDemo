@@ -136,9 +136,9 @@ public class CanvasView extends View {
         }
 
 
-        //todo draw 系列
+
         mCanvas.drawColor(Color.RED);
-        //todo 画圆环  圆环的半径是内圆半径+环宽度的一半
+        //画圆环  圆环的半径是内圆半径+环宽度的一半
 //        mCanvas.drawCircle();
 
         //裁剪功能canvas.clipRect()---Region.Op.INTERSECT交集    clipOutRect---Region.Op.DIFFERENCE差集  在AndroidP(28)及以上只有这两个是有效的参数

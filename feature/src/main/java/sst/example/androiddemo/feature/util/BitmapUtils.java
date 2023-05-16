@@ -1,5 +1,6 @@
 package sst.example.androiddemo.feature.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -71,10 +72,8 @@ public class BitmapUtils {
      * @return the bitmap from uri
      * @throws FileNotFoundException the file not found exception
      */
-    public static Bitmap getBitmapFromUri(Uri uri) throws FileNotFoundException {
-        //todo  去除第三方包影响   ContentResolver可以读取那些文件，都有什么用
-//        return BitmapFactory.decodeStream(Utils.getApp().getContentResolver().openInputStream(uri));
-        return null;
+    public static Bitmap getBitmapFromUri(Context context,Uri uri) throws FileNotFoundException {
+        return BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
     }
 
     /**

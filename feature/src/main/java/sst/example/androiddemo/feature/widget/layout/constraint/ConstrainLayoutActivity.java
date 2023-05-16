@@ -26,7 +26,7 @@ public class ConstrainLayoutActivity extends AppCompatActivity {
 
         //https://constraintlayout.com/  一个关于constraintLayout的网站
 
-        //Flow和Layer都是ConstraintHelper的子类，当两者不满足需求时，可以通过继承ConstraintHelper来实现想要的约束效果  todo
+        //Flow和Layer都是ConstraintHelper的子类，当两者不满足需求时，可以通过继承ConstraintHelper来实现想要的约束效果  可以参考AnimConstraintHelper
         //https://juejin.cn/post/6854573221312725000#heading-4
         //代码动态设置属性
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) findViewById(R.id.constrain_view1).getLayoutParams();

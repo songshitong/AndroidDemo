@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  */
 public class TimerUtil {
 
-  //todo
+  //
   //https://cloud.tencent.com/developer/article/1038304
   //实例：
   //    XGTimeUtil.retryTask((timer) -> {
@@ -40,6 +40,6 @@ public class TimerUtil {
 
   public static void main(String[] args) {
     AtomicInteger count= new AtomicInteger();
-    retryTask((timer) -> System.out.println("执行次数："+ count.getAndIncrement() +" 时间 "+new Date().toString()),5,0,1000);
+    retryTask((timer) -> System.out.println("执行次数："+ count.getAndIncrement() +" 时间 "+ new Date()),5,0,1000);
   }
 }

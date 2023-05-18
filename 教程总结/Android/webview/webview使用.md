@@ -100,15 +100,38 @@ https://www.itranslater.com/qa/details/2582595927299064832
 webView.loadUrl("about:blank")
 ```
 
-打印webview的log
+打印webview的log  WebChromeClient
 ```
-public void onConsoleMessage(String message, int lineNumber, String sourceID) {
-    Log.d("MyApplication", message + " -- From line "
-                         + lineNumber + " of "
-                         + sourceID);
-    return true;
-  }
+//public void onConsoleMessage(String message, int lineNumber, String sourceID) {
+//    Log.d("MyApplication", message + " -- From line "
+//                         + lineNumber + " of "
+//                         + sourceID);
+//    return true;
+//  }
+//两个内容相同，使用下面的即可  
+    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        DevUtil.i("console", "["+consoleMessage.messageLevel()+"] "+ consoleMessage.message() + "(" +consoleMessage.sourceId()  + ":" + consoleMessage.lineNumber()+")");
+        return super.onConsoleMessage(consoleMessage);
+    }  
 ```
+部分手机console.log可能不打印  需要自定义接口但是拿不到文件和行号
+https://blog.csdn.net/lanxingfeifei/article/details/50502436  也可以调用console.log先测试是否可以打印，然后使用替换的接口
+```
+// 首先,定一个类,叫什么名称都可以,但是里面的方法名必须与
+// Javascript的console中的方法名对应
+private class Console{
+    private static final String TAG="[WebView]";
+    public void log(String msg){
+        Log.i(TAG,msg);
+    }
+	// 还可以添加其他的方法,比如: warn,assert等等
+}
+ 
+// 然后,为WebView添加对应的接口
+webView.addJavascriptInterface(new Console, "console");
+```
+
+
 远程调试  webview debug   
 https://developer.chrome.com/docs/devtools/remote-debugging/webviews/
 ```

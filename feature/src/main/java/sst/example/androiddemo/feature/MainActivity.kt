@@ -603,6 +603,9 @@ class MainActivity : AppCompatActivity() {
 
   //获取方法调用栈
   private fun getMethodTrace() {
+    val element = Thread.currentThread().stackTrace[3]
+    println("调用getMethodTrace的方法为： ${element.methodName} ${element.className}  lineNumber:${element.lineNumber}")
+    //如何拿到方法的参数值，动态代理或aspects
     println("getMethodTrace start ==================================")
     val ste = Thread.currentThread().stackTrace
     ste.forEach {

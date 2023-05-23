@@ -4,13 +4,20 @@
 //在cmakelists.txt中引入系统库libandroid.so(android) 可能会用到其他系统头文件inflateEnd(libz.so) libOpenSLES
 #include <android/native_window_jni.h>
 #include <unistd.h>
-
+#include <signal.h>
+#include <map>
 #include "audioPlayer.h"
 
 extern "C" {
 #include <libfaac/faac.h>
 }
 #define  MAX_AUDIO_FRAME_SIZE 48000*4
+
+static void SetUpStack();
+static void SetUpSigHandler();
+
+static void CallOldHandler(int signo, siginfo_t* info, void* context);
+static void SignalHandler(int signo, siginfo_t* info, void* context);
 
 extern "C"
 JNIEXPORT jint JNICALL
@@ -34,6 +41,79 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nStartPlay(JNIEnv *env, jc
     initContext(const_cast<char *>(path),env,surface);
     env->ReleaseStringUTFChars(path_, path);
 
+}
+
+void NativeCrashTest() {
+  volatile int* p = nullptr;
+  *p = 1;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nInit(JNIEnv *env, jclass clazz) {
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "call init ");
+
+    SetUpStack();
+    SetUpSigHandler();
+    NativeCrashTest();
+}
+
+
+
+static void SetUpStack() {
+  stack_t stack{};
+  stack.ss_sp = new(std::nothrow) char[SIGSTKSZ];
+
+  if (!stack.ss_sp) {
+   __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "fail to alloc stack for crash catching");
+    return;
+  }
+  stack.ss_size = SIGSTKSZ;
+  stack.ss_flags = 0;
+  if (stack.ss_sp) {
+    if (sigaltstack(&stack, nullptr) != 0) {
+     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "fail to setup signal stack");
+    }
+  }
+}
+
+ std::map<int, struct sigaction> sOldHandlers;
+
+static  void SetUpSigHandler() {
+  struct sigaction action{};
+  action.sa_sigaction = SignalHandler;
+  action.sa_flags = SA_SIGINFO | SA_ONSTACK;
+  int signals[] = {
+      SIGABRT, SIGBUS, SIGFPE, SIGILL, SIGSEGV, SIGPIPE
+  };
+  struct sigaction old_action;
+  for (auto signo : signals) {
+    if (sigaction(signo, &action, &old_action) == -1) {
+      __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd",  "fail to set signal handler for signo %d", signo);
+    } else {
+     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd",  " signo register %d", signo);
+      if (old_action.sa_handler != SIG_DFL && old_action.sa_handler != SIG_IGN) {
+        sOldHandlers[signo] = old_action;
+      }
+    }
+  }
+}
+
+static  void SignalHandler(int signo, siginfo_t* info, void* context) {
+  __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "catch error %d", signo);
+  CallOldHandler(signo, info, context);
+  exit(0);
+}
+
+static  void CallOldHandler(int signo, siginfo_t* info, void* context) {
+  auto it = sOldHandlers.find(signo);
+  if (it != sOldHandlers.end()) {
+    if (it->second.sa_flags & SA_SIGINFO) {
+      it->second.sa_sigaction(signo, info, context);
+    } else {
+      it->second.sa_handler(signo);
+    }
+  }
 }
 
 void short2float(short* in, double *out, int len){

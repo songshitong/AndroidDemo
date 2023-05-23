@@ -9,9 +9,14 @@ import android.view.SurfaceView;
 
 public class FFmpegCmd implements SurfaceHolder.Callback {
    private SurfaceHolder surfaceHolder;
-//   static {
-//      System.loadLibrary("native-lib");
-//   }
+   static {
+      System.loadLibrary("native-lib");
+   }
+
+   public FFmpegCmd() {
+      nInit();
+   }
+
    public static int run(String[] cmd){
       return run(cmd.length,cmd);
    }
@@ -28,6 +33,7 @@ public class FFmpegCmd implements SurfaceHolder.Callback {
 
    private static native void nStartPlay(String path, Surface surface);
 
+   private static native void nInit();
 
 
    public void setSurfaceView(SurfaceView surfaceView){

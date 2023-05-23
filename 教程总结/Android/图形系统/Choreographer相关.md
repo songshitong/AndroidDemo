@@ -1,3 +1,8 @@
+注意点：
+不要用postFrameCallback 来推动动画的位移等效果，当然每次刷新取值是可以的，
+高帧率和低帧率手机的位移速度不一样，并且当手机丢帧时，位移速度也会发生变化
+
+
 https://juejin.cn/post/6894206842277199880 android 9.0
 Choreographer: 编舞者，用来控制当收到 VSync 信号后才开始绘制任务，保证绘制拥有完整的16.6ms。
 [ˌkɒriˈɒɡrəfə(r)]
@@ -619,7 +624,7 @@ WMS调用scheduleAnimationLocked()方法来设置mFrameScheduled=true来触发�
 
 
 
-Choreographer的postFrameCallback()通常用来计算丢帧情况，使用方式如下：
+Choreographer的postFrameCallback()通常用来计算丢帧情况，使用方式如下： 代码仿照Choreographer
 ```
     //Application.java
          public void onCreate() {
@@ -637,7 +642,7 @@ Choreographer的postFrameCallback()通常用来计算丢帧情况，使用方式
 
       public FPSFrameCallback(long lastFrameTimeNanos) {
           mLastFrameTimeNanos = lastFrameTimeNanos;
-          mFrameIntervalNanos = (long)(1000000000 / 60.0);
+          mFrameIntervalNanos = (long)(1000000000 / 60.0); //这最好根据刷新率计算
       }
 
       @Override

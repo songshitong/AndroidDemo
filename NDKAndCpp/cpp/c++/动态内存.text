@@ -10,6 +10,9 @@ C++ 程序中的内存分为两个部分：
 new data-type;
 delete data-type;
 
+Student a; //由操作系统进行内存的分配和管理
+Student a = new Student(); //堆中分配，由管理者进行内存的分配和管理，用完必须delete()，否则可能造成内存泄漏
+
 数组
 char* pvalue  = NULL;   // 初始化为 null 的指针
 pvalue  = new char[20]

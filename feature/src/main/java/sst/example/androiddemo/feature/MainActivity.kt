@@ -470,6 +470,9 @@ class MainActivity : AppCompatActivity() {
     findViewById<View>(R.id.cameraMatrixBtn).setOnClickListener {
       startActivity(Intent(this, CameraMatrixActivity::class.java))
     }
+    findViewById<View>(R.id.pluginBtn).setOnClickListener {
+      startActivity(Intent(this, PluginActivity::class.java))
+    }
 
     //测试livedata连续调用
     val ld = MutableLiveData<String>()

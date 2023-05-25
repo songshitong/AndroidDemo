@@ -12,6 +12,9 @@
 
 class Student {
   int i;
+  public:
+     int z;
+    int add();
   //友元函数  可以修改类的私有成员
   friend void test(Student*);
   //友元类 可以访问类所有的私有成员，不用再使用时定义多个友元函数
@@ -20,6 +23,7 @@ class Student {
      Student(int i,int j);//无参构造器
      ~Student();//析构函数
      void setJ(int j);
+     int getM();
      void getJ(){
        return j;
      }
@@ -30,8 +34,9 @@ class Student {
     int k;
     char m;
 
-
 };
+
+
 
 class Teacher{
   public:

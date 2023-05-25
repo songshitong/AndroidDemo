@@ -19,10 +19,17 @@ ssize_t nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &inc, sizeof(uint64_t)))
 
 
 文件打开open函数
-#include <sys/types.h>
+#include <fcntl.h>
+int fd = open("/dev/mydev",O_RDWR);
+
+文件大小
+https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
+```
 #include <sys/stat.h>
-#include <sys/fcntl.h>
-int fd = open("/dev/mydev",O_RDWR);  
+struct stat st;
+stat(filename, &st);
+size = st.st_size;
+```
 
 
 ioctl函数
@@ -72,7 +79,7 @@ mmap内存映射
 include <sys/mman.h>
 /*
 addr: 代表映射到进程地址空间的起始地址，当值等于0则由内核选择合适地址，此处为0；
-size: 代表需要映射的内存地址空间的大小
+size: 代表需要映射的内存地址空间的大小 必须大于0
 prot: 代表内存映射区的读写等属性值，此处为PROT_READ(可读取);
     PROT_EXEC内容可以被执行；
     PROT_READ:内容可以被读取；
@@ -84,6 +91,8 @@ fd: 代表mmap所关联的文件描述符，打开文件的句柄
 offset：偏移量，此处为0。 必须是4k的整数倍，一个物理页映射是4k
 void* mmap(void* addr, size_t size, int prot, int flags, int fd, off_t offset)
 //mVMStart = mmap(0, BINDER_VM_SIZE, PROT_READ, MAP_PRIVATE | MAP_NORESERVE, mDriverFD, 0) 
+if(mVMStart == MAP_FAILED){
+}
 ```
 解除内存映射
 munmap(m_ptr, oldSize);

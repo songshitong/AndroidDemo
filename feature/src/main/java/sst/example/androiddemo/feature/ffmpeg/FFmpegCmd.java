@@ -17,6 +17,14 @@ public class FFmpegCmd implements SurfaceHolder.Callback {
       nInit();
    }
 
+   public void initLog(String path){
+      nInitLog(path);
+   }
+
+   public void log(String log){
+      nLog(log);
+   }
+
    public static int run(String[] cmd){
       return run(cmd.length,cmd);
    }
@@ -34,6 +42,8 @@ public class FFmpegCmd implements SurfaceHolder.Callback {
    private static native void nStartPlay(String path, Surface surface);
 
    private static native void nInit();
+   private static native void nLog(String log);
+   private static native void nInitLog(String logPath);
 
 
    public void setSurfaceView(SurfaceView surfaceView){

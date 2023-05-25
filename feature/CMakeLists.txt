@@ -12,6 +12,7 @@ add_library(
         native-lib
         SHARED
         src/main/cpp/native-lib.cpp
+        src/main/cpp/nativelog.cpp
         src/main/cpp/audioPlayer.cpp
         src/main/cpp/libfaac.a
 )

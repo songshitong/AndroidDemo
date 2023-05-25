@@ -14,6 +14,8 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
+import java.io.IOException;
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.util.MyUtils;
 
@@ -46,6 +48,16 @@ public class FFmpegActivity extends AppCompatActivity {
         ffmpegCmd.setSurfaceView(surfaceView);
 
         initListener();
+        File logFile = new File(getFilesDir(),"test.log");
+        if(!logFile.exists()){
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        ffmpegCmd.initLog(logFile.getAbsolutePath());
+        ffmpegCmd.log("this is a  log");
     }
     byte[] pcmDatas;
     private void initListener() {

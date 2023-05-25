@@ -7,6 +7,7 @@
 #include <signal.h>
 #include <map>
 #include "audioPlayer.h"
+#include "nativelog.h"
 
 extern "C" {
 #include <libfaac/faac.h>
@@ -29,7 +30,26 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_run__I_3Ljava_lang_String_
     return cmdLen;
 }
 
+NativeLog nativeLog;
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nInitLog(JNIEnv *env, jclass clazz,
+                                                               jstring log_path) {
+    const char* nlogPath = env->GetStringUTFChars(log_path, nullptr);
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init logPath %s", nlogPath);
+    nativeLog.init(const_cast<char *>(nlogPath));
+    env->ReleaseStringUTFChars(log_path,nlogPath);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nLog(JNIEnv *env, jclass clazz, jstring jlog) {
+    const char* nlog = env->GetStringUTFChars(jlog, nullptr);
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native receive log %s", nlog);
+    nativeLog.log(const_cast<char *>(nlog));
+    env->ReleaseStringUTFChars(jlog,nlog);
+}
 
 
 extern "C"
@@ -55,7 +75,7 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nInit(JNIEnv *env, jclass 
 
     SetUpStack();
     SetUpSigHandler();
-    NativeCrashTest();
+//    NativeCrashTest(); todo native 异常模拟
 }
 
 
@@ -222,4 +242,6 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegActivity_native_1replaceAudio(
 
     env->ReleaseByteArrayElements(pcmDatas_, pcmDatas, 0);
 }
+
+
 

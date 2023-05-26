@@ -8,5 +8,7 @@ public:
      void init(char* path);
      void log(char* logStr);
 private:
-    char* fileStart;
+    int8_t* fileStart;
+    int logFileFD;
+    char *logFilePath;
 };

@@ -57,7 +57,9 @@ public class FFmpegActivity extends AppCompatActivity {
             }
         }
         ffmpegCmd.initLog(logFile.getAbsolutePath());
-        ffmpegCmd.log("this is a  log");
+        ffmpegCmd.log("this is first  log\n");
+        ffmpegCmd.log("this is second log\n");
+        ffmpegCmd.log("this is third log\n");
     }
     byte[] pcmDatas;
     private void initListener() {

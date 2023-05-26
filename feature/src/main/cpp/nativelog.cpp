@@ -11,29 +11,40 @@
 
 #include "nativelog.h"
 void NativeLog::init(char *path) {
-  int fd = open(path,O_RDWR); //todo 待关闭
-  int offset =0;
-  __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init file fd %d",fd);
+  logFilePath = path;
+  logFileFD = open(path,O_RDWR,S_IRWXU); //todo 待关闭
+}
 
-  struct stat st{};
-  stat(path, &st);
-  long long int size = st.st_size;
-  if(0 == size ){
-    write(fd, "", 1);
-    size=1;
-  }
-  __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init filesize %lld",size);
-  fileStart = static_cast<char *>(mmap(0, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, offset));
+void NativeLog::log(char *logStr) {
+  size_t length = strlen(logStr);
+//  // lseek将文件指针往后移动length-1位
+//  lseek(logFileFD,length-1,SEEK_END);
+//  // 从指针处写入一个空字符；
+//  write(logFileFD, "", 1);
+
+  __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init file fd %d",logFileFD);
+  int fileSize = lseek(logFileFD, 0, SEEK_END);
+  __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init filesize %d", fileSize);
+  int targetSize = fileSize+length;
+  ftruncate(logFileFD, targetSize);//填充文件大小   mmap不能扩展文件长度，这里相当于预先给文件长度，准备一个空架子
+
+  fileStart = (int8_t *)mmap(nullptr, targetSize, PROT_READ | PROT_WRITE, MAP_SHARED,
+                                            logFileFD, 0);
   if(fileStart == MAP_FAILED){
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init mmap error");
   } else{
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init mmap success ptr:%p",fileStart);
   }
-}
-
-void NativeLog::log(char *logStr) {
-  size_t length = strlen(logStr);
   __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native log filePtr:%p  length:%d",fileStart,length);
-  memcpy(fileStart, logStr, length);
+
+  if(nullptr == fileStart){
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "write data err ptr: %p",fileStart);
+    return;
+  }
+  memcpy(fileStart+fileSize, logStr, length);
+  munmap(fileStart, targetSize);
+//  close(logFileFD); todo 关闭日志再close fd
+
+  //每次log都进行内存映射和释放，存在性能问题
 }
 

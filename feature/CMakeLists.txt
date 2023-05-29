@@ -15,6 +15,8 @@ add_library(
         src/main/cpp/nativelog.cpp
         src/main/cpp/audioPlayer.cpp
         src/main/cpp/libfaac.a
+        autobuffer.cc
+        ptrbuffer.cc
 )
 
 

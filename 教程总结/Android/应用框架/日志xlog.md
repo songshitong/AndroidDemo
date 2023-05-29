@@ -5,6 +5,8 @@ https://zhuanlan.zhihu.com/p/25011775
 https://juejin.cn/post/6844903654575570951
 https://blog.csdn.net/qq372848728/article/details/89215295
 
+https://mp.weixin.qq.com/s/cnhuEodJGIbdodh0IxNeXQ? xlog的设计思想
+
 xlog使用
 ```
 Xlog xlog = new Xlog();
@@ -87,14 +89,16 @@ void appender_open(TAppenderMode _mode, const char* _dir, const char* _nameprefi
 ...
     char mmap_file_path[512] = {0};
     snprintf(mmap_file_path, sizeof(mmap_file_path), "%s/%s.mmap3", sg_cache_logdir.empty()?_dir:sg_cache_logdir.c_str(), _nameprefix);
-
+    //使用mmap建立一个临时文件的缓冲区，后续会写到日志中(可以在下次程序启动校验)  默认以mmap3结尾
+    //mmap为什么不直接写入文件？
+    //需要动态扩展文件，每次log需要mmap和unmmap  使用java缓存可能产生频繁GC  https://zhuanlan.zhihu.com/p/25011775
     bool use_mmap = false; //使用mmap是否成功
     if (OpenMmapFile(mmap_file_path, kBufferBlockLength, sg_mmmap_file))  {
         //sg_mmmap_file.data()为映射地址的指针
         sg_log_buff = new LogBuffer(sg_mmmap_file.data(), kBufferBlockLength, true, _pub_key);
         use_mmap = true;
     } else {
-        //mmap失败 使用buffer
+        //mmap失败 使用buffer  大小为150 * 1024
         char* buffer = new char[kBufferBlockLength];
         sg_log_buff = new LogBuffer(buffer, kBufferBlockLength, true, _pub_key);
         use_mmap = false;
@@ -132,7 +136,6 @@ void appender_open(TAppenderMode _mode, const char* _dir, const char* _nameprefi
     xlogger_appender(NULL, logmsg);
     ....
     BOOT_RUN_EXIT(appender_close);
-
 }
 ```
 OpenMmapFile
@@ -264,7 +267,8 @@ void xlogger_appender(const XLoggerInfo* _info, const char* _log) {
 
     if (sg_consolelog_open) ConsoleLog(_info,  _log);
 
-    if (2 <= (int)recursion.Get() && NULL == s_recursion_str.get()) {
+    if (2 <= (int)recursion.Get() && NULL == s_recursion_str.get()) { 
+       //发生了递归调用
         if ((int)recursion.Get() > 10) return;
         char* strrecursion = (char*)calloc(16 * 1024, 1);
         s_recursion_str.set((void*)(strrecursion));
@@ -274,14 +278,7 @@ void xlogger_appender(const XLoggerInfo* _info, const char* _log) {
 
         char recursive_log[256] = {0};
         snprintf(recursive_log, sizeof(recursive_log), "ERROR!!! xlogger_appender Recursive calls!!!, count:%d", (int)recursion.Get());
-
-        PtrBuffer tmp(strrecursion, 0, 16*1024);
-        log_formater(&info, recursive_log, tmp);
-
-        strncat(strrecursion, _log, 4096);
-        strrecursion[4095] = '\0';
-
-        ConsoleLog(&info,  strrecursion);
+        ...
     } else {
         if (NULL != s_recursion_str.get()) {
             char* strrecursion = (char*)s_recursion_str.get();
@@ -291,7 +288,7 @@ void xlogger_appender(const XLoggerInfo* _info, const char* _log) {
             free(strrecursion);
         }
 
-        if (kAppednerSync == sg_mode)
+        if (kAppednerSync == sg_mode) //根据mode进行异步还是同步添加
             __appender_sync(_info, _log);
         else
             __appender_async(_info, _log);
@@ -300,7 +297,7 @@ void xlogger_appender(const XLoggerInfo* _info, const char* _log) {
 
 
 static void __appender_async(const XLoggerInfo* _info, const char* _log) {
-    ScopedLock lock(sg_mutex_buffer_async);
+    ScopedLock lock(sg_mutex_buffer_async); //上锁
    ...
     char temp[16*1024] = {0};       //tell perry,ray if you want modify size.
     PtrBuffer log_buff(temp, 0, sizeof(temp));
@@ -312,10 +309,23 @@ static void __appender_async(const XLoggerInfo* _info, const char* _log) {
     }
 
     if (!sg_log_buff->Write(log_buff.Ptr(), (unsigned int)log_buff.Length())) return;
-
+   
+    //数据超过缓存的1/3或者 致命的日志
     if (sg_log_buff->GetData().Length() >= kBufferBlockLength*1/3 || (NULL!=_info && kLevelFatal == _info->level)) {
-       sg_cond_buffer_async.notifyAll();
+       sg_cond_buffer_async.notifyAll(); //唤醒锁
     }
+
+log/export_include/xlogger/xloggerbase.h
+typedef enum {
+    kLevelAll = 0,
+    kLevelVerbose = 0,
+    kLevelDebug,    // Detailed information on the flow through the system.
+    kLevelInfo,     // Interesting runtime events (startup/shutdown), should be conservative and keep to a minimum.
+    kLevelWarn,     // Other runtime situations that are undesirable or unexpected, but not necessarily "wrong".
+    kLevelError,    // Other runtime errors or unexpected conditions.
+    kLevelFatal,    // Severe errors that cause premature termination.
+    kLevelNone,     // Special level used to disable all log messages.
+} TLogLevel;    
 ```
 log/src/log_buffer.cc
 sg_log_buff->Write
@@ -380,5 +390,136 @@ void*  PtrBuffer::Ptr() {
 
 const void*  PtrBuffer::Ptr() const {
     return parray_;
+}
+```
+thread相关
+```
+static void __async_log_thread() {
+    while (true) {
+        ScopedLock lock_buffer(sg_mutex_buffer_async);
+        if (NULL == sg_log_buff) break;
+        AutoBuffer tmp;
+        sg_log_buff->Flush(tmp);
+        lock_buffer.unlock();
+        if (NULL != tmp.Ptr())  __log2file(tmp.Ptr(), tmp.Length(), true); 
+        if (sg_log_close) break;
+        sg_cond_buffer_async.wait(15 * 60 * 1000);
+    }
+}
+```
+log/src/log_buffer.cc
+```
+void LogBuffer::Flush(AutoBuffer& _buff) {
+   ...
+    __Flush(); //更新信息
+    _buff.Write(buff_.Ptr(), buff_.Length()); //写入
+    __Clear();
+}
+
+void LogBuffer::__Flush() {
+    ..    
+    log_crypt_->UpdateLogHour((char*)buff_.Ptr());
+    log_crypt_->SetTailerInfo((char*)buff_.Ptr() + buff_.Length());
+    buff_.Length(buff_.Length() + log_crypt_->GetTailerLen(), buff_.Length() + log_crypt_->GetTailerLen());
+}
+
+//清空操作
+void LogBuffer::__Clear() { 
+    memset(buff_.Ptr(), 0, buff_.Length()); //将buff以0填充
+    buff_.Length(0, 0);
+    remain_nocrypt_len_ = 0;
+}
+```
+log/src/appender.cc
+```
+static void __log2file(const void* _data, size_t _len, bool _move_file) {
+    ...
+    bool write_sucess = false;
+    bool open_success = __openlogfile(sg_logdir); //fopen打开
+    if (open_success) {
+        write_sucess = __writefile(_data, _len, sg_logfile); //fwrite写入
+        if (kAppednerAsync == sg_mode) {
+            __closelogfile();
+        }
+    }
+   ...
+}
+```
+
+同步写的模式
+log/src/appender.cc
+```
+static void __appender_sync(const XLoggerInfo* _info, const char* _log) {
+    char temp[16 * 1024] = {0};     // tell perry,ray if you want modify size.
+    PtrBuffer log(temp, 0, sizeof(temp));
+    log_formater(_info, _log, log);
+    AutoBuffer tmp_buff;
+    if (!sg_log_buff->Write(log.Ptr(), log.Length(), tmp_buff))   return;
+    __log2file(tmp_buff.Ptr(), tmp_buff.Length(), false);
+}
+```
+
+
+
+异步同步模式设置
+libraries/mars_android_sdk/src/main/java/com/tencent/mars/xlog/Xlog.java
+```
+public static native void setAppenderMode(int mode);
+```
+log/jni/Java2C_Xlog.cc
+```
+DEFINE_FIND_STATIC_METHOD(KXlog_setAppenderMode, KXlog, "setAppenderMode", "(I)V")
+JNIEXPORT void JNICALL Java_com_tencent_mars_xlog_Xlog_setAppenderMode
+  (JNIEnv *, jclass, jint _mode) {
+	appender_setmode((TAppenderMode)_mode);
+}
+```
+log/src/appender.cc
+```
+log/appender.h
+enum TAppenderMode  //只有同步和异步两种
+{
+    kAppednerAsync,
+    kAppednerSync,
+};
+log/src/appender.cc
+static TAppenderMode sg_mode = kAppednerAsync;
+void appender_setmode(TAppenderMode _mode) {
+    sg_mode = _mode;
+    sg_cond_buffer_async.notifyAll();
+    if (kAppednerAsync == sg_mode && !sg_thread_async.isruning()) {
+        sg_thread_async.start();
+    }
+}
+```
+
+
+ptrbuffer相关
+comm/ptrbuffer.cc  对固定长度内存的管理
+```
+PtrBuffer::PtrBuffer(void* _ptr, size_t _len)
+    : parray_((unsigned char*)_ptr)
+    , pos_(0)
+    , length_(_len)
+    , max_length_(_len) {
+    ... //创建内存信息
+}
+//读取一定的内存  todo使用用例
+size_t PtrBuffer::Read(void* _pBuffer, size_t _nLen, off_t _nPos) const {
+    ...
+    size_t nRead = Length() - _nPos;
+    nRead = min(nRead, _nLen);
+    //将数据拷贝到_pBuffer
+    memcpy(_pBuffer, PosPtr(), nRead);
+    return nRead;
+}
+
+//写入一定的内存  自动截取超长的？？ todo
+void PtrBuffer::Write(const void* _pBuffer, size_t _nLen, off_t _nPos) {
+    ...
+    size_t copylen = min(_nLen, max_length_ - _nPos);
+    length_ = max(length_, copylen + _nPos); //当前的长度
+    //将_pBuffer的数据拷贝到PtrBuffer
+    memcpy((unsigned char*)Ptr() + _nPos, _pBuffer, copylen);
 }
 ```

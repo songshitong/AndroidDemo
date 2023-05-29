@@ -10,9 +10,11 @@
 #include<unistd.h>
 
 #include "nativelog.h"
+static const unsigned int kBufferBlockLength = 150 * 1024; //todo 配置层
+
 void NativeLog::init(char *path) {
   logFilePath = path;
-  logFileFD = open(path,O_RDWR,S_IRWXU); //todo 待关闭
+  logFileFD = open(path,O_RDWR,S_IRWXU);
 }
 
 void NativeLog::log(char *logStr) {
@@ -23,7 +25,7 @@ void NativeLog::log(char *logStr) {
 //  write(logFileFD, "", 1);
 
   __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init file fd %d",logFileFD);
-  int fileSize = lseek(logFileFD, 0, SEEK_END);
+  int fileSize = lseek(logFileFD, 0, SEEK_END); //获取文件大小
   __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init filesize %d", fileSize);
   int targetSize = fileSize+length;
   ftruncate(logFileFD, targetSize);//填充文件大小   mmap不能扩展文件长度，这里相当于预先给文件长度，准备一个空架子
@@ -42,9 +44,16 @@ void NativeLog::log(char *logStr) {
     return;
   }
   memcpy(fileStart+fileSize, logStr, length);
-  munmap(fileStart, targetSize);
-//  close(logFileFD); todo 关闭日志再close fd
 
   //每次log都进行内存映射和释放，存在性能问题
+}
+
+void NativeLog::closeLog() {
+    if(logFileFD){
+      close(logFileFD);
+    }
+    if(fileStart){
+      munmap(fileStart, kBufferBlockLength);
+    }
 }
 

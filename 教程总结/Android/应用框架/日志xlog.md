@@ -394,6 +394,8 @@ const void*  PtrBuffer::Ptr() const {
 ```
 thread相关
 ```
+log/src/appender.cc
+static Thread sg_thread_async(&__async_log_thread);
 static void __async_log_thread() {
     while (true) {
         ScopedLock lock_buffer(sg_mutex_buffer_async);
@@ -404,6 +406,13 @@ static void __async_log_thread() {
         if (NULL != tmp.Ptr())  __log2file(tmp.Ptr(), tmp.Length(), true); 
         if (sg_log_close) break;
         sg_cond_buffer_async.wait(15 * 60 * 1000);
+    }
+}
+
+void appender_setmode(TAppenderMode _mode) {
+    ... //线程启动
+    if (kAppednerAsync == sg_mode && !sg_thread_async.isruning()) {
+        sg_thread_async.start();
     }
 }
 ```
@@ -504,7 +513,7 @@ PtrBuffer::PtrBuffer(void* _ptr, size_t _len)
     , max_length_(_len) {
     ... //创建内存信息
 }
-//读取一定的内存  todo使用用例
+//读取一定的内存  
 size_t PtrBuffer::Read(void* _pBuffer, size_t _nLen, off_t _nPos) const {
     ...
     size_t nRead = Length() - _nPos;
@@ -514,12 +523,53 @@ size_t PtrBuffer::Read(void* _pBuffer, size_t _nLen, off_t _nPos) const {
     return nRead;
 }
 
-//写入一定的内存  自动截取超长的？？ todo
+//写入一定的内存  
 void PtrBuffer::Write(const void* _pBuffer, size_t _nLen, off_t _nPos) {
     ...
-    size_t copylen = min(_nLen, max_length_ - _nPos);
-    length_ = max(length_, copylen + _nPos); //当前的长度
+    size_t copylen = min(_nLen, max_length_ - _nPos); //拷贝数据的长度，可能都能写入，可能只能写入一部分
+    length_ = max(length_, copylen + _nPos); //当前的长度仍为固定大小
     //将_pBuffer的数据拷贝到PtrBuffer
     memcpy((unsigned char*)Ptr() + _nPos, _pBuffer, copylen);
+}
+```
+
+comm/autobuffer.cc 自动扩展内存
+```
+//读取一定数据到_pbuffer
+size_t AutoBuffer::Read(const off_t& _pos, void* _pbuffer, size_t _len) const {
+    ...
+    size_t readlen = Length() - _pos;
+    readlen = min(readlen, _len);
+    memcpy(_pbuffer, PosPtr(), readlen);
+    return readlen;
+}
+
+void AutoBuffer::Write(const off_t& _pos, const void* _pbuffer, size_t _len) {
+    ...
+    size_t nLen = _pos + _len;
+    __FitSize(nLen);
+    length_ = max(nLen, length_); //长度取最大
+    //将_pbuffer拷贝到缓存区
+    memcpy((unsigned char*)Ptr() + _pos, _pbuffer, _len);
+}
+
+void AutoBuffer::__FitSize(size_t _len) {
+    if (_len > capacity_) {
+        //需要扩容
+        size_t mallocsize = ((_len + malloc_unitsize_ -1)/malloc_unitsize_)*malloc_unitsize_ ;
+        void* p = realloc(parray_, mallocsize);
+        if (NULL == p) {
+		    ... //扩展失败
+            free(parray_); //释放内存
+            parray_ = NULL;
+            capacity_ = 0;
+            return;
+        }
+        parray_ = (unsigned char*) p;
+        ...
+        //扩展的内存使用0填充
+        memset(parray_+capacity_, 0, mallocsize-capacity_);
+        capacity_ = mallocsize;
+    }
 }
 ```

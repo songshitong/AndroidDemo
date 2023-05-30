@@ -30,7 +30,7 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_run__I_3Ljava_lang_String_
     return cmdLen;
 }
 
-NativeLog nativeLog;
+NativeLog* nativeLog = nullptr;
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -38,7 +38,7 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nInitLog(JNIEnv *env, jcla
                                                                jstring log_path) {
     const char* nlogPath = env->GetStringUTFChars(log_path, nullptr);
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init logPath %s", nlogPath);
-    nativeLog.init(const_cast<char *>(nlogPath));
+    nativeLog = new NativeLog(const_cast<char *>(nlogPath));
     env->ReleaseStringUTFChars(log_path,nlogPath);
 }
 
@@ -47,14 +47,19 @@ JNIEXPORT void JNICALL
 Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nLog(JNIEnv *env, jclass clazz, jstring jlog) {
     const char* nlog = env->GetStringUTFChars(jlog, nullptr);
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native receive log %s", nlog);
-    nativeLog.log(const_cast<char *>(nlog));
+    if(nativeLog){
+        nativeLog->log(const_cast<char *>(nlog));
+    }
     env->ReleaseStringUTFChars(jlog,nlog);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nCloseLog(JNIEnv *env, jclass clazz) {
-    nativeLog.closeLog();
+    if(nullptr != nativeLog){
+        nativeLog->closeLog();
+        delete nativeLog;
+    }
 }
 
 

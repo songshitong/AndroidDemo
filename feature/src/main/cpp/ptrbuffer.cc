@@ -14,7 +14,7 @@
 //  ptrbuffer.cc
 //
 //  Created by yerungui on 13-4-4.
-//
+// 代码：https://github.com/Tencent/mars   comm/ptrbuffer.cc
 
 #include "ptrbuffer.h"
 

@@ -22,7 +22,7 @@ ssize_t nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &inc, sizeof(uint64_t)))
 #include <fcntl.h>
 int fd = open("/dev/mydev",O_RDWR);
 
-文件大小
+获取文件大小
 https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
 ```
 #include <sys/stat.h>

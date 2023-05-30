@@ -21,7 +21,7 @@
 
 //#include "mars/comm/assert/__assert.h"
 
-
+//代码来自：代码：https://github.com/Tencent/mars   comm/autobuffer.cc
 const AutoBuffer KNullAtuoBuffer;
 
 #ifndef max

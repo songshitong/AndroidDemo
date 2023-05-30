@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <string.h>
 
+//代码来自：代码：https://github.com/Tencent/mars   comm/autobuffer.cc
 class AutoBuffer {
   public:
     enum TSeek {

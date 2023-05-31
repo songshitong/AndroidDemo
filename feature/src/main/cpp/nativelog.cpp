@@ -47,8 +47,7 @@ NativeLog::NativeLog(char *path) {
     char* buffer = new char[kBufferBlockLength];
     log_buff = new LogBuffer(buffer, kBufferBlockLength, false, "");
   } else{
-    PtrBuffer mmapBuffer(fileStart,kBufferBlockLength);
-    log_buff = new LogBuffer(&mmapBuffer, kBufferBlockLength, false, "");
+    log_buff = new LogBuffer(fileStart, kBufferBlockLength, false, "");
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init mmap success ptr:%p",fileStart);
   }
   int threadId;
@@ -90,7 +89,7 @@ static void async_log_thread() {
   if(nullptr == log_buff) return;
   size_t length = strlen(logStr);
   __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "log str prt:%p, log_buff prt:%p  length:%d",logStr,log_buff,length);
-  log_buff->Write(&"1",strlen("1"));
+  log_buff->Write(logStr,length);
 //  memcpy(fileStart+fileSize, logStr, length);
     if (log_buff->GetData().Length() >= kBufferBlockLength*1/3) { //todo 单条log进行分割
 //        cond_buffer_async.notifyAll();

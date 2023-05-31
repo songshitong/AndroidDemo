@@ -88,7 +88,6 @@ static void async_log_thread() {
  void NativeLog::log(char *logStr) {
   if(nullptr == log_buff) return;
   size_t length = strlen(logStr);
-  __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "log str prt:%p, log_buff prt:%p  length:%d",logStr,log_buff,length);
   log_buff->Write(logStr,length);
 //  memcpy(fileStart+fileSize, logStr, length);
     if (log_buff->GetData().Length() >= kBufferBlockLength*1/3) { //todo 单条log进行分割

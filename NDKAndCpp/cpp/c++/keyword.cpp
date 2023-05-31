@@ -72,4 +72,46 @@ int main(){
     // （即在单个执行线程内，volatile 访问不能被优化掉，或者与另一按顺序早于或按顺序晚于该 volatile 访问的可见副作用
     // 进行重排序。这使得 volatile 对象适用于与信号处理函数之间的交流，但不适于与另一执行线程交流
     volatile int n4 = 0;
+
+   //Static Variables  静态变量整个程序声明周期都可以用
+   for (int i = 0; i < 5; i++)
+     staticVariable(); //输出结果  0 1 2 3 4
+
+   //Static variables in a class
+   GfG obj;
+   // prints value of i  输出1
+   cout << obj.i;
+
+   //static member function
+   GfG::printMsg();
+
+
+   static GfG obj;
+   cout << "End of main\n"; //程序结束后，打印Inside Destructor
 }
+
+//https://www.geeksforgeeks.org/static-keyword-cpp/
+void staticVariable()
+{
+    // static variable
+    static int count = 0;
+    cout << count << " ";
+
+    // value is updated and
+    // will be carried to next
+    // function calls
+    count++;
+}
+
+int GfG::i = 1; //可以通过双冒号访问
+class GfG {
+public:
+    static int i; //被所有GfG对象共享
+
+    GfG(){
+        // Do nothing 静态变量不能在构造器初始化
+        cout << "Inside Constructor\n";
+    };
+    ~GfG() { cout << "Inside Destructor\n"; }
+    static void printMsg() { cout << "Welcome to GfG!"; }
+};

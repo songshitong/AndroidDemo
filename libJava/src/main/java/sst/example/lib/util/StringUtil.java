@@ -52,4 +52,14 @@ public class StringUtil {
     return "";
   }
 
+  //unicode转中文
+  public static String unicodeToCn(String unicode) {
+    String[] strs = unicode.split("\\\\u");
+    StringBuilder returnStr = new StringBuilder();
+    for (int i = 1; i < strs.length; i++) {
+      returnStr.append((char) Integer.valueOf(strs[i], 16).intValue());
+    }
+    return returnStr.toString();
+  }
+
 }

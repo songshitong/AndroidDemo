@@ -6,6 +6,12 @@ okhttp的responseBody是一个流，string()只能调用一次然后流就关闭
 https://github.com/hongyangAndroid/okhttputils
 
 
+全局拦截器设置token
+缺点 获取token接口可能携带token   
+不好灵活控制
+没办法不同接口不同的token
+
+
 //缓存
 默认没有配置缓存
 okhttp3/Cache.kt 代码示例

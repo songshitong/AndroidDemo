@@ -276,7 +276,6 @@ Capacity   [kəˈpæsəti] n.容量;容积;容纳能力;领悟(或理解、办�
             MAX_ARRAY_SIZE;
     }    
 ```
-//todo 位运算
 
 
 

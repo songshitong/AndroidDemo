@@ -10,7 +10,7 @@ js方法的注入
     function _createQueueReadyIframe() {
         messagingIframe = document.createElement('iframe');
         messagingIframe.style.display = 'none';
-        messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE;
+        messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE;   // yy://__QUEUE_MESSAGE__
         document.documentElement.appendChild(messagingIframe);
     }
 ```
@@ -61,7 +61,7 @@ WebViewJavascriptBridge对象的属性设置
     var jobs = window.WVJBCallbacks || [];
     readyEvent.initEvent('WebViewJavascriptBridgeReady');
     readyEvent.bridge = WebViewJavascriptBridge;
-    window.WVJBCallbacks = [];
+    window.WVJBCallbacks = []; //创建一个数组
     jobs.forEach(function (job) {
         job(WebViewJavascriptBridge)
     });
@@ -131,7 +131,7 @@ var sendMessageQueue = [];
         }else{
             callbackId = ''; //没有回调
         }
-        try { //执行js方法  WebViewJavascriptBridge.handler
+        try { //执行js方法  WebViewJavascriptBridge.handlerName
              var fn = eval('WebViewJavascriptBridge.' + handlerName);
          } catch(e) {
              console.log(e);
@@ -175,8 +175,6 @@ js调用原生的handler
 
 
 
-
-
 android测
 android测有两种使用方式,继承webview和使用BridgeHelper    
 两者都继承WebViewJavascriptBridge，实现发送消息  必须在主线程，但是没有抛出异常，没有进行线程切换
@@ -184,6 +182,10 @@ android测有两种使用方式,继承webview和使用BridgeHelper
 1 转义的逻辑不同BridgeHelper手动转义，webview使用JSONObject.quote进行转义
 2 webView对于总长度大于2097152并且android4.4以上，使用evaluateJavascript，否则使用loadUrl
 BridgeHelper发送消息全部由loadUrl实现
+
+缺点：
+监听页面完成才进行js注入，web侧可能初始化时拿不到对象  页面完成监听不稳定  注意多次调用finish会多次注入，js判断了初始化后不执行
+
 com/github/lzyzsd/jsbridge/WebViewJavascriptBridge.java
 ```
 public interface WebViewJavascriptBridge {
@@ -310,8 +312,80 @@ public void callHandler(String handlerName, String data, OnBridgeCallback callBa
     }    
 ```
 
+
+额外知识 BridgeWebView与Client
+BridgeWebView内置BridgeWebViewClient，其对WebViewClient功能增强，新加额外的功能，外部可以正常设置client
+java/com/github/lzyzsd/jsbridge/BridgeWebView.java
+```
+   private void init() {
+        mClient = new BridgeWebViewClient(this);
+        super.setWebViewClient(mClient);
+    }
+ 
+   @Override
+    public void setWebViewClient(WebViewClient client) {
+        mClient.setWebViewClient(client);
+    }   
+```
+java/com/github/lzyzsd/jsbridge/BridgeWebViewClient.java
+```
+class BridgeWebViewClient extends WebViewClient {
+    public void setWebViewClient(WebViewClient client) {
+        mClient = client;
+    }
+    
+    @Override
+    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        if (mClient != null) {
+            mClient.onPageStarted(view, url, favicon);
+        } else {
+            super.onPageStarted(view, url, favicon);
+        }
+    }
+    
+     @Override
+    public void onPageFinished(WebView view, String url) {
+        if (mClient != null) {
+            mClient.onPageFinished(view, url);
+        } else {
+            super.onPageFinished(view, url);
+        }
+        mListener.onLoadStart();
+        BridgeUtil.webViewLoadLocalJs(view, BridgeUtil.JAVA_SCRIPT);
+        mListener.onLoadFinished();
+    }
+}
+```
+
 总结：
 android向js发送消息 一般由loadUrl或者evaluateJavascript实现
- js方法的注册
+ js方法的注册 保存方法和方法名，evaluateJavascript执行时触发对应的方法
 js向Android发送消息
- android方法的注册 webView.addJavascriptInterface();  方法由@JavascriptInterface标记
+ android方法的注册 webView.addJavascriptInterface();  方法由@JavascriptInterface标记  
+    //类似的可以做框架设计，反射拿到所有方法及注解，标有注解的进行特殊处理 
+    //注解需要一个调用的方法名常量，这样使用时会方便许多
+ android的方法如何添加到WebViewJavascriptBridge?
+    webview.addJavascriptInterface(BridgeWebView.BaseJavascriptInterface,"WebViewJavascriptBridge") 将对象注入到js
+
+js的iframe中，src有什么用？
+https://www.jianshu.com/p/ce47bee0034f
+
+
+js库的注入  监听页面完成才进行js注入，web侧可能初始化时拿不到对象, 注意多次调用finish会多次注入，js判断了初始化后不执行
+SalesChampionQISDK/src/main/java/com/cubic/xgcar/component/jsbridge/BridgeWebViewClient.java
+```
+ @Override
+    public void onPageFinished(WebView view, String url) {
+       ... //加载asset的WebViewJavascriptBridge.js
+        BridgeUtil.webViewLoadLocalJs(view, BridgeUtil.JAVA_SCRIPT);
+       ...
+    }
+```
+//加载js方法
+java/com/cubic/xgcar/component/jsbridge/BridgeUtil.java
+```
+  public static void webViewLoadLocalJs(WebView view, String path){
+        String jsContent = assetFile2Str(view.getContext(), path);
+		view.loadUrl("javascript:" + jsContent);
+    }
+```

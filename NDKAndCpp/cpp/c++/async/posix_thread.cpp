@@ -2,7 +2,7 @@
 //POSIX 可移植操作系统接口（英语：Portable Operating System Interface，缩写为POSIX）是IEEE为要在各种UNIX操作系统上运行软件
 //unix,linux,window各有实现
 
-//线程创建  创建的线程id，线程参数，调用的函数，传入的函数参数
+//线程创建  创建的线程id，线程参数(默认值 NULL)，调用的函数，传入的函数参数(默认NULL)
 //pthread_create (thread, attr, start_routine, arg)
 //创建线程，并调用线程起始地址所指向的函数start_routine
 //返回值：成功则返回0；出错则返回-1

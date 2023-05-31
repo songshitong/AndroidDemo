@@ -12,9 +12,11 @@ public class MList {
         new Person("Paul", "Watson ")
     );
 
+    //将list的 item中某一部分 通过连接符连接为string
     String joinedFirstNames = list.stream()
         .map(Person::getFirstName)
-        .collect(Collectors.joining(", ")); // "John, Anna, Paul"  //// TODO: 2022/12/8  collect函数
+        .collect(Collectors.joining(", ")); // "John, Anna, Paul"
+    //Collectors 常用收集器，定义了一系列行为
     System.out.println("joinedFirstNames "+joinedFirstNames);
   }
 

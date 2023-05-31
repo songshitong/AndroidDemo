@@ -33,3 +33,24 @@ ActivityResultLauncher<Intent> requestDataLauncher;//java声明，调用launch�
 使用要点
 1. 需要实现ActivityResultCaller例如AppCompatActivity，Fragment(androidx)
 2. registerForActivityResult放在start之前
+
+
+选择图片
+```
+  galleryLauncher = registerForActivityResult(GetContent()) { uri ->}
+  
+  galleryLauncher?.launch("image/*")
+```
+
+拍照
+```
+   cameraLauncher = registerForActivityResult(TakePicture()) {}
+   
+    cameraLauncher?.launch(
+            FileProvider.getUriForFile(
+              context,
+              "${activity?.packageName}.fileprovider",
+              pathFile
+            )
+          ) 
+```

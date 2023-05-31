@@ -4,8 +4,8 @@
     <application
         android:supportsRtl="false"
         android:icon="@mipmap/ic_launcher" android:theme="@style/XGTheme.App">
-        <activity android:name=".BottomNavigationActivity"/>
-        <activity android:name=".ShapeActivity" >
+        <activity android:name=".BottomNavigationActivity" android:exported="false"/>
+        <activity android:name=".ShapeActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

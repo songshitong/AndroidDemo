@@ -44,8 +44,8 @@ include_directories(${CMAKE_SOURCE_DIR}/inc)
    # Google cmake教程包括常用参数https://developer.android.com/ndk/guides/cmake
    externalNativeBuild{   #设置本地库的CPU架构
       cmake{
-        cppFlags ""
-        abiFilters "x86"
+         cppFlags '-std=c++17' //传递给c++的参数 例如使用17的标准
+         abiFilters "x86"
          version "3.4.1"   #制定cmake版本
 # 也可以使用下面这种语法向变量传递参数：
 # arguments "-D变量名=参数".

@@ -88,7 +88,6 @@ public class MCoroutines{
 //              cost: 1024 ms.
           }
       }
-      //todo viewmodel中的viewModelScope  参考https://developer.android.google.cn/kotlin/coroutines/coroutines-best-practices?hl=zh-cn
       private fun testAsync() {
           val coroutineScope = CoroutineScope(Dispatchers.Default)
           coroutineScope.launch {

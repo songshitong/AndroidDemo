@@ -16,7 +16,6 @@ class DynamicAnimaitonActivity : AppCompatActivity() {
         findViewById<View>(R.id.startSpringBtn).setOnClickListener {
             springTextView.translationY=600f
             val sp = SpringAnimation(springTextView,DynamicAnimation.TRANSLATION_Y,590f).setStartVelocity(5000f)
-
             sp.start()
         }
 

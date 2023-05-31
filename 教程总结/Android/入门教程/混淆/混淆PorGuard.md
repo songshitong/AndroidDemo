@@ -1,3 +1,20 @@
+
+
+独立混淆
+https://www.jianshu.com/p/a8614ff60647
+Android 在构建apk的时候，会把每一个aar中的混淆配置文件读取出来，作为总的混淆配置文件，然后以这个总的混淆配置表对全部的Java代码进行混淆。
+因此只要我们的aar中包含了混淆配置文件，那么这个aar在打包到apk的时候，其自带的混淆配置就会对全部的Java代码生效。
+因此Android是支持aar独立配置自己混淆文件的，只要aar中包含混淆配置文件即可。
+配置方式 android->defaultConfig
+consumerProguardFiles 'proguard.pro','proguard-b.pro'    或者consumerProguardFiles fileTree(dir: projectDir, include: 'proguard*')
+
+
+
+
+
+
+
+
 https://www.guardsquare.com/manual/configuration/usage
 https://github.com/Guardsquare/proguard
 https://www.jianshu.com/p/d64e493cc07f

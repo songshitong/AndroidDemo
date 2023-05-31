@@ -64,7 +64,7 @@ class AidlActivity : AppCompatActivity() {
         }
     }
 
-    //获取隐式intent  todo Android5.0以后不让使用隐式intent
+    //获取隐式intent  Android5.0以后不让使用隐式intent
     // 1 getExplicitIntent将隐式转为显示
     // 2 拿到intent所在的包名和service名
     fun getExplicitIntent(context: Context, implicitIntent: Intent): Intent? {

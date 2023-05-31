@@ -126,3 +126,31 @@ private val contentType: MediaType = "$type; boundary=$boundary".toMediaType()
 //默认的boundary由UUID生成
 class Builder @JvmOverloads constructor(boundary: String = UUID.randomUUID().toString()) {}
 ```
+
+自定义重试次数
+1  Okhttp.Builder.retryOnConnectionFailure(false)
+2  自定义拦截器
+```
+public class RetryIntercepter implements Interceptor {
+
+    public int maxRetry;//最大重试次数
+    private int retryNum = 0;//假如设置为3次重试的话，则最大可能请求4次（默认1次+3次重试）
+
+    public RetryIntercepter(int maxRetry) {
+        this.maxRetry = maxRetry;
+    }
+
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+        Request request = chain.request();
+        System.out.println("retryNum=" + retryNum);
+        Response response = chain.proceed(request);
+        while (!response.isSuccessful() && retryNum < maxRetry) {
+            retryNum++;
+            System.out.println("retryNum=" + retryNum);
+            response = chain.proceed(request);
+        }
+        return response;
+    }
+}
+```

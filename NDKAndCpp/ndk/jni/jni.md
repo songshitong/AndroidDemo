@@ -208,6 +208,12 @@ Java_com_xfhy_jnifirst_MainActivity_operateString(JNIEnv *env, jobject thiz, jst
     //自动转为Unicode
     return env->NewStringUTF(buff);
 }
+
+Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nLog(JNIEnv *env, jclass clazz, jstring jlog) {
+    const char* nlog = env->GetStringUTFChars(jlog, nullptr);
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native receive log %s", nlog);
+    env->ReleaseStringUTFChars(jlog,nlog); //释放jlog和nlog
+}
 ```
 GetStringUTFRegion会进行越界检查,越界会抛StringIndexOutOfBoundsException异常.GetStringUTFRegion其实和GetStringUTFChars有点相似,
 但是GetStringUTFRegion内部不会分配内存,不会抛出内存溢出异常. 由于其内部没有分配内存,所以也没有类似Release这样的函数来释放资源.

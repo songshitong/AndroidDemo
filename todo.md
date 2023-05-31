@@ -1,5 +1,7 @@
 http://weishu.me/2016/12/23/dive-into-android-optimize-vm-heap/
 
+dokit
+https://github.com/didi/DoKit/tree/master/Android
 
 如何写业务代码  需要了解代码整洁指导  ddd领域驱动设计
 https://github.com/alibaba/COLA

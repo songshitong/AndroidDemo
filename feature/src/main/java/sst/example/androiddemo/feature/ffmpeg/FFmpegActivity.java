@@ -14,6 +14,8 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
+import java.io.IOException;
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.util.MyUtils;
 
@@ -46,6 +48,18 @@ public class FFmpegActivity extends AppCompatActivity {
         ffmpegCmd.setSurfaceView(surfaceView);
 
         initListener();
+        File logFile = new File(getFilesDir(),"test.log");
+        if(!logFile.exists()){
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        ffmpegCmd.initLog(logFile.getAbsolutePath());
+        ffmpegCmd.log("this is first  log\n");
+        ffmpegCmd.log("this is second log\n");
+        ffmpegCmd.log("this is third log\n");
     }
     byte[] pcmDatas;
     private void initListener() {
@@ -58,7 +72,6 @@ public class FFmpegActivity extends AppCompatActivity {
                 ffmpegCmd.startPlay(filePath);
             }
         });
-        //TODO texture he surfaceview
         recordAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

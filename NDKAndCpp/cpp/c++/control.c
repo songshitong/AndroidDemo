@@ -13,6 +13,8 @@ int main(){
    }else{
        printf("a为false的条件\n");
    }
+
+
    
 //    三元运算符
     (a>b)?printf("a>b\n"):printf("a<b\n");

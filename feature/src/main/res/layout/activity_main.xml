@@ -267,5 +267,13 @@
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:text="录屏recorder"
         />
+    <Button  android:id="@+id/cameraMatrixBtn"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Camera动画"
+        />
+    <Button  android:id="@+id/pluginBtn"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="插件化"
+        />
 </LinearLayout>
 </ScrollView>

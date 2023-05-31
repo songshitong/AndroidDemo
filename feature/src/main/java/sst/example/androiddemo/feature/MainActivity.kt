@@ -4,7 +4,6 @@ import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.app.ActivityManager
 import android.app.Application.getProcessName
-import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -16,9 +15,7 @@ import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.provider.Settings
-import android.provider.Settings.Secure
 import android.text.TextUtils
-import android.text.TextUtils.SimpleStringSplitter
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
@@ -31,7 +28,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
@@ -51,21 +47,20 @@ import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
 import sst.example.androiddemo.feature.resources.XmlParserActivity
 import sst.example.androiddemo.feature.service.IntentServiceActivity
-import sst.example.androiddemo.feature.service.OperationAccessibilityService
 import sst.example.androiddemo.feature.util.MyUtils
 import sst.example.androiddemo.feature.video.VideoParserActivity
 import sst.example.androiddemo.feature.video.recorder.RecorderActivity
 import sst.example.androiddemo.feature.wallpaper.NormalWallpaperService
 import sst.example.androiddemo.feature.webview.JumpActivity
+import sst.example.androiddemo.feature.widget.CameraMatrixActivity
 import sst.example.androiddemo.feature.widget.SystemView
 import sst.example.androiddemo.feature.widget.ViewOutlineProviderActivity
-import sst.example.androiddemo.feature.widget.layout.ConstrainLayoutActivity
+import sst.example.androiddemo.feature.widget.layout.constraint.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.LinearLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
-import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCutsomLayoutManagerActivity
+import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCustomLayoutManagerActivity
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.util.function.Predicate
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -307,7 +302,6 @@ class MainActivity : AppCompatActivity() {
       } while (time + 1000 >= System.currentTimeMillis())
       Log.d(TAG, "index value  $index")
     }).start();
-    //todo 文字动画 https://github.com/aagarwal1012/Animated-Text-Kit
 
 
     //handler原理为什么顺序是021  runnable运行的线程不是主线程吗
@@ -354,7 +348,7 @@ class MainActivity : AppCompatActivity() {
       startActivity(Intent(this, MeasureTestActivity::class.java))
     }
       findViewById<View>(R.id.customLMActivity).setOnClickListener {
-      startActivity(Intent(this, RVCutsomLayoutManagerActivity::class.java))
+      startActivity(Intent(this, RVCustomLayoutManagerActivity::class.java))
     }
       findViewById<View>(R.id.scrollNestedActivity).setOnClickListener {
       startActivity(
@@ -472,6 +466,12 @@ class MainActivity : AppCompatActivity() {
     }
       findViewById<View>(R.id.animatorTextBtn).setOnClickListener {
       startActivity(Intent(this, AnimatorTextActivity::class.java))
+    }
+    findViewById<View>(R.id.cameraMatrixBtn).setOnClickListener {
+      startActivity(Intent(this, CameraMatrixActivity::class.java))
+    }
+    findViewById<View>(R.id.pluginBtn).setOnClickListener {
+      startActivity(Intent(this, PluginActivity::class.java))
     }
 
     //测试livedata连续调用
@@ -606,6 +606,9 @@ class MainActivity : AppCompatActivity() {
 
   //获取方法调用栈
   private fun getMethodTrace() {
+    val element = Thread.currentThread().stackTrace[3]
+    println("调用getMethodTrace的方法为： ${element.methodName} ${element.className}  lineNumber:${element.lineNumber}")
+    //如何拿到方法的参数值，动态代理或aspects
     println("getMethodTrace start ==================================")
     val ste = Thread.currentThread().stackTrace
     ste.forEach {
@@ -684,17 +687,6 @@ class MainActivity : AppCompatActivity() {
     this.startActivity(Intent.createChooser(shareIntent, "分享title"))
   }
 
-  //dalvik system CloseGuard
-  //ndk 稳定版16b  aiqiyi xhook elf hook原理
-
-  //webview  好用的webview
-  //todo loadUrl   Refusing to load URL as it exceeds 2097152 characters.
-  //由loadUrl改为evaluateJavascript
-  //实例化webviewcontext必须是activity，内部弹出alert需要activity context
-  // Android webview无法全屏
-
-  //todo 打日志总结  方法的出入口，日志不能有相同的描述，方便定位到具体代码行，相当于唯一标识？，尤其是同一个方法里面的
-  //
 
 
 
@@ -794,7 +786,7 @@ class MainActivity : AppCompatActivity() {
       println("HOME has been pressed yet ...")
       // android.os.Process.killProcess(android.os.Process.myPid());
       Toast.makeText(
-        getApplicationContext(), "HOME 键已被禁用...",
+        applicationContext, "HOME 键已被禁用...",
         Toast.LENGTH_LONG
       ).show()
     }

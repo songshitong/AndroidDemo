@@ -270,6 +270,12 @@ public class ReflectDemo {
             Parameter[] printMsgParms =  printMsgMethod.getParameters();
             for (int i1 = 0; i1 < printMsgParms.length; i1++) {
                 Parameter printMsgParm = printMsgParms[i1];
+                //https://cloud.tencent.com/developer/article/1557509
+                //在JDK8之前javac编译是不会把构造器和方法的参数名编译进class中，如果需要获取参数名，可以在方法上加上注解，
+                //反射获取注解的值从而获取参数名，比如Jackson的@JsonCreator和@JsonProperty 。而JDK8新增了这一个功能，
+                //可以直接调用java.lang.reflect.Parameter.getName()获取到，前提是javac需要添加-parameters这个参数
+                //通常来说不建议这样做，因为这会增大.class和在JVM中会占用更多的内存。
+                printMsgParm.getName(); //可能是arg0->argN
                 Annotation[] printMsgParmAnnotations = printMsgParm.getAnnotations();
                 for (Annotation printMsgParmAnnotation : printMsgParmAnnotations) {
                     System.out.println("printMsg method printMsgParm  "+printMsgParm+" annotation "+printMsgParmAnnotation );

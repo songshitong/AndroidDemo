@@ -2,12 +2,14 @@ package com.sst.libkotlin
 
 import androidx.annotation.IntDef
 import java.io.IOException
+import java.lang.reflect.Method
+import java.lang.reflect.Parameter
 import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.jvm.Throws
 
 //kotlin中的注解
-//  @JvmSuppressWildcards todo
 class MAnnotation private constructor(){
+
 
     //抛出Java的IOException
     //翻译为
@@ -74,8 +76,12 @@ class MAnnotation private constructor(){
 
 
        //自定义注解
-        @IntDef(SLOW, NORMAL, FAST)
-        @Retention(AnnotationRetention.SOURCE)
+        @IntDef(SLOW, NORMAL, FAST)//限定注解的值
+        @Retention(AnnotationRetention.SOURCE) //其他类型 BINARY：保存在二进制但是反射不可见；RUNTIME：反射可见
+        //限定注解使用的位置  TYPE_PARAMETER参数类型  VALUE_PARAMETER参数名称
+        @Target(AnnotationTarget.FIELD,AnnotationTarget.TYPE_PARAMETER,AnnotationTarget.VALUE_PARAMETER)
+        @Repeatable//注解可以多次使用
+        @MustBeDocumented //注解包含在生成的文档中
         annotation class Speed
         const val SLOW = 0
         const val NORMAL = 1
@@ -86,9 +92,48 @@ class MAnnotation private constructor(){
         public fun setSpeed(@Speed speed: Int) {
             this.speed = speed
         }
+
+
+      //方法的注解
+      private inline fun <reified T:Annotation> parseMethodAnnotation(method: Method): T? {
+        //方法的所有注解
+        // method.parameterAnnotations 这是参数的注解
+        for (annotation in method.annotations){
+          if (annotation is T) {
+            // if(annotation is CustomMethod){//可以用泛型替代
+            //   annotation.name //拿到注解的name
+            // }
+            return annotation
+          }
+        }
+        return null
+      }
+
+      //参数注解
+      private inline fun <reified T:Annotation> parseMethodParameter(param: Parameter): T? {
+        for (annotation in param.annotations){
+          if (annotation is T) {
+            return annotation
+          }
+        }
+        return null
+      }
     }
 
+  @Retention(AnnotationRetention.RUNTIME)
+  annotation class CustomMethod(val name:String)
 
+  class Box<out T>(val value: T)
 
+  interface Base
+  class Derived : Base
 
+  //@JvmSuppressWildcards
+  //用来注解类和方法，使得被标记元素的泛型参数不会被编译成通配符
+  fun unboxBase(box:Box<@JvmSuppressWildcards Base>): Base = box.value
+// 会翻译成
+// Base unboxBase(Box<Base> box) { …… }
+
+  //不使用注解翻译
+  // Base unboxBase(Box<? extends Base> box) { …… }
 }

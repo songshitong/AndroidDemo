@@ -355,7 +355,7 @@ public class BitmapActivity extends AppCompatActivity {
     //指定我们想要存储文件的地址
     String TargetPath = mContext.getFilesDir() + "/images/";
     Log.d("Save Bitmap", "Save Path=" + TargetPath);
-    //判断指定文件夹的路径是否存在 // TODO: 2022/7/4 文件夹创建
+    //判断指定文件夹的路径是否存在
     if (!(new File(TargetPath)).exists()) {
       Log.d("Save Bitmap", "TargetPath isn't exist");
     } else {

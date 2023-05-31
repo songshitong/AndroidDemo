@@ -16,6 +16,6 @@ Kotlin 代码转 Java 代码
 
 
 
-todo nullable  nonnull
+nullable  nonnull
 java的API没有声明可空和非空
-kotlin不提示空的风险？？？
+kotlin不提示空的风险？？？  kotlin没法直接根据函数判断结果是否可空，需要额外的注解

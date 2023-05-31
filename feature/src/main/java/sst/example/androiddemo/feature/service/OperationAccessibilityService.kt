@@ -45,8 +45,8 @@ class OperationAccessibilityService : AccessibilityService() {
   fun onMessageEvent( event:String)
   {
     Log.d("receiveEvent","event $event")
-//    swipe(600f,1500f,200f,1500f)
-    click(2110f+ Random.Default.nextInt(-20,30), 798f+Random.Default.nextInt(-30,50))
+   swipe(600f,1500f,200f,1500f)
+    // click(2110f+ Random.Default.nextInt(-20,30), 798f+Random.Default.nextInt(-30,50))
   }
 
     @RequiresApi(VERSION_CODES.O)

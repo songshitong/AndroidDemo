@@ -84,7 +84,7 @@ s6 = s5;
 
 
 //    https://www.cnblogs.com/stonejin/archive/2011/09/16/2179248.html
-//    strcpy和memcpy主要有以下3方面的区别。
+//    strcpy和memcpy主要有以下3方面的区别。  #include <string.h>
 //    1、复制的内容不同。strcpy只能复制字符串，而memcpy可以复制任意内容，例如字符数组、整型、结构体、类等。
 //    2、复制的方法不同。strcpy不需要指定长度，它遇到被复制字符的串结束符"\0"才结束，所以容易溢出。memcpy则是根据其第3个参数决定复制的长度。
 //    3、用途不同。通常在复制字符串时用strcpy，而需要复制其他类型数据时则一般用memcpy
@@ -99,7 +99,7 @@ s6 = s5;
 
     //将 s 中第 11 个字符开始的 6个连续字符复制到 d 中:
     char *s="http://www.runoob.com";
-    char d[20];
+    char d[20]; //开辟20个空间
      memcpy(d, s+11, 6);// 从第 11 个字符(r)开始复制，连续复制 6 个字符(runoob)
     // 或者 memcpy(d, s+11*sizeof(char), 6*sizeof(char));
     d[6]='\0';

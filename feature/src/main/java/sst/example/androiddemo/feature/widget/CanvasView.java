@@ -128,11 +128,6 @@ public class CanvasView extends View {
         // 3 (float) Math.sqrt(3) 60度
         canvas.skew(1,-1);
 
-        //todo 3d旋转
-        Camera camera;
-//        camera.rotateZ();  绕z轴旋转，即在屏幕所在平面移动
-//          camera.rotateX(0); 绕x轴旋转，屏幕里外上下
-//          camera.rotateY(0); 绕Y轴旋转，屏幕里外左右
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             //判断和某个矩形相交
@@ -141,9 +136,9 @@ public class CanvasView extends View {
         }
 
 
-        //todo draw 系列
+
         mCanvas.drawColor(Color.RED);
-        //todo 画圆环  圆环的半径是内圆半径+环宽度的一半
+        //画圆环  圆环的半径是内圆半径+环宽度的一半
 //        mCanvas.drawCircle();
 
         //裁剪功能canvas.clipRect()---Region.Op.INTERSECT交集    clipOutRect---Region.Op.DIFFERENCE差集  在AndroidP(28)及以上只有这两个是有效的参数

@@ -65,7 +65,7 @@ class MorphologyActivity : AppCompatActivity() {
     //这就是一个运算核，一个3x3的矩阵
     val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(3.0, 3.0))
     val noiseRemoveMat = Mat()
-    //进行开运算  todo 效果不好
+    //进行开运算
     Imgproc.morphologyEx(threMat,noiseRemoveMat,Imgproc.MORPH_OPEN,kernel)
     val noiseRemoveBitmap = Bitmap.createBitmap(noiseMat.width(),noiseMat.height(),Bitmap.Config.ARGB_8888)
     Utils.matToBitmap(noiseRemoveMat,noiseRemoveBitmap)

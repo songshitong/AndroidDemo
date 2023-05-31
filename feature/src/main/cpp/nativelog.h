@@ -7,7 +7,7 @@ class NativeLog{
 public:
      NativeLog(char* path);
      void init(char* path);
-     static void log(char* logStr);
+     void log(char* logStr);
      void closeLog();
     ~NativeLog(){
         //todo close前 缓存需要写入

@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <unistd.h>
 #include <pthread.h>
+#include <condition_variable>
 #include <mutex>
 #include "nativelog.h"
 #include "log_buffer.h"
@@ -16,8 +17,8 @@ static const unsigned int kBufferBlockLength = 150 * 1024; //todo 配置层
 static LogBuffer* log_buff = nullptr; //存储buffer
 static volatile bool log_close = true; //日志是否关闭
 
-//static Condition cond_buffer_async;
-//static Mutex mutex_buffer_async;
+static std::condition_variable cond_buffer_async;
+static std::mutex mutex_buffer_async;
 static void async_log_thread();
 
 NativeLog::NativeLog(char *path) {
@@ -31,6 +32,7 @@ NativeLog::NativeLog(char *path) {
     }
   log_close = false;
   logFilePath = path;
+     fopen()
   logFileFD = open(path,O_RDWR,S_IRWXU); //todo 建立临时文件
 //  __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init file fd %d",logFileFD);
 //  int fileSize = lseek(logFileFD, 0, SEEK_END); //获取文件大小
@@ -39,7 +41,7 @@ NativeLog::NativeLog(char *path) {
   ftruncate(logFileFD, kBufferBlockLength);//填充文件大小   mmap不能扩展文件长度，这里相当于预先给文件长度，准备一个空架子
 
   //每次log都进行内存映射和释放，存在性能问题  建立缓存文件，只映射一次即可
-  fileStart = (int8_t *)mmap(nullptr, kBufferBlockLength, PROT_READ | PROT_WRITE, MAP_PRIVATE,
+  fileStart = (int8_t *)mmap(nullptr, kBufferBlockLength, PROT_READ | PROT_WRITE, MAP_SHARED,
                              logFileFD, 0);
   if(fileStart == MAP_FAILED){
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init mmap error");
@@ -51,35 +53,40 @@ NativeLog::NativeLog(char *path) {
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "NativeLog init mmap success ptr:%p",fileStart);
   }
   int threadId;
-//  int ret =pthread_create(reinterpret_cast<pthread_t *>(&threadId), nullptr,
-//                          reinterpret_cast<void *(*)(void *)>(async_log_thread), nullptr);
-//  if(0 != ret){
-//      __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "thread create error");
-//  }
+  int ret =pthread_create(reinterpret_cast<pthread_t *>(&threadId), nullptr,
+                          reinterpret_cast<void *(*)(void *)>(async_log_thread), nullptr);
+  if(0 != ret){
+      __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "thread create error");
+  }
 
 }
 
 static void log2file(const void* _data, size_t _len, bool _move_file) {
-//    if (NULL == _data || 0 == _len || sg_logdir.empty()) { todo 校验dir
-//        return;
-//    }
+    if (nullptr == _data || 0 == _len /*|| sg_logdir.empty()*/) { //todo 校验dir
+        return;
+    }
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "start write buffer to file");
-
+    //文件分割
+    fwrite();
 }
 
+
 static void async_log_thread() {
-//    while (true) {
+    while (true) {
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "file write thread run....");
+
 ////        ScopedLock lock_buffer(mutex_buffer_async);
-//        if (nullptr == log_buff) break;
-//        AutoBuffer tmp;
-//        log_buff->Flush(tmp);
-////        lock_buffer.unlock();
+        if (nullptr == log_buff) break;
+        AutoBuffer tmp;
+        log_buff->Flush(tmp);
+////        lock_buffer.unlock();  todo 内存枷锁
 //
-//        if (nullptr != tmp.Ptr())  log2file(tmp.Ptr(), tmp.Length(), true);
+        if (nullptr != tmp.Ptr())  log2file(tmp.Ptr(), tmp.Length(), true);
 //
-//        if (log_close) break;
-////        cond_buffer_async.wait(15 * 60 * 1000);
-//    }
+        if (log_close) break;
+        std::unique_lock<std::mutex> lock(mutex_buffer_async);
+        cond_buffer_async.wait(lock);
+    }
 }
 
 
@@ -87,12 +94,14 @@ static void async_log_thread() {
 
  void NativeLog::log(char *logStr) {
   if(nullptr == log_buff) return;
+  std::lock_guard<std::mutex> lk(mutex_buffer_async);
   size_t length = strlen(logStr);
   log_buff->Write(logStr,length);
-//  memcpy(fileStart+fileSize, logStr, length);
-    if (log_buff->GetData().Length() >= kBufferBlockLength*1/3) { //todo 单条log进行分割
-//        cond_buffer_async.notifyAll();
-    }
+  size_t bufferLength =  log_buff->GetData().Length();
+   __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "buffer now length %d",bufferLength);
+ if (bufferLength >= kBufferBlockLength*1/3) { //todo 单条log进行分割
+    cond_buffer_async.notify_all();
+  }
 
 }
 
@@ -106,7 +115,6 @@ void NativeLog::closeLog() {
     delete log_buff;
     log_buff = nullptr;
 //    delete cond_buffer_async;
-//    cond_buffer_async = NULL;
     if(logFileFD){
       close(logFileFD);
     }

@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 import sst.example.androiddemo.feature.R;
 import sst.example.androiddemo.feature.util.MyUtils;
 
@@ -60,6 +61,13 @@ public class FFmpegActivity extends AppCompatActivity {
         ffmpegCmd.log("this is first  log\n");
         ffmpegCmd.log("this is second log\n");
         ffmpegCmd.log("this is third log\n");
+        for (int i=0 ;i<100;i++){
+            StringBuilder sb = new StringBuilder(100);
+            for (int j=0;j<100;j++){
+                sb.append(Math.random());
+            }
+            ffmpegCmd.log(sb.toString());
+        }
     }
     byte[] pcmDatas;
     private void initListener() {

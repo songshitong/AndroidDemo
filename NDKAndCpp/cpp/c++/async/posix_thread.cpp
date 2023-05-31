@@ -121,4 +121,49 @@ int main()
     int result = pthread_mutex_destroy(&mutexT);
     //等各个线程退出后，进程才结束，否则进程强制结束了，线程可能还没反应过来；
     pthread_exit(NULL);
+
+
+
+
+    pthread_cond_init(&cond, NULL);
+    pthread_mutex_init(&mutex, NULL);
+    pthread_t threadfactorID, threadcomsumerID;
+    pthread_create(&threadfactorID, NULL, (void *) threadfacter, NULL);
+    pthread_create(&threadcomsumerID, NULL, (void *) threadcomsumer, NULL);
+    pthread_join(threadfactorID);
+    pthread_join(threadcomsumerID);
+}
+
+
+void func(int x, int y)
+{
+    printf("x is greater than y, the value is x,y = %d,%d\n", x, y);
+}
+
+//生产者的线程执行函数
+void threadfacter()
+{
+    while(1)
+    {
+        pthread_mutex_lock(&mutex);
+        //do some thing on x, y
+        if(x > y)
+        {
+            pthread_cond_broadcast(&cond);//如果条件符合，则通知消费者线程
+        }
+        pthread_mutex_unlock(&mutex);
+    }
+}
+
+void threadcomsumer()
+{
+    while(1)
+    {
+        pthread_mutex_lock(&mutex);
+        pthread_cond_wait(&cond, &mutex) //如果条件不符合，则释放mutex锁，并等待。如果条件符合，表示条件已经符合，并且尝试再对mutex加锁，如果加锁成功，pthread_cond_wait返回0
+        {
+            func(x,y);
+        }
+        pthread_mutex_unlock(&mutex);//
+    }
 }

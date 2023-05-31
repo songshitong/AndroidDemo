@@ -418,6 +418,7 @@ void appender_setmode(TAppenderMode _mode) {
 ```
 log/src/log_buffer.cc
 ```
+//将缓存信息 写入_buff
 void LogBuffer::Flush(AutoBuffer& _buff) {
    ...
     __Flush(); //更新信息

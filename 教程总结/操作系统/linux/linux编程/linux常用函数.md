@@ -94,8 +94,21 @@ void* mmap(void* addr, size_t size, int prot, int flags, int fd, off_t offset)
 if(mVMStart == MAP_FAILED){
 }
 ```
+https://blog.csdn.net/yangle4695/article/details/52139585
+MAP_PRIVATE 对映射区域的写入操作会产生一个映射文件的复制，即私人的“写入时复制”（copy on write）对此区域作的任何修改都不会写回原来的文件内容
+
 解除内存映射
 munmap(m_ptr, oldSize);
+https://juejin.cn/s/mmap%E5%A4%B1%E8%B4%A5%E5%8E%9F%E5%9B%A0
+mmap失败原因：
+文件不存在：如果要映射的文件不存在，则mmap调用将失败。
+文件大小为0：如果要映射的文件大小为0，则无法映射，并且mmap调用将失败。
+没有权限：如果当前进程没有读写文件的权限，则mmap调用将失败。
+内存不足：如果系统内存不足，则mmap调用将失败。
+系统限制：如果系统限制了映射的地址空间大小，则mmap调用将失败。
+其他错误：如果发生其他错误，则mmap调用将失败，例如文件系统故障、磁盘空间不足等
+
+
 
 stat函数
 函数原型  #include <sys/stat.h>

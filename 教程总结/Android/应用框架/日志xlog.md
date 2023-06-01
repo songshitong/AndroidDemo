@@ -174,6 +174,49 @@ void mapped_file_impl::open(param_type p)
     params_ = p;
 }
 
+void mapped_file_impl::open_file(param_type p)
+{
+    bool readonly = p.flags != mapped_file::readwrite;
+。。。
+    // Open file
+    int flags = (readonly ? O_RDONLY : O_RDWR);
+    if (p.new_file_size != 0 && !readonly)
+        flags |= (O_CREAT | O_TRUNC);
+    #ifdef _LARGEFILE64_SOURCE
+        flags |= O_LARGEFILE;
+    #endif
+    errno = 0;
+    handle_ = ::open(p.path.c_str(), flags, S_IRWXU);
+    if (errno != 0) {
+        cleanup_and_throw("failed opening file");
+        return;
+    }
+
+    //--------------Set file size---------------------------------------------//
+
+    if (p.new_file_size != 0 && !readonly)
+        if (BOOST_IOSTREAMS_FD_TRUNCATE(handle_, p.new_file_size) == -1) {
+            cleanup_and_throw("failed setting file size");
+            return;
+        }
+
+    //--------------Determine file size---------------------------------------//
+
+    bool success = true;
+    if (p.length != max_length) {
+        size_ = p.length;
+    } else {
+        struct BOOST_IOSTREAMS_FD_STAT info;
+        success = ::BOOST_IOSTREAMS_FD_FSTAT(handle_, &info) != -1;
+        size_ = info.st_size;
+    }
+    if (!success) {
+        cleanup_and_throw("failed querying file size");
+        return;
+    }
+。。。
+}
+
 void mapped_file_impl::map_file(param_type& p)
 {
     BOOST_TRY {
@@ -418,7 +461,7 @@ void appender_setmode(TAppenderMode _mode) {
 ```
 log/src/log_buffer.cc
 ```
-//将缓存信息 写入_buff
+//将缓存信息 写入_buff 同时清空buffer的内容
 void LogBuffer::Flush(AutoBuffer& _buff) {
    ...
     __Flush(); //更新信息

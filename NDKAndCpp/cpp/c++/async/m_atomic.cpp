@@ -13,11 +13,21 @@
 //·memory_order_consume：使用它的线程中，后续有关的原子操作必须在本原子操作完成后执行。
 //更多 https://en.cppreference.com/w/cpp/atomic/memory_order。
 
+//std::atomic_flag的使用  类似于atomic<bool>      https://www.cnblogs.com/haippy/p/3252056.html
+//bool test_and_set (memory_order sync = memory_order_seq_cst) noexcept;
+//在上锁的时候，如果 lock.test_and_set 返回 false，则表示上锁成功（此时 while 不会进入自旋状态），因为此前 lock 的标志位为 false
+//(即没有线程对 lock 进行上锁操作)，但调用 test_and_set 后 lock 的标志位为 true，说明某一线程已经成功获得了 lock 锁。
+//如果在该线程解锁（即调用 lock.clear(std::memory_order_release)） 之前，另外一个线程也调用 lock.test_and_set(std::memory_order_acquire)
+//试图获得锁，则 test_and_set(std::memory_order_acquire) 返回 true，则 while 进入自旋状态。如果获得锁的线程解锁
+//（即调用了 lock.clear(std::memory_order_release)）之后，某个线程试图调用 lock.test_and_set(std::memory_order_acquire) 并且返回 false，
+//则 while 不会进入自旋，此时表明该线程成功地获得了锁
+//void clear (memory_order sync = memory_order_seq_cst) 操作完成清除内部标记
 
 #include <thread>
 #include <atomic>
 #include <cassert>
 #include "iostream"
+#include <vector>
 
 std::atomic<bool> x = {false};
 std::atomic<bool> y = {false};
@@ -66,4 +76,32 @@ int main()
     assert(z.load() != 0);  // will never happen
     std::cout << "z is " << z.load() << std::endl;
     //结果  z is2
+
+    testAtomicFlag();
+}
+
+std::atomic_flag lock = ATOMIC_FLAG_INIT;
+void f(int n)
+{
+    for (int cnt = 0; cnt < 100; ++cnt) {
+        while (lock.test_and_set(std::memory_order_acquire))  // acquire lock
+            ; // spin  返回true代表其他线程获得锁，一直自旋
+        std::cout << "Output from thread " << n << '\n';
+        lock.clear(std::memory_order_release);               // release lock
+
+        //等价于：
+        while (!lock.test_and_set(std::memory_order_acquire)){ //初始为false，进入
+            std::cout << "Output from thread " << n << '\n';  //当前true
+            lock.clear(std::memory_order_release); //清除true，让其他线程可以获得锁
+        }
+    }
+}
+void testAtomicFlag{
+        std::vector<std::thread> v;
+        for (int n = 0; n < 10; ++n) {
+            v.emplace_back(f, n);
+        }
+        for (auto& t : v) {
+            t.join();
+        }
 }

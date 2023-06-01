@@ -14,8 +14,5 @@ public:
         closeLog();
     }
 private:
-    int8_t* fileStart{};
-    int logFileFD{};
-    char *logFilePath{};
-
+    int8_t* tmpFileStart{};
 };

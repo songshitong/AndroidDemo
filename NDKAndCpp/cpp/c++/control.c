@@ -42,4 +42,12 @@ int main(){
         default:printf("error\n");
     }
 
+
+    while (true){
+        printf("while again =====");
+        if(false){
+            printf("exit again =====");
+            break;
+        }
+    }
 }

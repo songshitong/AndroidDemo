@@ -98,6 +98,7 @@ int main()
     {
         indexes[i] = i; //先保存i的值 不保存i，线程运行时，I的指针地址的数据已经改变
         //参数依次是：创建的线程id，线程参数，调用的函数，传入的函数参数
+        //string类型传递可以使用 std.c_str()进行类型转换  直接传递char*，参数可能异常
         int ret = pthread_create(&tids[i], NULL, say_hello, (void *)&(indexes[i]));
         if (ret != 0)
         {

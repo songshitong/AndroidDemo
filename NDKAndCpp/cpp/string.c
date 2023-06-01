@@ -65,7 +65,8 @@ s6 = s5;
     //复制
     //Copy SRC to DEST  strcpy(dest,src)
     strcpy(c, a);
-    //添加
+
+    //添加  将b连接到c的后面
     //Append SRC onto DEST  strcat(dest,src)
     strcat(c, b);
     printf("字符串拼接后 %s\n",c);

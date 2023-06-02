@@ -14,11 +14,20 @@ public class FFmpegCmd implements SurfaceHolder.Callback {
    }
 
    public FFmpegCmd() {
-      nInit();
+
    }
 
    public void initLog(String path){
       nInitLog(path); //// TODO: 2023/5/29 多进程要单独处理吗？ 每个进程由业务方配置文件名字
+      nInitCrashMonitor();
+      Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
+         Thread.UncaughtExceptionHandler exceptionHandler = Thread.currentThread().getUncaughtExceptionHandler();
+         if(null != exceptionHandler){
+            exceptionHandler.uncaughtException(t,e);
+         }
+         //// TODO: 2023/6/2 java和native合并为一个类
+         //// TODO: 2023/6/2 调用原生 退出
+      });
    }
 
    public void log(String log){
@@ -40,12 +49,18 @@ public class FFmpegCmd implements SurfaceHolder.Callback {
 //      nStartPlay(path,surfaceHolder.getSurface());
    }
 
+   public void nativeCrashTest(){
+      nNativeCrashTest();
+   }
+
 
    private static native int run(int cmdLen, String[] cmd);
 
    private static native void nStartPlay(String path, Surface surface);
 
-   private static native void nInit();
+   private static native void nInitCrashMonitor();
+   private static native void nNativeCrashTest();
+
    private static native void nLog(String log);
    private static native void nInitLog(String logPath);
    private static native void nCloseLog();

@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <unistd.h>
 #include <pthread.h>
+#include <cstdlib>
 #include <condition_variable>
 #include <mutex>
 #include <atomic>
@@ -24,8 +25,9 @@ static std::condition_variable cond_buffer_async;
 static std::mutex mutex_buffer_async;
 static std::atomic_flag bufferChangeLock = ATOMIC_FLAG_INIT; //标记buffer正在变更
 static const char* TAG = "AFOLOG";
+pthread_t pthread;
 
-void log2file(const void *_data, size_t _len, bool _move_file) {
+void log2file(const void *_data, size_t _len) {
     if (nullptr == _data || 0 == _len || logFilePath.empty()) {
         return;
     }
@@ -47,7 +49,6 @@ void async_log_thread() {
     while (true) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "file write thread run....");
         if (nullptr == log_buff) break;
-        if (log_close) break;
         AutoBuffer tmp;
         while (!bufferChangeLock.test_and_set()){
             //确保只有一个线程在操作log_buff
@@ -57,7 +58,8 @@ void async_log_thread() {
             __android_log_print(ANDROID_LOG_ERROR, TAG, "flush buffer end====");
             break;
         }
-        if (nullptr != tmp.Ptr()) log2file(tmp.Ptr(), tmp.Length(), true);
+        if (nullptr != tmp.Ptr()) log2file(tmp.Ptr(), tmp.Length());
+        if (log_close) break; //写入一次，检测退出，不再循环
         std::unique_lock<std::mutex> lock(mutex_buffer_async);
         cond_buffer_async.wait(lock);
     }
@@ -77,6 +79,8 @@ void checkWriteFile() {
 NativeLog::NativeLog(char *path) {
     init(path);
 }
+
+
 
 void NativeLog::init(char *path) {
     if (!log_close) {
@@ -114,9 +118,8 @@ void NativeLog::init(char *path) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "NativeLog init mmap success ptr:%p",
                             tmpFileStart);
     }
-    int threadId;
     __android_log_print(ANDROID_LOG_ERROR, TAG, "init thread param:%s ", path);
-    int ret = pthread_create(reinterpret_cast<pthread_t *>(&threadId), nullptr,
+    int ret = pthread_create(&pthread, nullptr,
                              reinterpret_cast<void *(*)(void *)>(async_log_thread), nullptr);
     if (0 != ret) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "thread create error");
@@ -124,6 +127,7 @@ void NativeLog::init(char *path) {
     //映射完成，校验是否写入文件
     checkWriteFile();
 }
+
 
 
 void NativeLog::log(char *logStr) {
@@ -146,18 +150,33 @@ void NativeLog::closeLog() {
     __android_log_print(ANDROID_LOG_ERROR, TAG, "closeLog");
     if (log_close) return;
     log_close = true;
-    delete log_buff;
-    log_buff = nullptr;
+    while (!bufferChangeLock.test_and_set()){
+        //确保只有一个线程在操作log_buff
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "flush delete start====");
+        delete log_buff;
+        log_buff = nullptr;
+        bufferChangeLock.clear();
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "flush delete end====");
+        break;
+    }
+
 //    delete cond_buffer_async;
 //    delete mutex_buffer_async;
-    if (tmpFileStart) {
-        munmap(tmpFileStart, kBufferBlockLength);
-    }
+//    if (tmpFileStart) { //todo 确定使用mmap还是内存 看看需要删除  内存关闭前需要写一次文件
+//        munmap(tmpFileStart, kBufferBlockLength);
+//    }
     pthread_exit(nullptr);
 }
 
 
-
+ void  NativeLog::onCrash(){
+     if(log_close)return;
+     log_close = true;
+     __android_log_print(ANDROID_LOG_ERROR, TAG, "onCrash 写入日志");
+     cond_buffer_async.notify_all();//执行一次写入
+     pthread_join(pthread, nullptr);  //等待子线程完成
+     __android_log_print(ANDROID_LOG_ERROR, TAG, "onCrash 写入日志完成");
+}
 
 
 

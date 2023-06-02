@@ -19,6 +19,7 @@ add_library(
         src/main/cpp/ptrbuffer.cc
         src/main/cpp/log_crypt.cc
         src/main/cpp/log_buffer.cc
+        src/main/cpp/crash_monitor.cpp
 )
 
 

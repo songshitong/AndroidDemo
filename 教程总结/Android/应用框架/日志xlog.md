@@ -135,7 +135,7 @@ void appender_open(TAppenderMode _mode, const char* _dir, const char* _nameprefi
     snprintf(logmsg, sizeof(logmsg), "get mmap time: %" PRIu64, (int64_t)get_mmap_time);
     xlogger_appender(NULL, logmsg);
     ....
-    BOOT_RUN_EXIT(appender_close);
+    BOOT_RUN_EXIT(appender_close); //退出调用  通过Linux的atexit(func)函数注册
 }
 ```
 OpenMmapFile
@@ -543,6 +543,40 @@ void appender_setmode(TAppenderMode _mode) {
     if (kAppednerAsync == sg_mode && !sg_thread_async.isruning()) {
         sg_thread_async.start();
     }
+}
+```
+
+
+退出调用
+```
+void appender_close() {
+    if (sg_log_close) return;
+    ...
+    sg_log_close = true;
+
+    sg_cond_buffer_async.notifyAll();
+    //等待子线程写完成？？ 会不会卡主
+    if (sg_thread_async.isruning())
+        sg_thread_async.join();
+
+    //根据mmap是否成功，清空对应的缓存
+    ScopedLock buffer_lock(sg_mutex_buffer_async);
+    if (sg_mmmap_file.is_open()) {
+        if (!sg_mmmap_file.operator !()) memset(sg_mmmap_file.data(), 0, kBufferBlockLength);
+
+        CloseMmapFile(sg_mmmap_file);
+    } else {
+        delete[] (char*)((sg_log_buff->GetData()).Ptr());
+    }
+    //清除buffer 
+    delete sg_log_buff;
+    sg_log_buff = NULL;
+    //对buffer锁 解除
+    buffer_lock.unlock();
+
+    ScopedLock lock(sg_mutex_log_file);
+    //关闭fd
+    __closelogfile();
 }
 ```
 

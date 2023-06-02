@@ -73,7 +73,7 @@ int main(){
     // 进行重排序。这使得 volatile 对象适用于与信号处理函数之间的交流，但不适于与另一执行线程交流
     volatile int n4 = 0;
 
-   //Static Variables  静态变量整个程序声明周期都可以用
+   //Static Variables  静态变量整个程序声明周期都可以用  生命周期结束自动释放，无法delete删除
    for (int i = 0; i < 5; i++)
      staticVariable(); //输出结果  0 1 2 3 4
 

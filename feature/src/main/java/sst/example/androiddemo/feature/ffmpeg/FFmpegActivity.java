@@ -45,6 +45,7 @@ public class FFmpegActivity extends AppCompatActivity {
         stopRecordAudio = findViewById(R.id.stopRecordAudio);
         replaceAudio = findViewById(R.id.replaceAudio);
         btnPlay = findViewById(R.id.playVideo);
+        findViewById(R.id.nativeCrashTest).setOnClickListener(v -> ffmpegCmd.nativeCrashTest());
 
         ffmpegCmd.setSurfaceView(surfaceView);
 

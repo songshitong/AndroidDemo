@@ -10,7 +10,7 @@ using namespace std; //标准输入输出函数，比printf更高效
 Student::Student(int i ,int j):i(i),j(j) //设置声明的属性
   ,k(i+j){ //实现头文件中声明的方法
   //构造方法:i(i) 是将传进的i赋值给i
-  //等同于 this->i=i;     this.自动变为this->代表类的属性
+  //等同于 this->i=i;     this.自动变为this->代表类的属性   shis是一个指针
 
    cout <<"我是输出函数"<< endl;   //<<endl是换行符号
 

@@ -66,7 +66,6 @@ void PtrBuffer::Write(const void* _pBuffer, size_t _nLen, off_t _nPos) {
     size_t copylen = min(_nLen, max_length_ - _nPos);
     length_ = max(length_, copylen + _nPos);
     memcpy((unsigned char*)Ptr() + _nPos, _pBuffer, copylen);
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "write:%p pos:%ld pbuffer:%p copylen:%d",Ptr(),_nPos,_pBuffer,copylen);
 }
 
 size_t PtrBuffer::Read(void* _pBuffer, size_t _nLen) {
@@ -87,7 +86,6 @@ size_t PtrBuffer::Read(void* _pBuffer, size_t _nLen, off_t _nPos) const {
 }
 
 void  PtrBuffer::Seek(off_t _nOffset,  TSeek _eOrigin) {
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "start seek offset:%ld origin:%u",_nOffset,_eOrigin);
 
     switch (_eOrigin) {
     case kSeekStart:
@@ -112,8 +110,6 @@ void  PtrBuffer::Seek(off_t _nOffset,  TSeek _eOrigin) {
 
     if ((unsigned int)pos_ > length_)
         pos_ = length_;
-
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "after seek pos_:%d",pos_);
 
 }
 

@@ -16,7 +16,6 @@
 #include "nativelog.h"
 #include "log_buffer.h"
 
-static const unsigned int kBufferBlockLength = 150 * 1024; //todo 配置层
 static LogBuffer *log_buff = nullptr; //存储buffer
 static std::string logFilePath;
 static volatile bool log_close = true; //日志是否关闭
@@ -66,20 +65,14 @@ void async_log_thread() {
 }
 
 
-void checkWriteFile() {
+void checkWriteFile(NativeLog* nativeLog) {
     if(!log_buff)return;
     size_t bufferLength = log_buff->GetData().Length();
     __android_log_print(ANDROID_LOG_ERROR, TAG, "buffer now length %d", bufferLength);
-    if (bufferLength >= kBufferBlockLength * 1 / 3) { //todo 单条log进行分割
+    if (bufferLength >= nativeLog->cacheBuffer * 1 / 3) { //todo 单条log进行分割
         cond_buffer_async.notify_all();
     }
 }
-
-
-NativeLog::NativeLog(char *path) {
-    init(path);
-}
-
 
 
 void NativeLog::init(char *path) {
@@ -95,26 +88,23 @@ void NativeLog::init(char *path) {
     strcpy(tmpPath, path);
     strcat(tmpPath, prefix);
     int tmpFd = open(tmpPath, O_CREAT | O_RDWR, S_IRWXU); //todo 建立临时文件
-//  __android_log_print(ANDROID_LOG_ERROR, TAG, "NativeLog init file fd %d",logFileFD);
-//  int fileSize = lseek(logFileFD, 0, SEEK_END); //获取文件大小
-//  __android_log_print(ANDROID_LOG_ERROR, TAG, "NativeLog init filesize %d", fileSize);
-//  int targetSize = fileSize+length;
+
     if (!tmpFd) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "tmpFd open error");
         return;
     }
-    ftruncate(tmpFd, kBufferBlockLength);//填充文件大小   mmap不能扩展文件长度，这里相当于预先给文件长度，准备一个空架子
+    ftruncate(tmpFd, cacheBuffer);//填充文件大小   mmap不能扩展文件长度，这里相当于预先给文件长度，准备一个空架子
     //每次log都进行内存映射和释放，存在性能问题  建立缓存文件，只映射一次即可
-    tmpFileStart = (int8_t *) mmap(nullptr, kBufferBlockLength, PROT_READ | PROT_WRITE, MAP_SHARED,
+    tmpFileStart = (int8_t *) mmap(nullptr, cacheBuffer, PROT_READ | PROT_WRITE, MAP_SHARED,
                                    tmpFd, 0);
     close(tmpFd);
     if (tmpFileStart == MAP_FAILED) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "NativeLog init mmap error");
         //创建buffer
-        char *buffer = new char[kBufferBlockLength];
-        log_buff = new LogBuffer(buffer, kBufferBlockLength, false, "");
+        char *buffer = new char[cacheBuffer];
+        log_buff = new LogBuffer(buffer, cacheBuffer, false, "");
     } else {
-        log_buff = new LogBuffer(tmpFileStart, kBufferBlockLength, false, "");
+        log_buff = new LogBuffer(tmpFileStart, cacheBuffer, false, "");
         __android_log_print(ANDROID_LOG_ERROR, TAG, "NativeLog init mmap success ptr:%p",
                             tmpFileStart);
     }
@@ -125,7 +115,7 @@ void NativeLog::init(char *path) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "thread create error");
     }
     //映射完成，校验是否写入文件
-    checkWriteFile();
+    checkWriteFile(this);
 }
 
 
@@ -142,7 +132,7 @@ void NativeLog::log(char *logStr) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "write buffer end====");
         break;
     }
-    checkWriteFile();
+    checkWriteFile(this);
 }
 
 
@@ -169,13 +159,13 @@ void NativeLog::closeLog() {
 }
 
 
- void  NativeLog::onCrash(){
+ void  NativeLog::flushCache(){
      if(log_close)return;
      log_close = true;
-     __android_log_print(ANDROID_LOG_ERROR, TAG, "onCrash 写入日志");
+     __android_log_print(ANDROID_LOG_ERROR, TAG, "flushCache 写入日志");
      cond_buffer_async.notify_all();//执行一次写入
      pthread_join(pthread, nullptr);  //等待子线程完成
-     __android_log_print(ANDROID_LOG_ERROR, TAG, "onCrash 写入日志完成");
+     __android_log_print(ANDROID_LOG_ERROR, TAG, "flushCache 写入日志完成");
 }
 
 

@@ -11,4 +11,7 @@ class MultiPlatform {
 //      在LazyJVM.kt存在具体的实现
 //    public actual fun <T> lazy(lock: Any?, initializer: () -> T): Lazy<T> = SynchronizedLazyImpl(initializer, lock)
 
+
+  //external代表不是kotlin实现的，可以是jni或js
+  // private external fun nInit();
 }

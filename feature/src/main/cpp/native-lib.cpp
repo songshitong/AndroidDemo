@@ -14,10 +14,11 @@ extern "C" {
 #define  MAX_AUDIO_FRAME_SIZE 48000*4
 
 
-
 extern "C"
 JNIEXPORT jint JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_run__I_3Ljava_lang_String_2(JNIEnv *env, jclass type, jint cmdLen,
+Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_run__I_3Ljava_lang_String_2(JNIEnv *env,
+                                                                                  jclass type,
+                                                                                  jint cmdLen,
                                                                                   jobjectArray cmd) {
     __android_log_write(ANDROID_LOG_INFO, "FFmpegCmd", "run start");
 //  ffmpeg的函数都是以av开头
@@ -25,41 +26,95 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_run__I_3Ljava_lang_String_
     return cmdLen;
 }
 
-NativeLog* nativeLog = nullptr;
+NativeLog *nativeLog = nullptr;
+CrashMonitor monitor;
+
+const char* getStringProperty(JNIEnv *env,jclass clazz,jobject obj,const char* propertyName){
+    jmethodID methodId = env->GetMethodID(clazz,propertyName,"()Ljava/lang/String;");
+    auto jResult = (jstring)env->CallObjectMethod(obj, methodId);
+    const char *result_str = env->GetStringUTFChars(jResult, nullptr);
+    env->DeleteLocalRef(jResult);
+    return result_str;
+}
+
+int getIntProperty(JNIEnv *env,jclass clazz,jobject obj,const char* propertyName){
+    jmethodID methodId = env->GetMethodID(clazz,propertyName,"()I");
+    int jResult = env->CallIntMethod(obj, methodId);
+    return jResult;
+}
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nInitLog(JNIEnv *env, jclass clazz,
-                                                               jstring log_path) {
-    const char* nlogPath = env->GetStringUTFChars(log_path, nullptr);
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init logPath %s", nlogPath);
-    nativeLog = new NativeLog(const_cast<char *>(nlogPath));
-    env->ReleaseStringUTFChars(log_path,nlogPath);
+Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nInitLog(JNIEnv *env, jobject thiz,
+                                                            jobject config) {
+      jclass clazz = env->FindClass("sst/example/androiddemo/feature/ffmpeg/Configuration");
+
+      char* fileDir = const_cast<char *>(getStringProperty(env, clazz, config, "getFileDir"));
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init fileDir %s", fileDir);
+
+      int singleLogUnit = getIntProperty(env,clazz,config,"getSingleLogUnit");
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init singleLogUnit %d", singleLogUnit);
+
+    char* logSpliterator = const_cast<char *>(getStringProperty(env, clazz, config, "getLogSpliterator"));
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init logSpliterator %s", logSpliterator);
+
+    char* strSplitter = const_cast<char *>(getStringProperty(env, clazz, config, "getStrSplitter"));
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init strSplitter %s", strSplitter);
+
+    int cacheBuffer = getIntProperty(env,clazz,config,"getCacheBuffer");
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init cacheBuffer %d", cacheBuffer);
+
+   int fileMaxLength = getIntProperty(env,clazz,config,"getFileMaxLength");
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init fileMaxLength %d", fileMaxLength);
+
+   int logLevel = getIntProperty(env,clazz,config,"getLogLevel");
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init logLevel %d", logLevel);
+    nativeLog = new NativeLog();
+    nativeLog->cacheBuffer = cacheBuffer;
+    nativeLog->logSpliterator = logSpliterator;
+    nativeLog->init(fileDir);
+    env->DeleteLocalRef(clazz);
 }
-CrashMonitor  monitor;
+
+
+
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nInitCrashMonitor(JNIEnv *env, jclass clazz) {
+Java_sst_example_androiddemo_feature_ffmpeg_CrashMonitor_nInitCrashMonitor(JNIEnv *env,
+                                                                           jobject thiz) {
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "call init ");
-    monitor.init(NativeLog::onCrash);
-
+    //回调给java层处理可能来不及 直接在native层处理
+    monitor.init(NativeLog::flushCache);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nLog(JNIEnv *env, jclass clazz, jstring jlog) {
-    const char* nlog = env->GetStringUTFChars(jlog, nullptr);
+Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nLog(JNIEnv *env, jobject thiz, jint level,
+                                                        jstring process_id, jstring process_name,
+                                                        jstring thread_id, jstring thread_name,
+                                                        jstring method_name, jstring method_param,
+                                                        jstring message) {
+    char *nlog = const_cast<char *>(env->GetStringUTFChars(message, nullptr));
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native receive log %s", nlog);
-    if(nativeLog){
-        nativeLog->log(const_cast<char *>(nlog));
+    if (nativeLog) {
+        char* newLog;
+        if(nativeLog->logSpliterator){
+            newLog = strcat(nlog,nativeLog->logSpliterator);
+        }else{
+            newLog = const_cast<char *>(nlog);
+        }
+        nativeLog->log(newLog);
+
     }
-    env->ReleaseStringUTFChars(jlog,nlog);
+    env->ReleaseStringUTFChars(message, nlog); //todo 字符拼接
 }
+
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nCloseLog(JNIEnv *env, jclass clazz) {
-    if(nullptr != nativeLog){
+Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nCloseLog(JNIEnv *env, jobject thiz) {
+    if (nullptr != nativeLog) {
         nativeLog->closeLog();
         delete nativeLog;
     }
@@ -68,25 +123,27 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nCloseLog(JNIEnv *env, jcl
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nStartPlay(JNIEnv *env, jclass type, jstring path_,
+Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_flushCache(JNIEnv *env, jobject thiz) {
+    if(nativeLog){
+        NativeLog::flushCache();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nStartPlay(JNIEnv *env, jclass type,
+                                                                 jstring path_,
                                                                  jobject surface) {
     const char *path = env->GetStringUTFChars(path_, 0);
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "StartPlay %s", path);
-    initContext(const_cast<char *>(path),env,surface);
+    initContext(const_cast<char *>(path), env, surface);
     env->ReleaseStringUTFChars(path_, path);
 }
 
 
-
-
-
-
-
-
-
-void short2float(short* in, double *out, int len){
+void short2float(short *in, double *out, int len) {
     register int i;
-    for(i = 0; i < len; i++)
+    for (i = 0; i < len; i++)
         out[i] = in[i] / 32767.0;
 }
 
@@ -107,8 +164,10 @@ void addADTSheader(uint8_t *in, int packet_size, int channels) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_FFmpegActivity_native_1replaceAudio(JNIEnv *env, jobject instance,
-                                                                                jbyteArray pcmDatas_,jint len) {
+Java_sst_example_androiddemo_feature_ffmpeg_FFmpegActivity_native_1replaceAudio(JNIEnv *env,
+                                                                                jobject instance,
+                                                                                jbyteArray pcmDatas_,
+                                                                                jint len) {
     jbyte *pcmDatas = env->GetByteArrayElements(pcmDatas_, NULL);
     AVCodec *codec = avcodec_find_encoder(AV_CODEC_ID_AAC);
     if (codec) {
@@ -132,7 +191,7 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegActivity_native_1replaceAudio(
 
     int ret = avcodec_open2(codecContext, codec, NULL);
     if (ret < 0) {
-        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "avcodec_open2失败 %d",ret);
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "avcodec_open2失败 %d", ret);
         return;
     }
     AVFrame *frame = av_frame_alloc();
@@ -144,11 +203,13 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegActivity_native_1replaceAudio(
     frame->format = codecContext->sample_fmt;
     frame->channel_layout = codecContext->channel_layout;
 
-    int bufferSize = av_samples_get_buffer_size(NULL, codecContext->channels, codecContext->frame_size,
+    int bufferSize = av_samples_get_buffer_size(NULL, codecContext->channels,
+                                                codecContext->frame_size,
                                                 codecContext->sample_fmt, 0);
     uint8_t *encoderData = static_cast<uint8_t *>(av_malloc(bufferSize));
 
-    avcodec_fill_audio_frame(frame, codecContext->channels, codecContext->sample_fmt, (const uint8_t *) encoderData,
+    avcodec_fill_audio_frame(frame, codecContext->channels, codecContext->sample_fmt,
+                             (const uint8_t *) encoderData,
                              bufferSize, 0);
 
 //    ret = av_frame_make_writable(frame);
@@ -159,38 +220,36 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegActivity_native_1replaceAudio(
     //开始编码
     AVPacket pkt;
     av_init_packet(&pkt);
-    short2float(reinterpret_cast<short *>(pcmDatas), reinterpret_cast<double *>(encoderData), len / 2);
+    short2float(reinterpret_cast<short *>(pcmDatas), reinterpret_cast<double *>(encoderData),
+                len / 2);
     frame->data[0] = encoderData;
     frame->pts = 0;
     ret = avcodec_send_frame(codecContext, frame);
-    if(ret<0){
-        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "avcodec_send_frame失败 %d",ret);
+    if (ret < 0) {
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "avcodec_send_frame失败 %d", ret);
     }
     ret = avcodec_receive_packet(codecContext, &pkt);
-    if(ret<0){
-        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "AVERROR(EAGAIN) %d",AVERROR(EAGAIN));
-        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "AVERROR_EOF %d",AVERROR_EOF);
-        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "AVERROR(EINVAL) %d",AVERROR(EINVAL));
+    if (ret < 0) {
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "AVERROR(EAGAIN) %d", AVERROR(EAGAIN));
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "AVERROR_EOF %d", AVERROR_EOF);
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "AVERROR(EINVAL) %d", AVERROR(EINVAL));
 
-        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "avcodec_receive_packet失败 %d",ret);
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "avcodec_receive_packet失败 %d", ret);
 
     }
-    while (ret>=0){
+    while (ret >= 0) {
         int length = pkt.size + ADTS_HEADER_LENGTH;
         void *adts = malloc(ADTS_HEADER_LENGTH);
         //添加adts header 可以正常播放。
-        addADTSheader((uint8_t *) adts, pkt.size + ADTS_HEADER_LENGTH,codecContext->channel_layout);
+        addADTSheader((uint8_t *) adts, pkt.size + ADTS_HEADER_LENGTH,
+                      codecContext->channel_layout);
         uint8_t *out;
         memcpy(out, adts, ADTS_HEADER_LENGTH);
         free(adts);
         memcpy(out + ADTS_HEADER_LENGTH, pkt.data, pkt.size);
 
-        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "输出转码 %d",out);
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "输出转码 %d", out);
     }
 
     env->ReleaseByteArrayElements(pcmDatas_, pcmDatas, 0);
 }
-
-
-
-

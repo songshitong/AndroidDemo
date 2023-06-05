@@ -55,12 +55,11 @@ static  void SetUpSigHandler() {
 static CrashCallG onCrashCallG;
 
 static  void SignalHandler(int signo, siginfo_t* info, void* context) {
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "catch error %d  onCrashCallG:%p", signo,onCrashCallG);
-    if(nullptr != onCrashCallG){
+    if(onCrashCallG){
         onCrashCallG();
     }
     CallOldHandler(signo, info, context);
-    exit(0);
+//    exit(0);
 }
 
 static  void CallOldHandler(int signo, siginfo_t* info, void* context) {
@@ -94,8 +93,9 @@ void NativeCrashTest() {
     *p = 1;
 }
 
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_nNativeCrashTest(JNIEnv *env, jclass clazz) {
+Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nNativeCrashTest(JNIEnv *env, jobject thiz) {
     NativeCrashTest();
 }

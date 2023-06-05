@@ -5,11 +5,13 @@
 
 class NativeLog{
 public:
-     NativeLog(char* path);
-     void init(char* path);
      void log(char* logStr);
      void closeLog();
-     static void onCrash();
+     static void flushCache();
+     int cacheBuffer;
+     char* logSpliterator;
+    void init(char* path);
+
     ~NativeLog(){
         //todo close前 缓存需要写入
         closeLog();

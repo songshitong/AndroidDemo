@@ -308,7 +308,7 @@ JNIEXPORT jobjectArray JNICALL
 Java_com_xfhy_jnifirst_MainActivity_init2DArray(JNIEnv *env, jobject thiz, jint size) {
     //创建一个size*size大小的二维数组
 
-    //jobjectArray是用来装对象数组的   Java数组就是一个对象 int[]
+    //jobjectArray是用来装对象数组的   Java数组就是一个对象 int[]  
     jclass classIntArray = env->FindClass("[I");
     if (classIntArray == NULL) {
         return NULL;
@@ -351,7 +351,7 @@ Java_com_xfhy_jnifirst_MainActivity_init2DArray(JNIEnv *env, jobject thiz, jint 
 ps: 在JNI中,只要是jobject的子类就属于引用变量,会占用引用表的空间. 而基础数据类型jint,jfloat,jboolean等是不会占用引用表空间的,不需要释放.
 
 
-native中调用Java方法
+native中调用Java方法  类似反射
 ps: 在JVM中,运行一个Java程序时,会先将运行时需要用到的所有相关class文件加载到JVM中,并按需加载,提高性能和节约内存.
 当我们调用一个类的静态方法之前,JVM会先判断该类是否已经加载,如果没有被ClassLoader加载到JVM中,会去classpath路径下查找该类.
 找到了则加载该类,没有找到则报ClassNotFoundException异常.
@@ -380,7 +380,7 @@ JNIEXPORT void JNICALL
 Java_com_xfhy_allinone_jni_CallMethodActivity_callJavaStaticMethod(JNIEnv *env, jobject thiz) {
     //调用某个类的static方法
     //JVM使用一个类时,是需要先判断这个类是否被加载了,如果没被加载则还需要加载一下才能使用
-    //1. 从classpath路径下搜索MyJNIClass这个类,并返回该类的Class对象
+    //1. 从classpath路径下搜索MyJNIClass这个类,并返回该类的Class对象   内部类查找增加&标识
     jclass clazz = env->FindClass("com/xfhy/allinone/jni/MyJNIClass");
     //2. 从clazz类中查找getDes方法 得到这个静态方法的方法id
     jmethodID mid_get_des = env->GetStaticMethodID(clazz, "getDes", "(Ljava/lang/String;)Ljava/lang/String;");
@@ -410,10 +410,31 @@ ps: 函数结束后,JVM会自动释放所有局部引用变量所占的内存空
   当超出这个数量时直接崩溃.当我在高版本,比如小米 8(安卓10)上,这个引用个数可以达到100000也不会崩溃,只是会卡顿一下.
   可能是硬件比当年更牛逼了,默认值也跟着改了.
 
-获取Field
+获取Field  只能调用类中声明为 public的参数
 ```
 jfieldID  GetFieldID(jclass clazz,const char *name,const char *sig);
-示例env->GetFieldID(clazz, "mNativeContext", "J");
+示例env->GetFieldID(clazz, "mNativeContext", "J"); //参数名mNativeContext  该参数的签名J
+
+env->GetBooleanField(jobject obj, jfieldID fieldID) //获取对象属性
+ SetObjectField()//设置对象属性
+```
+
+多次获取bean的属性  clazz是bean的类，obj是bean的实例,propertyName一般为"getUserName"形式
+```
+//获取string类型属性
+const char* getStringProperty(JNIEnv *env,jclass clazz,jobject obj,const char* propertyName){
+    jmethodID methodId = env->GetMethodID(clazz,propertyName,"()Ljava/lang/String;");
+    auto jResult = (jstring)env->CallObjectMethod(obj, methodId);
+    const char *result_str = env->GetStringUTFChars(jResult, nullptr);
+    env->DeleteLocalRef(jResult);
+    return result_str;
+}
+
+int getIntProperty(JNIEnv *env,jclass clazz,jobject obj,const char* propertyName){
+    jmethodID methodId = env->GetMethodID(clazz,propertyName,"()I");
+    int jResult = env->CallIntMethod(obj, methodId);
+    return jResult;
+}
 ```
 
 
@@ -489,22 +510,26 @@ Java_com_xfhy_allinone_jni_CallMethodActivity_createAndCallJavaInstanceMethod(JN
 5 删除局部引用 !!!
 
 
+
+
+
 方法签名
 调用Java方法需要使用jmethodID,每次获取jmethodID都需要传入方法签名.明明已经传入了方法名称,感觉就已经可以调这个方法了啊,
   为啥还需要传入一个方法签名? 因为Java方法存在重载,可能方法名是相同的,但是参数不同.所以这里必须传入方法签名以区别.
 方法签名格式为: (形参参数类型列表)返回值 , 引用类型以L开头,后面是类的全路径名.
-
+(Ljava/lang/String;)Ljava/lang/String;   参数为string，返回为string
 Java基本类型与方法签名中的定义关系:
 Java	Field Descriptor
 boolean	Z
 byte	B
 char	C
 short	S
-int	I
+int	    I
 long	J
 float	F
 double	D
 int[]	[I
+Void	V      ()V  
 ```
 public String[] testString(boolean a, byte b, float f, double d, int i, int[] array)
 

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import androidx.annotation.NonNull;
 
 public class FFmpegCmd implements SurfaceHolder.Callback {
    private SurfaceHolder surfaceHolder;
@@ -15,27 +16,6 @@ public class FFmpegCmd implements SurfaceHolder.Callback {
 
    public FFmpegCmd() {
 
-   }
-
-   public void initLog(String path){
-      nInitLog(path); //// TODO: 2023/5/29 多进程要单独处理吗？ 每个进程由业务方配置文件名字
-      nInitCrashMonitor();
-      Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
-         Thread.UncaughtExceptionHandler exceptionHandler = Thread.currentThread().getUncaughtExceptionHandler();
-         if(null != exceptionHandler){
-            exceptionHandler.uncaughtException(t,e);
-         }
-         //// TODO: 2023/6/2 java和native合并为一个类
-         //// TODO: 2023/6/2 调用原生 退出
-      });
-   }
-
-   public void log(String log){
-      nLog(log);
-   }
-
-   public void closeLog(){
-      nCloseLog();
    }
 
    public static int run(String[] cmd){
@@ -49,21 +29,10 @@ public class FFmpegCmd implements SurfaceHolder.Callback {
 //      nStartPlay(path,surfaceHolder.getSurface());
    }
 
-   public void nativeCrashTest(){
-      nNativeCrashTest();
-   }
-
 
    private static native int run(int cmdLen, String[] cmd);
 
    private static native void nStartPlay(String path, Surface surface);
-
-   private static native void nInitCrashMonitor();
-   private static native void nNativeCrashTest();
-
-   private static native void nLog(String log);
-   private static native void nInitLog(String logPath);
-   private static native void nCloseLog();
 
 
    public void setSurfaceView(SurfaceView surfaceView){

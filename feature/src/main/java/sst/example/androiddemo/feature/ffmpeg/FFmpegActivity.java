@@ -55,24 +55,19 @@ public class FFmpegActivity extends AppCompatActivity {
     });
 
     initListener();
-    File logFile = new File(getFilesDir(), "test.log");
-    if (!logFile.exists()) {
-      try {
-        logFile.createNewFile();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
     Configuration config =
-        new Configuration(logFile.getPath(), logFile.getPath(), 4 * 1024, "\n++", "|", 150 * 1024,
-            10 * 1024 * 1024, Level.DEBUG);
+        new Configuration(getApplicationContext().getFilesDir().getPath(), "xg-main", 4 * 1024, "\n",
+            "|", 150 * 1024,
+            10 * 1024 * 1024, "yyyy-MM-dd HH:mm:ss.SSS", Level.DEBUG);
     log = new AFOLog(getApplicationContext(), config);
     log("this is first  log");
     log("this is second log");
     log("this is third log");
-    for (int i = 0; i < 1000; i++) {
-       log(UUID.randomUUID().toString());
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < 10000; i++) {
+      sb.append(UUID.randomUUID().toString());
     }
+    log(sb.toString());
   }
 
   private void log(String str) {

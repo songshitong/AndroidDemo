@@ -10,11 +10,24 @@ public:
      static void flushCache();
      int cacheBuffer;
      char* logSpliterator;
+     char* strSplitter;
+     int singleLogUnit;
+     int fileMaxLength;
+     char* fileNamePrefix;
     void init(char* path);
 
     ~NativeLog(){
-        //todo close前 缓存需要写入
+        flushCache();
         closeLog();
+        if(logSpliterator){
+            delete logSpliterator;
+        }
+        if(strSplitter){
+            delete strSplitter;
+        }
+        if(fileNamePrefix){
+            delete fileNamePrefix;
+        }
     }
 private:
     int8_t* tmpFileStart{};

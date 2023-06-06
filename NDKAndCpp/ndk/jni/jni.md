@@ -419,23 +419,7 @@ env->GetBooleanField(jobject obj, jfieldID fieldID) //获取对象属性
  SetObjectField()//设置对象属性
 ```
 
-多次获取bean的属性  clazz是bean的类，obj是bean的实例,propertyName一般为"getUserName"形式
-```
-//获取string类型属性
-const char* getStringProperty(JNIEnv *env,jclass clazz,jobject obj,const char* propertyName){
-    jmethodID methodId = env->GetMethodID(clazz,propertyName,"()Ljava/lang/String;");
-    auto jResult = (jstring)env->CallObjectMethod(obj, methodId);
-    const char *result_str = env->GetStringUTFChars(jResult, nullptr);
-    env->DeleteLocalRef(jResult);
-    return result_str;
-}
 
-int getIntProperty(JNIEnv *env,jclass clazz,jobject obj,const char* propertyName){
-    jmethodID methodId = env->GetMethodID(clazz,propertyName,"()I");
-    int jResult = env->CallIntMethod(obj, methodId);
-    return jResult;
-}
-```
 
 
 下面是引用表溢出时所报的错误(要得到这个错还挺难的,得找一个比较老旧的设备才行):

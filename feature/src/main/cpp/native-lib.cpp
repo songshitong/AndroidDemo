@@ -7,6 +7,8 @@
 #include "nativelog.h"
 #include "audioPlayer.h"
 #include "crash_monitor.h"
+#include <cmath>
+#include <ctime>
 
 extern "C" {
 #include <libfaac/faac.h>
@@ -29,49 +31,70 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegCmd_run__I_3Ljava_lang_String_
 NativeLog *nativeLog = nullptr;
 CrashMonitor monitor;
 
-const char* getStringProperty(JNIEnv *env,jclass clazz,jobject obj,const char* propertyName){
-    jmethodID methodId = env->GetMethodID(clazz,propertyName,"()Ljava/lang/String;");
-    auto jResult = (jstring)env->CallObjectMethod(obj, methodId);
+void fmtLog(JNIEnv *env, jstring time, jint level, jstring process_id, jstring process_name,
+            jstring thread_id,
+            jstring thread_name, jstring method_name, jstring method_param, const std::string &log);
+
+const char *getStringProperty(JNIEnv *env, jclass clazz, jobject obj, const char *propertyName) {
+    jmethodID methodId = env->GetMethodID(clazz, propertyName, "()Ljava/lang/String;");
+    auto jResult = (jstring) env->CallObjectMethod(obj, methodId);
     const char *result_str = env->GetStringUTFChars(jResult, nullptr);
     env->DeleteLocalRef(jResult);
     return result_str;
 }
 
-int getIntProperty(JNIEnv *env,jclass clazz,jobject obj,const char* propertyName){
-    jmethodID methodId = env->GetMethodID(clazz,propertyName,"()I");
+int getIntProperty(JNIEnv *env, jclass clazz, jobject obj, const char *propertyName) {
+    jmethodID methodId = env->GetMethodID(clazz, propertyName, "()I");
     int jResult = env->CallIntMethod(obj, methodId);
     return jResult;
+}
+
+std::string convertJString(JNIEnv *env, jstring str) {
+    char *charStr = const_cast<char *>(env->GetStringUTFChars(str, nullptr));
+    std::string result(charStr, env->GetStringLength(str));
+    env->ReleaseStringUTFChars(str, charStr);
+    return result;
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nInitLog(JNIEnv *env, jobject thiz,
                                                             jobject config) {
-      jclass clazz = env->FindClass("sst/example/androiddemo/feature/ffmpeg/Configuration");
+    jclass clazz = env->FindClass("sst/example/androiddemo/feature/ffmpeg/Configuration");
 
-      char* fileDir = const_cast<char *>(getStringProperty(env, clazz, config, "getFileDir"));
+    char *fileDir = const_cast<char *>(getStringProperty(env, clazz, config, "getFileDir"));
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init fileDir %s", fileDir);
 
-      int singleLogUnit = getIntProperty(env,clazz,config,"getSingleLogUnit");
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init singleLogUnit %d", singleLogUnit);
+    int singleLogUnit = getIntProperty(env, clazz, config, "getSingleLogUnit");
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init singleLogUnit %d",
+                        singleLogUnit);
 
-    char* logSpliterator = const_cast<char *>(getStringProperty(env, clazz, config, "getLogSpliterator"));
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init logSpliterator %s", logSpliterator);
+    char *logSpliterator = const_cast<char *>(getStringProperty(env, clazz, config,
+                                                                "getLogSpliterator"));
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init logSpliterator %s",
+                        logSpliterator);
 
-    char* strSplitter = const_cast<char *>(getStringProperty(env, clazz, config, "getStrSplitter"));
+    char *strSplitter = const_cast<char *>(getStringProperty(env, clazz, config, "getStrSplitter"));
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init strSplitter %s", strSplitter);
 
-    int cacheBuffer = getIntProperty(env,clazz,config,"getCacheBuffer");
+    int cacheBuffer = getIntProperty(env, clazz, config, "getCacheBuffer");
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init cacheBuffer %d", cacheBuffer);
 
-   int fileMaxLength = getIntProperty(env,clazz,config,"getFileMaxLength");
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init fileMaxLength %d", fileMaxLength);
+    int fileMaxLength = getIntProperty(env, clazz, config, "getFileMaxLength");
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init fileMaxLength %d",
+                        fileMaxLength);
+    char *fileNamePrefix = const_cast<char *>(getStringProperty(env, clazz, config, "getFileNamePrefix"));
 
-   int logLevel = getIntProperty(env,clazz,config,"getLogLevel");
+
+    int logLevel = getIntProperty(env, clazz, config, "getLogLevel");
     __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native init logLevel %d", logLevel);
     nativeLog = new NativeLog();
+    nativeLog->strSplitter = strSplitter;
     nativeLog->cacheBuffer = cacheBuffer;
     nativeLog->logSpliterator = logSpliterator;
+    nativeLog->singleLogUnit = singleLogUnit;
+    nativeLog->fileMaxLength = fileMaxLength;
+    nativeLog->fileNamePrefix = fileNamePrefix;
     nativeLog->init(fileDir);
     env->DeleteLocalRef(clazz);
 }
@@ -88,26 +111,101 @@ Java_sst_example_androiddemo_feature_ffmpeg_CrashMonitor_nInitCrashMonitor(JNIEn
     monitor.init(NativeLog::flushCache);
 }
 
+
+std::string getLogPrefix(JNIEnv *env, jstring time, jint level,
+                         jstring process_id, jstring process_name,
+                         jstring thread_id, jstring thread_name,
+                         jstring method_name, jstring method_param) {
+    std::string s;
+    s.append(convertJString(env, time));
+    s.append(nativeLog->strSplitter);
+    std::string levelStr;
+    switch (level) {
+        case 0:
+            levelStr = "DEBUG";
+            break;
+        case 1:
+            levelStr = "INFO";
+            break;
+        case 2:
+            levelStr = "WARN";
+            break;
+        case 3:
+            levelStr = "ERROR";
+            break;
+        default:
+            __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "level not found:%d", level);
+            break;
+    }
+    s.append(levelStr);
+    s.append(nativeLog->strSplitter);
+    s.append(convertJString(env, process_id));
+    s.append(nativeLog->strSplitter);
+    s.append(convertJString(env, process_name));
+    s.append(nativeLog->strSplitter);
+    s.append(convertJString(env, thread_id));
+    s.append(nativeLog->strSplitter);
+    s.append(convertJString(env, thread_name));
+    s.append(nativeLog->strSplitter);
+    s.append(convertJString(env, method_name));
+    s.append(nativeLog->strSplitter);
+    s.append(convertJString(env, method_param));
+    s.append(nativeLog->strSplitter);
+    return s;
+}
+
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nLog(JNIEnv *env, jobject thiz, jint level,
+Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nLog(JNIEnv *env, jobject thiz, jstring time,
+                                                        jint level,
                                                         jstring process_id, jstring process_name,
                                                         jstring thread_id, jstring thread_name,
                                                         jstring method_name, jstring method_param,
                                                         jstring message) {
-    char *nlog = const_cast<char *>(env->GetStringUTFChars(message, nullptr));
-    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native receive log %s", nlog);
-    if (nativeLog) {
-        char* newLog;
-        if(nativeLog->logSpliterator){
-            newLog = strcat(nlog,nativeLog->logSpliterator);
-        }else{
-            newLog = const_cast<char *>(nlog);
-        }
-        nativeLog->log(newLog);
-
+    std::string log = convertJString(env, message);
+    __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native receive log length:%d %s",
+                        log.length(), log.c_str());
+    if (nullptr == nativeLog) {
+        return;
     }
-    env->ReleaseStringUTFChars(message, nlog); //todo 字符拼接
+    //log格式拼接
+    if (log.length() <= nativeLog->singleLogUnit) {
+        fmtLog(env, time, level, process_id, process_name, thread_id, thread_name, method_name,
+               method_param,
+               log);
+    } else {
+        int count = ceil(log.length() / (double) nativeLog->singleLogUnit);
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd", "native receive log count:%d",
+                            count);
+
+        for (int i = 0; i < count; i++) {
+            int end = nativeLog->singleLogUnit;
+            if ((i + 1) * nativeLog->singleLogUnit > log.length()) {
+                end = log.length() - i * nativeLog->singleLogUnit;
+            }
+            std::string subStr = log.substr(i * nativeLog->singleLogUnit, end);
+            __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd",
+                                "native receive log subStr.length:%dnd", subStr.length());
+            fmtLog(env, time, level, process_id, process_name, thread_id, thread_name, method_name,
+                   method_param,
+                   subStr);
+        }
+    }
+}
+
+void fmtLog(JNIEnv *env, jstring time, jint level, jstring process_id, jstring process_name,
+            jstring thread_id,
+            jstring thread_name, jstring method_name, jstring method_param,
+            const std::string &log) {
+    std::string s;
+    s.append(getLogPrefix(env, time, level, process_id, process_name, thread_id, thread_name,
+                          method_name, method_param));
+    s.append(log);
+    if (nativeLog->logSpliterator) {
+        s.append(nativeLog->logSpliterator);
+    }
+    nativeLog->log(const_cast<char *>(s.c_str()));
 }
 
 
@@ -124,7 +222,7 @@ Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nCloseLog(JNIEnv *env, jobjec
 extern "C"
 JNIEXPORT void JNICALL
 Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_flushCache(JNIEnv *env, jobject thiz) {
-    if(nativeLog){
+    if (nativeLog) {
         NativeLog::flushCache();
     }
 }

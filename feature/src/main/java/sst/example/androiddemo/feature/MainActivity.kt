@@ -28,6 +28,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
 import androidx.core.util.AtomicFile
 import androidx.lifecycle.MutableLiveData
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
@@ -73,7 +74,13 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-      Log.d(TAG, "PhysicsScreenSize: ${getPhysicsScreenSize(applicationContext)}")
+    requestPermissions(
+      arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+      ), 0
+    )
+    Log.d(TAG, "PhysicsScreenSize: ${getPhysicsScreenSize(applicationContext)}")
     getAndroidInfo()
     getMethodTrace()
     // ToastUtil.customSnackbar(this,"测试SnackBar",Snackbar.LENGTH_LONG)
@@ -121,18 +128,18 @@ class MainActivity : AppCompatActivity() {
       val intent = Intent(this, ServicesActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.layoutWeight).setOnClickListener {
+    findViewById<View>(R.id.layoutWeight).setOnClickListener {
       val intent = Intent(this, LinearLayoutActivity::class.java)
       startActivity(intent)
     }
 
-      findViewById<TextView>(R.id.sample_text).text = "BitMap"
-      findViewById<View>(R.id.sample_text).setOnClickListener {
+    findViewById<TextView>(R.id.sample_text).text = "BitMap"
+    findViewById<View>(R.id.sample_text).setOnClickListener {
       val intent = Intent(this, BitmapActivity::class.java)
       startActivity(intent)
     }
 
-      findViewById<View>(R.id.pictureView).setOnClickListener {
+    findViewById<View>(R.id.pictureView).setOnClickListener {
       val intent = Intent(this, PictureDrawableActivity::class.java)
       startActivity(intent)
     }
@@ -140,20 +147,20 @@ class MainActivity : AppCompatActivity() {
       val intent = Intent(this, CanvasActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id. paintActivity).setOnClickListener {
+    findViewById<View>(R.id.paintActivity).setOnClickListener {
       val intent = Intent(this, PaintActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.drawableActivity).setOnClickListener {
+    findViewById<View>(R.id.drawableActivity).setOnClickListener {
       val intent = Intent(this, DrawableActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.pathActivity).setOnClickListener {
+    findViewById<View>(R.id.pathActivity).setOnClickListener {
       val intent = Intent(this, PathActivity::class.java)
       startActivity(intent)
     }
 
-      findViewById<View>(R.id.layoutAnimationActivity).setOnClickListener {
+    findViewById<View>(R.id.layoutAnimationActivity).setOnClickListener {
       val intent = Intent(this, LayoutAnimationActivity::class.java)
       startActivity(intent)
     }
@@ -161,20 +168,20 @@ class MainActivity : AppCompatActivity() {
       val intent = Intent(this, ParticleActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.loadingActivity).setOnClickListener {
+    findViewById<View>(R.id.loadingActivity).setOnClickListener {
       val intent = Intent(this, LoadingActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.qqDragBubbleActivity).setOnClickListener {
+    findViewById<View>(R.id.qqDragBubbleActivity).setOnClickListener {
       val intent = Intent(this, QQDragBubbleActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.stickyRecyclerviewAct).setOnClickListener {
+    findViewById<View>(R.id.stickyRecyclerviewAct).setOnClickListener {
       val intent = Intent(this, StickyActivity::class.java)
       startActivity(intent)
     }
 
-      findViewById<View>(R.id.springAnimation).setOnClickListener {
+    findViewById<View>(R.id.springAnimation).setOnClickListener {
       val intent = Intent(this, DynamicAnimaitonActivity::class.java)
       startActivity(intent)
     }
@@ -182,15 +189,15 @@ class MainActivity : AppCompatActivity() {
       val intent = Intent(this, OscillationActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.growingTreeView).setOnClickListener {
+    findViewById<View>(R.id.growingTreeView).setOnClickListener {
       val intent = Intent(this, GrowingTreeActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.xmlParserBtn).setOnClickListener {
+    findViewById<View>(R.id.xmlParserBtn).setOnClickListener {
       val intent = Intent(this, XmlParserActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.wallpaperBtn).setOnClickListener {
+    findViewById<View>(R.id.wallpaperBtn).setOnClickListener {
 //            val intent = Intent(this, SettingActivity::class.java)
 //            startActivity(intent)
       startActivity(MyUtils.getWallPaper(this, NormalWallpaperService::class.java))
@@ -200,20 +207,20 @@ class MainActivity : AppCompatActivity() {
       val intent = Intent(this, JumpActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.videoParser).setOnClickListener {
+    findViewById<View>(R.id.videoParser).setOnClickListener {
       val intent = Intent(this, VideoParserActivity::class.java)
       startActivity(intent)
     }
-      findViewById<View>(R.id.shareBtn).setOnClickListener {
+    findViewById<View>(R.id.shareBtn).setOnClickListener {
       shareText("这是内容")
     }
-      findViewById<View>(R.id.ffmpeg).setOnClickListener {
+    findViewById<View>(R.id.ffmpeg).setOnClickListener {
       val intent = Intent(this, FFmpegActivity::class.java)
       startActivity(intent)
     }
 
 //      系统铃声 RingtoneManager  https://blog.csdn.net/ch853199769/article/details/78721003
-      findViewById<View>(R.id.ringtone).setOnClickListener {
+    findViewById<View>(R.id.ringtone).setOnClickListener {
       val player: MediaPlayer = MediaPlayer.create(
         this,
         ///系统铃声
@@ -304,7 +311,6 @@ class MainActivity : AppCompatActivity() {
       Log.d(TAG, "index value  $index")
     }).start();
 
-
     //handler原理为什么顺序是021  runnable运行的线程不是主线程吗
     //02是在本次消息,runnable的1需要另外的消息发送处理和执行
     findViewById<View>(R.id.startHandler).setOnClickListener {
@@ -327,7 +333,6 @@ class MainActivity : AppCompatActivity() {
       permissions, 0
     )
 
-
     //WindowManager.LayoutParams.FLAG_SECURE  禁止截屏
     //安全 监听截屏事件的产生  系统源码 TakeScreenshotService  GlobalScreenshot
     //  ContentObserver 监听图片的变化。。
@@ -345,13 +350,13 @@ class MainActivity : AppCompatActivity() {
     findViewById<View>(R.id.testAnrActivity).setOnClickListener {
       startActivity(Intent(this, TestAnrActivity::class.java))
     }
-      findViewById<View>(R.id.measureTestActivity).setOnClickListener {
+    findViewById<View>(R.id.measureTestActivity).setOnClickListener {
       startActivity(Intent(this, MeasureTestActivity::class.java))
     }
-      findViewById<View>(R.id.customLMActivity).setOnClickListener {
+    findViewById<View>(R.id.customLMActivity).setOnClickListener {
       startActivity(Intent(this, RVCustomLayoutManagerActivity::class.java))
     }
-      findViewById<View>(R.id.scrollNestedActivity).setOnClickListener {
+    findViewById<View>(R.id.scrollNestedActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -369,7 +374,7 @@ class MainActivity : AppCompatActivity() {
       )
     }
 
-      findViewById<View>(R.id.bigPictureActivity).setOnClickListener {
+    findViewById<View>(R.id.bigPictureActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -386,7 +391,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-      findViewById<View>(R.id.IntentConstrainLayoutActivity).setOnClickListener {
+    findViewById<View>(R.id.IntentConstrainLayoutActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -394,7 +399,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-      findViewById<View>(R.id.IntentRevealAnimatorActivity).setOnClickListener {
+    findViewById<View>(R.id.IntentRevealAnimatorActivity).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -418,7 +423,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-      findViewById<View>(R.id.IntentActivityTransition).setOnClickListener {
+    findViewById<View>(R.id.IntentActivityTransition).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -426,7 +431,7 @@ class MainActivity : AppCompatActivity() {
         ), ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle()
       )
     }
-      findViewById<View>(R.id.ActivityKeyFrame).setOnClickListener {
+    findViewById<View>(R.id.ActivityKeyFrame).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -442,7 +447,7 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-      findViewById<View>(R.id.viewOutlineProviderBtn).setOnClickListener {
+    findViewById<View>(R.id.viewOutlineProviderBtn).setOnClickListener {
       startActivity(
         Intent(
           this,
@@ -450,10 +455,10 @@ class MainActivity : AppCompatActivity() {
         )
       )
     }
-      findViewById<View>(R.id.motionLayoutBtn).setOnClickListener {
+    findViewById<View>(R.id.motionLayoutBtn).setOnClickListener {
       startActivity(Intent(this, MotionLayoutActivity::class.java))
     }
-      findViewById<View>(R.id. viewPropertyBtn).setOnClickListener {
+    findViewById<View>(R.id.viewPropertyBtn).setOnClickListener {
       startActivity(Intent(this, ViewPropertyAnimatorActivity::class.java))
     }
     findViewById<View>(R.id.recorderBtn).setOnClickListener {
@@ -462,10 +467,10 @@ class MainActivity : AppCompatActivity() {
     findViewById<View>(R.id.blackWhitePictureBtn).setOnClickListener {
       startActivity(Intent(this, BlackWhitePictureActivity::class.java))
     }
-      findViewById<View>(R.id.shipWaveBtn).setOnClickListener {
+    findViewById<View>(R.id.shipWaveBtn).setOnClickListener {
       startActivity(Intent(this, ShipWaveActivity::class.java))
     }
-      findViewById<View>(R.id.animatorTextBtn).setOnClickListener {
+    findViewById<View>(R.id.animatorTextBtn).setOnClickListener {
       startActivity(Intent(this, AnimatorTextActivity::class.java))
     }
     findViewById<View>(R.id.cameraMatrixBtn).setOnClickListener {
@@ -488,27 +493,31 @@ class MainActivity : AppCompatActivity() {
     if (!isAccessibilityServiceOn()) {
       open()
     }
-    SystemView.init(this,windowManager)
+    SystemView.init(this, windowManager)
   }
 
-
-
-  fun open(){
+  fun open() {
     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
   }
 
   fun isAccessibilityServiceOn(): Boolean {
     var service = "${packageName}/${AccessibilityService::class.java.canonicalName}"
-    var enabled = Settings.Secure.getInt(applicationContext.contentResolver, Settings.Secure.ACCESSIBILITY_ENABLED)
+    var enabled = Settings.Secure.getInt(
+      applicationContext.contentResolver,
+      Settings.Secure.ACCESSIBILITY_ENABLED
+    )
     var splitter = TextUtils.SimpleStringSplitter(':')
     if (enabled == 1) {
-      var settingValue = Settings.Secure.getString(applicationContext.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+      var settingValue = Settings.Secure.getString(
+        applicationContext.contentResolver,
+        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+      )
       if (settingValue != null) {
         splitter.setString(settingValue)
         while (splitter.hasNext()) {
           var accessibilityService = splitter.next()
           //例如打开QQ的无障碍服务 com.tencent.qqpinyin/.accessibility.EmotionHelperService
-          Log.d(TAG,"用户开启的无障碍服务有： $accessibilityService")
+          Log.d(TAG, "用户开启的无障碍服务有： $accessibilityService")
           if (accessibilityService.equals(service, ignoreCase = true)) {
             return true
           }
@@ -586,7 +595,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     Log.i(TAG, "当前是否是主进程：${isMainProcess(context = this)}")
-    Log.i(TAG, "当前是否是主进程：${packageName.equals(applicationContext.applicationInfo.processName)}")
+    Log.i(
+      TAG,
+      "当前是否是主进程：${packageName.equals(applicationContext.applicationInfo.processName)}"
+    )
   }
 
   fun isMainProcess(context: Context?): Boolean {
@@ -687,9 +699,6 @@ class MainActivity : AppCompatActivity() {
 //        shareIntent.putExtra(Intent.EXTRA_STREAM, UriUtils.file2Uri(File(path)))//添加分享内容
     this.startActivity(Intent.createChooser(shareIntent, "分享title"))
   }
-
-
-
 
   //项目根gradle
 //    buildscript {

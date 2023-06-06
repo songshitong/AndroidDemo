@@ -1,8 +1,10 @@
 package sst.example.androiddemo.feature.ffmpeg
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Process
 import sst.example.androiddemo.feature.ffmpeg.CrashMonitor.CrashCallBack
+import java.text.SimpleDateFormat
 
 /**
  * @description:
@@ -37,7 +39,8 @@ class Level{
 data class Configuration(
   //日志文件目录
   val fileDir:String,
-  val fileNamePattern:String,
+  //日志名的前半部分  自动拼接-yyyyMM-dd-HH-mm-ss.log形式结尾
+  val fileNamePrefix:String,
   //单条日志最大长度，超过自动截取
   val singleLogUnit:Int = 4*1024,
   //每条日志之间的分割符
@@ -48,18 +51,24 @@ data class Configuration(
   val cacheBuffer:Int = 150*1024,
   //文件大小，超过自动分割
   val fileMaxLength:Int = 10*1024*1024,
+  //日志时间格式
+  val timePattern:String = "yyyy-MM-dd HH:mm:ss.SSS",
   //输出日志级别  默认全部输出，设置为Level.ERROR则等级以下的日志不输出
   val logLevel:Int = Level.DEBUG,
 )
 
+@SuppressLint("SimpleDateFormat")
 class AFOLog(context: Context,val config:Configuration) : Log{
   private val pid:String =  Process.myPid().toString()
   private val pName:String
+  private var sdf:SimpleDateFormat
   init {
     System.loadLibrary("native-lib")
-    nInitLog(config)
     configMonitor()
+    nInitLog(config)
     pName = context.applicationInfo.processName
+    sdf = SimpleDateFormat(config.timePattern)
+    //todo 目录权限校验
   }
 
   private fun configMonitor() {
@@ -78,7 +87,8 @@ class AFOLog(context: Context,val config:Configuration) : Log{
     methodParam: String,
     message: String
   ) {
-    nLog(level,pid,pName,threadId,threadName,methodName,methodParam,message)
+    val time = System.currentTimeMillis()
+    nLog(sdf.format(time),level,pid,pName,threadId,threadName,methodName,methodParam,message)
   }
 
   fun javaCrashTest() {
@@ -92,7 +102,9 @@ class AFOLog(context: Context,val config:Configuration) : Log{
 
   private external fun nInitLog(config: Configuration)
 
-  private external fun nLog( level: Int,
+  private external fun nLog(
+    time:String,
+    level: Int,
     processId:String,
     processName:String,
     threadId: String,

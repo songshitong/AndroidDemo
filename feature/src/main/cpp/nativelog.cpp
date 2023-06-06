@@ -17,14 +17,21 @@
 #include "log_buffer.h"
 
 static LogBuffer *log_buff = nullptr; //存储buffer
+static std::string logFileDir;
 static std::string logFilePath;
 static volatile bool log_close = true; //日志是否关闭
 
 static std::condition_variable cond_buffer_async;
 static std::mutex mutex_buffer_async;
 static std::atomic_flag bufferChangeLock = ATOMIC_FLAG_INIT; //标记buffer正在变更
-static const char* TAG = "AFOLOG";
+static const char *TAG = "AFOLOG";
 pthread_t pthread;
+int fileMaxL = 10 * 1024 * 1024;
+char *fileNameP = new char[]{};
+static const char *FILE_EXTENSION = ".log";
+static const char *FILE_TMP_EXTENSION = ".tmp";
+
+std::string createFilePath(std::string dir);
 
 void log2file(const void *_data, size_t _len) {
     if (nullptr == _data || 0 == _len || logFilePath.empty()) {
@@ -32,7 +39,20 @@ void log2file(const void *_data, size_t _len) {
     }
     __android_log_print(ANDROID_LOG_ERROR, TAG, "start write buffer to file logFilePath:%s",
                         logFilePath.c_str());
-    //文件分割 todo
+    struct stat st;
+    stat(logFilePath.c_str(), &st);
+    int size = st.st_size;
+    if (size >= fileMaxL) {
+        //文件分割
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "file approach max length:%d current:%d",
+                            fileMaxL, size);
+        std::string newFileStr = createFilePath(logFileDir);
+        logFilePath = newFileStr;
+        FILE *create = fopen(logFilePath.c_str(), "w");
+        fclose(create);
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "file approach max length,new file:%s",
+                            logFilePath.c_str());
+    }
     FILE *file = fopen(logFilePath.c_str(), "a+");
     if (nullptr == file) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "log2file file open error");
@@ -42,14 +62,26 @@ void log2file(const void *_data, size_t _len) {
     fclose(file);
 }
 
+std::string createFilePath(std::string dir) {
+    std::string newFileStr;
+    newFileStr.append(dir);
+    newFileStr.append("/");
+    newFileStr.append(fileNameP);
+    newFileStr.append("-");
+    time_t t = time(nullptr);
+    char tmp[21] = {'\0'};
+    strftime(tmp, sizeof(tmp), "%Y-%m-%d-%H-%M-%S", localtime(&t));
+    newFileStr.append(tmp);
+    newFileStr.append(FILE_EXTENSION);
+    return newFileStr;
+}
+
 void async_log_thread() {
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "async_log_thread param %s",
-                        logFilePath.c_str());
     while (true) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "file write thread run....");
         if (nullptr == log_buff) break;
         AutoBuffer tmp;
-        while (!bufferChangeLock.test_and_set()){
+        while (!bufferChangeLock.test_and_set()) {
             //确保只有一个线程在操作log_buff
             __android_log_print(ANDROID_LOG_ERROR, TAG, "flush buffer start====");
             log_buff->Flush(tmp);
@@ -65,11 +97,11 @@ void async_log_thread() {
 }
 
 
-void checkWriteFile(NativeLog* nativeLog) {
-    if(!log_buff)return;
+void checkWriteFile(NativeLog *nativeLog) {
+    if (!log_buff)return;
     size_t bufferLength = log_buff->GetData().Length();
     __android_log_print(ANDROID_LOG_ERROR, TAG, "buffer now length %d", bufferLength);
-    if (bufferLength >= nativeLog->cacheBuffer * 1 / 3) { //todo 单条log进行分割
+    if (bufferLength >= nativeLog->cacheBuffer * 1 / 3) {
         cond_buffer_async.notify_all();
     }
 }
@@ -82,12 +114,18 @@ void NativeLog::init(char *path) {
         return;
     }
     log_close = false;
-    logFilePath = path;
-    char prefix[] = ".tmp";
-    char *tmpPath = (char *) malloc(strlen(path) + strlen(prefix));
-    strcpy(tmpPath, path);
-    strcat(tmpPath, prefix);
-    int tmpFd = open(tmpPath, O_CREAT | O_RDWR, S_IRWXU); //todo 建立临时文件
+    logFileDir = path;
+    fileMaxL = fileMaxLength;
+    fileNameP = fileNamePrefix;
+    logFilePath = createFilePath(logFileDir);
+    std::string tmp;
+    tmp.append(logFileDir);
+    tmp.append("/");
+    tmp.append(fileNameP);
+    tmp.append(FILE_TMP_EXTENSION);
+    __android_log_print(ANDROID_LOG_ERROR, TAG,
+                        "tmpfile path:%s ", tmp.c_str());
+    int tmpFd = open(tmp.c_str(), O_CREAT | O_RDWR, S_IRWXU);
 
     if (!tmpFd) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "tmpFd open error");
@@ -119,12 +157,11 @@ void NativeLog::init(char *path) {
 }
 
 
-
 void NativeLog::log(char *logStr) {
     if (nullptr == log_buff) return;
     if (log_close)return;
     size_t length = strlen(logStr);
-    while (!bufferChangeLock.test_and_set()){
+    while (!bufferChangeLock.test_and_set()) {
         //确保只有一个线程在操作log_buff
         __android_log_print(ANDROID_LOG_ERROR, TAG, "write buffer start====");
         log_buff->Write(logStr, length);
@@ -140,7 +177,7 @@ void NativeLog::closeLog() {
     __android_log_print(ANDROID_LOG_ERROR, TAG, "closeLog");
     if (log_close) return;
     log_close = true;
-    while (!bufferChangeLock.test_and_set()){
+    while (!bufferChangeLock.test_and_set()) {
         //确保只有一个线程在操作log_buff
         __android_log_print(ANDROID_LOG_ERROR, TAG, "flush delete start====");
         delete log_buff;
@@ -155,17 +192,21 @@ void NativeLog::closeLog() {
 //    if (tmpFileStart) { //todo 确定使用mmap还是内存 看看需要删除  内存关闭前需要写一次文件
 //        munmap(tmpFileStart, kBufferBlockLength);
 //    }
+    delete fileNamePrefix;
+    delete FILE_EXTENSION;
+    delete TAG;
+    delete[] fileNameP;
     pthread_exit(nullptr);
 }
 
 
- void  NativeLog::flushCache(){
-     if(log_close)return;
-     log_close = true;
-     __android_log_print(ANDROID_LOG_ERROR, TAG, "flushCache 写入日志");
-     cond_buffer_async.notify_all();//执行一次写入
-     pthread_join(pthread, nullptr);  //等待子线程完成
-     __android_log_print(ANDROID_LOG_ERROR, TAG, "flushCache 写入日志完成");
+void NativeLog::flushCache() {
+    if (log_close)return;
+    log_close = true;
+    __android_log_print(ANDROID_LOG_ERROR, TAG, "flushCache 写入日志");
+    cond_buffer_async.notify_all();//执行一次写入
+    pthread_join(pthread, nullptr);  //等待子线程完成
+    __android_log_print(ANDROID_LOG_ERROR, TAG, "flushCache 写入日志完成");
 }
 
 

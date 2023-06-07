@@ -7,9 +7,11 @@
 //创建线程，并调用线程起始地址所指向的函数start_routine
 //返回值：成功则返回0；出错则返回-1
 
+//pthread_setname_np(pthread, "xxthread"); 设置线程名称
+
 //线程终止
 // 如果 main() 是在它所创建的线程之前结束，并通过 pthread_exit() 退出，那么其他线程将继续执行。否则，它们将在 main() 结束时自动被终止
-//pthread_exit (status)
+//pthread_exit (status)  结束调用线程
 
 //线程链接  阻塞的方式等待thread指定的线程结束，thread指定的线程必须是joinable的。
 // pthread_join() 子程序阻碍调用程序，直到指定的 threadid 线程终止为止。当创建一个线程时，它的某个属性会定义它是否是可连接的（joinable）或可分离的（detached）。

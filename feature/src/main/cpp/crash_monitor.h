@@ -8,7 +8,7 @@
 #include <jni.h>
 #include <functional>
 
-typedef std::function<void()> CrashCallG;
+typedef std::function<void(char*)> CrashCallG;
 class CrashMonitor {
 public:
     void init(CrashCallG call);

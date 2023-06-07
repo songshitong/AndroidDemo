@@ -1,6 +1,7 @@
 package sst.example.androiddemo.feature.ffmpeg;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -47,7 +48,8 @@ public class FFmpegActivity extends AppCompatActivity {
     replaceAudio = findViewById(R.id.replaceAudio);
     btnPlay = findViewById(R.id.playVideo);
     findViewById(R.id.nativeCrashTest).setOnClickListener(v -> log.nativeCrashTest());
-
+    findViewById(R.id.closeLogBtn).setOnClickListener(v -> log.closeLog());
+    findViewById(R.id.clearLog).setOnClickListener(v -> log.clear());
     ffmpegCmd.setSurfaceView(surfaceView);
 
     findViewById(R.id.javaCrashTest).setOnClickListener(v -> {
@@ -55,10 +57,23 @@ public class FFmpegActivity extends AppCompatActivity {
     });
 
     initListener();
+    StringBuilder extra = new StringBuilder();
+    extra.append("extra info is:\n");
+    try {
+      String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+      extra.append("versionName:");
+      extra.append(versionName);
+      extra.append("\n");
+    } catch (PackageManager.NameNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    extra.append("AFOLog version:");
+    extra.append(AFOLog.VERSION);
+    extra.append("\n");
     Configuration config =
         new Configuration(getApplicationContext().getFilesDir().getPath(), "xg-main", 4 * 1024, "\n",
             "|", 150 * 1024,
-            10 * 1024 * 1024, "yyyy-MM-dd HH:mm:ss.SSS", Level.DEBUG);
+            10 * 1024 * 1024, "yyyy-MM-dd HH:mm:ss.SSS", Level.DEBUG,extra.toString());
     log = new AFOLog(getApplicationContext(), config);
     log("this is first  log");
     log("this is second log");

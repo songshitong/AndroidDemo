@@ -148,7 +148,7 @@ bool LogBuffer::__Reset() {
         }
         
     }
-    
+
     log_crypt_->SetHeaderInfo((char*)buff_.Ptr(), is_compress_);
     buff_.Length(log_crypt_->GetHeaderLen(), log_crypt_->GetHeaderLen());
 
@@ -157,7 +157,7 @@ bool LogBuffer::__Reset() {
 
 void LogBuffer::__Flush() {
     assert(buff_.Length() >= log_crypt_->GetHeaderLen());
-    
+
     log_crypt_->UpdateLogHour((char*)buff_.Ptr());
     log_crypt_->SetTailerInfo((char*)buff_.Ptr() + buff_.Length());
     buff_.Length(buff_.Length() + log_crypt_->GetTailerLen(), buff_.Length() + log_crypt_->GetTailerLen());

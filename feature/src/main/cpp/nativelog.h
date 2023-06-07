@@ -3,34 +3,46 @@
 //
 
 
-class NativeLog{
+class NativeLog {
 public:
-     void log(char* logStr);
-     void closeLog();
-     static void flushCache();
-     int cacheBuffer;
-     char* logSpliterator;
-     char* strSplitter;
-     int singleLogUnit;
-     int fileMaxLength;
-     char* fileNamePrefix;
-    void init(char* path);
+    int cacheBuffer;
+    char *logSpliterator;
+    char *strSplitter;
+    int singleLogUnit;
+    int fileMaxLength;
+    char *fileNamePrefix;
+    char *extraInfo;
 
-    ~NativeLog(){
-        flushCache();
-        closeLog();
-        if(logSpliterator){
+    void log(char *logStr);
+
+    //日志控件内部打印
+    void closeLog();
+
+    static void flushCache();
+
+    void flushCache(char *str);
+
+    void init(char *path);
+
+    void writeBuffer(char *logStr);
+
+    ~NativeLog() {
+        if (logSpliterator) {
             delete logSpliterator;
         }
-        if(strSplitter){
+        if (strSplitter) {
             delete strSplitter;
         }
-        if(fileNamePrefix){
+        if (fileNamePrefix) {
             delete fileNamePrefix;
         }
+        if (extraInfo) {
+            delete extraInfo;
+        }
     }
+
 private:
-    int8_t* tmpFileStart{};
+    int8_t *tmpFileStart{};
 
 
 };

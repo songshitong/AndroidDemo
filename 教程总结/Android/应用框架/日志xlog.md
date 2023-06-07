@@ -1,4 +1,12 @@
 
+https://github.com/cxMax/Xlog
+原生android.util.Log的api打印日志，会频繁触发GC，造成内存抖动
+Java_IO的方式，CPU占用高、内存占用
+
+log to mmap（目前是在主线程完成的）， 修改在线程里面实现， 可以提升函数线程执行时间， 尽量不占用主线程资源
+mmap to file， 增加分段写（类似美团Logan的实现）， 主要好处是，可以避免存储交大日志文件时， 避免cpu出现峰值，让cpu表现，尽可能平滑
+
+
 xlog 1.3.0
 
 https://zhuanlan.zhihu.com/p/25011775

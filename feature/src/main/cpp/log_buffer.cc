@@ -36,7 +36,7 @@
 
 
 bool LogBuffer::GetPeriodLogs(const char* _log_path, int _begin_hour, int _end_hour, unsigned long& _begin_pos, unsigned long& _end_pos, std::string& _err_msg) {
-    return LogCrypt::GetPeriodLogs(_log_path, _begin_hour, _end_hour, _begin_pos, _end_pos, _err_msg);
+    return log_crypt_->GetPeriodLogs(_log_path, _begin_hour, _end_hour, _begin_pos, _end_pos, _err_msg);
 }
 
 LogBuffer::LogBuffer(void* _pbuffer, size_t _len, bool _isCompress, const char* _pubkey)
@@ -128,11 +128,11 @@ bool LogBuffer::Write(const void* _data, size_t _length) {
 
     before_len += out_buffer.Length();
     buff_.Length(before_len, before_len);
-
     log_crypt_->UpdateLogLen((char*)buff_.Ptr(), (uint32_t)(out_buffer.Length() - last_remain_len));
 
     return true;
 }
+
 
 bool LogBuffer::__Reset() {
     

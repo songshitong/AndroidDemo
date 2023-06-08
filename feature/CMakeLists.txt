@@ -7,6 +7,12 @@ message("CMAKE_ANDROID_ARCH_ABI ===  ${CMAKE_ANDROID_ARCH_ABI}")
 
 #添加头文件
 include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/micro-ecc-master)
+
+file(GLOB SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/main/cpp/micro-ecc-master/*.c)
+source_group(micro-ecc-master FILES ${SOURCE_FILES})
+message("SOURCE_FILES ===  ${SOURCE_FILES}")
+
 
 add_library(
         native-lib
@@ -20,6 +26,7 @@ add_library(
         src/main/cpp/log_crypt.cc
         src/main/cpp/log_buffer.cc
         src/main/cpp/crash_monitor.cpp
+        ${SOURCE_FILES}
 )
 
 

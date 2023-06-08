@@ -9,6 +9,8 @@
 #include <cstdio>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <cstdlib>
 #include <condition_variable>
 #include <mutex>
@@ -16,6 +18,7 @@
 #include "nativelog.h"
 #include "log_buffer.h"
 #include "native-lib.h"
+#include <fstream>
 
 static LogBuffer *log_buff = nullptr; //存储buffer
 static std::string logFileDir;
@@ -33,6 +36,24 @@ static const char *FILE_TMP_EXTENSION = ".tmp";
 char *logExtraInfo;
 
 std::string createFilePath(std::string dir);
+
+
+
+
+void checkMaxStorage() {
+    struct dirent *entry;
+    DIR *dir = opendir(logFileDir.c_str());
+    if (dir == nullptr) {
+        return;
+    }
+    int allSize=0;
+    while ((entry = readdir(dir)) != nullptr) {
+        printf("%s\n",entry->d_name);
+        allSize+=entry->d_reclen;
+    }
+
+    closedir(dir);
+}
 
 void log2file(const void *_data, size_t _len) {
     if (nullptr == _data || 0 == _len || logFilePath.empty()) {
@@ -53,6 +74,7 @@ void log2file(const void *_data, size_t _len) {
         fclose(create);
         selfLog("file approach max length,new file:%s",
                 logFilePath.c_str());
+        checkMaxStorage();
     }
     FILE *file = fopen(logFilePath.c_str(), "a+");
     if (nullptr == file) {
@@ -60,9 +82,9 @@ void log2file(const void *_data, size_t _len) {
         return;
     }
     if (0 == size && logExtraInfo) {
-        selfLog("write logExtraInfo");
+        selfLog("start write logExtraInfo");
         //文件的第一条
-        fwrite(logExtraInfo, sizeof(logExtraInfo), 1, file);
+        fwrite(logExtraInfo, strlen(logExtraInfo), 1, file);
     }
     fwrite(_data, _len, 1, file);
     fclose(file);
@@ -155,9 +177,9 @@ void NativeLog::init(char *path) {
         selfLog("NativeLog init mmap error");
         //创建buffer
         char *buffer = new char[cacheBuffer];
-        log_buff = new LogBuffer(buffer, cacheBuffer, false, nullptr);
+        log_buff = new LogBuffer(buffer, cacheBuffer, false, "");
     } else {
-        log_buff = new LogBuffer(tmpFileStart, cacheBuffer, false, nullptr);
+        log_buff = new LogBuffer(tmpFileStart, cacheBuffer, false, "");
         selfLog("NativeLog init mmap success ptr:%p",
                 tmpFileStart);
     }

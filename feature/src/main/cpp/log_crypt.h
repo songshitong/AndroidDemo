@@ -36,15 +36,15 @@ private:
     LogCrypt& operator=(const LogCrypt&);
     
 public:
-    static uint32_t GetHeaderLen();
-    static uint32_t GetTailerLen();
+    uint32_t GetHeaderLen();
+    uint32_t GetTailerLen();
     
-    static bool GetLogHour(const char* const _data, size_t _len, int& _begin_hour, int& _end_hour);
-    static void UpdateLogHour(char* _data);
+     bool GetLogHour(const char* const _data, size_t _len, int& _begin_hour, int& _end_hour);
+     void UpdateLogHour(char* _data);
     
-    static uint32_t GetLogLen(const char* const _data, size_t _len);
-    static void UpdateLogLen(char* _data, uint32_t _add_len);
-    static bool GetPeriodLogs(const char* const _log_path, int _begin_hour, int _end_hour, unsigned long& _begin_pos, unsigned long& _end_pos, std::string& _err_msg);
+     uint32_t GetLogLen(const char* const _data, size_t _len);
+     void UpdateLogLen(char* _data, uint32_t _add_len);
+     bool GetPeriodLogs(const char* const _log_path, int _begin_hour, int _end_hour, unsigned long& _begin_pos, unsigned long& _end_pos, std::string& _err_msg);
 
 public:
     

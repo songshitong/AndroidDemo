@@ -41,8 +41,11 @@ void selfLog(const char* fmt,...){
     vsnprintf(buffer,sizeof(buffer),fmt,args);
     va_end(args);
     __android_log_write(ANDROID_LOG_INFO, TAG, buffer);
+    std::string result;
+    result.append(buffer);
+    result.append("\n");
     if(nativeLog){
-        nativeLog->writeBuffer(buffer);
+        nativeLog->writeBuffer(const_cast<char *>(result.c_str()));
     }
 }
 
@@ -108,6 +111,8 @@ Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nInitLog(JNIEnv *env, jobject
 
     int logLevel = getIntProperty(env, clazz, config, "getLogLevel");
     selfLog( "native init logLevel %d", logLevel);
+    int maxStorage = getIntProperty(env, clazz, config, "getMaxStorage");
+    selfLog( "native init logLevel %d", maxStorage);
     nativeLog = new NativeLog();
     nativeLog->strSplitter = strSplitter;
     nativeLog->cacheBuffer = cacheBuffer;
@@ -116,6 +121,7 @@ Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nInitLog(JNIEnv *env, jobject
     nativeLog->fileMaxLength = fileMaxLength;
     nativeLog->fileNamePrefix = fileNamePrefix;
     nativeLog->extraInfo = extraInfo;
+    nativeLog->maxStorage = maxStorage;
     nativeLog->init(fileDir);
     env->DeleteLocalRef(clazz);
 }
@@ -190,8 +196,8 @@ Java_sst_example_androiddemo_feature_ffmpeg_AFOLog_nLog(JNIEnv *env, jobject thi
                                                         jstring method_name, jstring method_param,
                                                         jstring message) {
     std::string log = convertJString(env, message);
-    selfLog( "native receive log length:%d %s",
-                        log.length(), log.c_str());
+//    selfLog( "native receive log length:%d %s",
+//                        log.length(), log.c_str());
     if (nullptr == nativeLog) {
         return;
     }
@@ -373,7 +379,7 @@ Java_sst_example_androiddemo_feature_ffmpeg_FFmpegActivity_native_1replaceAudio(
         free(adts);
         memcpy(out + ADTS_HEADER_LENGTH, pkt.data, pkt.size);
 
-        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "输出转码 %d", out);
+        __android_log_print(ANDROID_LOG_ERROR, "FFmpegCmd ", "输出转码 %s", out);
     }
 
     env->ReleaseByteArrayElements(pcmDatas_, pcmDatas, 0);

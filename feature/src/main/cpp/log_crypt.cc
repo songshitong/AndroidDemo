@@ -25,31 +25,37 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #ifdef WIN32
 #include <algorithm>
 #endif // WIN32
 
+#ifndef XLOG_NO_CRYPT
 
+#include "micro-ecc-master/uECC.h"
+
+#endif
 
 static const char kMagicSyncStart = '\x06';
-static const char kMagicSyncNoCryptStart ='\x08';
-static const char kMagicAsyncStart ='\x07';
-static const char kMagicAsyncNoCryptStart ='\x09';
+static const char kMagicSyncNoCryptStart = '\x08';
+static const char kMagicAsyncStart = '\x07';
+static const char kMagicAsyncNoCryptStart = '\x09';
 
-static const char kMagicEnd  = '\0';
+static const char kMagicEnd = '\0';
 
 const static int TEA_BLOCK_LEN = 8;
 
-static void __TeaEncrypt (uint32_t* v, uint32_t* k) {
-    uint32_t v0=v[0], v1=v[1], sum=0, i;
-    const static uint32_t delta=0x9e3779b9;
-    uint32_t k0=k[0], k1=k[1], k2=k[2], k3=k[3];
-    for (i=0; i < 16; i++) {
+static void __TeaEncrypt(uint32_t *v, uint32_t *k) {
+    uint32_t v0 = v[0], v1 = v[1], sum = 0, i;
+    const static uint32_t delta = 0x9e3779b9;
+    uint32_t k0 = k[0], k1 = k[1], k2 = k[2], k3 = k[3];
+    for (i = 0; i < 16; i++) {
         sum += delta;
-        v0 += ((v1<<4) + k0) ^ (v1 + sum) ^ ((v1>>5) + k1);
-        v1 += ((v0<<4) + k2) ^ (v0 + sum) ^ ((v0>>5) + k3);
+        v0 += ((v1 << 4) + k0) ^ (v1 + sum) ^ ((v1 >> 5) + k1);
+        v1 += ((v0 << 4) + k2) ^ (v0 + sum) ^ ((v0 >> 5) + k3);
     }
-    v[0]=v0; v[1]=v1;
+    v[0] = v0;
+    v[1] = v1;
 }
 
 static uint16_t __GetSeq(bool _is_async) {
@@ -60,26 +66,27 @@ static uint16_t __GetSeq(bool _is_async) {
 
     static uint16_t s_seq = 0;
 
-    s_seq ++;
+    s_seq++;
 
     if (0 == s_seq) {
-        s_seq ++;
+        s_seq++;
     }
 
     return s_seq;
 }
 
 #ifndef XLOG_NO_CRYPT
-static bool Hex2Buffer(const char* _str, size_t _len, unsigned char* _buffer) {
 
-    if (NULL == _str || _len ==0 || _len % 2 != 0) {
+static bool Hex2Buffer(const char *_str, size_t _len, unsigned char *_buffer) {
+
+    if (NULL == _str || _len == 0 || _len % 2 != 0) {
         return -1;
     }
 
     char tmp[3] = {0};
-    for (size_t i=0; i<_len-1; i+=2) {
-        for (size_t j=0; j<2; ++j) {
-            tmp[j] = _str[i+j];
+    for (size_t i = 0; i < _len - 1; i += 2) {
+        for (size_t j = 0; j < 2; ++j) {
+            tmp[j] = _str[i + j];
             if (!(('0' <= tmp[j] && tmp[j] <= '9')
                   || ('a' <= tmp[j] && tmp[j] <= 'f')
                   || ('A' <= tmp[j] && tmp[j] <= 'F'))) {
@@ -88,14 +95,15 @@ static bool Hex2Buffer(const char* _str, size_t _len, unsigned char* _buffer) {
             }
         }
 
-        _buffer[i/2] = (unsigned char)strtol(tmp, NULL, 16);
+        _buffer[i / 2] = (unsigned char) strtol(tmp, NULL, 16);
 
     }
     return true;
 }
+
 #endif
 
-LogCrypt::LogCrypt(const char* _pubkey): seq_(0), is_crypt_(false) {
+LogCrypt::LogCrypt(const char *_pubkey) : seq_(0), is_crypt_(false) {
 
 #ifndef XLOG_NO_CRYPT
     const static size_t PUB_KEY_LEN = 64;
@@ -111,10 +119,14 @@ LogCrypt::LogCrypt(const char* _pubkey): seq_(0), is_crypt_(false) {
     }
 
     uint8_t client_pri[32] = {0};
-
+    if (0 == uECC_make_key((uint8_t *) client_pubkey_, client_pri, uECC_secp256k1())) {
+        return;
+    }
 
     uint8_t ecdh_key[32] = {0};
-
+    if (0 == uECC_shared_secret(svr_pubkey, client_pri, ecdh_key, uECC_secp256k1())) {
+        return;
+    }
 
     memcpy(tea_key_, ecdh_key, sizeof(tea_key_));
 
@@ -129,40 +141,51 @@ LogCrypt::LogCrypt(const char* _pubkey): seq_(0), is_crypt_(false) {
  */
 
 uint32_t LogCrypt::GetHeaderLen() {
-    return sizeof(char) * 3 + sizeof(uint16_t) + sizeof(uint32_t) + sizeof(char) * 64;
+    if (is_crypt_) { //基于原有的变更：不加密时特殊处理
+        return sizeof(char) * 3 + sizeof(uint16_t) + sizeof(uint32_t) + sizeof(char) * 64;
+    } else {
+        return 0;
+    }
 }
 
 uint32_t LogCrypt::GetTailerLen() {
-    return sizeof(kMagicEnd);
+    //基于原有的变更：不加密时特殊处理
+    if (is_crypt_) {
+        return sizeof(kMagicEnd);
+    } else {
+        return 0;
+    }
 }
 
-bool LogCrypt::GetLogHour(const char* const _data, size_t _len, int& _begin_hour, int& _end_hour) {
-
+bool LogCrypt::GetLogHour(const char *const _data, size_t _len, int &_begin_hour, int &_end_hour) {
+    if(!is_crypt_) return false; //基于原有的变更：不加密时特殊处理
     if (_len < GetHeaderLen()) return false;
 
     char start = _data[0];
     if (kMagicAsyncStart != start && kMagicSyncStart != start) return false;
 
-    char begin_hour = _data[sizeof(char)+sizeof(uint16_t)];
-    char end_hour = _data[sizeof(char)+sizeof(uint16_t)+sizeof(char)];
+    char begin_hour = _data[sizeof(char) + sizeof(uint16_t)];
+    char end_hour = _data[sizeof(char) + sizeof(uint16_t) + sizeof(char)];
 
-    _begin_hour = (int)begin_hour;
-    _end_hour = (int)end_hour;
+    _begin_hour = (int) begin_hour;
+    _end_hour = (int) end_hour;
     return true;
 }
 
-void LogCrypt::UpdateLogHour(char* _data) {
-
+void LogCrypt::UpdateLogHour(char *_data) {
+    if(!is_crypt_)return; //基于原有的变更：不加密时特殊处理
     struct timeval tv;
     gettimeofday(&tv, 0);
     time_t sec = tv.tv_sec;
-    struct tm tm_tmp = *localtime((const time_t*)&sec);
+    struct tm tm_tmp = *localtime((const time_t *) &sec);
 
-    char hour = (char)tm_tmp.tm_hour;
-    memcpy(_data + GetHeaderLen() - sizeof(uint32_t) - sizeof(char) * 64 - sizeof(char), &hour, sizeof(hour));
+    char hour = (char) tm_tmp.tm_hour;
+    memcpy(_data + GetHeaderLen() - sizeof(uint32_t) - sizeof(char) * 64 - sizeof(char), &hour,
+           sizeof(hour));
 }
 
-uint32_t LogCrypt::GetLogLen(const char*  const _data, size_t _len) {
+uint32_t LogCrypt::GetLogLen(const char *const _data, size_t _len) {
+    if(!is_crypt_) return _len; //基于原有的变更：不加密时特殊处理
     if (_len < GetHeaderLen()) return 0;
 
     char start = _data[0];
@@ -172,17 +195,19 @@ uint32_t LogCrypt::GetLogLen(const char*  const _data, size_t _len) {
     }
 
     uint32_t len = 0;
-    memcpy(&len, _data + GetHeaderLen() - sizeof(uint32_t) - sizeof(char)*64, sizeof(len));
+    memcpy(&len, _data + GetHeaderLen() - sizeof(uint32_t) - sizeof(char) * 64, sizeof(len));
     return len;
 }
 
-void LogCrypt::UpdateLogLen(char* _data, uint32_t _add_len) {
-
-    uint32_t currentlen = (uint32_t)(GetLogLen(_data, GetHeaderLen()) + _add_len);
-    memcpy(_data + GetHeaderLen() - sizeof(uint32_t) - sizeof(char) * 64, &currentlen, sizeof(currentlen));
+void LogCrypt::UpdateLogLen(char *_data, uint32_t _add_len) {
+    if(!is_crypt_) return; //基于原有的变更：不加密时特殊处理
+    uint32_t currentlen = (uint32_t) (GetLogLen(_data, GetHeaderLen()) + _add_len);
+    memcpy(_data + GetHeaderLen() - sizeof(uint32_t) - sizeof(char) * 64, &currentlen,
+           sizeof(currentlen));
 }
 
-void LogCrypt::SetHeaderInfo(char* _data, bool _is_async) {
+void LogCrypt::SetHeaderInfo(char *_data, bool _is_async) {
+    if(!is_crypt_) return ; //基于原有的变更：不加密时特殊处理
     if (_is_async) {
         if (is_crypt_) {
             memcpy(_data, &kMagicAsyncStart, sizeof(kMagicAsyncStart));
@@ -204,33 +229,39 @@ void LogCrypt::SetHeaderInfo(char* _data, bool _is_async) {
     struct timeval tv;
     gettimeofday(&tv, 0);
     time_t sec = tv.tv_sec;
-    tm tm_tmp = *localtime((const time_t*)&sec);
+    tm tm_tmp = *localtime((const time_t *) &sec);
 
-    char hour = (char)tm_tmp.tm_hour;
+    char hour = (char) tm_tmp.tm_hour;
     memcpy(_data + sizeof(kMagicAsyncStart) + sizeof(seq_), &hour, sizeof(hour));
     memcpy(_data + sizeof(kMagicAsyncStart) + sizeof(seq_) + sizeof(hour), &hour, sizeof(hour));
 
 
     uint32_t len = 0;
     memcpy(_data + sizeof(kMagicAsyncStart) + sizeof(seq_) + sizeof(hour) * 2, &len, sizeof(len));
-    memcpy(_data + sizeof(kMagicAsyncStart) + sizeof(seq_) + sizeof(hour) * 2 + sizeof(len), client_pubkey_, sizeof(client_pubkey_));
+    memcpy(_data + sizeof(kMagicAsyncStart) + sizeof(seq_) + sizeof(hour) * 2 + sizeof(len),
+           client_pubkey_, sizeof(client_pubkey_));
 }
 
-void LogCrypt::SetTailerInfo(char* _data) {
+void LogCrypt::SetTailerInfo(char *_data) {
+    if (!is_crypt_)return; //基于原有的变更：不加密时特殊处理
     memcpy(_data, &kMagicEnd, sizeof(kMagicEnd));
 }
 
-bool LogCrypt::GetPeriodLogs(const char* const _log_path, int _begin_hour, int _end_hour, unsigned long& _begin_pos, unsigned long& _end_pos, std::string& _err_msg) {
+bool LogCrypt::GetPeriodLogs(const char *const _log_path, int _begin_hour, int _end_hour,
+                             unsigned long &_begin_pos, unsigned long &_end_pos,
+                             std::string &_err_msg) {
+    if(!is_crypt_) return false; //基于原有的变更：不加密时特殊处理
 
     char msg[1024] = {0};
 
 
     if (NULL == _log_path || _end_hour <= _begin_hour) {
-        snprintf(msg, sizeof(msg), "NULL == _logPath || _endHour <= _beginHour, %d, %d", _begin_hour, _end_hour);
+        snprintf(msg, sizeof(msg), "NULL == _logPath || _endHour <= _beginHour, %d, %d",
+                 _begin_hour, _end_hour);
         return false;
     }
 
-    FILE* file = fopen(_log_path, "rb");
+    FILE *file = fopen(_log_path, "rb");
     if (NULL == file) {
         snprintf(msg, sizeof(msg), "open file fail:%s", strerror(errno));
         _err_msg += msg;
@@ -259,18 +290,21 @@ bool LogCrypt::GetPeriodLogs(const char* const _log_path, int _begin_hour, int _
     int last_end_hour = -1;
     unsigned long last_end_pos = 0;
 
-    char* header_buff = new char[GetHeaderLen()];
+    char *header_buff = new char[GetHeaderLen()];
 
     while (!feof(file) && !ferror(file)) {
 
-        if ((long)(ftell(file) + GetHeaderLen() + GetTailerLen()) > file_size) {
-            snprintf(msg, sizeof(msg), "ftell(file) + __GetHeaderLen() + sizeof(kMagicEnd)) > file_size error");
+        if ((long) (ftell(file) + GetHeaderLen() + GetTailerLen()) > file_size) {
+            snprintf(msg, sizeof(msg),
+                     "ftell(file) + __GetHeaderLen() + sizeof(kMagicEnd)) > file_size error");
             break;
         }
 
         long before_len = ftell(file);
         if (GetHeaderLen() != fread(header_buff, 1, GetHeaderLen(), file)) {
-            snprintf(msg, sizeof(msg), "fread(buff.Ptr(), 1, __GetHeaderLen(), file) error:%s, before_len:%ld.", strerror(ferror(file)), before_len);
+            snprintf(msg, sizeof(msg),
+                     "fread(buff.Ptr(), 1, __GetHeaderLen(), file) error:%s, before_len:%ld.",
+                     strerror(ferror(file)), before_len);
             break;
         }
 
@@ -283,16 +317,20 @@ bool LogCrypt::GetPeriodLogs(const char* const _log_path, int _begin_hour, int _
             fix = true;
         } else {
             uint32_t len = GetLogLen(header_buff, GetHeaderLen());
-            if ((long)(ftell(file) + len + sizeof(kMagicEnd)) > file_size) {
+            if ((long) (ftell(file) + len + sizeof(kMagicEnd)) > file_size) {
                 fix = true;
             } else {
                 if (0 != fseek(file, len, SEEK_CUR)) {
-                    snprintf(msg, sizeof(msg), "fseek(file, len, SEEK_CUR):%s, before_len:%ld, len:%u.", strerror(ferror(file)), before_len, len);
+                    snprintf(msg, sizeof(msg),
+                             "fseek(file, len, SEEK_CUR):%s, before_len:%ld, len:%u.",
+                             strerror(ferror(file)), before_len, len);
                     break;
                 }
                 char end;
                 if (1 != fread(&end, 1, 1, file)) {
-                    snprintf(msg, sizeof(msg), "fread(&end, 1, 1, file) err:%s, before_len:%ld, len:%u.", strerror(ferror(file)), before_len, len);
+                    snprintf(msg, sizeof(msg),
+                             "fread(&end, 1, 1, file) err:%s, before_len:%ld, len:%u.",
+                             strerror(ferror(file)), before_len, len);
                     break;
                 }
                 if (end != kMagicEnd) {
@@ -302,8 +340,10 @@ bool LogCrypt::GetPeriodLogs(const char* const _log_path, int _begin_hour, int _
         }
 
         if (fix) {
-            if (0 !=fseek(file, before_len+1, SEEK_SET)) {
-                snprintf(msg, sizeof(msg), "fseek(file, before_len+1, SEEK_SET) err:%s, before_len:%ld.", strerror(ferror(file)), before_len);
+            if (0 != fseek(file, before_len + 1, SEEK_SET)) {
+                snprintf(msg, sizeof(msg),
+                         "fseek(file, before_len+1, SEEK_SET) err:%s, before_len:%ld.",
+                         strerror(ferror(file)), before_len);
                 break;
             }
             continue;
@@ -313,11 +353,13 @@ bool LogCrypt::GetPeriodLogs(const char* const _log_path, int _begin_hour, int _
         int begin_hour = 0;
         int end_hour = 0;
         if (!GetLogHour(header_buff, GetHeaderLen(), begin_hour, end_hour)) {
-            snprintf(msg, sizeof(msg), "__GetLogHour(buff.Ptr(), buff.Length(), beginHour, endHour) err, before_len:%ld.", before_len);
+            snprintf(msg, sizeof(msg),
+                     "__GetLogHour(buff.Ptr(), buff.Length(), beginHour, endHour) err, before_len:%ld.",
+                     before_len);
             break;
         }
 
-        if (begin_hour > end_hour)  begin_hour = end_hour;
+        if (begin_hour > end_hour) begin_hour = end_hour;
 
 
         if (!find_begin_pos) {
@@ -359,7 +401,8 @@ bool LogCrypt::GetPeriodLogs(const char* const _log_path, int _begin_hour, int _
     if (!ret) {
         _err_msg += msg;
         memset(msg, 0, sizeof(msg));
-        snprintf(msg, sizeof(msg), "begintpos:%lu, endpos:%lu, filesize:%ld.", _begin_pos, _end_pos, file_size);
+        snprintf(msg, sizeof(msg), "begintpos:%lu, endpos:%lu, filesize:%ld.", _begin_pos, _end_pos,
+                 file_size);
         _err_msg += msg;
     }
 
@@ -367,19 +410,23 @@ bool LogCrypt::GetPeriodLogs(const char* const _log_path, int _begin_hour, int _
 }
 
 
-void LogCrypt::CryptSyncLog(const char* const _log_data, size_t _input_len, AutoBuffer& _out_buff) {
+void LogCrypt::CryptSyncLog(const char *const _log_data, size_t _input_len, AutoBuffer &_out_buff) {
+    if(!is_crypt_){ //基于原有的变更：不加密时特殊处理
+        memcpy((char *) _out_buff.Ptr(), _log_data, _input_len);
+        return;
+    }
     _out_buff.AllocWrite(GetHeaderLen() + GetTailerLen() + _input_len);
 
-    SetHeaderInfo((char*)_out_buff.Ptr(), false);
+    SetHeaderInfo((char *) _out_buff.Ptr(), false);
 
     uint32_t header_len = GetHeaderLen();
 
-    UpdateLogLen((char*)_out_buff.Ptr(), (uint32_t)_input_len);
+    UpdateLogLen((char *) _out_buff.Ptr(), (uint32_t) _input_len);
 
-    SetTailerInfo((char*)_out_buff.Ptr() + _input_len + header_len);
+    SetTailerInfo((char *) _out_buff.Ptr() + _input_len + header_len);
 
     //  if (!is_crypt_) {
-    memcpy((char*)_out_buff.Ptr() + header_len, _log_data, _input_len);
+    memcpy((char *) _out_buff.Ptr() + header_len, _log_data, _input_len);
     //    return;
     //}
 
@@ -399,7 +446,8 @@ void LogCrypt::CryptSyncLog(const char* const _log_data, size_t _input_len, Auto
 
 }
 
-void LogCrypt::CryptAsyncLog(const char* const _log_data, size_t _input_len, AutoBuffer& _out_buff, size_t& _remain_nocrypt_len) {
+void LogCrypt::CryptAsyncLog(const char *const _log_data, size_t _input_len, AutoBuffer &_out_buff,
+                             size_t &_remain_nocrypt_len) {
 
     _out_buff.AllocWrite(_input_len);
 
@@ -416,14 +464,16 @@ void LogCrypt::CryptAsyncLog(const char* const _log_data, size_t _input_len, Aut
     for (size_t i = 0; i < cnt; ++i) {
         memcpy(tmp, _log_data + i * TEA_BLOCK_LEN, TEA_BLOCK_LEN);
         __TeaEncrypt(tmp, tea_key_);
-        memcpy((char*)_out_buff.Ptr() + i * TEA_BLOCK_LEN, tmp, TEA_BLOCK_LEN);
+        memcpy((char *) _out_buff.Ptr() + i * TEA_BLOCK_LEN, tmp, TEA_BLOCK_LEN);
     }
 
-    memcpy((char*)_out_buff.Ptr() + _input_len - _remain_nocrypt_len, _log_data + _input_len - _remain_nocrypt_len, _remain_nocrypt_len);
+    memcpy((char *) _out_buff.Ptr() + _input_len - _remain_nocrypt_len,
+           _log_data + _input_len - _remain_nocrypt_len, _remain_nocrypt_len);
 #endif
 }
 
-bool LogCrypt::Fix(char* _data, size_t _data_len, bool& _is_async, uint32_t& _raw_log_len) {
+bool LogCrypt::Fix(char *_data, size_t _data_len, bool &_is_async, uint32_t &_raw_log_len) {
+    if(!is_crypt_)return false; //基于原有的变更：不加密时特殊处理
     if (_data_len < GetHeaderLen()) {
         return false;
     }

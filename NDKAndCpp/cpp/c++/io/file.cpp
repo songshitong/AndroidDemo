@@ -1,6 +1,9 @@
 //
 // Created by ISS Mac on 2019-06-28.
 //
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/types.h>
 
 // c语言的文件读写
 // 头文件 stdio.h
@@ -39,7 +42,7 @@
 
 
 
-//c++ 的文件读写
+//c++ 的文件读写 todo 使用例子
 //<iostream>和<fstream>
 // ofstream   输出文件流，创建文件并向文件写入信息
 // ifstream   输入文件流，从文件读取信息
@@ -49,3 +52,17 @@ int main(){
   return 0;
 }
 
+//https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+static void list_dir(const char *path) {
+  struct dirent *entry;
+  DIR *dir = opendir(path);
+  if (dir == nullptr) {
+    return;
+  }
+
+  while ((entry = readdir(dir)) != nullptr) {
+    printf("%s\n",entry->d_name);
+  }
+
+  closedir(dir);
+}

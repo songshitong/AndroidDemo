@@ -12,7 +12,7 @@ public:
     int fileMaxLength;
     char *fileNamePrefix;
     char *extraInfo;
-
+    int maxStorage;
     void log(char *logStr);
 
     //日志控件内部打印

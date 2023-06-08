@@ -60,6 +60,8 @@ data class Configuration(
   val cacheBuffer: Int = 150 * 1024,
   //文件大小，超过自动分割
   val fileMaxLength: Int = 10 * 1024 * 1024,
+  //最大占用存储单位:byte，超过后按照最老的文件淘汰
+  val maxStorage:Int=100*1024*1024,
   //日志时间格式
   val timePattern: String = "yyyy-MM-dd HH:mm:ss.SSS",
   //输出日志级别  默认全部输出，设置为Level.ERROR则等级以下的日志不输出

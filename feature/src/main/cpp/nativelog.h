@@ -43,6 +43,10 @@ public:
 
 private:
     int8_t *tmpFileStart{};
+};
 
-
+class FileInfo{
+public:
+    int size=0;
+    char* name;
 };

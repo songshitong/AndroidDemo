@@ -27,7 +27,7 @@ https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
 ```
 #include <sys/stat.h>
 struct stat st;
-stat(filename, &st);
+stat(filename, &st);  //filename为全路径，获取成功返回0，失败返回-1
 size = st.st_size;
 ```
 

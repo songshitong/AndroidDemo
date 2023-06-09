@@ -47,6 +47,7 @@ void selfLog(const char* fmt,...){
     if(nativeLog){
         nativeLog->writeBuffer(const_cast<char *>(result.c_str()));
     }
+    result.clear();
 }
 
 void fmtLog(JNIEnv *env, jstring time, jint level, jstring process_id, jstring process_name,

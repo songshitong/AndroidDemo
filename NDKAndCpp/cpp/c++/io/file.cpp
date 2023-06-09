@@ -61,7 +61,11 @@ static void list_dir(const char *path) {
   }
 
   while ((entry = readdir(dir)) != nullptr) {
-    printf("%s\n",entry->d_name);
+    if (strcmp(entry->d_name, ".") == 0 ||
+        strcmp(entry->d_name, "..") == 0 )
+      continue;//过滤默认的
+    printf("%s\n",entry->d_name); //名称
+    //d_reclen是文件名长
   }
 
   closedir(dir);

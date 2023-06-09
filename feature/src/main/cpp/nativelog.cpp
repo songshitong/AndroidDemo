@@ -19,6 +19,7 @@
 #include "log_buffer.h"
 #include "native-lib.h"
 #include <fstream>
+#include <vector>
 
 static LogBuffer *log_buff = nullptr; //存储buffer
 static std::string logFileDir;
@@ -30,6 +31,7 @@ static std::mutex mutex_buffer_async;
 static std::atomic_flag bufferChangeLock = ATOMIC_FLAG_INIT; //标记buffer正在变更
 pthread_t pthread;
 int fileMaxL = 10 * 1024 * 1024;
+int mMaxStorage = 100*1024*1024;
 char *fileNameP;
 static const char *FILE_EXTENSION = ".log";
 static const char *FILE_TMP_EXTENSION = ".tmp";
@@ -46,13 +48,36 @@ void checkMaxStorage() {
     if (dir == nullptr) {
         return;
     }
-    int allSize=0;
+    int allSize =0;
+    std::vector<FileInfo> fileList;
     while ((entry = readdir(dir)) != nullptr) {
-        printf("%s\n",entry->d_name);
-        allSize+=entry->d_reclen;
+        if (strcmp(entry->d_name, ".") == 0 ||
+            strcmp(entry->d_name, "..") == 0 )
+            continue;
+        std::string allPath;
+        allPath.append(logFileDir);
+        allPath.append("/");
+        allPath.append(entry->d_name);
+        struct stat statbuf;
+        int result = stat(allPath.c_str(), &statbuf);
+        int size = statbuf.st_size;
+        selfLog("file size %d",size);
+        if(0 == result){
+            allSize += size;
+            FileInfo item;
+            item.size = size;
+            item.name = entry->d_name;
+            fileList.push_back(item);
+        }else{
+            selfLog("file read size error: %s",allPath.c_str());
+            //排序
+            //遍历中删除
+        }
     }
-
     closedir(dir);
+    if(allSize>=mMaxStorage){
+        selfLog("approach mMaxStorage size:%d , mMaxStorage:%d",allSize,mMaxStorage);
+    }
 }
 
 void log2file(const void *_data, size_t _len) {
@@ -151,6 +176,7 @@ void NativeLog::init(char *path) {
     fileMaxL = fileMaxLength;
     fileNameP = fileNamePrefix;
     logExtraInfo = extraInfo;
+    mMaxStorage = maxStorage;
     logFilePath = createFilePath(logFileDir);
     FILE *create = fopen(logFilePath.c_str(), "w");
     fclose(create); //创建文件

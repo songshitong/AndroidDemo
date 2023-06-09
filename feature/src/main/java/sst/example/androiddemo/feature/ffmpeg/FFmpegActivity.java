@@ -73,7 +73,7 @@ public class FFmpegActivity extends AppCompatActivity {
     Configuration config =
         new Configuration(getApplicationContext().getFilesDir().getPath(), "xg-main", 4 * 1024, "\n",
             "|", 150 * 1024,
-            10 * 1024 * 1024, "yyyy-MM-dd HH:mm:ss.SSS", Level.DEBUG,extra.toString());
+            /*10 * 1024 **/ 1024, /*100**/1024*1024,"yyyy-MM-dd HH:mm:ss.SSS", Level.DEBUG,extra.toString());
     log = new AFOLog(getApplicationContext(), config);
     log("this is first  log");
     log("this is second log");

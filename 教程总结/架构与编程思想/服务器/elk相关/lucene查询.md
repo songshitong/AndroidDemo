@@ -4,8 +4,10 @@ https://segmentfault.com/a/1190000002972420
 kibana在ELK阵营中用来查询展示数据
 elasticsearch构建在Lucene之上，过滤器语法和Lucene相同
 
-team: datatech.front  AND  project: mainengine-xiaoguan-android  AND user_id:18284
-team: datatech.front  AND  project: mainengine-xiaoguan-android  AND custom_msg:文件删除
+team: xx.front  AND  project: xx-android  AND user_id:18284
+team: xx.front  AND  project: xx-android  AND custom_msg:文件删除
+
+增加基本 AND level:"ERROR"
 
 常用语法
 字符串匹配

@@ -236,10 +236,11 @@ Dispatcher.kt
         val asyncCall = i.next()
         //如果正在执行的任务>=64  那么就算了,先缓一缓
         if (runningAsyncCalls.size >= this.maxRequests) break // Max capacity.
+        //域名的call大于5个退出
         if (asyncCall.callsPerHost.get() >= this.maxRequestsPerHost) continue // Host max capacity.
 
         i.remove()
-        asyncCall.callsPerHost.incrementAndGet()
+        asyncCall.callsPerHost.incrementAndGet() //增加计数
         //加入到运行队列中
         executableCalls.add(asyncCall)       
         runningAsyncCalls.add(asyncCall)

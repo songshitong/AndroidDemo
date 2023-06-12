@@ -31,7 +31,7 @@ static std::mutex mutex_buffer_async;
 static std::atomic_flag bufferChangeLock = ATOMIC_FLAG_INIT; //标记buffer正在变更
 pthread_t pthread;
 int fileMaxL = 10 * 1024 * 1024;
-int mMaxStorage = 100*1024*1024;
+int mMaxStorage = 100 * 1024 * 1024;
 char *fileNameP;
 static const char *FILE_EXTENSION = ".log";
 static const char *FILE_TMP_EXTENSION = ".tmp";
@@ -40,20 +40,20 @@ char *logExtraInfo;
 std::string createFilePath(std::string dir);
 
 
-
-
 void checkMaxStorage() {
     struct dirent *entry;
     DIR *dir = opendir(logFileDir.c_str());
     if (dir == nullptr) {
         return;
     }
-    int allSize =0;
+    int allSize = 0;
     std::vector<FileInfo> fileList;
     while ((entry = readdir(dir)) != nullptr) {
         if (strcmp(entry->d_name, ".") == 0 ||
-            strcmp(entry->d_name, "..") == 0 )
+            strcmp(entry->d_name, "..") == 0 ||
+            strlen(entry->d_name) < 23) //todo 23常量
             continue;
+
         std::string allPath;
         allPath.append(logFileDir);
         allPath.append("/");
@@ -61,22 +61,30 @@ void checkMaxStorage() {
         struct stat statbuf;
         int result = stat(allPath.c_str(), &statbuf);
         int size = statbuf.st_size;
-        selfLog("file size %d",size);
-        if(0 == result){
+        selfLog("file size %d", size);
+        if (0 == result) {
             allSize += size;
-            FileInfo item;
+            std::string name;
+            name.append(entry->d_name);
+            FileInfo item(name);
             item.size = size;
-            item.name = entry->d_name;
             fileList.push_back(item);
-        }else{
-            selfLog("file read size error: %s",allPath.c_str());
-            //排序
-            //遍历中删除
+        } else {
+            selfLog("file read size error: %s", allPath.c_str());
         }
     }
     closedir(dir);
-    if(allSize>=mMaxStorage){
-        selfLog("approach mMaxStorage size:%d , mMaxStorage:%d",allSize,mMaxStorage);
+    if (allSize >= mMaxStorage) {
+        selfLog("approach mMaxStorage size:%d , mMaxStorage:%d", allSize, mMaxStorage);
+        for (const auto &item: fileList) {
+            selfLog("before sort:%s", item.name.c_str());
+        }
+        //排序
+        std::sort(fileList.begin(), fileList.end(), FileInfo::compare);
+        for (const auto &item: fileList) {
+            selfLog("after sort:%s", item.name.c_str());
+        }
+        //遍历中删除
     }
 }
 
@@ -236,9 +244,9 @@ void NativeLog::log(char *logStr) {
     checkWriteFile(this);
 }
 
-void NativeLog::writeBuffer(char *logStr){
+void NativeLog::writeBuffer(char *logStr) {
     if (log_close)return;
-    if(log_buff){
+    if (log_buff) {
         log_buff->Write(logStr, strlen(logStr));
     }
 }
@@ -253,8 +261,8 @@ void NativeLog::closeLog() {
 
     if (tmpFileStart) {
         munmap(tmpFileStart, cacheBuffer);
-    }else {
-        delete[] (char*)((log_buff->GetData()).Ptr());
+    } else {
+        delete[] (char *) ((log_buff->GetData()).Ptr());
     }
     //确保只有一个线程在操作log_buff
     delete log_buff;
@@ -276,7 +284,12 @@ void NativeLog::flushCache(char *str) {
 }
 
 
-
-
-
-
+bool FileInfo::compare(FileInfo a, FileInfo b) {
+    int  result = /*a.time.compare(b.time);*/  strcmp(a.time.c_str(),b.time.c_str());
+    selfLog("compare atime:%s btime:%s result:%d",a.time.c_str(),b.time.c_str(),result);
+    if(result>0){
+        return true;
+    }else{
+        return false;
+    }
+}

@@ -48,5 +48,14 @@ private:
 class FileInfo{
 public:
     int size=0;
-    char* name;
+    std::string name;
+    FileInfo(std::string aname){
+        this->name = aname;
+        if(!name.empty()&&name.length()>23){
+           time = name.substr(name.length()-23);
+        }
+    }
+    static bool compare(FileInfo a,FileInfo b);
+private:
+    std::string time;
 };

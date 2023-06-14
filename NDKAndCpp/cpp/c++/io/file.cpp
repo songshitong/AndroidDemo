@@ -39,7 +39,17 @@
 //SEEK_SET 设置当前的文件指针   SEEK_END移动到末尾fseek(fd,0,SEEK_END)
 //fseek (ptr, -sizeof student1, SEEK_CUR);  从当前位置移动多少距离
 
-
+//文件删除remove
+// int remove(const char *filename) 删除给定的文件名 filename
+//如果成功，则返回零。如果错误，则返回 -1，并设置 errno
+//strerror(errno)
+// cout << strerror(errno);
+//1）EROFS  欲写入的文件为只读文件。   Read-only file system
+//2）EFAULT  参数filename 指针超出可存取内存空间。
+//3）ENAMETOOLONG  参数filename 太长。
+//4）ENOMEM  核心内存不足。
+//5）ELOOP  参数filename 有过多符号连接问题。
+//6）EIO I/O存取错误。
 
 
 //c++ 的文件读写 todo 使用例子
@@ -66,6 +76,7 @@ static void list_dir(const char *path) {
       continue;//过滤默认的
     printf("%s\n",entry->d_name); //名称
     //d_reclen是文件名长
+    //后续可以根据名称+dir获取文件信息  例如stat(path,stat)
   }
 
   closedir(dir);

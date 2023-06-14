@@ -5,6 +5,19 @@ https://baike.baidu.com/item/OGG/1790364
 Ogg全称是OGGVobis(oggVorbis)是一种音频压缩格式，类似于MP3等的音乐格式。Ogg是完全免费、开放和没有专利限制的。OggVorbis文件的扩展名是".ogg"。
 Ogg文件格式可以不断地进行大小和音质的改良，而不影响旧有的编码器或播放器。
 
+Ogg可以以各种格式[3][4]（如Dirac，MNG，CELT，MPEG-4，MP3等）嵌入音频和视频，但是Ogg旨在和通常用于以下Xiph.org免费编解码器：
+
+音频 https://zh.wikipedia.org/zh-cn/Ogg
+有损
+Speex：以低比特率处理语音数据（〜2.1-32 kbit / s /通道）
+Vorbis：处理中高级可变比特率（每通道≈16-500kbit / s）的一般音频数据
+Opus：以低和高可变比特率处理语音，音乐和通用音频（每通道≈6-510kbit / s）
+无损
+FLAC：处理文件和高保真音频数据。
+未压缩
+OggPCM：处理未压缩的PCM音频。它与WAV大致相当[5]。
+...
+
 优点与缺点
 优点1：Ogg Vorbis的音质和MP3不相上下，但无法和FLAC比。
 优点2：Ogg Vorbis支持类似于MP3的ID3信息

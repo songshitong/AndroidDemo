@@ -37,7 +37,8 @@ void testOperator(){
 
 int main(){
 
-  Student stu(10,20);
+  Student stu(10,20); //function-style
+  Student a{10,10};//声明对象a uniform initialization
   test(&stu);
 
  //没有std的命名空间

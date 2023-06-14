@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <stdarg.h>
 //字符串处理  https://wangdoc.com/clang/string.html
 int main(){
 //   C 语言没有单独的字符串类型，字符串被当作字符数组，即char类型的数组。比如，字符串“Hello”是当作数组{'H', 'e', 'l', 'l', 'o'}处理的。
@@ -54,7 +54,7 @@ s6 = s5;
   char *a="a";
   char *b="bbb";
 
-   //比较字符串
+   //比较字符串 按照字典序 0为相等 <0 a小于b  大于0,a大于b
  printf("字符串比较 %d\n",strcmp(a, b)); //-1
  //strncmp 只比较到指定的位置
  printf("strncmp %d \n",strncmp(a, b, 5));
@@ -152,7 +152,27 @@ s6 = s5;
     // 上面的字符串数组，其实是一个一维数组，成员就是7个字符指针，每个指针指向一个字符串（字符数组）
     for (int i = 0; i < 7; i++) {
          printf("%s\n", weekdays3[i]);
-    }    
+    }
 
+    //strerror
+//    char *strerror(int errnum) 从内部数组中搜索错误号 errnum，并返回一个指向错误消息字符串的指针。strerror 生成的错误字符串取决于开发平台和编译器
+    fopen("111222.txt","r");//打开一个不存在的文件，发生错误会设置errno
+    printf("Error: %s\n", strerror(errno)); //打印当前的错误
+
+    //格式化字符串
+    //snprintf与vsnprintf   snprintf函数不是C中的标准函数，不同的编译器可能对该函数的实现不同
+    //int vsnprintf(char* const  dest, size_t size, const char* format, va_list ap)  size指定格式化字符串的大小,包括\0
+    char* buf;
+    char param="p";
+    my_snprintf(buf,"param is %s",param);
     return 0;
+}
+
+//自定义格式化字符
+int my_snprintf(char* buffer, const char* format, ...) {
+    va_list ap; //可变参数提取到ap  其他可变参数参考https://blog.csdn.net/zhizhengguan/article/details/110220084
+    va_start(ap, format); //开始提取
+    int ret = vsnprintf(buffer, strlen(format), format, ap);
+    va_end(ap); //结束提取
+    return ret;
 }

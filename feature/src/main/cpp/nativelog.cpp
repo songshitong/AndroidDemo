@@ -51,15 +51,15 @@ void checkMaxStorage() {
     while ((entry = readdir(dir)) != nullptr) {
         if (strcmp(entry->d_name, ".") == 0 ||
             strcmp(entry->d_name, "..") == 0 ||
-            strlen(entry->d_name) < 23) //todo 23常量
+            strlen(entry->d_name) < FILE_NAME_PREFIX_LENGTH)
             continue;
 
-        std::string allPath;
-        allPath.append(logFileDir);
-        allPath.append("/");
-        allPath.append(entry->d_name);
+        std::string fullPath;
+        fullPath.append(logFileDir);
+        fullPath.append("/");
+        fullPath.append(entry->d_name);
         struct stat statbuf;
-        int result = stat(allPath.c_str(), &statbuf);
+        int result = stat(fullPath.c_str(), &statbuf);
         int size = statbuf.st_size;
         selfLog("file size %d", size);
         if (0 == result) {
@@ -68,23 +68,30 @@ void checkMaxStorage() {
             name.append(entry->d_name);
             FileInfo item(name);
             item.size = size;
+            item.path = fullPath;
             fileList.push_back(item);
         } else {
-            selfLog("file read size error: %s", allPath.c_str());
+            selfLog("file read size error: %s", fullPath.c_str());
         }
     }
     closedir(dir);
-    if (allSize >= mMaxStorage) {
+    if (allSize > mMaxStorage) {
         selfLog("approach mMaxStorage size:%d , mMaxStorage:%d", allSize, mMaxStorage);
-        for (const auto &item: fileList) {
-            selfLog("before sort:%s", item.name.c_str());
-        }
         //排序
         std::sort(fileList.begin(), fileList.end(), FileInfo::compare);
-        for (const auto &item: fileList) {
-            selfLog("after sort:%s", item.name.c_str());
+        for (const FileInfo& item: fileList) {
+            //遍历中删除
+            allSize-= item.size;
+            selfLog("淘汰文件,剩余大小:%d 文件大小： 文件名path:%s",allSize,item.size,item.path.c_str());
+            int removeResult = remove(item.path.c_str());
+            if(0 != removeResult){
+                selfLog("文件淘汰失败:%s 原因:%s",item.path.c_str(),strerror(errno));
+            }
+            if(allSize <= mMaxStorage){
+                break;
+            }
         }
-        //遍历中删除
+
     }
 }
 
@@ -262,7 +269,9 @@ void NativeLog::closeLog() {
     if (tmpFileStart) {
         munmap(tmpFileStart, cacheBuffer);
     } else {
-        delete[] (char *) ((log_buff->GetData()).Ptr());
+        if(nullptr != log_buff){
+            delete[] (char *) ((log_buff->GetData()).Ptr());
+        }
     }
     //确保只有一个线程在操作log_buff
     delete log_buff;
@@ -285,9 +294,8 @@ void NativeLog::flushCache(char *str) {
 
 
 bool FileInfo::compare(FileInfo a, FileInfo b) {
-    int  result = /*a.time.compare(b.time);*/  strcmp(a.time.c_str(),b.time.c_str());
-    selfLog("compare atime:%s btime:%s result:%d",a.time.c_str(),b.time.c_str(),result);
-    if(result>0){
+    int  result = strcmp(a.time.c_str(),b.time.c_str());
+    if(result<0){
         return true;
     }else{
         return false;

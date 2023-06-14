@@ -8,4 +8,5 @@
 #endif //ANDROIDDEMO_NATIVE_LIB_H
 static const char *TAG = "AFOLOG";
 
+//日志控件内部打印
 void selfLog(const char* fmt,...);

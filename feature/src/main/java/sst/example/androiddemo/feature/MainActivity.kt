@@ -47,6 +47,10 @@ import sst.example.androiddemo.feature.animation.dynamicanimation.DynamicAnimait
 import sst.example.androiddemo.feature.animation.evaluator.TypeEvaluatorActivity
 import sst.example.androiddemo.feature.ffmpeg.FFmpegActivity
 import sst.example.androiddemo.feature.graphics.*
+import sst.example.androiddemo.feature.monitor.BatteryMonitor
+import sst.example.androiddemo.feature.monitor.LockScreenMonitor
+import sst.example.androiddemo.feature.monitor.MemoryMonitor
+import sst.example.androiddemo.feature.monitor.NetworkMonitor
 import sst.example.androiddemo.feature.resources.XmlParserActivity
 import sst.example.androiddemo.feature.service.IntentServiceActivity
 import sst.example.androiddemo.feature.util.MyUtils
@@ -80,6 +84,13 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
       ), 0
     )
+    Log.d(TAG,"checkNetworkUsePing:${NetworkMonitor.checkNetworkUsePing()}")
+    Log.d(TAG,"checkCapability:${NetworkMonitor.checkCapability(this)}")
+    LockScreenMonitor.register(this)
+    val memoryInfo = MemoryMonitor.getMemoryInfo(this)
+    Log.d(TAG,"总内存：${memoryInfo.totalMem/1000000}M 可用内存：${memoryInfo.availMem/1000000}M 低内存临界值：${memoryInfo.threshold/1000000}M  是否低内存：${memoryInfo.lowMemory}")
+    BatteryMonitor.register(this)
+    Log.d(TAG,"当前电量${BatteryMonitor.batteryLevel}   isCharging:${BatteryMonitor.isCharging}")
     Log.d(TAG, "PhysicsScreenSize: ${getPhysicsScreenSize(applicationContext)}")
     getAndroidInfo()
     getMethodTrace()

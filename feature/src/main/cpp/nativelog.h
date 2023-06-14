@@ -3,6 +3,7 @@
 //
 
 
+const int FILE_NAME_PREFIX_LENGTH = 23; //yyyyMM-dd-HH-mm-ss.log的长度
 class NativeLog {
 public:
     int cacheBuffer;
@@ -15,7 +16,6 @@ public:
     int maxStorage;
     void log(char *logStr);
 
-    //日志控件内部打印
     void closeLog();
 
     static void flushCache();
@@ -48,11 +48,13 @@ private:
 class FileInfo{
 public:
     int size=0;
-    std::string name;
-    FileInfo(std::string aname){
-        this->name = aname;
-        if(!name.empty()&&name.length()>23){
-           time = name.substr(name.length()-23);
+    std::string name; //名称
+    std::string path; //路径
+
+    FileInfo(std::string mName){
+        this->name = mName;
+        if(!name.empty()&&name.length()>FILE_NAME_PREFIX_LENGTH){
+           time = name.substr(name.length()-FILE_NAME_PREFIX_LENGTH);
         }
     }
     static bool compare(FileInfo a,FileInfo b);

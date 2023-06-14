@@ -14,7 +14,7 @@ extern "C"{   //开启混合编译，告诉编译器，下面的是c文件
 #include <iostream>
 
 
-//%d              十进制有符号整数
+//%d              十进制有符号整数 bool值也可以，c中没有bool，使用0,1标识
 //%u              十进制无符号整数
 //%f              浮点数
 //%s              字符串
@@ -73,6 +73,15 @@ int main(){
     // 进行重排序。这使得 volatile 对象适用于与信号处理函数之间的交流，但不适于与另一执行线程交流
     volatile int n4 = 0;
 
+    bool a = false;
+    cout << a; //0
+    bool b = 10;
+    cout << b; //1
+    bool c = -10;
+    cout << c; //1
+    bool d = 1;
+    cout << d; //1
+
    //Static Variables  静态变量整个程序声明周期都可以用  生命周期结束自动释放，无法delete删除
    for (int i = 0; i < 5; i++)
      staticVariable(); //输出结果  0 1 2 3 4
@@ -88,6 +97,7 @@ int main(){
 
    static GfG obj;
    cout << "End of main\n"; //程序结束后，打印Inside Destructor
+
 }
 
 //https://www.geeksforgeeks.org/static-keyword-cpp/

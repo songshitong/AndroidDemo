@@ -13,6 +13,7 @@ import java.io.InputStreamReader
 //https://www.jianshu.com/p/ed7c58ee2c11
 object NetworkMonitor {
 
+  //判断是否可用
   @RequiresApi(VERSION_CODES.M) fun checkCapability(context: Context): Boolean {
     val connectivityManager: ConnectivityManager = context.getSystemService(
       ConnectivityManager::class.java

@@ -189,6 +189,7 @@ native不像Java,我们需要手动释放申请的内存空间.GetStringUTFChars
 1 GetStringChars和ReleaseStringChars: 这对函数和Get/ReleaseStringUTFChars函数功能类似,用于获取和释放的字符串是以Unicode格式编码的.
 2 GetStringLength: 获取Unicode字符串(jstring)的长度. UTF-8编码的字符串是以\0结尾,而Unicode的不是,所以这里需要单独区分开.
 3 GetStringUTFLength: 获取UTF-8编码字符串的长度,就是获取C/C++默认编码字符串的长度.还可以使用标准C函数strlen来获取其长度.
+  GetStringUTFLength和GetStringLength的长度可能不一致，注意区分
 4 strcat: 拼接字符串,标准C函数. eg:strcat(buff, "xfhy"); 将xfhy添加到buff的末尾.
 5 GetStringCritical和ReleaseStringCritical: 为了增加直接传回指向Java字符串的指针的可能性(而不是拷贝).在这2个函数之间的区域,
   是绝对不能调用其他JNI函数或者让线程阻塞的native函数.否则JVM可能死锁. 如果有一个字符串的内容特别大,比如1M,且

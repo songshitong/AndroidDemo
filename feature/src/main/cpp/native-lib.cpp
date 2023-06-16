@@ -70,7 +70,7 @@ int getIntProperty(JNIEnv *env, jclass clazz, jobject obj, const char *propertyN
 
 std::string convertJString(JNIEnv *env, jstring str) {
     char *charStr = const_cast<char *>(env->GetStringUTFChars(str, nullptr));
-    std::string result(charStr, env->GetStringLength(str));
+    std::string result(charStr);
     env->ReleaseStringUTFChars(str, charStr);
     return result;
 }

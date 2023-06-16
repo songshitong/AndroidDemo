@@ -8,8 +8,9 @@
 class JniUtil {
     //将jstring转为std::string 释放jni的引用
     std::string convertJString(JNIEnv *env,jstring str){
-        char *charStr = const_cast<char *>(env->GetStringUTFChars(str, nullptr));
-        std::string result(charStr, env->GetStringLength(str));
+        char *charStr = const_cast<char *>(env->GetStringUTFChars(str, nullptr));  //获取utf字符
+        //env->GetStringUTFLength 获取utf字符的长度
+        std::string result(charStr);
         env->ReleaseStringUTFChars(str, charStr);
         return result;
     }

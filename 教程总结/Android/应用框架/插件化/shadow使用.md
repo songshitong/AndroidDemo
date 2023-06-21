@@ -1,4 +1,14 @@
 
+存在的坑
+1 so文件可能无法使用
+https://github.com/Tencent/Shadow/issues/628
+shadow替换activity为shadowActivity，导致jni的c/c++接口签名对应不上了
+2 不支持系统app  https://github.com/Tencent/Shadow/issues/1195
+  系统APP使用可能出问题
+3 插件进程可能在后台被杀掉
+可能需要增加前台服务保活  https://github.com/Tencent/Shadow/issues/1038
+
+
 参考
 sample\source\sample-plugin\sample-app
 ```

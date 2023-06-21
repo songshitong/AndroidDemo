@@ -597,7 +597,7 @@ class MainActivity : AppCompatActivity() {
     Log.i(TAG, "getTaskId: " + taskId);
     //当前调用该应用程序的用户号
     Log.i(TAG, "getApplicationInfo().uid: " + applicationInfo.uid);
-    //当前调用该应用程序的进程名
+    //当前调用该应用程序的进程名 子进程可能获取不到，获取的是主进程
     Log.i(TAG, "getApplicationInfo().processName): " + applicationInfo.processName);
 
     Log.i(TAG, "主进程名 " + packageManager.getApplicationInfo(packageName, 0).processName)
@@ -662,15 +662,16 @@ class MainActivity : AppCompatActivity() {
 
   private fun getCurrentProcessName(): String {
     val pid = Process.myPid()
-    var processName = "";
+    var processName = ""
     val manager: ActivityManager =
       applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     manager.runningAppProcesses.forEach {
       if (it.pid == pid) {
-        processName = it.processName;
+        processName = it.processName
+        return processName
       }
     }
-    return processName;
+    return processName
   }
 
 //    /**

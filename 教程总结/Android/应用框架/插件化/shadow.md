@@ -106,10 +106,13 @@ shadow {packagePlugin {}}DSL动态生成config.json
 
 
 Activity 实现
+
+
 关于插件 Activity 的实现，我们主要看：
 0 替换插件 Activity 的父类
 1宿主中如何启动插件 Activity
 2插件中如何启动插件 Activity
+过程相似启动代理activity：PluginDefaultProxyActivity，然后创建插件的activity
 
 替换插件 Activity 的父类
 Shadow 中有一个比较巧妙的地方，就是插件开发的时候，插件的 Activity 还是正常继承 Activity，在打包的时候，会通过 Transform 替换其父类为 ShadowActivity。
@@ -333,7 +336,7 @@ com/tencent/shadow/sample/manager/SamplePluginManager.java
                     if (extras != null) {
                         pluginIntent.replaceExtras(extras);
                     }
-                    //binder通信获取宿主intent PluginDefaultProxyActivity
+                    //binder通信获取 代理activity的intent PluginDefaultProxyActivity
                     Intent intent = mPluginLoader.convertActivityIntent(pluginIntent);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     //通过binder启动Activity    
@@ -490,7 +493,7 @@ com/tencent/shadow/core/loader/delegates/ShadowActivityDelegate.kt
         mHostActivityDelegator.intent.setExtrasClassLoader(mPluginClassLoader)
 
         try {
-           // 创建插件 activity    (ShadowActivity) cl.loadClass(className).newInstance();
+           // 创建插件activity    (ShadowActivity) cl.loadClass(className).newInstance();
             val pluginActivity = mAppComponentFactory.instantiateActivity(
                 mPluginClassLoader,
                 pluginActivityClassName,
@@ -498,6 +501,7 @@ com/tencent/shadow/core/loader/delegates/ShadowActivityDelegate.kt
             )
             //设置pluginActity的Resources，ClassLoader，Application，theme等
             initPluginActivity(pluginActivity, pluginActivityInfo)
+            //插件activity给到父类
             super.pluginActivity = pluginActivity
             ...
             //使PluginActivity替代ContainerActivity接收Window的Callback
@@ -528,6 +532,17 @@ com/tencent/shadow/core/loader/delegates/ShadowActivityDelegate.kt
         }
     }
 ```
+代理类的父类处理
+com/tencent/shadow/core/loader/delegates/GeneratedShadowActivityDelegate.java
+```
+ @Override
+  public void finish() {
+    pluginActivity.finish(); //调用插件activity的方法
+  }
+
+```
+
+
 
 插件中如何启动插件 Activity
 插件 Activity 会在打包过程中替换其父类为 ShadowActivity，很明显了，在插件中启动 Activity 即调用 startActivity，
@@ -566,7 +581,8 @@ com/tencent/shadow/core/runtime/ShadowContext.java
         super.startActivity(intent, options);
     }
 ```
-通过调用 toActivityContainerIntent 转化 intent 为代理 Activity 的 intent，然后调用系统 startActivity 启动代理 Activity
+通过调用 toActivityContainerIntent 转化 intent 为代理 Activity 的 intent，然后调用系统 startActivity 启动代理 Activity(PluginDefaultProxyActivity)
+然后再拉起插件的类
 
 
 

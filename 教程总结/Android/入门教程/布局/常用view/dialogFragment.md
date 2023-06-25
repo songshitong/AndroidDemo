@@ -1,4 +1,31 @@
 
+监听dialogFragment的消失
+```
+1 自定义基类，增加接口，onDissMiss回调给外部
+2 activity重写OnDismissListener接口
+public final class YourActivity extends Activity implements DialogInterface.OnDismissListener {
+
+    @Override
+    public void onDismiss(final DialogInterface dialog) {
+        //Fragment dialog had been dismissed
+    }
+
+}
+DialogFragment回调给外部activity
+public final class DialogFragmentImage extends DialogFragment {
+    @Override
+    public void onDismiss(final DialogInterface dialog) {
+        super.onDismiss(dialog);
+        final Activity activity = getActivity();
+        if (activity instanceof DialogInterface.OnDismissListener) {
+            ((DialogInterface.OnDismissListener) activity).onDismiss(dialog);
+        }
+    }
+
+}
+```
+
+
 注意：dialog中不要进行计时，dialog会隐藏，又显示，计时的进度不好保存，
 最好跟随页面或者其他
 dialogFragment销毁后 dialog为空，可以用来判断dialogFragment是否为空

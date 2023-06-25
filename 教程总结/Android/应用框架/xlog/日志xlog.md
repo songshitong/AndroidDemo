@@ -1,4 +1,11 @@
 
+xlog没有自动打印行号，方法名等
+https://github.com/Tencent/mars/issues/325
+java层面不是不能提供行号等信息，但是考虑到需要每次都要取stack才能取到这些信息，不像C的__FILE__ __LINE__ 有内置宏。
+而日志比较频繁使用的功能，所以担心频繁去读取stack会影响性能，所以现在微信也是没有文件名和行号的，是通过tag来区分是哪个文件的日志的
+
+
+
 https://github.com/cxMax/Xlog
 原生android.util.Log的api打印日志，会频繁触发GC，造成内存抖动
 Java_IO的方式，CPU占用高、内存占用

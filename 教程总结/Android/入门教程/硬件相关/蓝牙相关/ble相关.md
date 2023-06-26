@@ -144,12 +144,16 @@ public void onServicesDiscovered(BluetoothGatt gatt, int status) {
 这些问题大多是设备底层gatt 服务异常，重新连接，进行discoverServices();
 ```
 // 出现129，133时。关闭蓝牙
-mBluetoothAdapter.disable();
+mBluetoothAdapter.disable(); //android13已废弃，使用intent   
 // 关闭蓝牙后，延时1s，重新开启蓝牙
 mBluetoothAdapter.enable();
 //重新连接
 ```
-
+https://developer.android.com/guide/topics/connectivity/bluetooth/setup   intent使用方法
+```
+val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+  startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+```
 
 BluetoothGatt关键方法
 ```

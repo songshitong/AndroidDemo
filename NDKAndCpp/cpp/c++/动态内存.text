@@ -8,7 +8,7 @@ C++ 程序中的内存分为两个部分：
 在 C++ 中，您可以使用特殊的运算符为给定类型的变量在运行时分配堆内的内存，这会返回所分配的空间地址。这种运算符即 new 运算符。
 如果您不再需要动态分配的内存空间，可以使用 delete 运算符，删除之前由 new 运算符分配的内存
 new data-type;
-delete data-type;
+delete data-type;   delete,删除由new创建的对象
 
 Student a; //由操作系统进行内存的分配和管理
 Student a = new Student(); //堆中分配，由管理者进行内存的分配和管理，用完必须delete()，否则可能造成内存泄漏

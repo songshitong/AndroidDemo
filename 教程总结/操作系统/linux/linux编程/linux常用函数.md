@@ -21,6 +21,10 @@ ssize_t nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &inc, sizeof(uint64_t)))
 文件打开open函数
 #include <fcntl.h>
 int fd = open("/dev/mydev",O_RDWR);
+第二个模式 O_RDWR读写  O_CREAT不存在则创建
+第三个权限
+S_IRWXU 00700 权限，代表该文件所有者具有可读、可写及可执行的权限。
+
 
 获取文件大小
 https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c

@@ -374,7 +374,7 @@ MMKV::MMKV(const string &mmapID, MMKVMode mode, string *cryptKey, MMKVPath_t *ro
     : m_mmapID(mmapID)
      // 拼装文件的路径     MMKVPath_t m_path
     , m_path(mappedKVPathWithID(m_mmapID, mode, rootPath))
-    // 拼装 .crc 文件路径
+    // 拼装 .crc 文件路径  后缀增加.crc
     , m_crcPath(crcPathWithID(m_mmapID, mode, rootPath))
     ...
     // 1. 将文件摘要信息映射到内存， 4 kb 大小
@@ -383,8 +383,8 @@ MMKV::MMKV(const string &mmapID, MMKVMode mode, string *cryptKey, MMKVPath_t *ro
     , m_crypter(nullptr)
     , m_lock(new ThreadLock())
     , m_fileLock(new FileLock(m_metaFile->getFd()))
-    , m_sharedProcessLock(new InterProcessLock(m_fileLock, SharedLockType))
-    , m_exclusiveProcessLock(new InterProcessLock(m_fileLock, ExclusiveLockType))
+    , m_sharedProcessLock(new InterProcessLock(m_fileLock, SharedLockType)) //读锁
+    , m_exclusiveProcessLock(new InterProcessLock(m_fileLock, ExclusiveLockType))//写锁
     , m_isInterProcess((mode & MMKV_MULTI_PROCESS) != 0) {
     m_actualSize = 0;
     m_output = nullptr;
@@ -404,7 +404,7 @@ MMKV::MMKV(const string &mmapID, MMKVMode mode, string *cryptKey, MMKVPath_t *ro
    ....
     // sensitive zone
     {
-        SCOPED_LOCK(m_sharedProcessLock);
+        SCOPED_LOCK(m_sharedProcessLock); //加上读锁
         // 2. 根据 m_mmapID 来加载文件中的数据
         loadFromFile();
     }
@@ -786,7 +786,7 @@ KVHolderRet_t MMKV::appendDataWithKey(const MMBuffer &data, MMKVKey_t key, bool 
 }
 
 KVHolderRet_t MMKV::appendDataWithKey(const MMBuffer &data, const KeyValueHolder &kvHolder, bool isDataHolder) {
-    SCOPED_LOCK(m_exclusiveProcessLock);
+    SCOPED_LOCK(m_exclusiveProcessLock); //加上写锁
     //计算 key + value 的 ProtocolBuffer 编码后的长度
     uint32_t keyLength = kvHolder.keySize;
     // size needed to encode the key
@@ -825,7 +825,7 @@ MMKV::doAppendDataWithKey(const MMBuffer &data, const MMBuffer &keyData, bool is
     // size needed to encode the value
     size += valueLength + pbRawVarint32Size(valueLength);
 
-    SCOPED_LOCK(m_exclusiveProcessLock);
+    SCOPED_LOCK(m_exclusiveProcessLock); //加上写锁
     //验证是否有足够的空间, 不足则进行数据重整与扩容操作
     bool hasEnoughSize = ensureMemorySize(size);
     if (!hasEnoughSize || !isFileValid()) {

@@ -22,3 +22,14 @@ char* matches[1];
 completion(matches);
 ```
 2 将matches声明为const的，但是后续就无法释放了
+
+
+
+https://blog.csdn.net/newchenxf/article/details/122172137
+signal 5 (SIGTRAP), code 1 (TRAP_BRKPT)
+问题：函数没有返回值   c++中，函数没有返回值可以编译通过，运行时会崩溃
+```
+int getValue(){
+  int a = 1+2
+}
+```

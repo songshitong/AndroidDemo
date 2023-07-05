@@ -1,4 +1,8 @@
 
+exoplayer后续整合到media3
+https://developer.android.com/guide/topics/media/media3
+https://developer.android.com/guide/topics/media/exoplayer
+
 https://exoplayer.dev/hello-world.html 参考官网最好
 https://www.jianshu.com/p/6e466e112877
 ExoPlayer实现的通用组件是：

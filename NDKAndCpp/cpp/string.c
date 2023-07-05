@@ -158,6 +158,12 @@ s6 = s5;
 //    char *strerror(int errnum) 从内部数组中搜索错误号 errnum，并返回一个指向错误消息字符串的指针。strerror 生成的错误字符串取决于开发平台和编译器
     fopen("111222.txt","r");//打开一个不存在的文件，发生错误会设置errno
     printf("Error: %s\n", strerror(errno)); //打印当前的错误
+    //EINTR指被中断唤醒，需要重新读/写
+    //EWOULDBLOCK，EAGAIN代表需要重试一次 //https://blog.csdn.net/dongyu_1989/article/details/72840739
+    //这个错误经常出现在当应用程序进行一些非阻塞（non-blocking）操作（对文件或socket）的时候。例如，以O_NONBLOCK的标记打开文件/socket/FIFO，
+    // 如果你连续做read操作而没有数据可读。此时程序不会阻塞起来等待数据准备就绪返回，read函数会返回一个错误EAGAIN，
+    // 提示你的应用程序现在没有数据可读请稍后再试。
+    //又例如，当一个系统调用(比如fork)因为没有足够的资源（比如虚拟内存）而执行失败，返回EAGAIN提示其在调用一次（也许下次就能成功）。
 
     //格式化字符串
     //snprintf与vsnprintf   snprintf函数不是C中的标准函数，不同的编译器可能对该函数的实现不同

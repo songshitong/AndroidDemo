@@ -41,7 +41,7 @@ Full thread dump Java HotSpot(TM) Server VM (16.3-b01 mixed mode):
 # 线程名称：Timer-0；线程类型：daemon；优先级: 10，默认是5；
 # JVM线程id：tid=0xac190c00，JVM内部线程的唯一标识（通过java.lang.Thread.getId()获取，通常用自增方式实现）。
 # 对应系统线程id（NativeThread ID）：nid=0xaef，和top命令查看的线程pid对应，不过一个是10进制，一个是16进制。
-   #（通过命令：top -H -p pid，可以查看该进程的所有线程信息）
+   #（通过命令：top -H -p pid，可以查看该进程的所有线程信息,线程的cpu占用率）
 # 线程状态：in Object.wait()；
 # 起始栈地址：[0xae77d000]，对象的内存地址，通过JVM内存查看工具，能够看出线程是在哪儿个对象上等待；
 2.  java.lang.Thread.State: TIMED_WAITING (on object monitor)

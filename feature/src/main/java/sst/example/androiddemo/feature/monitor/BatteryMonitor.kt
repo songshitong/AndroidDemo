@@ -20,8 +20,8 @@ object BatteryMonitor {
   @RequiresApi(VERSION_CODES.M) fun register(context: Context){
     val filter = IntentFilter()
     filter.addAction(ACTION_BATTERY_CHANGED)
-    context.registerReceiver(receiver,filter)
-    batteryLevel = getBatteryFromManager(context) //更新一次电量
+    context.applicationContext.registerReceiver(receiver,filter)
+    batteryLevel = getBatteryFromManager(context.applicationContext) //更新一次电量
   }
 
   //是否省电模式 华为，小米不适用 https://juejin.cn/post/7056354420246642719
@@ -33,7 +33,7 @@ object BatteryMonitor {
   }
 
   @RequiresApi(VERSION_CODES.M) fun getBatteryFromManager(context: Context):Int{
-    val batteryManager = context.getSystemService(
+    val batteryManager = context.applicationContext.getSystemService(
       BatteryManager::class.java
     )
     // batteryManager.isCharging 获取不准  建议使用广播获取
@@ -42,7 +42,7 @@ object BatteryMonitor {
 
   fun destroy(context: Context){
     try {
-      context.unregisterReceiver(receiver)
+      context.applicationContext.unregisterReceiver(receiver)
     }catch (e:Exception){
       e.printStackTrace()
     }

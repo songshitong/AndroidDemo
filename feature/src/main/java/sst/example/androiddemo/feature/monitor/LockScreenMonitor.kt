@@ -15,7 +15,7 @@ object LockScreenMonitor { //https://juejin.cn/post/6844903633084121096
     filter?.addAction(Intent.ACTION_SCREEN_ON)
     filter?.addAction(Intent.ACTION_SCREEN_OFF)
     filter?.addAction(Intent.ACTION_USER_PRESENT)
-    context.registerReceiver(receiver, filter)
+    context.applicationContext.registerReceiver(receiver, filter)
 
   }
 
@@ -37,7 +37,7 @@ object LockScreenMonitor { //https://juejin.cn/post/6844903633084121096
 
   fun destroy(context: Context){
     try {
-      context.unregisterReceiver(receiver)
+      context.applicationContext.unregisterReceiver(receiver)
     }catch (e:Exception){
       e.printStackTrace()
     }

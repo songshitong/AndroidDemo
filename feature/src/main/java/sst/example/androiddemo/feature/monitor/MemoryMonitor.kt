@@ -8,7 +8,7 @@ import androidx.annotation.RequiresApi
 
 object MemoryMonitor {
   @RequiresApi(VERSION_CODES.M) fun getMemoryInfo(context: Context):MemoryInfo{
-    val activityManager = context.getSystemService(ActivityManager::class.java)
+    val activityManager = context.applicationContext.getSystemService(ActivityManager::class.java)
     val memoryInfo = MemoryInfo()
     activityManager.getMemoryInfo(memoryInfo)
     return memoryInfo

@@ -15,7 +15,7 @@ object NetworkMonitor {
 
   //判断是否可用
   @RequiresApi(VERSION_CODES.M) fun checkCapability(context: Context): Boolean {
-    val connectivityManager: ConnectivityManager = context.getSystemService(
+    val connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
       ConnectivityManager::class.java
     )
     val networkCapabilities =
@@ -23,6 +23,22 @@ object NetworkMonitor {
     return null != networkCapabilities && networkCapabilities.hasCapability(
       NetworkCapabilities.NET_CAPABILITY_VALIDATED
     )
+  }
+
+  //获取网络类型 0无网络，1移动网络,2wifi
+  fun getNetworkType(context: Context):Int{
+    val connectivityManager: ConnectivityManager = context.applicationContext.getSystemService(
+      ConnectivityManager::class.java
+    )
+     //新api使用 networkCapabilities
+    val type = connectivityManager.activeNetworkInfo?.type
+    if(ConnectivityManager.TYPE_MOBILE == type){
+      return 1
+    }
+    if(ConnectivityManager.TYPE_WIFI == type){
+      return 2
+    }
+    return 0
   }
 
   //判断是否有外网连接（普通方法不能判断外网的网络是否连接，比如连接上局域网）

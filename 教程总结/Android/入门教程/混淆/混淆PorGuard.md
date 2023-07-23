@@ -1,4 +1,4 @@
-
+//todo -keepattributes SourceFile,LineNumberTable
 
 独立混淆
 https://www.jianshu.com/p/a8614ff60647
@@ -6,10 +6,17 @@ Android 在构建apk的时候，会把每一个aar中的混淆配置文件读取
 因此只要我们的aar中包含了混淆配置文件，那么这个aar在打包到apk的时候，其自带的混淆配置就会对全部的Java代码生效。
 因此Android是支持aar独立配置自己混淆文件的，只要aar中包含混淆配置文件即可。
 配置方式 android->defaultConfig
-consumerProguardFiles 'proguard.pro','proguard-b.pro'    或者consumerProguardFiles fileTree(dir: projectDir, include: 'proguard*')
-
-
-
+consumerProguardFiles 'proguard.pro','proguard-b.pro'   
+或者consumerProguardFiles fileTree(dir: projectDir, include: 'proguard*')
+在aar中consumer的内容会打进proguard.txt中
+如果需要在build时就需要生效，需要配置
+```
+ buildTypes {
+        debug {
+           isMinifyEnabled = true
+           proguardFiles( "consumer-rules.pro") //配置内容为consumer
+        }
+```
 
 
 
@@ -50,6 +57,10 @@ optimization：在optimization阶段会对代码进行进一步优化：
    部分方法可能会被优化为内联方法
 obfuscation：obfuscation阶段会将非入口代码进行混淆。被标识为入口的代码则会免于被混淆
 
+
+@keep注解
+保持类不被混淆中移除
+
 2 Keep 选项
 keep选项是为了在代码混淆的过程中保留部分类及其字段不被混淆以满足程序运行需求。keep选项一共有如下6种规则：
 2.1 keep
@@ -83,6 +94,10 @@ keepclassmembers仅保留指定的类成员不被混淆，但类名会被混淆�
     java.lang.Object writeReplace(); 
     java.lang.Object readResolve(); 
 } 
+
+//保留静态属性和方法
+ public static <fields>;
+ public static <methods>;
 ```
 
 2.4 keepclassmembernames

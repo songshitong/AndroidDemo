@@ -85,3 +85,26 @@ manifest使用
     }
 ```
 
+allprojects和subprojects
+allprojects是对所有project的配置，包括Root Project；而subprojects是对所有Child Project的配置。
+build.gradle中全局处理子module的类型
+```
+subprojects {
+  // 默认应用所有子项目中 kotlin kapt
+  apply(plugin = "kotlin-kapt")
+
+  val isModule = false
+  // 区分子项目添加应用
+  when (name) {
+    "app" -> {
+      apply(plugin = "com.android.application")
+    }
+    "lib"->{
+      apply(plugin = "com.android.library")
+    }
+    else -> {
+      apply(plugin = "com.android.library")
+    }
+  }
+}
+```

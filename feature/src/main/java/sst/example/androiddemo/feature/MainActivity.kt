@@ -11,7 +11,6 @@ import android.content.SharedPreferences
 import android.content.pm.ResolveInfo
 import android.graphics.Point
 import android.media.MediaPlayer
-import android.net.TrafficStats
 import android.os.*
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -29,8 +28,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.content.ContextCompat
-import androidx.core.util.AtomicFile
 import androidx.lifecycle.MutableLiveData
 import sst.example.androiddemo.feature.SystemBug.ToastBugActivity
 import sst.example.androiddemo.feature.activity.*
@@ -62,8 +59,8 @@ import sst.example.androiddemo.feature.webview.JumpActivity
 import sst.example.androiddemo.feature.widget.CameraMatrixActivity
 import sst.example.androiddemo.feature.widget.SystemView
 import sst.example.androiddemo.feature.widget.ViewOutlineProviderActivity
-import sst.example.androiddemo.feature.widget.layout.constraint.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.LinearLayoutActivity
+import sst.example.androiddemo.feature.widget.layout.constraint.ConstrainLayoutActivity
 import sst.example.androiddemo.feature.widget.layout.repeatMeasure.MeasureTestActivity
 import sst.example.androiddemo.feature.widget.practice.recyclerview.customLayoutManager.RVCustomLayoutManagerActivity
 import java.io.PrintWriter
@@ -653,6 +650,26 @@ class MainActivity : AppCompatActivity() {
     val sw = StringWriter()
     tr.printStackTrace(PrintWriter(sw))
     return sw.toString()
+  }
+
+  fun onCrash(var0: Throwable?) {
+    try {
+      if (var0 == null) {
+        return
+      }
+      //打印全部异常
+      val var1 = StringWriter()
+      val var2 = PrintWriter(var1)
+      var0.printStackTrace(var2)
+      var var3 = var0.cause
+      while (var3 != null) {
+        var3.printStackTrace(var2)
+        var3 = var3.cause
+      }
+      var2.close()
+    } catch (var4: java.lang.Exception) {
+      var4.printStackTrace()
+    }
   }
 
   //获取所有的进程

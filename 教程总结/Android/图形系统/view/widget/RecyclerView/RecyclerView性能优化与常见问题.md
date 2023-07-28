@@ -99,6 +99,10 @@ LinearLayoutManager.setInitialPrefetchItemCount()
 通过重写RecyclerView.onViewRecycled(holder)来回收资源
 onDetachedFromRecyclerView() 也可以，视频停止，图片停止加载等 去除item数据等
 
+调用notifyItemchange  rangeChange 传入payload时触发
+public void onBindViewHolder(@NonNull VH holder, int position,
+@NonNull List<Object> payloads)
+
 处理刷新闪烁
 1 调用notifyDataSetChange时，适配器不知道整个数据集中的那些内容以及存在，再重新匹配ViewHolder时会花生闪烁。
 设置adapter.setHasStableIds(true)，并重写getItemId()来给每个Item一个唯一的ID

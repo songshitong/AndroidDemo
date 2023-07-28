@@ -19,3 +19,13 @@ Kotlin 代码转 Java 代码
 nullable  nonnull
 java的API没有声明可空和非空
 kotlin不提示空的风险？？？  kotlin没法直接根据函数判断结果是否可空，需要额外的注解
+
+
+
+java.lang.IllegalAccessError:
+java.lang.IllegalAccessError: Method 'android.content.Context xx.a(com.xx)' is inaccessible to
+   class 'yr' (declaration of 'yr' appears in /data/app/com.xx-Efok_xxx-w==/base.apk!classes2.dex)
+解决
+1 检查混淆文件
+2 kotlin版本
+3 将涉及的两个类放到同一个包名

@@ -1,5 +1,6 @@
 package sst.example.lib;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class Array {
@@ -33,5 +34,8 @@ public class Array {
                 break out;
             }
         }
+
+        byte[] barr = new byte[]{1,0,1};
+        System.out.println("barr "+barr);
     }
 }

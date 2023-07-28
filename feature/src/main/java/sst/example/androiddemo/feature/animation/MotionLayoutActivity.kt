@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.recyclerview.widget.RecyclerView
 import sst.example.androiddemo.feature.R
 
 // https://developer.android.com/training/constraint-layout/motionlayout?hl=zh-cn
@@ -88,8 +90,8 @@ class MotionLayoutActivity : AppCompatActivity() {
   // constraint.propertySet.alpha = 0.1f
 
 
-    //状态跳转
-    //motionLayout.jumpToState(R.id.scene_end)
+    //状态跳转  可能包含动画
+    // motionLayout.jumpToState(R.id.scene_end)
 
     //recyclerview中使用motionLayout
 //    trigger.setOnClickListener {
@@ -103,17 +105,28 @@ class MotionLayoutActivity : AppCompatActivity() {
 //      }
 //    }
     //由于recyclerview的复用机制，每次onBindViewHolder都需要设置状态
-//    if (itemData.expand) {
-//      if (motionLayout.progress != 1.0f) {
-//        notifyItem(itemData)
-//      }
-//      motionLayout.progress = 1.0f
-//    } else {
-//      if (motionLayout.progress != 0f) {
-//        notifyItem(itemData)
-//      }
-//      motionLayout.progress = 0f
-//    }
+    //
+    // if (itemData.expand) {
+    //   if (motionLayout.progress != 1.0f) {
+    //     motionLayout.setTransitionDuration(0)
+    //     motionLayout.transitionToEnd()
+    //   }
+    // } else {
+    //   if (motionLayout.progress != 0f) {
+    //     motionLayout.setTransitionDuration(0)
+    //     motionLayout.transitionToStart()
+    //   }
+    // }
+
+    //清空状态
+    // override fun onViewRecycled(holder: BaseViewHolder) {
+    //   val motionLayout = holder.itemView.findViewById<MotionLayout>(R.id.xg_audio_fold_container)
+    //   if(null != motionLayout){
+    //     motionLayout.setTransitionDuration(0)   //直接设置progress 0/1也可以实现跳转
+    //     motionLayout.transitionToStart()
+    //   }
+    //   super.onViewRecycled(holder)
+    // }
 
   }
 }

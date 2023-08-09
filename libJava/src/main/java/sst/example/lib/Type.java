@@ -73,6 +73,12 @@ public class Type {
         int value = bytes2Int(new byte[]{byte1});
         System.out.println("=========");
         System.out.println("bytes2Int:"+value);
+
+        int num =10000;
+        byte[] int2bArray = intToByteBig(num);
+        for (byte b : int2bArray){
+            System.out.println("intToByteBig:"+ b);
+        }
     }
     public static String getBit(byte by){
         StringBuffer sb = new StringBuffer();
@@ -104,6 +110,18 @@ public class Type {
 
     public static Integer bytes2Int(byte[] bytes) {
         return Integer.parseInt(bytes2Hex(bytes), 16);
+    }
+
+
+    //将int转为高字节在前，低字节在后的byte数组（大端）
+    //https://www.cnblogs.com/hopeofthevillage/p/12917113.html
+    public static byte[] intToByteBig(int n) {
+        byte[] b = new byte[4];
+        b[3] = (byte) (n & 0xff);
+        b[2] = (byte) (n >> 8 & 0xff);
+        b[1] = (byte) (n >> 16 & 0xff);
+        b[0] = (byte) (n >> 24 & 0xff);
+        return b;
     }
 
 

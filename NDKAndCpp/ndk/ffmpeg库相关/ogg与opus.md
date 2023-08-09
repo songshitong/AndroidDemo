@@ -1,5 +1,7 @@
 
-
+ogg格式协议：
+https://docs.fileformat.com/audio/ogg/
+https://xiph.org/ogg/
 
 https://baike.baidu.com/item/OGG/1790364
 Ogg全称是OGGVobis(oggVorbis)是一种音频压缩格式，类似于MP3等的音乐格式。Ogg是完全免费、开放和没有专利限制的。OggVorbis文件的扩展名是".ogg"。

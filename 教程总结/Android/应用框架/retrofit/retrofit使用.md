@@ -256,7 +256,9 @@ https://github.com/JessYanCoding/RetrofitUrlManager
 (@Url String url) 动态执行url
 https://blog.csdn.net/Jason_996/article/details/78659019
 Retrofit解决多个BaseURL切换的问题
-1. retrofit添加拦截器,根据注解信息,处理多个baseurl
+1 retrofit添加拦截器,根据注解信息,处理多个baseurl
+   缺点：注解中的url为常量，无法进行拼接
+1.1 增强版 注解只用key，配置baseUrl的集合，根据key进行替换，
 ```
 public class Api {
     public static final String base_url = "http://172.0.0.92:8080/";
@@ -342,6 +344,7 @@ public class MoreBaseUrlInterceptor implements Interceptor {
  @Headers(DOMAIN_BASE_URL)
   Observable<LoginEntity> userLogin(@Body Map map);
 ```
+2 使用不同的retrofit实例和不同的域名
 
 
 全局header

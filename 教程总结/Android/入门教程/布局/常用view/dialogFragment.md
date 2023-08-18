@@ -1,4 +1,44 @@
 
+Can not perform this action after onSaveInstanceState 
+https://www.jianshu.com/p/bcc5af0085d3?t=1481296807683
+在onSaveInstanceState行为之后，app执行某个不能响应的行为而导致异常发生  一般为commit()
+1 修改commit()为commitAllowingStateLoss()，在activity执行状态保存后进行fragment的操作允许状态丢失
+2 增加异常捕获
+```
+ try{ 
+          super.show(manager,tag); 
+        }catch (IllegalStateException ignore){ 
+        }
+   }
+```
+3 dialogFragment没有提供commitAllowingStateLoss()，需要自己实现
+```
+public void showAllowingStateLoss(FragmentManager manager, String tag){
+    try {        
+        Field dismissed = DialogFragment.class.getDeclaredField("mDismissed");
+        dismissed.setAccessible(true);        
+        dismissed.set(this, false);    
+        } catch (NoSuchFieldException e) {        
+            e.printStackTrace();   
+        } catch (IllegalAccessException e) {        
+            e.printStackTrace();   
+        }    
+    try {        
+        Field shown = DialogFragment.class.getDeclaredField("mShownByMe");
+        shown.setAccessible(true);        
+        shown.set(this, true);   
+        } catch (NoSuchFieldException e) {       
+            e.printStackTrace();   
+        } catch (IllegalAccessException e) {        
+            e.printStackTrace();    
+        }    
+        FragmentTransaction ft = manager.beginTransaction();    
+        ft.add(this, tag);    
+        ft.commitAllowingStateLoss();
+      }
+```
+
+
 监听dialogFragment的消失
 ```
 1 自定义基类，增加接口，onDissMiss回调给外部

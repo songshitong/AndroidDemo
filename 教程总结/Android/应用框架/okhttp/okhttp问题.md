@@ -11,6 +11,14 @@ Request request = new Request.Builder()
                              .header("Connection", "close") //不复用链接  可能服务器没有复用，client复用了，导致异常
 ```
 
+https://github.com/google/ExoPlayer/issues/7880
+其他解释
+"Unexpected end of stream" normally means that the server response indicated it will provide a certain number of bytes 
+(specified in the Content-Length response header), but then closed the connection before providing that many bytes.
+That's a server-side issue (i.e., it's either closing the connection when it shouldn't, 
+or it's specifying the Content-Length header response incorrectly)
+
+
 版本4.9.3
 unexpected end of stream
 ```
@@ -136,3 +144,23 @@ at java.net.SocketOutputStream.socketWrite0(Native Method)
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
 	at java.lang.Thread.run(Thread.java:764)
 ```
+
+
+
+Retrofit. java.net.ProtocolException: expected 123 bytes but received 456
+https://stackoverflow.com/questions/44845883/retrofit-java-net-protocolexception-expected-bytes-but-received
+1 文件上传时 文件发生了改动，例如增减内容
+解决：等待文件完成 或者创建文件快照，确保快照不发生变化
+注意：文件上传完成后，删除临时文件
+2 header中 content-length与文件大小不一致
+
+
+java.net.SocketException: Software caused connection abort
+https://stackoverflow.com/questions/135919/java-net-socketexception-software-caused-connection-abort-recv-failed
+This error occurs when a connection is closed abruptly (when a TCP connection is reset while there is still data in the send buffer).
+The condition is very similar to a much more common 'Connection reset by peer'. 
+It can happen sporadically when connecting over the Internet, but also systematically if the timing is right 
+(e.g. with keep-alive connections on localhost)
+解决：关闭HttpClient 然后重新创建请求
+
+

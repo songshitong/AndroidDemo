@@ -10,6 +10,8 @@ https://dorgenjones.github.io/2017/03/13/%E5%9F%BA%E7%A1%80%E5%B7%A5%E5%85%B7/lo
 
 项目地址 https://github.com/apache/logging-log4j2
 集成页面 https://logging.apache.org/log4j/2.x/maven-artifacts.html
+implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
 
 用法：
 android初始化xml

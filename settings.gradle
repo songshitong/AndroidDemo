@@ -5,6 +5,5 @@ include ':GradlePlugin'
 include ':feature'
 include ':libJava'
 include ':associatedapp'
-
 include ':libOpengl'
 include ':opencv'

@@ -1,3 +1,6 @@
+
+//todo 正则表达式  匹配中文[\u4e00-\u9fa5]
+
 http://weishu.me/2016/12/23/dive-into-android-optimize-vm-heap/
 
 dokit

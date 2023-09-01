@@ -50,7 +50,7 @@ new ScanCallback() {
           case SCAN_FAILED_ALREADY_STARTED:
             Logger.e(TAG+" 扫描失败===: 已经开始 ");
           break;
-          case SCAN_FAILED_APPLICATION_REGISTRATION_FAILED:
+          case SCAN_FAILED_APPLICATION_REGISTRATION_FAILED: //需要关闭重新打开蓝牙bluetoothAdapter.disable()  bluetoothAdapter.enable()
             Logger.e(TAG+" 扫描失败===: app 注册失败 ");
             break;
           case SCAN_FAILED_FEATURE_UNSUPPORTED:

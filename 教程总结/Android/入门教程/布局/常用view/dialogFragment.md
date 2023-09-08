@@ -1,4 +1,11 @@
 
+
+java.lang.IllegalStateException: FragmentManager is already executing transactions
+https://blog.csdn.net/wangzhezhilu001/article/details/120726847
+原因：在fragment嵌套时，使用了错误的FragmentManager
+解决：把getActivity().getSupportFragmentManager() 改为getchildfragmentmanager()
+
+
 Can not perform this action after onSaveInstanceState 
 https://www.jianshu.com/p/bcc5af0085d3?t=1481296807683
 在onSaveInstanceState行为之后，app执行某个不能响应的行为而导致异常发生  一般为commit()

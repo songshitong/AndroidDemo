@@ -79,7 +79,7 @@ inline fun <reified T> get(id: Long): T = Store.box.boxFor(T::class.java).get(id
     }   
 
 int属性查询    
-box.query().`in`(XX_.status, intArrayOf(1)).order(XX_.startTime).build().find()    
+box.query().`in`(XX_.status, intArrayOf(1)).order(XX_.startTime).build().find(0,10) //查询前10条    
 ```
 属性查询 查询某个属性的最大值，类似还有min,sum(),avg(),count()
 ```

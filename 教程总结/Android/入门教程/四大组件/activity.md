@@ -162,6 +162,25 @@ taskAffinity属性呢，可以简单的理解为任务相关性。
   这两种启动模式下不会创建新的task（如果不指定即默认值，即包名）
 <activity  android:taskAffinity="com.demo.singletop"/>
 
+后台任务管理
+ActivityManager
+用于将当前任务移动到最前面 用户可见
+moveTaskToFront (int taskId, int flags, Bundle options)
+
+
+
+
+第一次安装成功点击“打开”后Home键切出应用后再点击桌面图标返回导致应用重启
+https://www.jb51.net/article/97919.htm
+https://www.jianshu.com/p/0d08f7f98666
+FLAG_ACTIVITY_BROUGHT_TO_FRONT这个Flag主要用来改变Task堆栈顺序，如果在ABCD的状态下，以该标识启动B，则会成为ACDB，且B不会重新创建
+解决
+```
+if((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0){ 
+  finish(); 
+  return; 
+}
+```
 
 
 https://stackoverflow.com/questions/3588682/is-it-normal-for-the-activity-oncreate-method-to-be-called-multiple-times

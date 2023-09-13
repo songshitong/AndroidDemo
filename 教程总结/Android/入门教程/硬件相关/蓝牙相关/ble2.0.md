@@ -36,7 +36,9 @@ new ScanCallback() {
         super.onScanResult(callbackType, result);
         BluetoothDevice device = result.getDevice();
         if (null != device) {
-
+              //由于可能扫描到重复的蓝牙设备，通过Set过滤掉重复的设备。 
+               //部分设备可能过一段时间改变mac  提示这个设备仍然可以被连接
+              //https://stackoverflow.com/questions/36296769/scanning-using-bluetoothlescanner-calls-onscanresult-multiple-times-for-the-same
         }
       }
 

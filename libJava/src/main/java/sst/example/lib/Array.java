@@ -1,7 +1,10 @@
 package sst.example.lib;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.function.ToIntFunction;
 
 public class Array {
     //二维数组 http://c.biancheng.net/view/916.html
@@ -37,5 +40,15 @@ public class Array {
 
         byte[] barr = new byte[]{1,0,1};
         System.out.println("barr "+barr);
+
+
+        PriorityQueue<Integer> queue = new PriorityQueue<>(
+            (o1, o2) -> o2 - o1);
+        queue.add(10);
+        queue.add(5);
+
+        System.out.println("queue1 "+queue.poll());
+        System.out.println("queue2 "+queue.poll());
+
     }
 }

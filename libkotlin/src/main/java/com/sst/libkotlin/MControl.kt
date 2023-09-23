@@ -93,6 +93,13 @@ class MControl {
         for ((index, value) in array1.withIndex()) {
             println("the element at $index is $value")
         }
+
+        //多层for跳出  out@
+        first@ for(i in array1){
+            second@ for(j in arr){
+                break@first
+            }
+        }
     }
 
     //while语句

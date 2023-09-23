@@ -1,4 +1,5 @@
 import kotlinx.coroutines.*
+import java.util.concurrent.Executors
 import kotlin.coroutines.suspendCoroutine
 import kotlin.jvm.Throws
 
@@ -43,8 +44,22 @@ public class MCoroutines{
 //          testCase()
 
           //suspendCoroutine  todo  CPS https://www.jianshu.com/p/06703abc56b1
+
+          testCustomThread()
       }
 
+      private fun testCustomThread() {
+          //在单一的子线程运行
+          val thread = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
+          runBlocking {
+              withContext(thread){
+                  println("testCustomThread 111")
+              }
+              withContext(thread){
+                  println("testCustomThread 222")
+              }
+          }
+      }
 
       private fun testWithContext() {
           val a=null

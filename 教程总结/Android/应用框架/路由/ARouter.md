@@ -3,6 +3,7 @@ https://mp.weixin.qq.com/s/sFM3OCorZ8HzV0R89cUAEw
 版本1.5.2
 
 Arouter缺点：
+0 停止维护了
 1 没有结束activity的能力，只有跳转
 2 没有处理onActivityResult
 3 activity的跳转逻辑分散在各处，如果多次处理输入参数，容易造成异常，最好有个中转站，不用每次调用arouter封装参数 
@@ -11,7 +12,13 @@ Arouter缺点：
 arouter.navigation(Activity mContext, int requestCode)
 ```
 https://blog.csdn.net/sinat_33680954/article/details/117322797
-3 没有适配androidX的ActivityResultLauncher
+4 没有适配androidX的ActivityResultLauncher
+5 没有提供判断初始化的方法 ...
+```
+public final class ARouter {
+    private volatile static boolean hasInit = false;
+}    
+```
 
 初始化
 ```

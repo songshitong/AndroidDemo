@@ -6,7 +6,7 @@ https://blog.csdn.net/wangzhezhilu001/article/details/120726847
 解决：把getActivity().getSupportFragmentManager() 改为getchildfragmentmanager()
 
 
-Can not perform this action after onSaveInstanceState 
+java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState 
 https://www.jianshu.com/p/bcc5af0085d3?t=1481296807683
 在onSaveInstanceState行为之后，app执行某个不能响应的行为而导致异常发生  一般为commit()
 1 修改commit()为commitAllowingStateLoss()，在activity执行状态保存后进行fragment的操作允许状态丢失

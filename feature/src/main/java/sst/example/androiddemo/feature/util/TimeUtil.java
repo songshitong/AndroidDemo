@@ -21,6 +21,19 @@ public class TimeUtil {
     public static final String  TIMEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     public static final String TAG = "TimeUtil";
+
+
+    /**
+     * @Description: 统计方法的耗时
+     */
+    public static void runTimeCount(String funcName,Runnable func){
+        long start = System.currentTimeMillis();
+        func.run();
+        Log.i(TAG,"runTimeCount,funcName:"+funcName+" time:"+ (System.currentTimeMillis() - start));
+    }
+
+
+
     /**
      * Get date from string string. 格式化时间，返回yyyy年MM月dd日 HH:mm
      *

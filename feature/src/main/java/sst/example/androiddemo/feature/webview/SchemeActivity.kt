@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import sst.example.androiddemo.feature.R
 
-
+//应用内跳转  web浏览器跳转
 //在Android平台而言，URI主要分三个部分：scheme, authority,path, queryString。其中authority又分为host和port。格式如下：
 //scheme://host:port/path?qureyParameter=queryString
 //举个例子：
-//http://www.sstdemo.com:80/aaa?id=hello
+//http://www.sstdemo.com:80/aaa?id=hello&name=aa
 
 //Manifest配置  <intent-filter>配置项中有<data>配置
 //<!--需要添加下面的intent-filter配置-->
@@ -24,7 +24,7 @@ import sst.example.androiddemo.feature.R
 //</intent-filter>
 //<data android:host=""
 //android:mimeType=""
-//android:path=""
+//android:path=""     //path以/开头
 //android:pathPattern=""
 //android:pathPrefix=""
 //android:port=""

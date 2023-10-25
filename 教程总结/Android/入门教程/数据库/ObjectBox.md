@@ -12,6 +12,13 @@ data class BaseBean(
     var name: String? = null
 )
 ```
+1 必须有构造器，@id注解
+2 构造器最好有默认值，For Kotlin data classes this can be achieved by adding default values for all parameters. 
+(Technically this is only required if adding properties to the class body, like custom or transient properties or relations,
+but it's a good idea to do it always.)
+3 数据库升级时新增的字段需要声明为可空的，旧版本没有该字段，声明为非空的升级后会异常闪退
+
+
 生成：Build > Make project
 查看： app > objectbox-models
 https://www.jianshu.com/p/57d5db61fc77

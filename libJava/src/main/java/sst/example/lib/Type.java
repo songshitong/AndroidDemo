@@ -9,8 +9,6 @@ public class Type {
         Integer integer = Integer.valueOf(2);
         int intValue = integer.intValue();
         //List.remove()方法，可以是index也可以是object  如果元素是int时最好进行装箱操作
-        //int 输出为二进制
-        Integer.toBinaryString(2); //结果10
         outInfo();
 
         //基础类型转换
@@ -58,7 +56,8 @@ public class Type {
         Food food = (Food) fruit;
         System.out.println(food.name);
 
-        //字节（byte）：   java中一个byte为8个二进制位。https://blog.csdn.net/qq_34763699/article/details/78650272
+        //字节（byte）：   java中一个byte为8个带符号的二进制位。 [-128, 127]  byte默认是10进制的
+        // https://blog.csdn.net/qq_34763699/article/details/78650272
         //type转bit https://blog.csdn.net/dengzhi_00/article/details/52885820
         //转为string，然后使用charAt
         byte byte1 = (byte) 0x11;
@@ -79,7 +78,53 @@ public class Type {
         for (byte b : int2bArray){
             System.out.println("intToByteBig:"+ b);
         }
+
+        System.out.println("11 "+bit2byte("11"));
+        byte text = 0b11;
+        System.out.println("byte转二进制输出"+byte2bits(text)); //00000011
+        System.out.println("byte转二进制输出  toBinaryString:"+Integer.toBinaryString(text));//11
     }
+
+    //15进制转二进制  固定4位    也可以new BigInteger(s, 16).toString(2)，但是位数不固定
+    public static String hexToBin(String hex) {
+        hex = hex.replaceAll("0", "0000");
+        hex = hex.replaceAll("1", "0001");
+        hex = hex.replaceAll("2", "0010");
+        hex = hex.replaceAll("3", "0011");
+        hex = hex.replaceAll("4", "0100");
+        hex = hex.replaceAll("5", "0101");
+        hex = hex.replaceAll("6", "0110");
+        hex = hex.replaceAll("7", "0111");
+        hex = hex.replaceAll("8", "1000");
+        hex = hex.replaceAll("9", "1001");
+        hex = hex.replaceAll("A", "1010");
+        hex = hex.replaceAll("B", "1011");
+        hex = hex.replaceAll("C", "1100");
+        hex = hex.replaceAll("D", "1101");
+        hex = hex.replaceAll("E", "1110");
+        hex = hex.replaceAll("F", "1111");
+        return hex;
+    }
+
+    //字节转二进制输出
+    public static String byte2bits(byte b) {
+        int z = b;
+        z |= 256;
+        String str = Integer.toBinaryString(z);
+        int len = str.length();
+        return str.substring(len - 8, len);
+    }
+
+     //二进制转byte
+    public static byte bit2byte(String bString){
+        byte result=0;
+        for(int i=bString.length()-1,j=0;i>=0;i--,j++){
+            result+=(Byte.parseByte(bString.charAt(i)+"")*Math.pow(2, j));
+        }
+        return result;
+    }
+
+
     public static String getBit(byte by){
         StringBuffer sb = new StringBuffer();
         sb.append((by>>7)&0x1)

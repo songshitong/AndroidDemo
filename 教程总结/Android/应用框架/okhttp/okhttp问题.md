@@ -4,11 +4,16 @@ https://www.jianshu.com/p/d7b2666b4b50
 https://blog.csdn.net/lyabc123456/article/details/87368161
 
 unexpected end of stream on Connection
+java.io.EOFException: \n not found: limit=0 content=
 java.io.IOException: unexpected end of stream on http://www.xx.com.xxapi
 ```
 Request request = new Request.Builder()
                              .url(URL)
                              .header("Connection", "close") //不复用链接  可能服务器没有复用，client复用了，导致异常
+单个接口api注解@Headers("Connection: close")
+
+只配置okhttp连接池可能不生效  新生成的socket通道没有进入pool，但是可能很长时间才断掉
+connectionPool(ConnectionPool(0, 1, TimeUnit.MILLISECONDS))                             
 ```
 
 https://github.com/google/ExoPlayer/issues/7880

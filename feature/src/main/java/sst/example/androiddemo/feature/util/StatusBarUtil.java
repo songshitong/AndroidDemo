@@ -11,6 +11,12 @@ import sst.example.androiddemo.feature.R;
 
 //可以参考 https://github.com/Zackratos/UltimateBarX
 public class StatusBarUtil {
+
+  //设置虚拟导航透明   黑色时会把布局顶上去
+  public void setNavigationBarTrans(Window window){
+    window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+  }
+
   //https://juejin.cn/post/6878195975966425101#heading-10
   //https://blog.csdn.net/QQxiaoqiang1573/article/details/79867127
   //沉浸式状态栏

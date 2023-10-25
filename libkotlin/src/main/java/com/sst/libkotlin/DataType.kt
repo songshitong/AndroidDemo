@@ -96,6 +96,19 @@ class DataType {
             val a2 = arrayOf(1,2,3,5)
             a1 = a2
             println(a1)
+
+            //array.fill  元素填充
+            intArray.fill(0,0,1)
+
+            //创建一个160的自己数组
+            val byteA = ByteArray(160)
+
+            //展开操作符,将数据偏移
+            count(*intArray)
+        }
+
+        fun count(vararg num:Int){
+
         }
     }
 }

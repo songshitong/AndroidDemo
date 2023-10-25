@@ -261,7 +261,7 @@ private void close() {
 9.给蓝牙设备发送命令
 ```
  boolean b = writeCharacteristic.setValue(bytes);
- //极端情况存在写入失败 还有就是onCharacteristicWrite的status判断是否写入成功
+ //极端情况存在写入失败 还有就是onCharacteristicWrite的status判断是否写入成功  这判断也行
  boolean result = bluetoothGatt.writeCharacteristic(writeCharacteristic);
 ```
 发送无响应的配置

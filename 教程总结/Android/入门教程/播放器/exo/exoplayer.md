@@ -38,6 +38,11 @@ seekto方法
 解决 拖动进度条播放状态seekto，停止状态记录进度，播放按钮时再seekto
 
 
+获取当前播放url
+```
+player.currentMediaItem?.playbackProperties?.uri
+```
+
 
 exoplayer常用监听
 ```

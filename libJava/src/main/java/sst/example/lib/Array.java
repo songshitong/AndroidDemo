@@ -51,4 +51,6 @@ public class Array {
         System.out.println("queue2 "+queue.poll());
 
     }
+
+
 }

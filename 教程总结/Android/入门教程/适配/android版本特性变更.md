@@ -177,3 +177,20 @@ context.registerReceiver(privateBroadcastReceiver, intentFilter,
     RECEIVER_NOT_EXPORTED);
 ```
 
+
+android 14
+缓存应用冻结
+https://developer.android.com/about/versions/14/behavior-changes-all
+Android 14 开始缓存的 App 会在短时间内被冻结
+在 Android 14 里，除了前台服务 和 JobScheduler/WorkManager 之外，App 应该不再运行其他形式的后台工作
+缓存应用定义：
+an app's process is in a cached state when it's moved to the background and no other app process components are running.
+cached process 更多介绍
+https://developer.android.com/guide/components/activities/process-lifecycle
+
+广播优化
+On Android 14, the system may place context-registered broadcasts in a queue while the app is in the cached state.
+When the app leaves the cached state, such as returning to the foreground, the system delivers any queued broadcasts
+
+manifest声明的广播不受影响
+Manifest-declared broadcasts aren't queued, and apps are removed from the cached state for broadcast delivery

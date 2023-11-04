@@ -78,6 +78,7 @@ class MCollection {
             val map2 = mutableMapOf("1" to "1","2" to "2") //LinkedHashMap MutableMap接口可读可写
             //编为 Map map2 = MapsKt.mutableMapOf(new Pair[]{TuplesKt.to("1", "1"), TuplesKt.to("2", "2")}); 返回MutableMap
 
+
             val linkedMap = linkedMapOf("2" to "2","1" to "1")//LinkedHashMap
             val hashMap = hashMapOf("1" to "1")//hashMap
 
@@ -105,6 +106,9 @@ class MCollection {
                 listOf("seven", "eight")
             )
             println("flatmap ${containers.flatMap { it }}")//flatmap [one, two, three, four, five, six, seven, eight]
+
+          //map整合
+          val mapPlus = map1.plus(maps)
 
             //fold和reduce  两个函数都是对集合的遍历，只是遍历完成之后能得到一个结果
 //            reduce的返回值类型必须和集合的元素类型相符。

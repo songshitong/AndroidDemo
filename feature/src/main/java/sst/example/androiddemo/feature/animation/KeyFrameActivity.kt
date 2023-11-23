@@ -26,6 +26,7 @@ class KeyFrameActivity : AppCompatActivity() {
     val frame1 = Keyframe.ofFloat(0f, 0f);
     //第二帧  百分之50 value为100f
     val frame2 = Keyframe.ofFloat(1f, 60f);
+    //translationY的初始值是view的当前translationY，转换到对应的参数值->frame1->frame2
     val holder = PropertyValuesHolder.ofKeyframe("translationY", frame1, frame2)
 
     val animator = ObjectAnimator.ofPropertyValuesHolder(findViewById<View>(R.id.btn_key_frame), holder)

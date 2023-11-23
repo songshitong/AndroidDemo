@@ -2,6 +2,13 @@ https://juejin.cn/post/7029344208234217485
 
 已知的问题
 1 android12 指定数据库目录在storage/0/非包名，插入数据后读取不到 版本3.3.1
+2 监听数据库异常便于查询问题
+  store.setDbExceptionListener
+3 findFirst() 返回类型为nullable，如何得知是数据不存在还是数据库本身异常
+  如果需要区分才能进行下一步  例如数据不存在执行下一步，异常不执行。。。，就没有办法区分了
+  3.3版本内部各种抛出异常，需要进行try catch
+4 unique字段
+  由数据库字段unique保证唯一性，而不是由代码查询是否存在，然后执行什么操作   很明显代码稳定性不高，需要处理各种场景
 
 注解与实体类
 ```
@@ -33,6 +40,21 @@ https://www.jianshu.com/p/57d5db61fc77
 @ToMany：做一对多的关联注解；  ToMany<Order>
 @Backlink：表示反向关联。
 @Unique：被标识的字段必须唯一，2.0+支持。在存入过程中，如果被@Unique标识的字段重复则会抛出UniqueViolationException异常。
+```
+https://docs.objectbox.io/entity-annotations
+@Unique(onConflict = ConflictStrategy.REPLACE) 指明冲突时的策略   FAIL/REPLACE
+The REPLACE strategy will add a new object with a different ID. As relations (ToOne/ToMany) reference objects by ID, 
+if the previous object was referenced in any relations, these need to be updated manually.
+
+//unique标识的需要进行try catch
+try {
+    box.put(User("Sam Flynn"))
+} catch (e: UniqueViolationException) {
+    // A User with that name already exists.
+}
+```
+
+
 注意：
 ObjectBox不支持List<String>,这样是一对多的关系，直接多条记录就可以
 构造器需要时空的或者所有参数的并且有默认值的

@@ -15,9 +15,11 @@
 </shape>
 
         <!--
-
+useLevel只在LevelListDrawable中使用
 android:shape  rectangle 长方形 /默认,oval 椭圆,line 线,ring 环形
-<size android:width="200dp" android:height="200dp"/> 指定大小
+<size android:width="200dp" android:height="200dp"/> 指定大小 通常用在背景中会拉伸，不生效
+需要防止layer-list的item中进行指定
+
  <solid android:color="@color/colorGrey500"/> 填充色
 
 radius设置四周的圆角， bottomLeftRadius 左下

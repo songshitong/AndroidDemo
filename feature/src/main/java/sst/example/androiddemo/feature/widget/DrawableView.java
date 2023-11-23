@@ -222,11 +222,13 @@ public class DrawableView extends View {
         AnimationDrawable ad = (AnimationDrawable) getBackground();
         ad.start();
 
+        //android根据svg创建矢量图xml  drawable right click -> New -> Vector Asset -> Local SVG file
 //       VectorDrawable使用 vector根标签     在21以下使用，gradle中配置vectorDrawables.useSupportLibrary = true      xml中使用 app:srcCompat
 //        VectorDrawableCompat 兼容类
         setBackground(context, R.drawable.ic_android_black_24dp);
         VectorDrawable vectorDrawable = (VectorDrawable) getBackground();
 
+        //VectorDrawable几乎不能改变svg的内部属性，针对svg的某部分做动画    https://developer.android.com/develop/ui/views/graphics/vector-drawable-resources
 //        AnimatedVectorDrawable vector动画  对应xml标签 animated-vector
 //        AnimatedVectorDrawableCompat 兼容类
         setBackground(context, R.drawable.ainmated_vector_drawable);

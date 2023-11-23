@@ -128,7 +128,7 @@ class MCollection {
             println("runningFold ${runningFoldList.runningFold(-1){a,b -> a+b}}")
             //[-1, 0, 2, 5, 9]  -1,1-1,1+2-1,1+2+3-1,1+2+3+4-1
 
-            //associateWith  转为关联的map
+            //associateWith  将list转为关联的map
             val associateWithList = listOf("one","two")
             println("associateWith ${associateWithList.associateWith { it.uppercase() }}") //{one=ONE, two=TWO}
 

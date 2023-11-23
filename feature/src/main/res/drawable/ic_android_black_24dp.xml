@@ -60,4 +60,37 @@
 
         <vector>	alpha
 
+
+        设置渐变
+        <aapt:attr name="android:fillColor">
+          <gradient
+              android:startY="0"  //起始位置，与大小相关
+              android:endY="16"
+              android:startX="0"
+              android:endX="10.936"
+              android:startColor = "#ffAFFF69"
+              android:endColor = "#ff00B377"
+              android:type="linear">
+          </gradient>
+        </aapt:attr>
+
+        或者
+        <gradient
+                android:endColor="#009944"
+                android:startColor="#b9b202"
+                android:startX="50"
+                android:endX="50"
+                android:startY="1"
+                android:endY="99"
+                android:type="linear">
+                <item
+                    android:color="#b99b5b"
+                    android:offset="0.0" /> //颜色百分比
+                <item
+                    android:color="#39bdcc"
+                    android:offset="0.8" />
+                <item
+                    android:color="#9b3e00"
+                    android:offset="1.0" />
+            </gradient>
         -->

@@ -589,7 +589,7 @@
                 app:layout_constraintTop_toBottomOf="@id/DogImg" />
 
             <!--        ImageFilterButton和ImageFilterView可以使用两个属性来设置图片资源的圆角，分别是roundPercent和round，-->
-            <!--           roundPercent接受的值类型是0-1的小数，根据数值的大小会使图片在方形和圆形之间按比例过度，round=可以设置具体圆角的大小-->
+            <!--           roundPercent接受的值类型是0-1的小数，根据数值的大小会使图片在方形和圆形之间按比例过度,roundPercent=1是圆形，round=可以设置具体圆角的大小-->
             <!--        ImageFilterButton和ImageFilterView不但可以使用src来设置图片资源，还可以使用altSrc来设置第二个图片资源，-->
             <!--          altSrc提供的资源将会和src提供的资源通过crossfade属性形成交叉淡化效果,默认情况下，crossfade=0，-->
             <!--          altSrc所引用的资源不可见，取值在0-1-->

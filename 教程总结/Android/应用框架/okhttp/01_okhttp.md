@@ -676,6 +676,7 @@ override fun intercept(chain: Interceptor.Chain): Response {
       requestBuilder.header("Cookie", cookieHeader(cookies))
     }
 
+    //设置默认的userAgent  "okhttp/${OkHttp.VERSION}"
     if (userRequest.header("User-Agent") == null) {
       requestBuilder.header("User-Agent", userAgent)
     }

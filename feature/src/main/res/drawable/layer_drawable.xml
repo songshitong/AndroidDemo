@@ -9,7 +9,8 @@
             <solid android:color="#9b9b9b" />
         </shape>
     </item>
-<!--    背景色白色 底部1px，将线留出一条缝-->
+<!--  底部线  背景色白色 底部1px，将线留出一条缝-->
+<!--    背景黄色，底部黑色  使用两个图层颜色叠加，漏出来一个-->
     <item android:bottom="1px">
         <shape>
             <solid android:color="@android:color/white" />

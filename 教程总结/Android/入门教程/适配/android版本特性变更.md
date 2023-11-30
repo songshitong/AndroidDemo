@@ -1,3 +1,9 @@
+https://storage.googleapis.com/play_public/supported_devices.html
+所有手机型号列表
+Retail Branding 	Marketing Name	   Device	  Model
+Redmi	            K30 PRO	            lmi	      Redmi K30 Pro
+
+
 https://blog.csdn.net/qq_40881680/article/details/109281912
 https://developer.android.com/guide/topics/manifest/uses-sdk-element
 https://developer.android.com/about/versions

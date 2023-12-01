@@ -18,7 +18,7 @@ import org.greenrobot.eventbus.EventBus
 import sst.example.androiddemo.feature.R
 import sst.example.androiddemo.feature.common.LiveEventBus
 
-//全局弹窗不依赖activity上下文的弹窗。及时关闭app，同样可以浮在系统桌面上
+//全局弹窗不依赖activity上下文的弹窗。即使关闭app，同样可以浮在系统桌面上
 //<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 class SystemView : FrameLayout {
   private lateinit var windowManager:WindowManager

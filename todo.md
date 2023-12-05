@@ -1,3 +1,11 @@
+《下沉年代》https://mp.weixin.qq.com/s/olIbhn54zoR_FkuFQfY5ww
+美国作家乔治·帕克的《下沉年代》，讲的就是伴随着美国“去工业化”的进程，不同阶层、职业的人所经历的人生意义的幻灭故事。
+帕克对于“去工业化”的价值判断很明确：
+这件事非常糟糕，不仅无数底层劳动者丧失谋生手段，更让无数人丢掉了人生方向，迷茫而不知所往，包括新时代暴富的新贵。
+
+
+https://mp.weixin.qq.com/s/hAfrPlPD2KBCWxpIuGkQTQ
+
 https://mp.weixin.qq.com/s/XGKXUYJ4oTbZWHkI-MJbtQ
 
 https://mp.weixin.qq.com/s/kJF_ezR2TdPnYlfPCjwdKQ 缓存一致性

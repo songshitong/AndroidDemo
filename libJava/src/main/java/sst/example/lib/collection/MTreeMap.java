@@ -11,6 +11,7 @@ import java.util.SortedMap;
 public class MTreeMap {
 
   public static void main(String[] args) {
+    //key要求实现Comparable接口，用于排序  否则抛出异常   常见的String,Integer已经实现
     TreeMap<String,String> map = new TreeMap<String,String>();
     map.put("b","123");
     map.put("f","111");

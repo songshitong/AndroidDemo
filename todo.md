@@ -1,8 +1,22 @@
+聚焦优化音频卡顿、杂音问题
+https://mp.weixin.qq.com/s/yQQ5q8vvi7ltVxVQrfcl0Q
+
+
 《下沉年代》https://mp.weixin.qq.com/s/olIbhn54zoR_FkuFQfY5ww
 美国作家乔治·帕克的《下沉年代》，讲的就是伴随着美国“去工业化”的进程，不同阶层、职业的人所经历的人生意义的幻灭故事。
 帕克对于“去工业化”的价值判断很明确：
 这件事非常糟糕，不仅无数底层劳动者丧失谋生手段，更让无数人丢掉了人生方向，迷茫而不知所往，包括新时代暴富的新贵。
 
+
+
+webrtc
+https://mp.weixin.qq.com/s/bsK5mCLmioIshKaBMKmoCQ
+
+mmap
+https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247491413&idx=1&sn=b4a7a3b6b5407e6d012441415c4dc5de&chksm=a6e31e6e91949778fb959258a7b460977f300a94a739cf96440fb4bb8123ba750244aadd770a#rd
+
+不同语言的错误处理
+https://mp.weixin.qq.com/s/bvkF1X2cTvo2D2DV7vadpA
 
 https://mp.weixin.qq.com/s/hAfrPlPD2KBCWxpIuGkQTQ
 

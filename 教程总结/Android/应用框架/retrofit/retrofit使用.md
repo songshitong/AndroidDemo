@@ -62,6 +62,14 @@ Call<User> updateUser(@Field("first_name") String first, @Field("last_name") Str
 @POST("/things")
 Call<ResponseBody> things(@FieldMap Map<String, String> fields);
 
+post上传原始json
+```
+@POST("/send")
+public Call<ResponseBody> withRequestBody(@Url String url, @Body RequestBody body);
+//body的创建方式
+RequestBody body = RequestBody.create(MediaType.parse("application/json"), result.toString());
+```
+
 多类型请求
 ```
 @Multipart

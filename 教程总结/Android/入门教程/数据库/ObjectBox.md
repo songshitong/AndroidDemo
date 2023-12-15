@@ -25,6 +25,41 @@ data class BaseBean(
 but it's a good idea to do it always.)
 3 数据库升级时新增的字段需要声明为可空的，旧版本没有该字段，声明为非空的升级后会异常闪退
 
+支持自定义类型
+https://docs.objectbox.io/advanced/custom-types
+```
+@Entity
+data class User(
+        //配置convert
+        @Convert(converter = RoleConverter::class, dbType = Int::class)
+        var role: Role? = null
+)
+
+enum class Role(val id: Int) {
+    DEFAULT(0), AUTHOR(1), ADMIN(2);
+}
+
+class RoleConverter : PropertyConverter<Role?, Int?> {
+    override fun convertToEntityProperty(databaseValue: Int?): Role? {
+        if (databaseValue == null) {
+            return null
+        }
+        for (role in Role.values()) {
+            if (role.id == databaseValue) {
+                return role
+            }
+        }
+        return Role.DEFAULT
+    }
+
+    override fun convertToDatabaseValue(entityProperty: Role?): Int? {
+        return entityProperty?.id
+    }
+}
+```
+
+MyObjectBox以及相关表的生成目录
+build\generated\source\kapt\envTestDebug\com\autohome\module_badge\sql\MyObjectBox.java
 
 生成：Build > Make project
 查看： app > objectbox-models

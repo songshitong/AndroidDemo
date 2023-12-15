@@ -49,6 +49,13 @@ package com.sst.libkotlin.clasz
 //    putExtra("params2","666")
 //}
 
+//非安全的类型强转
+@Suppress("UNCHECKED_CAST")
+fun <T> cast(obj: Any?): T {
+  return obj as T
+}
+
+
 //泛型协变，逆变和不变
 //1 泛型协变的语法规则：<out T> 类似于 Java 的 <? extends Bound>，它限定的类型是当前上边界类或者其子类，
 // 如果是接口的话就是当前上边界接口或者实现类，协变的泛型变量只读，不可以写，可以添加 null ，但是没意义 ,例如SimpleDataOut

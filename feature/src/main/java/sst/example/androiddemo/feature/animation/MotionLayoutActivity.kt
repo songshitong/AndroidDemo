@@ -86,7 +86,7 @@ class MotionLayoutActivity : AppCompatActivity() {
     //代码控制constraintSet
 //    val startConstraintSet = motionLayout.getConstraintSet(R.id.scene_start)
 //    val startConstraint = startConstraintSet.getConstraint(R.id.container)
-//    startConstraint.layout.mHeight = foldHeight 控制不同场景的约束
+//    startConstraint.layout.mHeight = foldHeight 控制不同场景的约束 LayoutParams.WRAP_CONTENT
   // constraint.propertySet.alpha = 0.1f
 
 

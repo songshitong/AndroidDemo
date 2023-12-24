@@ -279,3 +279,27 @@ android.intent.category.LAUNCHER // 决定应用程序是否显示在程序列�
         </intent-filter>
     </activity>
 ```
+
+一个应用设置多个入口，不同的入口跳转不同的页面
+https://juejin.cn/post/7226911455878479931
+```
+<activity
+    android:name=".MainActivity"
+    android:exported="true"
+    android:launchMode="singleTask">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+<activity-alias
+    android:name=".Alias"
+    android:icon="@mipmap/ic_chrome"
+    android:label="Fake Chrome"
+    android:targetActivity=".MainActivity"> //指向一个已经存在的activity
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity-alias>
+```

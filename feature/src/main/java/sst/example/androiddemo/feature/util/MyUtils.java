@@ -40,6 +40,8 @@ public class MyUtils {
 
 
 
+    //判断APP处于前台或者后台
+    //https://stackoverflow.com/questions/8489993/check-android-application-is-in-foreground-or-not
     public boolean foregrounded() {
         ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
         ActivityManager.getMyMemoryState(appProcessInfo);

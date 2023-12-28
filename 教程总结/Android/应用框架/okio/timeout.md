@@ -103,7 +103,8 @@ actual open class Timeout {
 ```
 
 jvmMain/okio/AsyncTimeout.kt
-耗时任务放在子线程的timeout
+监控放在子线程的timeout，超时回调timedOut()也在子线程
+不能监听native的超时
 ```
 open class AsyncTimeout : Timeout() {
   private var inQueue = false
@@ -222,8 +223,51 @@ open class AsyncTimeout : Timeout() {
         }
       }
     }
-  
   }
 }
+```
+exit方法  超时返回true
+```
+  fun exit(): Boolean {
+    if (!inQueue) return false
+    inQueue = false
+    return cancelScheduledTimeout(this)
+  }
   
+   private fun cancelScheduledTimeout(node: AsyncTimeout): Boolean {
+      synchronized(AsyncTimeout::class.java) {
+        // Remove the node from the linked list.
+        var prev = head
+        while (prev != null) {
+          if (prev.next === node) {
+            prev.next = node.next //移除节点
+            node.next = null
+            return false
+          }
+          prev = prev.next
+        }
+        //队列中没有，已经因为超时被移除了
+        // The node wasn't found in the linked list: it must have timed out!
+        return true
+      }
+    }
+```
+
+使用示例
+jvmMain/okio/AsyncTimeout.kt
+```
+ inline fun <T> withTimeout(block: () -> T): T {
+    var throwOnTimeout = false
+    enter()
+    try {
+      val result = block()
+      throwOnTimeout = true
+      return result
+    } catch (e: IOException) {
+      throw if (!exit()) e else `access$newTimeoutException`(e)
+    } finally {
+      val timedOut = exit() //block执行完成时已经超时，抛出异常
+      if (timedOut && throwOnTimeout) throw `access$newTimeoutException`(null)
+    }
+  }
 ```

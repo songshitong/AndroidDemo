@@ -549,4 +549,29 @@ ActivityManager: Not finishing activity because controller resumed
    (Waiting because no window has focus but there is a focused application that may eventually add a window when
     it finishes starting up.)]
 ```
-发生这个ANR的原因是Contoller将resume的操作给拦截了, 导致Focus不过去, 从而导致ANR，User版本不会有Contoller, 所以不会出现这个 ANR. 所以这个 ANR 可以忽略.
+发生这个ANR的原因是Contoller将resume的操作给拦截了, 导致Focus不过去, 从而导致ANR，User版本不会有Contoller, 所以不会出现这个 ANR. 
+所以这个 ANR 可以忽略.
+
+
+
+6.0
+设置UncaughtExceptionHandler后没有调用系统默认的handler
+```
+Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(final Thread t, Throwable e) {
+                Log.i("uncaught", Thread.currentThread().toString());
+                Log.i("uncaught", t.toString());
+            }
+        });
+```
+堆栈表现
+```
+at android.os.MessageQueue.nativePollOnce(Native method)
+at android.os.MessageQueue.next(MessageQueue.java:323)
+at android.os.Looper.loop(Looper.java:135)
+at android.app.ActivityThread.main(ActivityThread.java:5417)
+at java.lang.reflect.Method.invoke!(Native method)
+at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:726)
+at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
+```

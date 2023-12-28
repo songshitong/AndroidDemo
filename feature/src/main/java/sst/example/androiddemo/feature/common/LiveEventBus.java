@@ -4,6 +4,10 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.HashMap;
 import java.util.Map;
 
+//缺点：
+//1  不支持粘性和非粘性的获取
+//2  不支持数据的清空  例如退出登录时，将所有数据重置
+
 public class LiveEventBus {
 
   //Class<T> clz用于确定liveData传入的泛型，并没有使用

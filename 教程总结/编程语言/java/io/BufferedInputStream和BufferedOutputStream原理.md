@@ -67,7 +67,7 @@ public synchronized int read() throws IOException {
   
 
  private void fill() throws IOException {
-    byte[] buffer = this.getBufIfOpen();
+    byte[] buffer = this.getBufIfOpen(); //拿到buffer
     int nsz;
     if (this.markpos < 0) {
       //第一次执行
@@ -132,4 +132,55 @@ public synchronized int read() throws IOException {
       this.pos = this.markpos;
     }
   }  
+```
+
+//buff读取
+read(byte b[], int off, int len)
+```
+ public synchronized int read(byte b[], int off, int len)
+        throws IOException
+    {
+        getBufIfOpen(); // Check for closed stream
+        if ((off | len | (off + len) | (b.length - (off + len))) < 0) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return 0;
+        }
+
+        int n = 0;
+        for (;;) {
+            int nread = read1(b, off + n, len - n);
+            if (nread <= 0)
+                return (n == 0) ? nread : n;
+            n += nread;
+            if (n >= len)
+                return n;
+            // if not closed but no bytes available, return
+            InputStream input = in;
+            if (input != null && input.available() <= 0)
+                return n;
+        }
+    }
+
+ private int read1(byte[] b, int off, int len) throws IOException {
+        int avail = count - pos;
+        if (avail <= 0) {
+            /* If the requested length is at least as large as the buffer, and
+               if there is no mark/reset activity, do not bother to copy the
+               bytes into the local buffer.  In this way buffered streams will
+               cascade harmlessly. */
+            if (len >= getBufIfOpen().length && markpos < 0) {
+                return getInIfOpen().read(b, off, len);
+            }
+            //填充数据
+            fill();
+            avail = count - pos;
+            if (avail <= 0) return -1;
+        }
+        int cnt = (avail < len) ? avail : len;
+        //从buffer拷贝到b[]
+        System.arraycopy(getBufIfOpen(), pos, b, off, cnt);
+        pos += cnt;
+        return cnt;
+    }    
 ```

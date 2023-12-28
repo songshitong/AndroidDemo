@@ -1,4 +1,9 @@
 
+sentry 默认关闭dump  设置——>隐私
+Store Native Crash Reports
+Store native crash reports such as Minidumps for improved processing and download in issue details
+
+
 https://juejin.cn/post/6844904143090352135
 sentry是一个基于Django构建的现代化的实时事件日志监控、记录和聚合平台,主要用于如何快速的发现故障。支持几乎所有主流开发语言和平台,
 并提供了现代化UI,它专门用于监视错误和提取执行适当的事后操作所需的所有信息,而无需使用标准用户反馈循环的任何麻烦。官方提供了多个语言的SDK.

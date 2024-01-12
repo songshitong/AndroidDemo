@@ -27,7 +27,9 @@ if (serviceUuids != null && serviceUuids.length > 0) {
     ScanFilter filter =
             new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUuids[0])) //final UUID[] serviceUuids 过滤设备的service uuid
                     .build();
-    //filter.setDeviceName(name)过滤设备名称  .setDeviceAddress(address)                
+    //filter.setDeviceName(name)过滤设备名称  .setDeviceAddress(address) //过滤address
+    //过滤条件越多，兼容性越差  例如设备名为中文 部分机型编码不支持
+    // samsung galaxy s10在同时设置uuid和name时，无法扫描到设备，但是设置任一个却可以               
     filters.add(filter);
 }
 scanner.startScan(filters, settings, 

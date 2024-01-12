@@ -1,4 +1,8 @@
 
+androidx包
+OneShotPreDrawListener 用于监听一次PreDraw，实现后移除
+可以查看androidx/core/view/View.kt的实现
+
 
 判断action是否在view内触发
 ```

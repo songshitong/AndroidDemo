@@ -532,7 +532,7 @@ frameworks/base/core/java/android/app/ActivityThread.java
                 CompatibilityInfo compatInfo, Map<String, IBinder> services, Bundle coreSettings) {
 
             ...
-            AppBindData data = new AppBindData();
+            AppBindData data = new AppBindData(); //此时会将进程信息传递给ActivityThread
              ...
             sendMessage(H.BIND_APPLICATION, data);
         }

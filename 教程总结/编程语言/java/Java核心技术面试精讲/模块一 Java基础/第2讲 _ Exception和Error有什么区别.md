@@ -19,7 +19,11 @@ Error 是指在正常情况下，不大可能出现的情况，绝大部分的 E
 
 Exception 又分为可检查（checked）异常和不检查（unchecked）异常，可检查异常在源代码里必须显式地进行捕获处理，
   这是编译期检查的一部分。前面我介绍的不可查的 Error，是 Throwable 不是 Exception。
-//非RuntimeException的子类都是checked异常   IOException->Exception
+//非RuntimeException的子类都是checked异常   IOException->Exception   不捕获也会闪退
+检查异常一般是在方法的后面为throw Exception xx，声明在方法内部的异常不是检查异常
+kotlin的写法为使用注解@Throws(java.io.IOException::class)，kotlin中没有检查异常，该注解是为了提供java的提示
+
+
 
 RuntimeException会发生崩溃
 不检查异常就是所谓的运行时异常，类似 NullPointerException、ArrayIndexOutOfBoundsException 之类，

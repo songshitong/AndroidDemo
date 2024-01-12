@@ -43,10 +43,46 @@ class MFlow {
             runBlocking {
                 getFlow().collect { value -> println("start collect1 $value") }
                 getFlow().collect { value -> println("start collect2 $value") }
-
             }
 
+            //冷流接口
+            // public interface Flow<out T> {
+            //   public suspend fun collect(collector: FlowCollector<T>)
+            // }
+            // public fun interface FlowCollector<in T> {
+            //   public suspend fun emit(value: T)
+            // }
+            //创建一个flow
+            // public fun <T> flow(@BuilderInference block: suspend FlowCollector<T>.() -> Unit): Flow<T> = SafeFlow(block)
 
+            //冷流使用场景  配合替换Rxjava，某些固定的流程，结果不需要更新
+            // GlobalScope.launch(Dispatchers.Main) {
+            //   flowOf(bitmap).map { bmp ->
+            //     //在子线程中执行耗时操作，存储 bitmap 到本地
+            //     saveBitmap(bmp)
+            //   }.flowOn(Dispatchers.IO).collect { bitmapLocalPath ->
+            //     //在主线程中处理存储 bitmap 后的本地路地址
+            //   }
+            // }
+
+
+
+            //https://juejin.cn/post/7217601930917969957#heading-2
+            //热流  StateFlow或者SharedFlow
+            //SharedFlow实现flow，但是collect不执行, 实现是MutableSharedFlow
+            // public interface SharedFlow<out T> : Flow<T> {
+            //   public val replayCache: List<T>
+            //   override suspend fun collect(collector: FlowCollector<T>): Nothing
+            // }
+
+            //StateFlow继承SharedFlow  可以获取value，实现类MutableStateFlow
+            // public interface StateFlow<out T> : SharedFlow<T> {
+            //   public val value: T
+            // }
+
+            //热流的使用场景
+            //热流 SharedFlow 可以用来做事件总线，替换 EventBus
+            //热流 StateFlow 可以用来做事件状态更新，替换 LiveData，并结合 MVI 替换 MVVM
         }
 
         suspend fun simpleFlow() {

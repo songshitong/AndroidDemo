@@ -108,7 +108,7 @@ class MCollection {
             println("flatmap ${containers.flatMap { it }}")//flatmap [one, two, three, four, five, six, seven, eight]
 
           //map整合
-          val mapPlus = map1.plus(maps)
+          val mapPlus = map1.plus(mapOf("1" to "2"))
 
             //fold和reduce  两个函数都是对集合的遍历，只是遍历完成之后能得到一个结果
 //            reduce的返回值类型必须和集合的元素类型相符。

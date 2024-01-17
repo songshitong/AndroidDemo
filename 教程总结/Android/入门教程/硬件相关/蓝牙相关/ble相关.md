@@ -11,10 +11,23 @@ Android 4.3 （API 18 ）引入了低功耗蓝牙，应用可以查询周围设�
 2.属性协议 (ATT) — 属性协议 (ATT) 是 GATT 的构建基础，二者的关系也被称为 GATT/ATT。ATT 经过优化，可在 BLE 设备上运行。
 为此，该协议尽可能少地使用字节。每个属性均由通用唯一标识符 (UUID) 进行唯一标识，后者是用于对信息进行唯一标识的字符串 ID 的 128 位标准化格式。
 由 ATT 传输的属性采用特征和服务格式
-3. 特征 — 特征包含一个值和 0 至多个描述特征值的描述符。您可将特征理解为类型，后者与类类似。
-4. 描述符 — 描述符是描述特征值的已定义属性。例如，描述符可指定人类可读的描述、特征值的可接受范围或特定于特征值的度量单位。
-5. Service — 服务是一系列特征。例如，您可能拥有名为“心率监测器”的服务，其中包括“心率测量”等特征。
+3.特征 — 特征包含一个值和 0 至多个描述特征值的描述符。您可将特征理解为类型，后者与类类似。
+4.描述符 — 描述符是描述特征值的已定义属性。例如，描述符可指定人类可读的描述、特征值的可接受范围或特定于特征值的度量单位。
+5.Service — 服务是一系列特征。例如，您可能拥有名为“心率监测器”的服务，其中包括“心率测量”等特征。
  您可以在 bluetooth.org 上找到基于 GATT 的现有配置文件和服务的列表
+
+https://developers.weixin.qq.com/miniprogram/dev/framework/device/ble.html
+uuid
+UUID (Universally Unique Identifier)
+根据蓝牙 4.2 协议规范(Vol 3, Part B, section 2.5.1 UUID)，UUID 是一个 128 位的唯一标识符，用来标识 Service 和 Characteristic 等。
+为了减少存储和传输 128 位 UUID 值的负担，蓝牙技术联盟预分配了一批 UUID，这一批 UUID 拥有一个共同部分，被称为 Bluetooth Base UUID，
+即 00000000-0000-1000-8000-00805F9B34FB。因此，预分配的 UUID 也可以使用 16 位或 32 位表示，其中 16 位 UUID 最为常用。
+使用 16/32 位的 UUID 可以降低存储和传输的负载。开发者自定义的 UUID 应注意不能与预分配的 UUID 冲突
+iOS 支持直接使用 16 位 和 128 位的 UUID；
+Android 8.0.9 版本开始，支持直接使用 16/32/128 位 UUID；
+Android 8.0.9 以下版本，只支持 128 位的 UUID，需要开发者手动补位到 128 位
+
+
 
 
 https://developer.android.com/guide/topics/connectivity/bluetooth-le?hl=zh-cn

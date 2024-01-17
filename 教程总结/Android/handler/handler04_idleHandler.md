@@ -1,12 +1,7 @@
 https://cloud.tencent.com/developer/article/1578511
 https://blog.csdn.net/fhcxiaosa1995/article/details/107343319
-//todo GCIdler
 
-if (mPendingIdleHandlers == null) {
-mPendingIdleHandlers = new IdleHandler[Math.max(pendingIdleHandlerCount, 4)];
-}
-mPendingIdleHandlers = mIdleHandlers.toArray(mPendingIdleHandlers);
-//todo mIdleHandlers为什么转为array
+
 
 idle [ˈaɪdl] adj. 懈怠的;懒惰的;闲置的;没有工作的;闲散的  v. 混时间;闲荡;无所事事;空转;挂空挡;未熄火;(尤指暂时地)关闭工厂，使(工人)闲着
 
@@ -38,7 +33,7 @@ public final class MessageQueue {
                     continue;
                 }
                 ......
-                // 1.3 将空闲消息处理者集合转为数组
+                // 1.3 将空闲消息处理者集合转为数组 临时存储数据用于遍历执行
                 mPendingIdleHandlers = mIdleHandlers.toArray(mPendingIdleHandlers);
             }
 
@@ -122,6 +117,26 @@ IdleHandler就是当消息队列里面没有当前要处理的消息了，需要
 //todo https://mp.weixin.qq.com/s/dh_71i8J5ShpgxgWN5SPEw
 
 IdleHandler具有一定的不可控特性,例如UI线程的任务一直不执行完
+
+
+https://mp.weixin.qq.com/s/gVUf4uy7kkukYKziRWN5Mg
+IdleHandler的适用场景
+轻量级任务：IdleHandler主要用于执行轻量级的任务。由于它是在主线程空闲时执行，所以不适合执行耗时的任务。
+主线程空闲时执行：IdleHandler通过在主线程空闲时被调用，避免了主线程的阻塞。因此，适用于需要在主线程执行的任务，并且这些任务对于用户体验的影响较小。
+优先级较低的任务：如果有多个任务注册了IdleHandler，系统会按照注册的顺序调用它们的queueIdle方法。因此，适用于需要在较低优先级下执行的任务。
+总的来说IdleHandler适用于需要在主线程空闲时执行的轻量级任务，以提升应用的性能和用户体验。
+高级应用
+性能监控与优化利用 IdleHandler 可以实现性能监控和优化，例如统计每次空闲时的内存占用情况，或者执行一些内存释放操作。
+预加载数据在用户操作前，通过 IdleHandler 提前加载一些可能会用到的数据，提高用户体验。
+动态资源加载利用空闲时间预加载和解析资源，减轻在用户操作时的资源加载压力。
+性能优化技巧
+虽然IdleHandler提供了一个方便的机制来在主线程空闲时执行任务，但在使用过程中仍需注意一些性能方面的问题。
+任务的轻量级处理: 确保注册的IdleHandler中的任务是轻量级的，不要在空闲时执行过于复杂或耗时的操作，以免影响主线程的响应性能。
+避免频繁注册和取消IdleHandler: 频繁注册和取消IdleHandler可能会引起性能问题，因此建议在应用的生命周期内尽量减少注册和取消的操作。
+   可以在应用启动时注册IdleHandler，在应用退出时取消注册。
+合理设置任务执行频率: 根据任务的性质和执行需求，合理设置任务的执行频率。不同的任务可能需要在不同的时间间隔内执行，这样可以更好地平衡性能和功能需求。
+
+
 
 IdleHandler的任务队列
 https://mp.weixin.qq.com/s/pXabtyyg9JhbQY1ZA7Mu6w

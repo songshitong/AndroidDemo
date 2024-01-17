@@ -46,6 +46,10 @@ public class MCoroutines{
           //suspendCoroutine  todo  CPS https://www.jianshu.com/p/06703abc56b1
 
           testCustomThread()
+
+           //协程中使用锁
+          //todo https://kotlinlang.org/docs/shared-mutable-state-and-concurrency.html#mutual-exclusion
+          //https://mp.weixin.qq.com/s/fQoBmVYZHKqHPNikPGEEzw
       }
 
       private fun testCustomThread() {

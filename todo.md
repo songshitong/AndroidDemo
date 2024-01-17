@@ -64,6 +64,10 @@ https://mp.weixin.qq.com/s/yQQ5q8vvi7ltVxVQrfcl0Q
 这件事非常糟糕，不仅无数底层劳动者丧失谋生手段，更让无数人丢掉了人生方向，迷茫而不知所往，包括新时代暴富的新贵。
 
 
+valhalla 将java的对象类型改为值类型来优化性能和内存
+https://openjdk.org/projects/valhalla/
+https://mp.weixin.qq.com/s/jPAVBurLIxmoN82eLUdhmw
+
 
 webrtc
 https://mp.weixin.qq.com/s/bsK5mCLmioIshKaBMKmoCQ

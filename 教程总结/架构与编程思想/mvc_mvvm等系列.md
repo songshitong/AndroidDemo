@@ -145,6 +145,7 @@ View可以独立于Model变化和修改，一个ViewModel可以绑定到不同�
 内存消耗：activity,viewModel,model,dataBinding
 
 
+https://github.com/flyfire/android-architecture-mvi
 MVI
 MVI 与 MVVM 很相似，其借鉴了前端框架的思想，更加强调数据的单向流动和唯一数据源
 Model: 与MVVM中的Model不同的是，MVI的Model主要指UI状态（State）。例如页面加载状态、控件位置等都是一种UI状态

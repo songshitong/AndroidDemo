@@ -3,6 +3,7 @@ https://blog.csdn.net/fhcxiaosa1995/article/details/107343319
 
 
 
+
 idle [ˈaɪdl] adj. 懈怠的;懒惰的;闲置的;没有工作的;闲散的  v. 混时间;闲荡;无所事事;空转;挂空挡;未熄火;(尤指暂时地)关闭工厂，使(工人)闲着
 
 /frameworks/base/core/java/android/os/MessageQueue.java
@@ -137,6 +138,30 @@ IdleHandler的适用场景
 合理设置任务执行频率: 根据任务的性质和执行需求，合理设置任务的执行频率。不同的任务可能需要在不同的时间间隔内执行，这样可以更好地平衡性能和功能需求。
 
 
+GCIdler 在合适的时机开始执行GC
+https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/ActivityThread.java
+```
+ final class GcIdler implements MessageQueue.IdleHandler {
+        @Override
+        public final boolean queueIdle() {
+            doGcIfNeeded();
+            purgePendingResources();
+            return false;
+        }
+    }
+ void doGcIfNeeded() {
+        doGcIfNeeded("bg");
+    }
+  void doGcIfNeeded(String reason) {
+        mGcIdlerScheduled = false;
+        final long now = SystemClock.uptimeMillis();
+        //MIN_TIME_BETWEEN_GCS为5*1000  
+        if ((BinderInternal.getLastGcTime()+MIN_TIME_BETWEEN_GCS) < now) {
+           //开始gc
+            BinderInternal.forceGc(reason);
+        }
+    }   
+```
 
 IdleHandler的任务队列
 https://mp.weixin.qq.com/s/pXabtyyg9JhbQY1ZA7Mu6w

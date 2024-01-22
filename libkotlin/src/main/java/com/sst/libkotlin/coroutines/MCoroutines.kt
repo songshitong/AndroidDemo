@@ -1,4 +1,8 @@
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import kotlin.coroutines.suspendCoroutine
 import kotlin.jvm.Throws
@@ -47,9 +51,27 @@ public class MCoroutines{
 
           testCustomThread()
 
-           //协程中使用锁
-          //todo https://kotlinlang.org/docs/shared-mutable-state-and-concurrency.html#mutual-exclusion
+
+          //mutex
+          //Mutex的实现基于挂起函数和协程的概念。当一个协程请求进入受Mutex保护的临界区时，如果Mutex已经被占用，请求的协程将被挂起，
+         // 直到Mutex可用。这样可以避免多个协程同时访问共享资源，确保线程安全。
+          // https://kotlinlang.org/docs/shared-mutable-state-and-concurrency.html#mutual-exclusion
           //https://mp.weixin.qq.com/s/fQoBmVYZHKqHPNikPGEEzw
+          val mutex = Mutex()
+          var count = 0
+          runBlocking {
+              withContext(Dispatchers.IO){
+                  repeat(10000){
+                      launch {
+                          mutex.withLock {
+                            count++
+                          }
+                      }
+                  }
+              }
+              println("test mutex: count is $count") //使用mutex保护，结果是10000  不使用mutex保护，结果一般小于10000
+          }
+         Channel<> {  }
       }
 
       private fun testCustomThread() {

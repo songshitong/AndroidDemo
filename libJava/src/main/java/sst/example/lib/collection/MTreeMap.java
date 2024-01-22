@@ -35,7 +35,7 @@ public class MTreeMap {
     System.out.println("ceilingKey is:"+ceilingKey.toString());  //ceilingKey is:b
 
 
-    SortedMap<String,Integer> sortedMap =map.subMap("a","f"); //获取a-f的集合
+    SortedMap<String,String> sortedMap =map.subMap("a","f"); //获取a-f的集合
     System.out.println("sortedMap is:"+sortedMap.toString()); //sortedMap is:{a=222, b=123}
   }
 }

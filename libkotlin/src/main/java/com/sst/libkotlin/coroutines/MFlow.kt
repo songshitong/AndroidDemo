@@ -3,6 +3,7 @@ package com.sst.libkotlin.coroutines
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -70,6 +71,17 @@ class MFlow {
       //   }
       // }
 
+
+      //https://juejin.cn/post/7169843775240405022
+      // StateFlow 和 SharedFlow 分别是用来处理 状态(state) 和 事件(event) 的，它称呼 StateFlow 是 a state-holder observable：
+      // val uiState: StateFlow<LatestNewsUiState>
+      // val tickFlow: SharedFlow<Event<String>>
+      //对 UI 而言，state 是 UI 组件的状态，它应当始终都有一个值来表示其状态，且当有新的订阅者加入时，它也应知道当前的状态，即 StateFlow 的粘性。
+      //而 event 事件只有在发生某些动作后才会触发，不需要有初始值。SharedFlow 默认非粘性的，当新的订阅者加入时，它不会重复发生已经发生过的事件。
+      //对于状态而言，即使多次发送，我们只关注最新的状态；对于事件而言，如果多次发送，我们不想丢失任何一个前台的事件
+
+
+
       //https://juejin.cn/post/7217601930917969957#heading-2
       //热流  StateFlow或者SharedFlow
       //SharedFlow实现flow，但是collect不执行, 实现是MutableSharedFlow
@@ -77,7 +89,11 @@ class MFlow {
       //   public val replayCache: List<T>
       //   override suspend fun collect(collector: FlowCollector<T>): Nothing
       // }
-      val shared = MutableSharedFlow<String>()
+      val shared = MutableSharedFlow<String>(0,0, BufferOverflow.SUSPEND)
+      //构建参数
+      //replay 新的订阅时，历史数据发送的个数  默认为0，即不支持粘性
+      //extraBufferCapacity 缓存区容量
+      //onBufferOverflow 缓冲策略，丢弃还是挂起
       CoroutineScope(Dispatchers.Default).launch {
         shared.collect {
           println("sharedFlow $it")
@@ -88,11 +104,18 @@ class MFlow {
         shared.emit("1")
       }
 
+      CoroutineScope(Dispatchers.Default).launch {
+        delay(2000)
+        shared.collect {
+          println("sharedFlow delay 粘性监听： $it")  //SharedFlow没有粘性
+        }
+      }
+
       //StateFlow继承SharedFlow  可以获取value，实现类MutableStateFlow
       // public interface StateFlow<out T> : SharedFlow<T> {
       //   public val value: T
       // }
-      val state = MutableStateFlow("")
+      val state = MutableStateFlow("") //有粘性的，提供一个默认空值，方便清空数据
       CoroutineScope(Dispatchers.Default).launch {
         println("stateFlow current:${state.value}")  //当前值，只有stateFlow才有，sharedFlow没有
         state.collect {
@@ -105,6 +128,12 @@ class MFlow {
         state.collect {
           //监听
           println("stateFlow2 $it")
+        }
+      }
+      CoroutineScope(Dispatchers.Default).launch {
+        delay(1000)
+        state.collect{
+          println("stateFlow delay 粘性监听  $it") //事件发生后监听，存在粘性
         }
       }
 

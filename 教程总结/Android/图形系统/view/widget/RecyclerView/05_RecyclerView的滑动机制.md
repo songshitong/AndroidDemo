@@ -743,3 +743,5 @@ ViewFlinger的run方法比较长，这里我将它简化了一下
    RecyclerView的滑动机制相比较来说，还是非常简单，我也感觉没有什么可以总结。不过从RecyclerView的源码，我们可以学习两点：
 1 多指滑动。我们可以根据RecyclerView的源码，来实现自己的多指滑动，这是一种参考，也是学以致用
 2 fling滑动。RecyclerView实现了fling效果，在日常开发过程中，如果我们也需要实现这种效果，我们可以根据RecyclerView的源码来实现。
+
+//todo https://zhuanlan.zhihu.com/p/594778527

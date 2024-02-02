@@ -1,7 +1,9 @@
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import kotlin.coroutines.suspendCoroutine
@@ -51,6 +53,8 @@ public class MCoroutines{
 
           testCustomThread()
 
+          //等待其他协程的完成
+          testJoinAll()
 
           //mutex
           //Mutex的实现基于挂起函数和协程的概念。当一个协程请求进入受Mutex保护的临界区时，如果Mutex已经被占用，请求的协程将被挂起，
@@ -71,7 +75,37 @@ public class MCoroutines{
               }
               println("test mutex: count is $count") //使用mutex保护，结果是10000  不使用mutex保护，结果一般小于10000
           }
-         Channel<> {  }
+
+          //Semaphore
+          //信号量来保证协程的安全
+          var count1 =0
+          val semaphore = Semaphore(1,0) //总的信号量(至少有1个)和已经使用的信号量
+          CoroutineScope(Dispatchers.Default).launch {
+              List(10000){//创建10000个协程
+                  launch {
+                      semaphore.withPermit { //对semaphore的封装，里面有acquire()，release()两个方法
+                          count1++
+                      }
+                  }
+              }.joinAll() //等待
+              println("Semaphore count1 $count1")
+          }
+      }
+
+      private fun testJoinAll() {
+          runBlocking {
+              val job1 = GlobalScope.launch {
+                  delay(1000)
+                  println("job1")
+              }
+              val job2 = GlobalScope.launch {
+                  delay(500)
+                  println("job2")
+              }
+              joinAll(job1,job2) //等待两个job的完成
+              println("job1和job2都已经完成")
+          }
+
       }
 
       private fun testCustomThread() {

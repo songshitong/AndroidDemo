@@ -200,3 +200,50 @@ When the app leaves the cached state, such as returning to the foreground, the s
 
 manifest声明的广播不受影响
 Manifest-declared broadcasts aren't queued, and apps are removed from the cached state for broadcast delivery
+
+https://mp.weixin.qq.com/s/GWtY8qV-BhTkPEnSbIjTHQ
+所有动态加载的文件都必须标记为只读(例如DEX、JAR 或 APK 文件)。否则，系统将抛出异常。官方建议应用尽可能避免动态加载代码，
+因为这样做会大大增加应用被代码注入或代码篡改破坏的风险。
+```
+val jar = File("xxx.jar")
+val os = FileOutputStream(jar)
+os.use {
+    jar.setReadOnly()
+}
+val cl = PathClassLoader(jar.absolutePath, parentClassLoader)
+```
+
+Foreground service types are required
+类型有：需要在manifest或代码中指定
+camera，connectedDevice，dataSync，health，location，mediaPlayback，mediaProjection，microphone，phoneCall，
+remoteMessaging，shortService，specialUse，systemExempted
+如果前台服务的逻辑与这些类型无关，建议使用WorkManager/user-initiated data transfer jobs
+
+user-initiated data transfer jobs 就是由用户发起的数据传输任务。此 API 是 Android14 新增的，
+适用于需要由用户发起的持续时间较长的数据传输，例如从远程服务器下载文件。这些任务需要在通知栏中显示一个通知，会立即启动，
+并且可能在系统条件允许的情况下长时间运行。我们可以同时运行多个由用户发起的数据传输作业
+```
+<uses-permission android:name="android.permission.RUN_USER_INITIATED_JOBS" />
+<service android:name="com.example.app.CustomTransferService"
+        android:permission="android.permission.BIND_JOB_SERVICE"
+        android:exported="false">
+        ...
+</service>
+class CustomTransferService : JobService() {
+  ...
+}
+https://developer.android.com/about/versions/14/changes/user-initiated-data-transfers 
+```
+
+Runtime-registered broadcasts receivers must specify export behavior
+```
+val filter = IntentFilter("alarmReceiver_custom_action")
+val listenToBroadcastsFromOtherApps = true
+val receiverFlags = if (listenToBroadcastsFromOtherApps) {
+    ContextCompat.RECEIVER_EXPORTED    // 该接收器对其他应用开放
+} else {
+    ContextCompat.RECEIVER_NOT_EXPORTED    // 该接收器不对其他应用开放
+}
+// 这里的 registerReceiver 方法必须设置 receiverFlags 参数
+registerReceiver(requireContext(), AlarmReceiver(), filter, receiverFlags)
+```

@@ -49,8 +49,6 @@ class MFlow {
         getFlow().collect { value -> println("start collect1 $value") }
         getFlow().collect { value -> println("start collect2 $value") }
       }
-      Mutex()
-
       //冷流接口
       // public interface Flow<out T> {
       //   public suspend fun collect(collector: FlowCollector<T>)

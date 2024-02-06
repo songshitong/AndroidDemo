@@ -1,8 +1,18 @@
 package com.sst.libkotlin
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.withPermit
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.Base64
+import kotlin.Result.Companion
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MString {
 
@@ -10,7 +20,12 @@ class MString {
 
         @JvmStatic
         fun main(args: Array<String>) {
-
+          CoroutineScope(Dispatchers.Default).launch {
+             delay(1000)
+             suspendCancellableCoroutine<String> {
+               it.resume("success")
+             }
+          }
             val a ="ab"
             //通过索引访问的字符串中的字符：s [i]
             println("索引1的字符为"+a[1])

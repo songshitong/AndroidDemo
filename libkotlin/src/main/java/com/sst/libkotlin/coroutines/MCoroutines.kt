@@ -6,9 +6,11 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import kotlin.Result.Companion
 import kotlin.coroutines.suspendCoroutine
 import kotlin.jvm.Throws
-
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 //https://juejin.cn/post/6913429237147893774
 //何为Kotlin协程？
@@ -90,6 +92,34 @@ public class MCoroutines{
               }.joinAll() //等待
               println("Semaphore count1 $count1")
           }
+
+          //suspendCancellableCoroutine
+          //https://juejin.cn/post/7047635719065436167
+          runBlocking {
+              println("before")
+              // susFun() //写入susFun后，after不会执行  即协程挂起了并且没有回复
+              susDelayFun() //1秒后执行after，类似delay函数的实现
+              println("after")
+          }
+      }
+
+      suspend fun susFun(){
+         //suspendCoroutine与suspendCancellableCoroutine类似，后者支持cancel
+         //用于实现一个挂起函数
+         suspendCancellableCoroutine<Unit> {
+
+         }
+      }
+
+      suspend fun susDelayFun(){
+         suspendCancellableCoroutine<String> {
+             Thread.sleep(1000)
+             //手动恢复协程，并返回String值
+             it.resume("success")  //需要import kotlin.coroutines.resume
+             // it.resumeWith(Result.success("2233"))
+             // it.resumeWith(Result.success(Unit)) 返回Unit类型
+             // it.resumeWithException(Exception("error")) //返回异常类型
+         }
       }
 
       private fun testJoinAll() {

@@ -1,3 +1,6 @@
 <resources>
   <string name="title_activity_main">MainActivity</string>
+  <string name="title_activity_custom_draw">CustomDrawActivity</string>
+  <string name="title_activity_custom_layout">CustomLayoutActivity</string>
+  <string name="title_activity_sub_compose_layout">SubComposeLayoutActivity</string>
 </resources>

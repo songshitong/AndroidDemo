@@ -3,6 +3,11 @@
 
   <application>
     <activity
+        android:name=".IntrinsicSizeActivity"
+        android:exported="false"
+        android:label="@string/title_activity_intrinsic_size"
+        android:theme="@style/Theme.AndroidDemo" />
+    <activity
         android:name=".SubComposeLayoutActivity"
         android:exported="false"
         android:label="@string/title_activity_sub_compose_layout"

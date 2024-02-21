@@ -191,6 +191,13 @@ class MCollection {
 
           //join  支持多种方式
           println("join ${list1.joinToString(",")}")
+
+          //maxOf 取最大值
+          val maxList = listOf(1,2,3)
+          println("maxList ${maxList.maxOf { i->i }}")
+
+          //sum 求和公式
+          println("sum of ${maxList.sumOf { i->i }}")
         }
     }
 }

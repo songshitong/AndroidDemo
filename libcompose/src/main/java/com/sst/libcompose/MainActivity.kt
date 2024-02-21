@@ -78,6 +78,12 @@ class MainActivity : ComponentActivity() {
             }
 
             Button(onClick = {
+              startActivity(Intent(this@MainActivity, IntrinsicSizeActivity::class.java))
+            }) {
+              Text(text = "固有测量IntrinsicSize")
+            }
+
+            Button(onClick = {
               startActivity(Intent(this@MainActivity, SubComposeLayoutActivity::class.java))
             }) {
               Text(text = "SubComposeLayout")

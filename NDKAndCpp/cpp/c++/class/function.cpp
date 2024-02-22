@@ -15,6 +15,36 @@
 
 //回调建议使用std::function   使用lambda，无法捕获外部变量，这样lambda的数据无法传递给外部
 #include <functional>
+#include <iostream>
+
+typedef std::function<void(int)> ResultCall;//定义回调函数 里面为函数签名
+void add(int a,int b,ResultCall resultCall){
+    resultCall(a+b);
+};
+
+int doubleFun(int a)
+{
+    return a*2;
+};
+
+class Add
+{
+public: 
+  int member = 10;
+  int operator()(int a,int b){ //function持有的类需要重写operator
+        return a+b;
+  }
+  int addInt(int a,int b){
+    return a+b;
+  }
+};
+
+double my_divide (double x, double y) {return x/y;};
+
+struct MyPair {
+  double a,b;
+  double multiply() {return a*b;}
+};
 
 int main(){
 //    lambda  [](int a, int b) -> bool { return a < b; }
@@ -45,11 +75,58 @@ int main(){
 
   //测试回调函数
   add(1,2,[](int result){
-      cout<< result;
+      std::cout<<"测试回调"<< result << std::endl;
   });
+  //lamada表达式情况
+  std::function<int(int,int)> lambda = [](int a,int b){
+    return a+b;
+  };
+  int lambdaResult = lambda(1,2);
+  std::cout<<"lambdaResult result = "<<lambdaResult<<std::endl;
+
+
+  //https://mp.weixin.qq.com/s/dh26mdQdCa_pydIj4mghGQ
+  //直接可以接受函数指针的赋值
+  std::function<int(int)> f = doubleFun;
+  int functionResult = f(1);
+  std::cout<<"function result = "<<functionResult<<std::endl;
+  //存储类对象
+  std::function<int(int,int)> addF = Add();
+  int addResult = addF(1,2); //等同于Add::operator()
+  std::cout<<"addResult result = "<<addResult<<std::endl;
+  //存储成员方法  function的Args里面第一个参数必须要求传递类对象。 调用function时候第一个参数也是必须要是Add类的对象
+  std::function<int(Add&,int,int)> addIntFun = &Add::addInt;
+  Add test;
+  int addIntResult = addIntFun(test,1,2);
+  std::cout<<"addIntResult result = "<<addIntResult<<std::endl;
+  //存储类成员变量
+  std::function<int(Add&)> memberFun = &Add::member;
+  Add testMemberAdd;
+  int memberResult = memberFun(testMemberAdd);
+  std::cout<<"memberResult result = "<<memberResult<<std::endl;
+
+
+ //std::bind 它是一个函数适配器，接受一个可调用对象（callable object），生成一个新的可调用对象来“适应”原对象的参数列表。
+  //将可调用对象和其参数绑定成一个仿函数；
+  //只绑定部分参数，减少可调用对象传入的参数。
+  //第一个参数 fn     一个function对象，方法指针，或者是类成员变量
+  //第二个参数  args 所有参数的集合列表，要买具体的值，要么placeholders
+  //返回值 就是一个function的对象，当调用时候调用的就是fn这个方法体和带上传递的参数
+  //std::placeholders _1,_2......就代表预置第1，2、、、个参数，后续真正调用function对象时候再传递进去
+  using namespace std::placeholders;    // adds visibility of _1, _2, _3,...
+  auto fn_five = std::bind (my_divide,10,2);  //执行my_divide
+  std::cout << "测试fn_five:" <<fn_five() << '\n'; //5
+
+  //参数1需要执行时传入
+  auto fn_half = std::bind (my_divide,_1,2);               // returns x/2
+  std::cout<< "test placeholer _1:" << fn_half(20) << '\n';  //10
+
+  //bind类成员
+  auto bound_member_fn = std::bind (&MyPair::multiply,_1); // returns x.multiply
+  MyPair ten_two {10,2};
+  std::cout << "test bind fun: " << bound_member_fn(ten_two) << '\n'; // 20  //相当于调用ten_two.multiply
+
+  auto bound_member_data = std::bind (&MyPair::a,ten_two); // returns ten_two.a (获取a.值)
+  std::cout << "test bind member: " << bound_member_data() << '\n'; //10  相当于ten_two.a()
 }
 
-typedef std::function<void(int)> ResultCall;//定义回调函数 里面为函数签名
-void add(int a,int b,ResultCall resultCall){
-  resultCall(a+b);
-}

@@ -1,4 +1,4 @@
-package com.autohome.badge_crm_sdk;
+package sst.example.androiddemo.feature.util;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -8,6 +8,12 @@ import android.os.Build;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.util.List;
 import android.os.Process;
@@ -20,7 +26,7 @@ public class ProcessUtil {
    * @return 当前进程名
    */
   @Nullable
-  public static String getCurrentProcessName(@NonNull Context context) {
+  public static String getCurrentProcessName(@NonNull Context context)  {
     if (!TextUtils.isEmpty(currentProcessName)) {
       return currentProcessName;
     }
@@ -50,7 +56,8 @@ public class ProcessUtil {
   }
 
   //通过cmdLine获取进程名  https://stackoverflow.com/questions/19631894/is-there-a-way-to-get-current-process-name-in-android
-  public static String getCurrentProcessNameByCmdLine(){
+  public static String getCurrentProcessNameByCmdLine()
+      {
     BufferedReader cmdlineReader = null;
     StringBuilder processName = new StringBuilder();
     try {
@@ -63,12 +70,19 @@ public class ProcessUtil {
         processName.append((char) c);
       }
       return processName.toString();
-    } finally {
+    }catch ( IOException e){
+
+    }
+    finally {
       if (cmdlineReader != null) {
-        cmdlineReader.close();
+        try {
+          cmdlineReader.close();
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
       }
     }
-    return processName;
+    return processName.toString();
   }
 
   /**
@@ -88,7 +102,7 @@ public class ProcessUtil {
     String processName = null;
     try {
       //高版本限制api调用 只在低版本使用
-      @SuppressLint("PrivateApi") final Method declaredMethod = Class.forName("android.app.ActivityThread", false, Application.class.getClassLoader())
+     /* @SuppressLint("PrivateApi")*/ final Method declaredMethod = Class.forName("android.app.ActivityThread", false, Application.class.getClassLoader())
           .getDeclaredMethod("currentProcessName", (Class<?>[]) new Class[0]);
       declaredMethod.setAccessible(true);
       final Object invoke = declaredMethod.invoke(null, new Object[0]);

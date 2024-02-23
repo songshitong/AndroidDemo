@@ -9,11 +9,11 @@ import android.os.IBinder
 import android.os.RemoteException
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androiddemo.IMyBinder
-import kotlinx.android.synthetic.main.activity_aidl.*
-
-
+import com.example.androiddemo.R
+import com.example.androiddemo.R.layout
 
 class AidlActivity : AppCompatActivity() {
     private val TAG ="AidlActivity"
@@ -22,14 +22,17 @@ class AidlActivity : AppCompatActivity() {
     private var myBinder: IMyBinder? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.example.androiddemo.R.layout.activity_aidl)
-        callAidlBtn.setOnClickListener {
-            start(it)
+        setContentView(layout.activity_aidl)
+        start()
+        findViewById<Button>(R.id.callAidlBtn).setOnClickListener {
+            for (i in 0..5000){
+                invoke()
+            }
         }
     }
 
     //开启服务按钮的点击事件
-    fun start(view: View) {
+    fun start() {
         aidlIntent = Intent()
         aidlIntent?.action = "com.example.aidlservice"
         aidlIntent?.setPackage("sst.example.androiddemo.feature")
@@ -44,7 +47,11 @@ class AidlActivity : AppCompatActivity() {
 
     operator fun invoke() {
         try {
-            myBinder?.invokeMethodInMyService()
+            val list = mutableListOf<String>()
+            for (i in 0..100){
+                list.add(i.toString())
+            }
+            myBinder?.invokeMethodInMyService(list.joinToString(","))
         } catch (e: RemoteException) {
             Log.e(TAG,"call aidl err "+e.printStackTrace())
         }
@@ -56,7 +63,6 @@ class AidlActivity : AppCompatActivity() {
         override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
             //通过Stub得到接口类型
             myBinder = IMyBinder.Stub.asInterface(iBinder)
-            invoke()
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {

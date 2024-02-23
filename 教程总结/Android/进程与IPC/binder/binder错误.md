@@ -76,3 +76,29 @@ public class MyActivity extends Activity {
     }
 }
 ```
+
+另一种代码模拟
+1 binder接口设置为oneway
+2 方法参数大于100字节，循环调用5000次
+```
+findViewById<Button>(R.id.callAidlBtn).setOnClickListener {
+            for (i in 0..5000){
+                invoke()
+            }
+}
+
+fun invoke() {
+        try {
+            val list = mutableListOf<String>()
+            for (i in 0..100){
+                list.add(i.toString())
+            }
+            myBinder?.invokeMethodInMyService(list.joinToString(","))
+        } catch (e: RemoteException) {
+            Log.e(TAG,"call aidl err "+e.printStackTrace())
+        }
+    }
+```
+
+todo 原因分析
+https://blog.csdn.net/learnframework/article/details/120244478

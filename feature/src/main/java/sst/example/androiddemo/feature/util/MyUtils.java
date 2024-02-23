@@ -1,6 +1,7 @@
 package sst.example.androiddemo.feature.util;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -33,6 +34,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
 import static android.content.Intent.EXTRA_ALLOW_MULTIPLE;
 
 public class MyUtils {
@@ -45,7 +48,7 @@ public class MyUtils {
     public boolean foregrounded() {
         ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
         ActivityManager.getMyMemoryState(appProcessInfo);
-        return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE)
+        return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE);
     }
 
     public static void log(String msg){

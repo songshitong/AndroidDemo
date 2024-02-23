@@ -19,7 +19,7 @@ class AidlService : Service() {
         return MyBinder()
     }
 
-    private fun methodInMyService() {
+    private fun methodInMyService(str:String) {
         Log.d(TAG,"服务里的方法执行了 ====")
     }
 
@@ -38,8 +38,8 @@ class AidlService : Service() {
         }
 
         @Throws(RemoteException::class)
-        override fun invokeMethodInMyService() {
-            methodInMyService()
+        override fun invokeMethodInMyService(str:String) {
+            methodInMyService(str)
         }
     }
 }

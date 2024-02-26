@@ -158,6 +158,17 @@ dd if=kernel-qemu bs=1 skip=$(LC_ALL=C grep -a -b -o $'\x1f\x8b\x08\x00\x00\x00\
 Linux version 3.4.67-01422-gd3ffcc7-dirty (digit@tyrion.par.corp.google.com) (gcc version 4.8 (GCC) ) #2 PREEMPT Tue Sep 16 19:38:10 CEST 2014
 ```
 
+android/kernel/samsung  三星内核
+android/kernel/msm  高通芯片内核 https://android.googlesource.com/kernel/msm/
+android/kernel/mediatek 联发科
+GoldFish  https://groups.google.com/g/android-kernel/c/M4SjXulUeUo?pli=1
+The Android emulator runs a virtual CPU that Google calls Goldfish.
+Goldfish executes ARM926T instructions and has hooks for input and
+output -- such as reading key presses from or displaying video output
+in the emulator. These interfaces are implemented in files specific to
+the Goldfish emulator and will not be compiled into a kernel that runs
+on real devices.
+
 
 lunch命令是envsetup.sh里定义的一个命令，用来让用户选择编译目标
 输入lunch后，会有编译目标的提示

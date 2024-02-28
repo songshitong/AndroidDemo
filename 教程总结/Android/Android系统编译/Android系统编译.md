@@ -158,6 +158,10 @@ dd if=kernel-qemu bs=1 skip=$(LC_ALL=C grep -a -b -o $'\x1f\x8b\x08\x00\x00\x00\
 Linux version 3.4.67-01422-gd3ffcc7-dirty (digit@tyrion.par.corp.google.com) (gcc version 4.8 (GCC) ) #2 PREEMPT Tue Sep 16 19:38:10 CEST 2014
 ```
 
+launch kernel
+每个 Android Platform 固定支持三个 AOSP 内核 版本用于发布（launching）新设备，这些 AOSP 内核 版本称之为 “Launch Kernel”
+
+android/kernel/common     Common Android Kernel Tree  简称 ACKs
 android/kernel/samsung  三星内核
 android/kernel/msm  高通芯片内核 https://android.googlesource.com/kernel/msm/
 android/kernel/mediatek 联发科

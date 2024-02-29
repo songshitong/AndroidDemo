@@ -1,3 +1,5 @@
+https://blog.csdn.net/u014535072/article/details/111405069
+
 binder驱动相关      Binder跟键盘、显示器一样属于一种外设（没有实体的外设） linux在/dev下标记外设
 binder驱动文件
 通过adb shell进入Android设备，看下他的/dev目录长啥样
@@ -64,16 +66,16 @@ common/drivers/android/binder.c
 device_initcall(binder_init);
 ```
 
-
-common/drivers/android/binder.c
-binder_init   //todo 哪里调用Init方法了 https://blog.csdn.net/u014535072/article/details/111405069
+binder_init    
 ```
 static int __init binder_init(void)
 {
     ...
     在/sys/kernel/debug目录创建binder目录
 	binder_debugfs_dir_entry_root = debugfs_create_dir("binder", NULL);
-
+	
+	const struct binder_debugfs_entry *db_entry; //5个元素的数组
+    //创建文件state，stats，transactions，transaction_log，failed_transaction_log
 	binder_for_each_debugfs_entry(db_entry)
 		debugfs_create_file(db_entry->name,
 					db_entry->mode,
@@ -83,6 +85,28 @@ static int __init binder_init(void)
 
 	binder_debugfs_dir_entry_proc = debugfs_create_dir("proc",
 						binder_debugfs_dir_entry_root);
+						
+	if (!IS_ENABLED(CONFIG_ANDROID_BINDERFS) &&
+	    strcmp(binder_devices_param, "") != 0) {
+		/*
+		* Copy the module_parameter string, because we don't want to
+		* tokenize it in-place.
+		 */
+		// #define CONFIG_ANDROID_BINDER_DEVICES "binder,hwbinder,vndbinder" //out/android-mainline/common/include/generated/autoconf.h (3 results)
+        // char *binder_devices_param = CONFIG_ANDROID_BINDER_DEVICES;
+		device_names = kstrdup(binder_devices_param, GFP_KERNEL); //用于申请一段内存将形参s的内容copy到这段新申请的内存中 todo
+		if (!device_names) {
+			ret = -ENOMEM;
+			goto err_alloc_device_names_failed;
+		}
+
+		device_tmp = device_names;
+		while ((device_name = strsep(&device_tmp, ","))) {
+			ret = init_binder_device(device_name);
+			if (ret)
+				goto err_init_binder_device_failed;
+		}
+	}					
     ...
 
 	ret = init_binderfs();
@@ -93,17 +117,86 @@ static int __init binder_init(void)
    ...
 }
 
-//文件 type
-static struct file_system_type binder_fs_type = {
-	.name			= "binder",
-	.init_fs_context	= binderfs_init_fs_context,
-	.parameters		= binderfs_fs_parameters,
-	.kill_sb		= binderfs_kill_super,
-	.fs_flags		= FS_USERNS_MOUNT,
+const struct binder_debugfs_entry binder_debugfs_entries[] = {
+	{
+		.name = "state",
+		.mode = 0444,
+		.fops = &state_fops,
+		.data = NULL,
+	},
+	{
+		.name = "stats",
+		.mode = 0444,
+		.fops = &stats_fops,
+		.data = NULL,
+	},
+	{
+		.name = "transactions",
+		.mode = 0444,
+		.fops = &transactions_fops,
+		.data = NULL,
+	},
+	{
+		.name = "transaction_log",
+		.mode = 0444,
+		.fops = &transaction_log_fops,
+		.data = &binder_transaction_log,
+	},
+	{
+		.name = "failed_transaction_log",
+		.mode = 0444,
+		.fops = &transaction_log_fops,
+		.data = &binder_transaction_log_failed,
+	},
+	{} /* terminator */
 };
 
-#define CONFIG_ANDROID_BINDER_DEVICES "binder,hwbinder,vndbinder" //out/android-mainline/common/include/generated/autoconf.h (3 results)
-char *binder_devices_param = CONFIG_ANDROID_BINDER_DEVICES;
+static int __init init_binder_device(const char *name)
+{
+	int ret;
+	struct binder_device *binder_device;
+
+	binder_device = kzalloc(sizeof(*binder_device), GFP_KERNEL);
+	if (!binder_device)
+		return -ENOMEM;
+    //binder注册虚拟字符设备所对应的file_operations
+    //file_operation是把系统调用和驱动程序关联起来的关键结构，这个结构的每一个成员都对应着一个系统调用，
+    //Linux系统调用通过读取file_operation中相应的函数指针，接着把控制权转交给函数，从而完成Linux设备驱动程序的工作
+    //const struct file_operations binder_fops = {
+    //    .owner = THIS_MODULE,
+    //    .poll = binder_poll,
+    //    .unlocked_ioctl = binder_ioctl,
+    //    .compat_ioctl = compat_ptr_ioctl, //compat_ioctl是对32和64位的兼容，最终调用unlocked_ioctl
+    //    .mmap = binder_mmap,
+    //    .open = binder_open,
+    //    .flush = binder_flush,
+    //    .release = binder_release,
+    //};
+    //binder_device的miscdevice用于misc设备注册
+	binder_device->miscdev.fops = &binder_fops;
+	//动态分配次设备号  是否动态
+	binder_device->miscdev.minor = MISC_DYNAMIC_MINOR;
+	binder_device->miscdev.name = name;
+
+	refcount_set(&binder_device->ref, 1);
+	binder_device->context.binder_context_mgr_uid = INVALID_UID;
+	binder_device->context.name = name;
+	mutex_init(&binder_device->context.context_mgr_node_lock);
+    //注册misc设备
+	ret = misc_register(&binder_device->miscdev);
+	if (ret < 0) {
+		kfree(binder_device);
+		return ret;
+	}
+    //将binder设备加入链表（头插法）
+	hlist_add_head(&binder_device->hlist, &binder_devices);
+
+	return ret;
+}
+
+
+
+
 int __init init_binderfs(void)
 {
 	int ret;
@@ -122,7 +215,7 @@ int __init init_binderfs(void)
 
 	/* Allocate new major number for binderfs. */
 	ret = alloc_chrdev_region(&binderfs_dev, 0, BINDERFS_MAX_MINOR,
-				  "binder");
+				  "binder"); //创建名为binder的字符设备 设备号动态分配 todo
 	if (ret)
 		return ret;
     //注册到内核file system
@@ -133,8 +226,24 @@ int __init init_binderfs(void)
 	}
 	return ret;
 }
-```
 
+//文件 type
+static struct file_system_type binder_fs_type = {
+	.name			= "binder",
+	.init_fs_context	= binderfs_init_fs_context,
+	.parameters		= binderfs_fs_parameters,
+	.kill_sb		= binderfs_kill_super,
+	.fs_flags		= FS_USERNS_MOUNT,
+};
+```
+1 /sys/kernel/debug创建binder目录 并创建5个文件
+2 注册binder为misc设备 文件有binder,hwbinder,vndbinder
+miscellaneous 杂项各式各样的
+在Linux驱动中把无法归类的五花八门的设备定义为misc设备，Linux内核所提供的misc设备有很强的包容性，各种无法归结为标准字符设备的类型都可以定义为misc设备，
+譬如NVRAM，看门狗，实时时钟，字符LCD等
+在Linux内核里把所有的misc设备组织在一起，构成了一个子系统(subsys)，统一进行管理。在这个子系统里的所有miscdevice类型的设备共享一个主设备号MISC_MAJOR(10)，
+但次设备号不同
+3 
 
 
 binder_open

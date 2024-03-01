@@ -365,19 +365,19 @@ private static BinderProxy getInstance(long nativeData, long iBinder) {
 
 
     public boolean transact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
-1112          if (mWarnOnBlocking && ((flags & FLAG_ONEWAY) == 0)) {
-1113              // For now, avoid spamming the log by disabling after we've logged
-1114              // about this interface at least once
-1115              mWarnOnBlocking = false;
-1116              Log.w(Binder.TAG, "Outgoing transactions from this process must be FLAG_ONEWAY",
-1117                      new Throwable());
-1118          }
-1119                ...
-1128          try {
-1129              return transactNative(code, data, reply, flags);
-1130          } finally {
-1134          }
-1135      }
+          if (mWarnOnBlocking && ((flags & FLAG_ONEWAY) == 0)) {
+              // For now, avoid spamming the log by disabling after we've logged
+              // about this interface at least once
+              mWarnOnBlocking = false;
+              Log.w(Binder.TAG, "Outgoing transactions from this process must be FLAG_ONEWAY",
+                      new Throwable());
+          }
+                ...
+          try {
+              return transactNative(code, data, reply, flags);
+          } finally {
+          }
+      }
 }
 ```
 

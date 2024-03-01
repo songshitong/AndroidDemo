@@ -151,8 +151,7 @@ kernel/goldfish/drivers/staging/android/binder.c
 static int binder_open(struct inode *nodp, struct file *filp)
 {   //代表Binder进程
 	struct binder_proc *proc;//1
-	binder_debug(BINDER_DEBUG_OPEN_CLOSE, "binder_open: %d:%d\n",
-		     current->group_leader->pid, current->pid);
+	...
     //分配内存空间 todo
 	proc = kzalloc(sizeof(*proc), GFP_KERNEL);//2
 	if (proc == NULL)
@@ -353,10 +352,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			ret = -EFAULT;
 			goto err;
 		}
-		binder_debug(BINDER_DEBUG_READ_WRITE,
-			     "binder: %d:%d write %ld at %08lx, read %ld at %08lx\n",
-			     proc->pid, thread->pid, bwr.write_size, bwr.write_buffer,
-			     bwr.read_size, bwr.read_buffer);
+		...
 
 		if (bwr.write_size > 0) {//2
 			ret = binder_thread_write(proc, thread, (void __user *)bwr.write_buffer, bwr.write_size, &bwr.write_consumed);//3
@@ -369,10 +365,6 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			}
 		}
 	    ...
-		binder_debug(BINDER_DEBUG_READ_WRITE,
-			     "binder: %d:%d wrote %ld of %ld, read return %ld of %ld\n",
-			     proc->pid, thread->pid, bwr.write_consumed, bwr.write_size,
-			     bwr.read_consumed, bwr.read_size);
 		if (copy_to_user(ubuf, &bwr, sizeof(bwr))) {//4
 			ret = -EFAULT;
 			goto err;

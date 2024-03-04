@@ -207,7 +207,7 @@ status_t IPCThreadState::talkWithDriver(bool doReceive)
         return -EBADF;
     }
 
-    binder_write_read bwr;  //创建binder读写数据 写入read write
+    binder_write_read bwr;  //创建binder读写数据 写入read write  
     
 
     // Is the read buffer empty?

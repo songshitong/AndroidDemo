@@ -1,5 +1,9 @@
 
 qemu:Quick Emulator
+android模拟器基于qemu定制，增加android的特性 例如(OpenGL, GPS, GSM, Sensors等)的模拟，访问Google Play Store，
+phone calls 和 text messages等，开源的，可以自定制
+https://android.googlesource.com/platform/external/qemu/+/2db80f7c1921a6f5d48b998378e3792e16c968a4/README.md
+
 
 官网
 https://www.qemu.org/
@@ -34,3 +38,7 @@ emulator -netdelay gprs
 emulator -netdelay 40,100
 网络速度
 network speed 14.4 80
+
+
+命令行
+https://developer.android.com/studio/run/emulator-commandline

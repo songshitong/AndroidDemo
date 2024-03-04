@@ -371,7 +371,7 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
     //分配物理页的指针数组，数组大小为vma的等效page个数；  为数组分配内存，大小n*size，并对分配的内存清零
 	alloc->pages = kcalloc(alloc->buffer_size / PAGE_SIZE,
 			       sizeof(alloc->pages[0]),
-			       GFP_KERNEL);
+			       GFP_KERNEL);  //kcalloc内部对page填充0的数据
 	if (alloc->pages == NULL) {
 		ret = -ENOMEM;
 		failure_string = "alloc page array";
@@ -402,6 +402,13 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
 //https://juejin.cn/post/7062654742329032740
 在旧版内核中，这里会调用binder_update_page_range函数分别将内核虚拟内存和进程虚拟内存与物理内存做映射，这样内核虚拟内存和进程虚拟内存也相当于间接建立了映射关系，
 而在4.4.223中，这件事将会延迟到binder_ioctl后
+
+https://juejin.cn/post/7244734179828203579
+在 Android10 以后，binder_mmap 的实现有了比较大的改动，取消了 vm_struct 的使用：
+1 binder_alloc_mmap_handler() 不再从内核空间分配一块和 vma 大小相等的虚拟内存，也不再记录什么偏移量。
+2 将客户端数据拷贝到缓冲区的时候，是逐个物理页处理的：先通过 kmap 建立内核空间虚拟地址和物理内存页的映射，
+然后通过 copy_from_user 按页拷贝，最后再 kunmap 取消映射。详见 binder_alloc_copy_user_to_buffer()。
+取消 vm_struct 的使用，最大的好处是极大地避免了耗尽内核可用的地址空间
 
 
 binder_ioctl  todo ioctl的其他调用
@@ -503,6 +510,9 @@ static int binder_ioctl_write_read(struct file *filp, unsigned long arg,
 	int ret = 0;
 	struct binder_proc *proc = filp->private_data;
 	void __user *ubuf = (void __user *)arg;
+	//__user宏简单告诉编译器（通过 noderef）不应该解除这个指针的引用（因为在当前地址空间中它是没有意义的）。 
+    //(void __user *)arg 指的是arg值是一个用户空间的地址，不能直接进行拷贝等，要使用例如copy_from_user
+	
 	struct binder_write_read bwr;
     //将用户空间ubuf拷贝至内核空间bwr
 	if (copy_from_user(&bwr, ubuf, sizeof(bwr))) {
@@ -634,6 +644,129 @@ binder请求码用于用户空间程序向binder驱动发送请求消息，以BC
 （include/uapi/linux/android/binder.h）
 BC是binder command代表请求
 BR是binder return代表响应
+
+common/include/uapi/linux/android/binder.h
+```
+struct binder_transaction_data {
+	/* The first two are only used for bcTRANSACTION and brTRANSACTION,
+	 * identifying the target and contents of the transaction.
+	 */
+	union {
+		/* target descriptor of command transaction */
+		__u32	handle;  Binder 引用
+		/* target descriptor of return transaction */
+		binder_uintptr_t ptr; 一个指针，指向 Binder 实体
+	} target;
+	binder_uintptr_t	cookie;	/* target object cookie */
+	__u32		code;		/* transaction command */
+
+	/* General information about the transaction. */
+	__u32	        flags;   事务的类型，例如TF_ONE_WAY
+	__kernel_pid_t	sender_pid;
+	__kernel_uid32_t	sender_euid;
+	binder_size_t	data_size;	/* number of bytes of data */
+	binder_size_t	offsets_size;	/* number of bytes of offsets */
+
+	/* If this transaction is inline, the data immediately
+	 * follows here; otherwise, it ends with a pointer to
+	 * the data buffer.
+	 */
+	union {
+		struct {
+			/* transaction data */
+			binder_uintptr_t	buffer; //一个指针，指向用于存放传输数据的用户空间缓冲区。当一个进程想要通过 Binder 事务发送数据时，
+			   它会把要发送的数据写入一个用户空间缓冲区，然后把这个缓冲区的地址通过 buffer 字段传给 Binder 驱动。
+			/* offsets from buffer to flat_binder_object structs */
+			binder_uintptr_t	offsets;  一个指针，指向用户空间中的一个数组。该数组记录了多个 flat_binder_object 的地址相比较于 buffer 的偏移量 offset
+		} ptr;
+		__u8	buf[8];
+	} data;
+};
+
+//binder中传递对象时使用
+//普通的数据类型传递给 Binder 驱动的时候，会直接拷贝到接收缓冲区。而对象不一样，需要做特殊处理。比如 Binder 实体传递给 Binder 驱动的时候，
+会被逐个处理，转换成 Binder 引用
+struct flat_binder_object {
+	struct binder_object_header	hdr;  代表对象的类型  
+		//BINDER_TYPE_BINDER,BINDER_TYPE_WEAK_BINDER,BINDER_TYPE_HANDLE,BINDER_TYPE_WEAK_HANDLE,
+	    //BINDER_TYPE_FD,BINDER_TYPE_FDA,BINDER_TYPE_PTR	
+	__u32				flags;
+
+	/* 8 bytes of data. */
+	union {
+		binder_uintptr_t	binder;	/* local object */  指向 Binder 实体的指针
+		__u32			handle;	/* remote object */  Binder 引用
+	};
+
+	/* extra data associated with local object */
+	binder_uintptr_t	cookie;
+};
+
+struct binder_object_header {
+	__u32        type;
+};
+```
+整体的数据结构
+buffer  offsets数组  int flat_binder_object float flat_binder_object
+offsets数组指向后面flat_binder_object的位置
+
+BINDER_TYPE_BINDER表示是一个binder实体对象，需要将它转换成binder引用句柄
+binder_translate_binder
+common/drivers/android/binder.c
+```
+static int binder_translate_binder(struct flat_binder_object *fp,
+				   struct binder_transaction *t,
+				   struct binder_thread *thread)
+{
+	struct binder_node *node;
+	struct binder_proc *proc = thread->proc;
+	struct binder_proc *target_proc = t->to_proc;
+	struct binder_ref_data rdata;
+	int ret = 0;
+
+	node = binder_get_node(proc, fp->binder);
+	if (!node) {
+		node = binder_new_node(proc, fp);
+		if (!node)
+			return -ENOMEM;
+	}
+	if (fp->cookie != node->cookie) {
+		binder_user_error("%d:%d sending u%016llx node %d, cookie mismatch %016llx != %016llx\n",
+				  proc->pid, thread->pid, (u64)fp->binder,
+				  node->debug_id, (u64)fp->cookie,
+				  (u64)node->cookie);
+		ret = -EINVAL;
+		goto done;
+	}
+	if (security_binder_transfer_binder(proc->cred, target_proc->cred)) {
+		ret = -EPERM;
+		goto done;
+	}
+
+	ret = binder_inc_ref_for_node(target_proc, node,
+			fp->hdr.type == BINDER_TYPE_BINDER,
+			&thread->todo, &rdata);
+	if (ret)
+		goto done;
+
+	if (fp->hdr.type == BINDER_TYPE_BINDER)
+		fp->hdr.type = BINDER_TYPE_HANDLE;
+	else
+		fp->hdr.type = BINDER_TYPE_WEAK_HANDLE;
+	fp->binder = 0;
+	fp->handle = rdata.desc;
+	fp->cookie = 0;
+
+	trace_binder_transaction_node_to_ref(t, node, &rdata);
+	binder_debug(BINDER_DEBUG_TRANSACTION,
+		     "        node %d u%016llx -> ref %d desc %d\n",
+		     node->debug_id, (u64)node->ptr,
+		     rdata.debug_id, rdata.desc);
+done:
+	binder_put_node(node);
+	return ret;
+}
+```
 
 看一下BC_TRANSACTION/BC_REPLY
 从用户空间中复制了一份binder_transaction_data到内核空间，接着就调用binder_transaction函数继续处理
@@ -887,6 +1020,22 @@ BC_REPLY只需要找到需要回应的那个事务，那个事务所在的线程
 数据拷贝，建立映射
 common/drivers/android/binder_alloc.c
 ```
+static struct page *binder_alloc_get_page(struct binder_alloc *alloc,
+					  struct binder_buffer *buffer,
+					  binder_size_t buffer_offset,
+					  pgoff_t *pgoffp)
+{
+	binder_size_t buffer_space_offset = buffer_offset +
+		(buffer->user_data - alloc->buffer);
+	pgoff_t pgoff = buffer_space_offset & ~PAGE_MASK;
+	size_t index = buffer_space_offset >> PAGE_SHIFT;
+	struct binder_lru_page *lru_page;
+
+	lru_page = &alloc->pages[index]; //binder_alloc_mmap_handler中分配的page
+	*pgoffp = pgoff;
+	return lru_page->page_ptr;
+}
+
 unsigned long
 binder_alloc_copy_user_to_buffer(struct binder_alloc *alloc,
 				 struct binder_buffer *buffer,
@@ -903,13 +1052,15 @@ binder_alloc_copy_user_to_buffer(struct binder_alloc *alloc,
 		struct page *page;
 		pgoff_t pgoff;
 		void *kptr;
-
+        //从binder_alloc中获得Page  拿到我们之前申请到的物理页面
 		page = binder_alloc_get_page(alloc, buffer,
 					     buffer_offset, &pgoff);
 		size = min_t(size_t, bytes, PAGE_SIZE - pgoff);
+		 //将该Page映射到Kernel地址空间
 		kptr = kmap_local_page(page) + pgoff;
-		ret = copy_from_user(kptr, from, size);
-		kunmap_local(kptr);
+		////从用户空间拷贝数据到kptr
+		ret = copy_from_user(kptr, from, size);   //todo 开辟空间是什么过程 数据拷贝呢  不开辟空间可以进行数据拷贝吗
+		kunmap_local(kptr);//释放page
 		if (ret)
 			return bytes - size + ret;
 		bytes -= size;
@@ -1152,6 +1303,9 @@ if (target_thread)
 	//设置目标进程的事务类型	
 	t->work.type = BINDER_WORK_TRANSACTION;
 
+
+#define to_flat_binder_object(hdr) \
+	container_of(hdr, struct flat_binder_object, hdr)  //https://zhuanlan.zhihu.com/p/54932270  todo
 ```
 我们可以将这一部分再细分成几个部分：
 1 分配缓存，建立映射
@@ -1907,3 +2061,11 @@ done:
 ```
 这一部分主要做的工作是，将处理事务所需要的信息（命令码、PID等）和数据（数据区首地址和偏移数组地址）准备好，拷贝到用户空间，
 交给用户空间处理这个事务
+
+
+https://juejin.cn/post/7266417942182821947
+既然Binder驱动和Server进程可以通过内存映射的形式映射到同一个页面，那么我们能不能把Client端的也给映射过去呢？这样甚至都不需要拷贝。
+其实这种做法就跟共享内存一样了，存在一些问题：   //todo 映射的是server端和客户端吗
+1、存在一定的安全问题，多个客户端都可以访问该内容
+2、数据同步很难处理，同时存在两个甚至多个进程对这段内存作出读写，很容易就出现数据同步问题
+3、内存不好管理

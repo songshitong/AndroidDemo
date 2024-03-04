@@ -162,6 +162,8 @@ launch kernel
 每个 Android Platform 固定支持三个 AOSP 内核 版本用于发布（launching）新设备，这些 AOSP 内核 版本称之为 “Launch Kernel”
 
 android/kernel/common     Common Android Kernel Tree  简称 ACKs
+例如android13 linux5.15
+https://cs.android.com/android/kernel/superproject/+/common-android13-5.15-2024-03
 android/kernel/samsung  三星内核
 android/kernel/msm  高通芯片内核 https://android.googlesource.com/kernel/msm/
 android/kernel/mediatek 联发科

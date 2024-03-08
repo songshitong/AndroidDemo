@@ -420,7 +420,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	struct binder_proc *proc = filp->private_data;
 	struct binder_thread *thread;
 	//__user是一个宏，它告诉编译器不应该解除这个指针的引用（因为在当前地址空间中它是没有意义的），(void __user *)arg表示arg是一个用户空间的地址，
-	不能直接进行拷贝等，要使用copy_from_user，copy_to_user等函数。 //todo
+	不能直接进行拷贝等，要使用copy_from_user，copy_to_user等函数。 
 	void __user *ubuf = (void __user *)arg;
 
 	binder_selftest_alloc(&proc->alloc);
@@ -723,7 +723,7 @@ static int binder_translate_binder(struct flat_binder_object *fp,
 	struct binder_proc *target_proc = t->to_proc;
 	struct binder_ref_data rdata;
 	int ret = 0;
-
+    //通过proc->nodes.rb_node红黑树查找binder_node
 	node = binder_get_node(proc, fp->binder);
 	if (!node) {
 		node = binder_new_node(proc, fp);
@@ -731,10 +731,7 @@ static int binder_translate_binder(struct flat_binder_object *fp,
 			return -ENOMEM;
 	}
 	if (fp->cookie != node->cookie) {
-		binder_user_error("%d:%d sending u%016llx node %d, cookie mismatch %016llx != %016llx\n",
-				  proc->pid, thread->pid, (u64)fp->binder,
-				  node->debug_id, (u64)fp->cookie,
-				  (u64)node->cookie);
+		...
 		ret = -EINVAL;
 		goto done;
 	}
@@ -742,31 +739,183 @@ static int binder_translate_binder(struct flat_binder_object *fp,
 		ret = -EPERM;
 		goto done;
 	}
-
+   //查找binder_ref并将其引用计数加1，如果没有查找到则创建一个，并将其插入红黑树 
 	ret = binder_inc_ref_for_node(target_proc, node,
 			fp->hdr.type == BINDER_TYPE_BINDER,
 			&thread->todo, &rdata);
 	if (ret)
 		goto done;
-
+     //转换binder类型
 	if (fp->hdr.type == BINDER_TYPE_BINDER)
 		fp->hdr.type = BINDER_TYPE_HANDLE;
 	else
 		fp->hdr.type = BINDER_TYPE_WEAK_HANDLE;
 	fp->binder = 0;
-	fp->handle = rdata.desc;
+	fp->handle = rdata.desc;//binder引用句柄赋值
 	fp->cookie = 0;
-
+   
 	trace_binder_transaction_node_to_ref(t, node, &rdata);
-	binder_debug(BINDER_DEBUG_TRANSACTION,
-		     "        node %d u%016llx -> ref %d desc %d\n",
-		     node->debug_id, (u64)node->ptr,
-		     rdata.debug_id, rdata.desc);
+	...
 done:
-	binder_put_node(node);
+	binder_put_node(node); //binder_node临时引用计数减1
 	return ret;
 }
+
+static struct binder_node *binder_get_node(struct binder_proc *proc,
+					   binder_uintptr_t ptr)
+{
+	struct binder_node *node;
+
+	binder_inner_proc_lock(proc);
+	node = binder_get_node_ilocked(proc, ptr);
+	binder_inner_proc_unlock(proc);
+	return node;
+}
+
+static struct binder_node *binder_get_node_ilocked(struct binder_proc *proc,
+						   binder_uintptr_t ptr)
+{
+	struct rb_node *n = proc->nodes.rb_node;
+	struct binder_node *node;
+
+	assert_spin_locked(&proc->inner_lock);
+
+	while (n) {
+		node = rb_entry(n, struct binder_node, rb_node);
+
+		if (ptr < node->ptr)
+			n = n->rb_left;
+		else if (ptr > node->ptr)
+			n = n->rb_right;
+		else {
+			/*
+			 * take an implicit weak reference
+			 * to ensure node stays alive until
+			 * call to binder_put_node()
+			 */
+			binder_inc_node_tmpref_ilocked(node);
+			return node;
+		}
+	}
+	return NULL;
+}
 ```
+
+binder_translate_handle
+BINDER_TYPE_HANDLE表示是一个binder引用句柄，，需要将它转换成binder实体对象
+```
+static int binder_translate_handle(struct flat_binder_object *fp,
+				   struct binder_transaction *t,
+				   struct binder_thread *thread)
+{
+	struct binder_proc *proc = thread->proc;
+	struct binder_proc *target_proc = t->to_proc;
+	struct binder_node *node;
+	struct binder_ref_data src_rdata;
+	int ret = 0;
+    //从proc->refs_by_desc.rb_node红黑树中查找binder_node，并将其临时引用计数加1
+	node = binder_get_node_from_ref(proc, fp->handle,
+			fp->hdr.type == BINDER_TYPE_HANDLE, &src_rdata);
+	...
+
+	binder_node_lock(node);
+	//如果binder实体所在的进程为事务处理进程
+	if (node->proc == target_proc) {
+	    //binder类型转换
+		if (fp->hdr.type == BINDER_TYPE_HANDLE)
+			fp->hdr.type = BINDER_TYPE_BINDER;
+		else
+			fp->hdr.type = BINDER_TYPE_WEAK_BINDER;
+		fp->binder = node->ptr; //设置binder
+		fp->cookie = node->cookie;
+		if (node->proc)
+			binder_inner_proc_lock(node->proc);
+		else
+			__acquire(&node->proc->inner_lock);
+		//binder强引用计数加1	
+		binder_inc_node_nilocked(node,
+					 fp->hdr.type == BINDER_TYPE_BINDER,
+					 0, NULL);
+		if (node->proc)
+			binder_inner_proc_unlock(node->proc);
+		else
+			__release(&node->proc->inner_lock);
+		...
+		binder_node_unlock(node);
+	} else {
+	   //重新查找binder_ref
+		struct binder_ref_data dest_rdata;
+
+		binder_node_unlock(node);
+		ret = binder_inc_ref_for_node(target_proc, node,
+				fp->hdr.type == BINDER_TYPE_HANDLE,
+				NULL, &dest_rdata);
+		if (ret)
+			goto done;
+
+		fp->binder = 0;
+		fp->handle = dest_rdata.desc;
+		fp->cookie = 0;
+		...
+	}
+done:
+	binder_put_node(node); //binder_node临时引用计数减1
+	return ret;
+}
+
+static struct binder_node *binder_get_node_from_ref(
+		struct binder_proc *proc,
+		u32 desc, bool need_strong_ref,
+		struct binder_ref_data *rdata)
+{
+	struct binder_node *node;
+	struct binder_ref *ref;
+
+	binder_proc_lock(proc);
+	ref = binder_get_ref_olocked(proc, desc, need_strong_ref);
+	if (!ref)
+		goto err_no_ref;
+	node = ref->node;
+	/*
+	 * Take an implicit reference on the node to ensure
+	 * it stays alive until the call to binder_put_node()
+	 */
+	binder_inc_node_tmpref(node);
+	if (rdata)
+		*rdata = ref->data;
+	binder_proc_unlock(proc);
+
+	return node;
+
+err_no_ref:
+	binder_proc_unlock(proc);
+	return NULL;
+}
+
+static struct binder_ref *binder_get_ref_olocked(struct binder_proc *proc,
+						 u32 desc, bool need_strong_ref)
+{
+	struct rb_node *n = proc->refs_by_desc.rb_node;
+	struct binder_ref *ref;
+
+	while (n) {
+		ref = rb_entry(n, struct binder_ref, rb_node_desc);
+
+		if (desc < ref->data.desc) {
+			n = n->rb_left;
+		} else if (desc > ref->data.desc) {
+			n = n->rb_right;
+		} else if (need_strong_ref && !ref->data.strong) {
+			binder_user_error("tried to use weak ref as strong ref\n");
+			return NULL;
+		} else {
+			return ref;
+		}
+	}
+	return NULL;
+}
+```
+
 
 看一下BC_TRANSACTION/BC_REPLY
 从用户空间中复制了一份binder_transaction_data到内核空间，接着就调用binder_transaction函数继续处理
@@ -900,7 +1049,7 @@ static void binder_transaction(struct binder_proc *proc,
 
 	if (reply) {
 		binder_inner_proc_lock(proc);
-		 //这个事务是发起事务，也就是说我们需要对这个事务做应答  todo binder事务
+		 //这个事务是发起事务，也就是说我们需要对这个事务做应答  
 		in_reply_to = thread->transaction_stack;
 		if (in_reply_to == NULL) {
 			...error
@@ -1242,7 +1391,7 @@ if (target_thread)
 		case BINDER_TYPE_WEAK_BINDER: {
 			struct flat_binder_object *fp;
 
-			fp = to_flat_binder_object(hdr); //todo 转换的过程
+			fp = to_flat_binder_object(hdr); 
 			ret = binder_translate_binder(fp, t, thread);
 
 			if (ret < 0 ||

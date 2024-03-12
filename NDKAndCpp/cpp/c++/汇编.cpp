@@ -1,5 +1,10 @@
 #include <stdio.h>
 
+//.s .S与.asm  https://gaozhiyuan.net/assembly/difference-between-the-suffix-of-the-assembly-file.html
+//.S文件，会进行预处理、汇编等操作
+//.s文件，在后期阶段不在进行预处理操作，只有汇编操作
+//.asm文件，等同于.s文件.一般dos和windows下以.asm为主，linux下以.s为主
+
 //https://c-cpp.com/c/language/asm
 //内联汇编（常由 asm 关键词引入）给予在 C 程序中嵌入汇编语言源代码的能力。
 //不同于 C++ 中，内联汇编在 C 中被当作扩展。它是条件性支持及由实现定义的，意思是它可以不存在，而且即使实现有所提供，它也并不拥有固定的含义

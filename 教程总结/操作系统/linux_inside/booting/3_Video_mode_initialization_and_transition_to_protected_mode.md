@@ -824,10 +824,10 @@ static void setup_gdt(void)
 	   proper kernel GDT. */
 	static struct gdt_ptr gdt;
 
-	gdt.len = sizeof(boot_gdt)-1;
-	gdt.ptr = (u32)&boot_gdt + (ds() << 4);
+	gdt.len = sizeof(boot_gdt)-1;  //the last valid address in the GDT
+	gdt.ptr = (u32)&boot_gdt + (ds() << 4); //real mode
 
-	asm volatile("lgdtl %0" : : "m" (gdt));
+	asm volatile("lgdtl %0" : : "m" (gdt)); // load the GDT into the GDTR register
 }
 ```
 __attribute__((aligned(16))) attribute. It means that this structure will be aligned by 16 bytes  todo
@@ -840,3 +840,85 @@ GDT_ENTRY(0xc09b, 0, 0xfffff)的segment是
 ```
 1100 0000 1001 1011
 ```
+Let's try to understand what every bit means. We will go through all bits from left to right:
+1 - (G) granularity bit
+1 - (D) if 0 16-bit segment; 1 = 32-bit segment
+0 - (L) executed in 64-bit mode if 1
+0 - (AVL) available for use by system software
+0000 - 4-bit length 19:16 bits in the descriptor
+1 - (P) segment presence in memory
+00 - (DPL) - privilege level, 0 is the highest privilege
+1 - (S) code or data segment, not a system segment
+101 - segment type execute/read/
+1 - accessed bit
+
+
+
+Actual transition into protected mode
+This is the end of the go_to_protected_mode function. We loaded the IDT and GDT, disabled interrupts 
+and now can switch the CPU into protected mode. The last step is calling the protected_mode_jump function
+protected_mode_jump(boot_params.hdr.code32_start,(u32)&boot_params + (ds() << 4));
+arch/x86/boot/pmjump.S
+```
+/*
+ * void protected_mode_jump(u32 entrypoint, u32 bootparams);
+ */
+GLOBAL(protected_mode_jump)
+	movl	%edx, %esi		# Pointer to boot_params table
+
+	xorl	%ebx, %ebx  
+	movw	%cs, %bx  //put the address of boot_params in the esi register and the address of the code segment register cs in bx
+	shll	$4, %ebx
+	addl	%ebx, 2f  //which is (cs << 4) + in_pm32, the physical address to jump after transitioned to 32-bit mode
+	jmp	1f			# Short jump to serialize on 386/486
+1:
+
+	movw	$__BOOT_DS, %cx    // put the data segment and the task state segment in the cx and di registers
+	movw	$__BOOT_TSS, %di
+
+	movl	%cr0, %edx
+	orb	$X86_CR0_PE, %dl	# Protected mode
+	movl	%edx, %cr0  //set the PE (Protection Enable) bit in the CR0 control register
+
+	# Transition to 32-bit mode
+	.byte	0x66, 0xea		# ljmpl opcode   0x66 is the operand-size prefix which allows us to mix 16-bit and 32-bit code
+2:	.long	in_pm32			# offset   the segment offset under protect mode, which has value (cs << 4) + in_pm32 derived from real mode
+	.word	__BOOT_CS		# segment   the code segment we want to jump to
+ENDPROC(protected_mode_jump)
+
+	.code32   // finally in protected mode
+	.section ".text32","ax"
+```
+todo 汇编
+
+Let's look at the first steps taken in protected mode
+```
+GLOBAL(in_pm32)
+	# Set up data segments for flat 32-bit mode
+	movl	%ecx, %ds  //we saved $__BOOT_DS in the cx register. Now we fill it with all segment registers besides cs (cs is already __BOOT_CS)
+	movl	%ecx, %es
+	movl	%ecx, %fs
+	movl	%ecx, %gs
+	movl	%ecx, %ss
+	# The 32-bit code sets up its own stack, but this way we do have
+	# a valid stack if some debugging hack wants to use it.
+	addl	%ebx, %esp  //setup a valid stack for debugging purposes
+
+	# Set up TR to make Intel VT happy
+	ltr	%di
+
+	# Clear registers to allow for future extensions to the
+	# 32-bit boot protocol    
+	xorl	%ecx, %ecx   //clear the general purpose registers
+	xorl	%edx, %edx
+	xorl	%ebx, %ebx
+	xorl	%ebp, %ebp
+	xorl	%edi, %edi
+
+	# Set up LDTR to make Intel VT happy
+	lldt	%cx
+
+	jmpl	*%eax			# Jump to the 32-bit entrypoint   //eax contains the address of the 32-bit entry (we passed it as the first parameter into protected_mode_jump)
+ENDPROC(in_pm32)
+```
+We're in protected mode and stop at its entry point

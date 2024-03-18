@@ -170,3 +170,6 @@ Native Binder、Kernel Binder，实际上Binder的内容非常多，完全可以
 
 Binder基于OpenBinder，主要用在Android，OpenBinder已经合入Linux3.9   OpenBinder已经停止维护
 https://en.wikipedia.org/wiki/OpenBinder
+
+binder在android8.0进行了优化和更大范围的使用
+https://source.android.google.cn/docs/core/architecture/hidl/binder-ipc?hl=zh-cn

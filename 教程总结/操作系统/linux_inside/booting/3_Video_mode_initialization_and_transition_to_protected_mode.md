@@ -882,14 +882,22 @@ GLOBAL(protected_mode_jump)
 
 	# Transition to 32-bit mode
 	.byte	0x66, 0xea		# ljmpl opcode   0x66 is the operand-size prefix which allows us to mix 16-bit and 32-bit code
+	  //设置一个跳转指令的操作符。具体来说，0x66是一个操作符前缀，它允许混合执行16位和32位代码
+      //而0xea则是一个ljmpl（long jump to memory location）指令的操作符，用于跳转到GDT（全局描述符表）中设置好的BOOT_CS段的in_pm32地址处执行
 2:	.long	in_pm32			# offset   the segment offset under protect mode, which has value (cs << 4) + in_pm32 derived from real mode
+	   //  .long用于指示声明一组数，每个数为32位。这相当于在C语言中声明一个数组，其中每个元素占用32位空间
 	.word	__BOOT_CS		# segment   the code segment we want to jump to
+	    //.word __BOOT_CS这一指令的作用是设置代码段寄存器（CS）的值为__BOOT_CS
 ENDPROC(protected_mode_jump)
 
-	.code32   // finally in protected mode
+	.code32   // finally in protected mode  .code32是一个伪指令，用于指定后续代码的字节宽度为32位。这意味着编译器将按照32位模式处理这些指令，而不是可能存在的其他模式（如16位或64位
 	.section ".text32","ax"
 ```
-todo 汇编
+todo 汇编  搜索结果：https://metaso.cn/
+//指令 "orb $X86_CR0_PE, %dl" 的意思是将 CR0 寄存器的保护模式（Protected mode）标志位设置为 1，即启用保护模式。
+在 x86 架构的计算机系统中，CR0（Control Register 0）是一个控制寄存器，用于控制处理器的各种操作模式和性能特性。
+其中，PE（Page Table-Base register enable）位是影响分页机制的一个标志位。当这个位被置为 1 时，表示启用基于页表的地址映射功能，
+这是实现虚拟内存管理的关键步骤之一
 
 Let's look at the first steps taken in protected mode
 ```

@@ -381,5 +381,5 @@ private static BinderProxy getInstance(long nativeData, long iBinder) {
 }
 ```
 
-//todo NativeAllocationRegistry
+
 //NoImagePreloadHolder.sRegistry.registerNativeAllocation

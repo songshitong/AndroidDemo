@@ -668,7 +668,7 @@ public final class Bitmap implements Parcelable {
 
         final int allocationByteCount = getAllocationByteCount();
         NativeAllocationRegistry registry;
-        //todo NativeAllocationRegistry  Android 8.0引入的一种辅助自动回收native内存的一种机制，当Java对象因为GC被回收后，
+        // Android 8.0引入的一种辅助自动回收native内存的一种机制，当Java对象因为GC被回收后，
         //NativeAllocationRegistry可以辅助回收Java对象所申请的native内存
         if (fromMalloc) {
             registry = NativeAllocationRegistry.createMalloced(

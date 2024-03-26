@@ -597,10 +597,107 @@ Next, we put this address with an offset of 0x1007 into the eax register. 0x1007
 In the end, we just write the address of the first PDP entry to the PML4 table.
 
 
+In the next step we will build four Page Directory entries in the Page Directory Pointer table with the same 
+PRESENT+RW+USE flags:
+```
+/* Build Level 3 */
+	leal	pgtable + 0x1000(%ebx), %edi
+	leal	0x1007(%edi), %eax
+	movl	$4, %ecx
+1:	movl	%eax, 0x00(%edi)
+	addl	%edx, 0x04(%edi)
+	addl	$0x00001000, %eax
+	addl	$8, %edi
+	decl	%ecx
+	jnz	1b
+```
+We set edi to the base address of the page directory pointer which is at an offset of 4096 or 0x1000 bytes 
+from the pgtable table and eax to the address of the first page directory pointer entry. 
+We also set ecx to 4 to act as a counter in the following loop and write the address of the first page directory pointer table entry 
+to the edi register. After this, edi will contain the address of the first page directory pointer entry with flags 0x7.
+Next we calculate the address of the following page directory pointer entries — each entry is 8 bytes — 
+and write their addresses to eax.
+
+The last step in building the paging structure is to build the 2048 page table entries with 2-MByte pages:
+```
+/* Build Level 2 */
+	leal	pgtable + 0x2000(%ebx), %edi
+	movl	$0x00000183, %eax
+	movl	$2048, %ecx
+1:	movl	%eax, 0(%edi)
+	addl	%edx, 4(%edi)
+	addl	$0x00200000, %eax
+	addl	$8, %edi
+	decl	%ecx
+	jnz	1b
+```
+Here we do almost the same things that we did in the previous example, all entries are associated with these flags - $0x00000183 - PRESENT + WRITE + MBZ. 
+In the end, we will have a page table with 2048 2-MByte pages, which represents a 4 Gigabyte block of memory:
+```
+>>> 2048 * 0x00200000
+4294967296
+```
+Since we've just finished building our early page table structure which maps 4 gigabytes of memory, 
+we can put the address of the high-level page table - PML4 - into the cr3 control register:
+```
+	/* Enable the boot page tables */
+	leal	pgtable(%ebx), %eax
+	movl	%eax, %cr3
+```
 
 
 
+The transition to 64-bit mode
+First of all we need to set the EFER.LME flag in the MSR to 0xC0000080:
 
+
+MSR  https://en.wikipedia.org/wiki/Model-specific_register
+A model-specific register (MSR) is any of various control registers in the x86 system architecture used for debugging, 
+program execution tracing, computer performance monitoring, and toggling certain CPU features.
+```
+/* Enable Long mode in EFER (Extended Feature Enable Register) */
+	movl	$MSR_EFER, %ecx
+	rdmsr
+	btsl	$_EFER_LME, %eax
+	wrmsr
+```
+https://github.com/torvalds/linux/blob/v4.16/arch/x86/include/asm/msr-index.h
+```
+#define MSR_EFER		0xc0000080 /* extended feature register */
+```
+Here we put the MSR_EFER flag  in the ecx register
+and execute the rdmsr instruction which reads the MSR register. After rdmsr executes, 
+the resulting data is stored in edx:eax according to the MSR register specified in ecx. We check the current EFER_LME bit, 
+transfer it into the carry flag and update the bit, all with the btsl instruction. 
+Then we write data from edx:eax back to the MSR register with the wrmsr instruction.
+
+In the next step, we push the address of the kernel segment code to the stack (we defined it in the GDT) 
+and put the address of the startup_64 routine in eax.
+```
+pushl	$__KERNEL_CS
+leal	startup_64(%ebp), %eax
+```
+After this we push eax to the stack and enable paging by setting the PG and PE bits in the cr0 register:
+```
+pushl	%eax
+
+	/* Enter paged protected Mode, activating Long Mode */
+	movl	$(X86_CR0_PG | X86_CR0_PE), %eax /* Enable Paging and Protected mode */
+	movl	%eax, %cr0
+/* Jump from 32bit compatibility mode into 64bit mode. */
+	lret	
+```
+we pushed the address of the startup_64 function to the stack in the previous step. 
+The CPU extracts startup_64's address from the stack and jumps there.
+
+
+After all of these steps we're finally in 64-bit mode:
+```
+.code64
+	.org 0x200
+ENTRY(startup_64)
+...
+```
 
 
 the history of virtual memory

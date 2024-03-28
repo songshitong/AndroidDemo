@@ -568,3 +568,41 @@ unsigned long kaslr_get_random_long(const char *purpose)
 ```
 
 We now have a random physical address to decompress the kernel to.
+
+
+
+
+Virtual address randomization
+After selecting a random physical address for the decompressed kernel, we generate identity mapped pages for the region:
+arch/x86/boot/compressed/kaslr.c
+```
+void choose_random_location(unsigned long input,
+			    unsigned long input_size,
+			    unsigned long *output,
+			    unsigned long output_size,
+			    unsigned long *virt_addr)
+{
+...
+/* Walk available memory entries to find a random address. */
+	random_addr = find_random_phys_addr(min_addr, output_size);
+	...
+		/* Update the new physical address location. */
+		if (*output != random_addr)
+			*output = random_addr;
+	...
+}
+```
+From now on, output will store the base address of the memory region where kernel will be decompressed. 
+Currrently, we have only randomized the physical address.
+We can randomize the virtual address as well on the x86_64 architecture:
+```
+/* Pick random virtual address starting from LOAD_PHYSICAL_ADDR. */
+	if (IS_ENABLED(CONFIG_X86_64))
+		random_addr = find_random_virt_addr(LOAD_PHYSICAL_ADDR, output_size);
+	*virt_addr = random_addr;
+```
+In architectures other than x86_64, the randomized physical and virtual addresses are the same. 
+The find_random_virt_addr function calculates the number of virtual memory ranges needed to hold the kernel image. 
+It calls the kaslr_get_random_long function, which we have already seen being used to generate a random physical address.
+
+At this point we have randomized both the base physical (*output) and virtual (*virt_addr) addresses for the decompressed kernel.

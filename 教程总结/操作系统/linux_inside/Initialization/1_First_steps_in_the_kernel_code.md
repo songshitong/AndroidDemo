@@ -638,3 +638,187 @@ arch/x86/kernel/vmlinux.lds.S
 INIT_PER_CPU(gdt_page);
 INIT_PER_CPU(irq_stack_union);
 ```
+As we got init_per_cpu__gdt_page in INIT_PER_CPU_VAR and INIT_PER_CPU macro from linker script 
+will be expanded we will get offset from the __per_cpu_load. After this calculations,
+we will have correct base address of the new GDT.
+
+
+Generally per-CPU variables is a 2.6 kernel feature. You can understand what it is from its name.
+When we create per-CPU variable, each CPU will have its own copy of this variable.
+Here we are creating gdt_page per-CPU variable. There are many advantages for variables of this type, 
+like there are no locks, because each CPU works with its own copy of variable and etc...
+So every core on multiprocessor will have its own GDT table and every entry in the table will represent a memory segment 
+which can be accessed from the thread which ran on the core. You can read in details about per-CPU variables in the Concepts/per-cpu post.
+https://0xax.gitbooks.io/linux-insides/content/Concepts/linux-cpu-1.html
+
+
+As we loaded new Global Descriptor Table, we reload segments as we did it every time:
+arch/x86/kernel/head_64.S
+```
+/* set up data segments */
+	xorl %eax,%eax
+	movl %eax,%ds
+	movl %eax,%ss
+	movl %eax,%es
+/*
+	 * We don't really need to load %fs or %gs, but load them anyway
+	 * to kill any stale realmode selectors.  This allows execution
+	 * under VT hardware.
+	 */
+	movl %eax,%fs
+	movl %eax,%gs	
+```
+
+After all of these steps we set up gs register that it post to the irqstack which represents special stack 
+where interrupts will be handled on:
+```
+/* Set up %gs.
+	 *
+	 * The base of %gs always points to the bottom of the irqstack
+	 * union.  If the stack protector canary is enabled, it is
+	 * located at %gs:40.  Note that, on SMP, the boot cpu uses
+	 * init data section till per cpu areas are set up.
+	 */
+	movl	$MSR_GS_BASE,%ecx
+	movl	initial_gs(%rip),%eax
+	movl	initial_gs+4(%rip),%edx
+	wrmsr
+```
+interrupts
+https://en.wikipedia.org/wiki/Interrupt
+In digital computers, an interrupt (sometimes referred to as a trap) is a request for the processor to 
+interrupt currently executing code (when permitted), so that the event can be processed in a timely manner.
+If the request is accepted, the processor will suspend its current activities, save its state,
+and execute a function called an interrupt handler (or an interrupt service routine, ISR) to deal with the event. 
+This interruption is often temporary, allowing the software to resume normal activities after the interrupt handler finishes,
+although the interrupt could instead indicate a fatal error.
+
+where MSR_GS_BASE is:
+arch/x86/include/asm/msr-index.h
+```
+#define MSR_GS_BASE		0xc0000101 /* 64bit GS base */
+```
+
+We need to put MSR_GS_BASE to the ecx register and load data from the eax and edx (which point to the initial_gs) 
+with wrmsr instruction. We don't use cs, fs, ds and ss segment registers for addressing in the 64-bit mode, 
+but fs and gs registers can be used. fs and gs have a hidden part (as we saw it in the real mode for cs) 
+and this part contains a descriptor which is mapped to Model Specific Registers. 
+So we can see above 0xc0000101 is a gs.base MSR address. When a system call or interrupt occurs, 
+there is no kernel stack at the entry point, so the value of the MSR_GS_BASE will store address of the interrupt stack.
+
+Model-specific_register
+https://en.wikipedia.org/wiki/Model-specific_register
+A model-specific register (MSR) is any of various control registers in the x86 system architecture used for debugging, 
+program execution tracing, computer performance monitoring, and toggling certain CPU features
+
+
+In the next step we put the address of the real mode bootparam structure to the rdi (remember rsi holds pointer 
+to this structure from the start) and jump to the C code with:
+```
+.Ljump_to_C_code:
+	pushq	$.Lafter_lret	# put return address on stack for unwinder
+	xorq	%rbp, %rbp	# clear frame pointer
+	movq	initial_code(%rip), %rax
+	pushq	$__KERNEL_CS	# set correct cs
+	pushq	%rax		# target address in negative space
+	lretq
+.Lafter_lret:
+```
+Here we put the address of the initial_code to the rax and push the return address, __KERNEL_CS and 
+the address of the initial_code to the stack. After this we can see lretq instruction which means that
+after it return address will be extracted from stack (now there is address of the initial_code) and jump there
+```
+...
+/* Both SMP bootup and ACPI suspend change these variables */
+	__REFDATA
+	.balign	8
+	GLOBAL(initial_code)
+	.quad	x86_64_start_kernel
+...	
+```
+As we can see initial_code contains address of the x86_64_start_kernel
+arch/x86/kernel/head64.c
+```
+asmlinkage __visible void __init x86_64_start_kernel(char * real_mode_data)
+{
+
+}
+```
+It has one argument is a real_mode_data (remember that we passed address of the real mode data to the rdi register previously).
+
+
+
+Next to start_kernel
+We need to see last preparations before we can see "kernel entry point" - start_kernel function from the init/main.c.
+
+First of all we can see some checks in the x86_64_start_kernel function:
+arch/x86/kernel/head64.c
+```
+asmlinkage __visible void __init x86_64_start_kernel(char * real_mode_data)
+{
+BUILD_BUG_ON(MODULES_VADDR < __START_KERNEL_map);
+	BUILD_BUG_ON(MODULES_VADDR - __START_KERNEL_map < KERNEL_IMAGE_SIZE);
+	BUILD_BUG_ON(MODULES_LEN + KERNEL_IMAGE_SIZE > 2*PUD_SIZE);
+	BUILD_BUG_ON((__START_KERNEL_map & ~PMD_MASK) != 0);
+	BUILD_BUG_ON((MODULES_VADDR & ~PMD_MASK) != 0);
+	BUILD_BUG_ON(!(MODULES_VADDR > __START_KERNEL));
+	BUILD_BUG_ON(!(((MODULES_END - 1) & PGDIR_MASK) ==
+				(__START_KERNEL & PGDIR_MASK)));
+	BUILD_BUG_ON(__fix_to_virt(__end_of_fixed_addresses) <= MODULES_END);
+	...
+}
+```
+There are checks for different things like virtual address of module space is not fewer than base address o
+f the kernel text - __STAT_KERNEL_map, that kernel text with modules is not less than image of the kernel and etc... 
+BUILD_BUG_ON is a macro which looks as:
+include/linux/build_bug.h
+```
+#define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
+```
+Let's try to understand how this trick works. Let's take for example first condition: MODULES_VADDR < __START_KERNEL_map. !!conditions 
+is the same that condition != 0. So it means if MODULES_VADDR < __START_KERNEL_map is true, we will 
+get 1 in the !!(condition) or zero if not. After 2*!!(condition) we will get or 2 or 0. 
+In the end of calculations we can get two different behaviors:
+1 We will have compilation error, because try to get size of the char array with negative index (as can be in our case, 
+   because MODULES_VADDR can't be less than __START_KERNEL_map will be in our case);
+2 No compilation errors.
+That's all. So interesting C trick for getting compile error which depends on some constants.
+
+
+In the next step we can see call of the cr4_init_shadow function which stores shadow copy of the cr4 per cpu.
+Context switches can change bits in the cr4 so we need to store cr4 for each CPU. And after this we can see call of the reset_early_page_tables
+function where we resets all page global directory entries and write new pointer to the PGT in cr3:
+arch/x86/kernel/head64.c
+```
+cr4_init_shadow();
+	/* Kill off the identity-map trampoline */
+	reset_early_page_tables();
+	
+
+static void __init reset_early_page_tables(void)
+{
+	memset(early_top_pgt, 0, sizeof(pgd_t)*(PTRS_PER_PGD-1));
+	next_early_pgt = 0;
+	write_cr3(__sme_pa_nodebug(early_top_pgt));
+}	
+```
+Soon we will build new page tables. Here we can see that we zero all Page Global Directory entries. 
+After this we set next_early_pgt to zero (we will see details about it in the next post) and 
+write physical address of the early_top_pgt to the cr3.
+
+After this we clear _bss from the __bss_stop to __bss_start and also clear init_top_pgt
+```
+clear_bss();
+
+clear_page(init_top_pgt);
+```
+arch/x86/kernel/head_64.S
+```
+NEXT_PGD_PAGE(init_top_pgt)
+	.fill	512,8,0
+	.fill	PTI_USER_PGD_FILL,8,0
+#endif
+```
+This is exactly the same definition as early_top_pgt.
+
+The next step will be setup of the early IDT handlers, but it's big concept so we will see it in the next post.

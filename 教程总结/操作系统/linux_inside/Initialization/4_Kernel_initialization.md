@@ -329,3 +329,5 @@ void __init boot_cpu_init(void)
 ```
 This function initializes various CPU masks for the bootstrap processor. 
 First of all it gets the bootstrap processor id
+For now it is just zero. If the CONFIG_DEBUG_PREEMPT configuration option is disabled, 
+smp_processor_id just expands to the call of raw_smp_processor_id which expands to the:

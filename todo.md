@@ -145,3 +145,49 @@ mediacodec
 https://www.jianshu.com/p/f5a1c9318524
 
 view.OnAttachStateChangeListener
+
+
+
+https://chat.openai.com/c/3020ae1a-ec5a-4308-89a1-29c235242a96
+you
+how to get a girlfriend
+ChatGPT
+Getting a girlfriend involves building connections, being yourself, and fostering mutual attraction. 
+Here are some tips to help you:
+
+Self-Improvement: Work on yourself first. Cultivate your interests, hobbies, and passions. Develop confidence and self-esteem. 
+Being comfortable with who you are is attractive to others.
+
+Socialize: Put yourself in social situations where you can meet new people. This could be through clubs, 
+classes, volunteering, or social events. The more people you meet, the higher the chances of finding someone compatible.
+
+Be Genuine: Authenticity is key. Be yourself when interacting with others. Pretending to be someone 
+you're not will eventually backfire.
+
+Communicate: Engage in conversations and listen attentively. Show interest in the other person's life and opinions.
+Communication is vital for building connections.
+
+Make Eye Contact and Smile: These are simple gestures, but they can convey warmth and openness, making you more approachable.
+
+Show Respect and Kindness: Treat others with respect and kindness. Being courteous and considerate 
+goes a long way in forming meaningful relationships.
+
+Take Initiative: If you're interested in someone, don't be afraid to make the first move. Ask them out for coffee, 
+lunch, or to participate in an activity together.
+
+Build Emotional Connection: Share your thoughts, feelings, and experiences. Vulnerability can foster intimacy
+and deepen your connection with someone.
+
+Be Patient: Finding the right person takes time. Don't rush or force relationships. Allow things to progress naturally.
+
+Work on Your Appearance: While inner qualities are important, taking care of your appearance can also make you more attractive. 
+Dress in a way that makes you feel confident and presentable.
+
+Remember, relationships are about mutual compatibility and respect. It's essential to find someone 
+who appreciates you for who you are and vice versa. Don't be discouraged by setbacks or rejections; 
+keep putting yourself out there, and eventually, you'll find someone special.
+
+
+
+
+

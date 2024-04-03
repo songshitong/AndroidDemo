@@ -169,6 +169,8 @@ PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 在 Android 11 及更低版本中，滚动事件会使视觉元素发光。在 Android 12 及更高版本中，发生拖动事件时，视觉元素会拉伸和反弹；
 发生快速滑动事件时，它们会快速滑动和反弹   停用：android:overScrollMode="never"
 
+请求精确位置，需同时申请 ACCESS_FINE_LOCATION 和 ACCESS_COARSE_LOCATION 权限（以Android12位目标平台的应用）
+
 
 android 13
 https://juejin.cn/post/7099762078977622053

@@ -331,3 +331,224 @@ This function initializes various CPU masks for the bootstrap processor.
 First of all it gets the bootstrap processor id
 For now it is just zero. If the CONFIG_DEBUG_PREEMPT configuration option is disabled, 
 smp_processor_id just expands to the call of raw_smp_processor_id which expands to the:
+include/linux/smp.h
+```
+# define smp_processor_id() raw_smp_processor_id()
+#endif
+```
+arch/x86/include/asm/smp.h
+```
+#define raw_smp_processor_id() (this_cpu_read(cpu_number))
+```
+this_cpu_read as many other function like this (this_cpu_write, this_cpu_add and etc...)  and presents this_cpu operation. 
+These operations provide a way of optimizing access to the per-cpu variables which are associated with the current processor. 
+In our case it is this_cpu_read:
+include/linux/percpu-defs.h
+```
+#define this_cpu_read(pcp)		__pcpu_size_call_return(this_cpu_read_, pcp)
+```
+Remember that we have passed cpu_number as pcp to the this_cpu_read from the raw_smp_processor_id. 
+Now let's look at the __pcpu_size_call_return implementation:
+```
+#define __pcpu_size_call_return(stem, variable)				\
+({									\
+	typeof(variable) pscr_ret__;					\
+	__verify_pcpu_ptr(&(variable));					\
+	switch(sizeof(variable)) {					\
+	case 1: pscr_ret__ = stem##1(variable); break;			\
+	case 2: pscr_ret__ = stem##2(variable); break;			\
+	case 4: pscr_ret__ = stem##4(variable); break;			\
+	case 8: pscr_ret__ = stem##8(variable); break;			\
+	default:							\
+		__bad_size_call_parameter(); break;			\
+	}								\
+	pscr_ret__;							\
+})
+```
+First of all we can see the definition of the pscr_ret__ variable with the int type. 
+Why int? Ok, variable is common_cpu and it was declared as per-cpu int variable:
+```
+#define DECLARE_PER_CPU_READ_MOSTLY(type, name)			\
+	DECLARE_PER_CPU_SECTION(type, name, "..read_mostly")
+```
+In the next step we call __verify_pcpu_ptr with the address of cpu_number. __veryf_pcpu_ptr used to verify 
+that the given parameter is a per-cpu pointer.
+```
+#define __verify_pcpu_ptr(ptr)						\
+do {									\
+	const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;	\
+	(void)__vpp_verify;						\
+} while (0)
+
+```
+
+After that we set pscr_ret__ value which depends on the size of the variable. Our common_cpu variable is int,
+so it 4 bytes in size. It means that we will get this_cpu_read_4(common_cpu) in pscr_ret__. 
+//todo this_cpu_read_4怎么来的
+In the end of the __pcpu_size_call_return we just call it. this_cpu_read_4 is a macro:
+arch/x86/include/asm/percpu.h
+```
+#define this_cpu_read_4(pcp)		percpu_from_op("mov", pcp)
+```
+which calls percpu_from_op and pass mov instruction and per-cpu variable there. percpu_from_op will expand to the inline assembly call:
+```
+#define percpu_from_op(op, var)				\
+({							\
+	typeof(var) pfo_ret__;				\
+	switch (sizeof(var)) {				\
+	case 1:						\
+		asm(op "b "__percpu_arg(1)",%0"		\
+		    : "=q" (pfo_ret__)			\
+		    : "m" (var));			\
+		break;					\
+	case 2:						\
+		asm(op "w "__percpu_arg(1)",%0"		\
+		    : "=r" (pfo_ret__)			\
+		    : "m" (var));			\
+		break;					\
+	case 4:						\
+		asm(op "l "__percpu_arg(1)",%0"		\
+		    : "=r" (pfo_ret__)			\
+		    : "m" (var));			\
+		break;					\
+	case 8:						\
+		asm(op "q "__percpu_arg(1)",%0"		\
+		    : "=r" (pfo_ret__)			\
+		    : "m" (var));			\
+		break;					\
+	default: __bad_percpu_size();			\
+	}						\
+	pfo_ret__;					\
+})
+```
+todo 理解汇编
+
+As we didn't setup per-cpu area, we have only one - for the current running CPU, 
+we will get zero as a result of the smp_processor_id.
+
+As we got the current processor id, boot_cpu_init sets the given CPU online, active, present and possible with the:
+kernel/cpu.c
+```
+void __init boot_cpu_init(void)
+{
+	int cpu = smp_processor_id();
+
+	set_cpu_online(cpu, true);
+	set_cpu_active(cpu, true);
+	set_cpu_present(cpu, true);
+	set_cpu_possible(cpu, true);
+...
+}
+```
+All of these functions use the concept - cpumask. 
+cpu_possible is a set of CPU ID's which can be plugged in at any time during the life of that system boot. 
+cpu_present represents which CPUs are currently plugged in. 
+cpu_online represents subset of the cpu_present and indicates CPUs which are available for scheduling.
+These masks depend on the CONFIG_HOTPLUG_CPU configuration option and if this option is disabled 
+  possible == present and active == online. 
+Implementation of the all of these functions are very similar. Every function checks the second parameter. 
+  If it is true, it calls cpumask_set_cpu or cpumask_clear_cpu otherwise.
+For example let's look at set_cpu_possible. As we passed true as the second parameter, the:
+include/linux/cpumask.h
+```
+static inline void
+set_cpu_possible(unsigned int cpu, bool possible)
+{
+	if (possible)
+		cpumask_set_cpu(cpu, &__cpu_possible_mask);
+	else
+		cpumask_clear_cpu(cpu, &__cpu_possible_mask);
+}
+
+static inline void cpumask_set_cpu(unsigned int cpu, struct cpumask *dstp)
+{
+	set_bit(cpumask_check(cpu), cpumask_bits(dstp));
+}
+
+#define cpumask_bits(maskp) ((maskp)->bits)
+
+typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
+```
+CPU masks provide a bitmap suitable for representing the set of CPU's in a system, one bit position per CPU number.
+CPU mask presented by the cpumask structure
+DECLARE_BITMAP todo 找这个宏
+
+更多关于cpumask 和 set_cpu_*
+https://0xax.gitbooks.io/linux-insides/content/Concepts/linux-cpu-2.html
+https://www.kernel.org/doc/Documentation/cpu-hotplug.txt
+
+As we activated the bootstrap processor, it's time to go to the next function in the start_kernel. 
+Now it is page_address_init, but this function does nothing in our case, because it executes only when all 
+RAM can't be mapped directly.
+
+
+Print linux banner
+The next call is pr_notice:
+init/main.c
+```
+...
+pr_notice("%s", linux_banner);
+...
+```
+as you can see it just expands to the printk call. At this moment we use pr_notice to print the Linux banner
+include/linux/printk.h
+```
+#define pr_notice(fmt, ...) \
+	printk(KERN_NOTICE pr_fmt(fmt), ##__VA_ARGS__)
+```
+
+which is just the kernel version with some additional parameters:
+```
+Linux version 4.0.0-rc6+ (alex@localhost) (gcc version 4.9.1 (Ubuntu 4.9.1-16ubuntu6) ) #319 SMP
+```
+
+
+
+Architecture-dependent parts of initialization
+The next step is architecture-specific initialization. The Linux kernel does it with the call of the setup_arch function. 
+This is a very big function like start_kernel and we do not have time to consider all of its implementation in this part.
+Here we'll only start to do it and continue in the next part. As it is architecture-specific,
+we need to go again to the arch/ directory. 
+
+This function starts from the reserving memory block for the kernel _text and _data which starts from the _text symbol 
+ and ends before __bss_stop. We are using memblock for the reserving of memory block:
+init/main.c
+```
+...
+setup_arch(&command_line);
+...
+```
+arch/x86/kernel/setup.c
+```
+void __init setup_arch(char **cmdline_p)
+{
+	memblock_reserve(__pa_symbol(_text),
+			 (unsigned long)__bss_stop - (unsigned long)_text);
+...			 
+```
+You can read about memblock https://0xax.gitbooks.io/linux-insides/content/MM/linux-mm-1.html
+
+memblock_reserve function takes two parameters:
+1 base physical address of a memory block;
+2 size of a memory block.
+
+We can get the base physical address of the _text symbol with the __pa_symbol macro:
+arch/x86/include/asm/page.h
+```
+#define __pa_symbol(x) \
+	__phys_addr_symbol(__phys_reloc_hide((unsigned long)(x)))
+```
+arch/x86/include/asm/page_64.h
+```
+#define __phys_reloc_hide(x)	(x)
+#define __phys_addr_symbol(x) \
+	((unsigned long)(x) - __START_KERNEL_map + phys_base)
+```
+First of all it calls __phys_reloc_hide macro on the given parameter. The __phys_reloc_hide macro does nothing for x86_64 and
+just returns the given parameter. 
+Implementation of the __phys_addr_symbol macro is easy. It just subtracts the symbol address from the 
+  base address of the kernel text mapping base virtual address (you can remember that it is __START_KERNEL_map) 
+  and adds phys_base which is the base address of _text
+
+After we got the physical address of the _text symbol, memblock_reserve can reserve a memory block from 
+the _text to the __bss_stop - _text.

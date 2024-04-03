@@ -250,6 +250,7 @@ bluetoothGatt.writeDescriptor(descriptor);
 https://blog.csdn.net/LoveDou0816/article/details/98508612
 一般都是先调用disconnect()方法，此时如果断开成功，会回调onConnectionStateChange()方法，在这个方法中我们再调用close()释放资源。但如果我们使用disconnect()方法后立即调用close()，
 会导致无法回调onConnectionStateChange()方法。因此我们需要在合适的地方使用close()释放资源。
+//BluetoothGattCallback基本在binder线程
 
 当应用完成对 BLE 设备的使用后，其应调用 close()，以便系统可以适当地释放资源
 ```

@@ -575,3 +575,7 @@ at java.lang.reflect.Method.invoke!(Native method)
 at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:726)
 at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
 ```
+
+6.1
+日志中每次调用gson解析和binder通信，日志频繁时可能anr
+对于固定bean的toJson，可以手动拼接，不调用GSON等三方库，减少反射等性能损耗

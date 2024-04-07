@@ -552,3 +552,75 @@ Implementation of the __phys_addr_symbol macro is easy. It just subtracts the sy
 
 After we got the physical address of the _text symbol, memblock_reserve can reserve a memory block from 
 the _text to the __bss_stop - _text.
+
+
+
+
+Initial ramdisk
+https://en.wikipedia.org/wiki/Initial_ramdisk
+In Linux systems, initrd (initial ramdisk) is a scheme for loading a temporary root file system into memory,
+to be used as part of the Linux startup process. initrd and initramfs (from INITial RAM File System)
+refer to two different methods of achieving this. Both are commonly used to make preparations before
+the real root file system can be mounted.
+
+Reserve memory for initrd
+In the next step after we reserved place for the kernel text and data is reserving place for the initrd. 
+We will not see details about initrd in this post, you just may know that it is temporary root file system stored in memory 
+and used by the kernel during its startup. The early_reserve_initrd function does all work. 
+First of all this function gets the base address of the ram disk, its size and the end address with:
+After we got ramdisk's size, base address and end address, we check that bootloader provided ramdisk
+and reserve memory block with the calculated addresses for the initial ramdisk in the end
+
+arch/x86/kernel/setup.c
+```
+void __init setup_arch(char **cmdline_p)
+{
+	memblock_reserve(__pa_symbol(_text),
+			 (unsigned long)__bss_stop - (unsigned long)_text);
+
+	early_reserve_initrd();
+	....
+}
+
+static void __init early_reserve_initrd(void)
+{
+	/* Assume only end is not page aligned */
+	u64 ramdisk_image = get_ramdisk_image();
+	u64 ramdisk_size  = get_ramdisk_size();
+	u64 ramdisk_end   = PAGE_ALIGN(ramdisk_image + ramdisk_size);
+
+	if (!boot_params.hdr.type_of_loader ||
+	    !ramdisk_image || !ramdisk_size)
+		return;		/* No initrd provided by bootloader */
+
+	memblock_reserve(ramdisk_image, ramdisk_end - ramdisk_image);
+}	
+```
+ramdisk_image,ramdisk_size,ramdisk_end,All of these parameters are taken from boot_params.
+The kernel setup header contains a couple of fields which describes ramdisk, for example:
+```
+Field name:    ramdisk_image
+Type:        write (obligatory)
+Offset/size:    0x218/4
+Protocol:    2.00+
+
+  The 32-bit linear address of the initial ramdisk or ramfs.  Leave at
+  zero if there is no initial ramdisk/ramfs.
+```
+So we can get all the information that interests us from boot_params. For example let's look at get_ramdisk_image:
+```
+static u64 __init get_ramdisk_image(void)
+{
+	u64 ramdisk_image = boot_params.hdr.ramdisk_image;
+	ramdisk_image |= (u64)boot_params.ext_ramdisk_image << 32;
+	return ramdisk_image;
+}
+```
+Here we get the address of the ramdisk from the boot_params and shift left it on 32. We need to do it because 
+as you can read in the Documentation/x86/zero-page.txt:
+https://github.com/0xAX/linux/blob/0a07b238e5f488b459b6113a62e06b6aab017f71/Documentation/x86/zero-page.txt
+```
+0C0/004	ALL	ext_ramdisk_image ramdisk_image high 32bits
+```
+So after shifting it on 32, we're getting a 64-bit address in ramdisk_image and we return it. 
+get_ramdisk_size works on the same principle as get_ramdisk_image, but it used ext_ramdisk_size instead of ext_ramdisk_image.

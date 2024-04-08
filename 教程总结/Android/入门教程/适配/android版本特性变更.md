@@ -249,3 +249,5 @@ val receiverFlags = if (listenToBroadcastsFromOtherApps) {
 // 这里的 registerReceiver 方法必须设置 receiverFlags 参数
 registerReceiver(requireContext(), AlarmReceiver(), filter, receiverFlags)
 ```
+android14相册适配
+https://mp.weixin.qq.com/s/qpbHBhmfwZcgq5CLdRj2rQ

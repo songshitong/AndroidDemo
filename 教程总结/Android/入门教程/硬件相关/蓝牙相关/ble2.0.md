@@ -37,7 +37,8 @@ new ScanCallback() {
       @Override public void onScanResult(int callbackType, ScanResult result) {
         super.onScanResult(callbackType, result);
         BluetoothDevice device = result.getDevice();
-        if (null != device) { //注意！！！此处在主线程，不要做耗时操作  String name = device.getName()，是binder调用耗时,注意只调用一次即可
+        if (null != device) { //注意！！！此处在主线程，不要做耗时操作 
+              //String name = device.getName()，是binder调用耗时,注意只调用一次即可  也可以Map缓存address和Name，对于重复返回的扫描设备减少binder通信
                 
               //由于可能扫描到重复的蓝牙设备，通过Set过滤掉重复的设备。 
                //部分设备可能过一段时间改变mac  提示这个设备仍然可以被连接

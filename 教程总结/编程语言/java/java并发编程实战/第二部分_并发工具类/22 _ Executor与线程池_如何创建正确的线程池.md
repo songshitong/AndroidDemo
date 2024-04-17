@@ -297,3 +297,13 @@ getPoolSize：线程池的线程数量。如果线程池不销毁的话，池里
 getActiveCount：获取活动的线程数。
 通过扩展线程池进行监控：继承线程池并重写线程池的beforeExecute()，afterExecute()和terminated()方法，可以在任务执行前、
 后和线程池关闭前自定义行为。如监控任务的平均执行时间，最大执行时间和最小执行时间等。
+
+
+
+线程池实现任务超时机制
+https://www.hangge.com/blog/cache/detail_3235.html
+默认的线程池提交任务时，没有超时时间，可以通过futureTask
+```
+executor.execute(futureTask)
+futureTask.get(timeout, TimeUnit.MILLISECONDS) //阻塞执行并超时
+```

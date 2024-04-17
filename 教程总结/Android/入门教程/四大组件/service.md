@@ -189,6 +189,7 @@ activity
 前台Service和后台Service（普通）最大的区别就在于：
 前台Service在下拉通知栏有显示通知，但后台Service没有；
 前台Service优先级较高，不会由于系统内存不足而被回收；后台Service优先级较低，当系统出现内存不足情况时，很有可能会被回收
+android12后，前台服务不允许在后台启动(特殊App除外)ForegroundServiceStartNotAllowedException
 用法很简单，只需要在原有的Service类对onCreate()方法进行稍微修改即可
 ```
 android9.0  声明manifest
@@ -302,5 +303,3 @@ if (Build.VERSION.SDK_INT >= 26) {
    
    
    https://zhuanlan.zhihu.com/p/70494771
-   
-   

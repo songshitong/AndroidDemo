@@ -302,7 +302,8 @@ getActiveCount：获取活动的线程数。
 
 线程池实现任务超时机制
 https://www.hangge.com/blog/cache/detail_3235.html
-默认的线程池提交任务时，没有超时时间，可以通过futureTask
+默认的线程池提交任务时，没有超时时间，可以通过futureTask   
+对于提交同一种任务而言，不管线程池存在几个线程，假如任务阻塞时间很长，添加任务的速度很快，可能导致任务队列达到maxSize而溢出
 ```
 executor.execute(futureTask)
 futureTask.get(timeout, TimeUnit.MILLISECONDS) //阻塞执行并超时

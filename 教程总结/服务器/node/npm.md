@@ -4,6 +4,9 @@ install :
 ```
 npm install
 npm install <package-name>@<version>
+
+npm install --verbose  //显示安装的详细信息 
+npm install --loglevel silly //比verbose内容更多
 ```
 Updating packages:
 ```

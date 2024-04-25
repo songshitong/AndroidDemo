@@ -537,3 +537,15 @@ export class MainConfiguration implements ILifeCycle {
    从而释放面向用户的进程以保持响应。
 提供跨各种服务的可靠通信渠道。例如，您可以在一个进程或服务中排队任务（作业），并在另一个进程或服务中使用它们。在任何流程或服务的作业生命周期中完成、
   错误或其他状态更改时，您都可以收到通知（通过监听状态事件）。当队列生产者或消费者失败时，它们的状态被保留，并且当节点重新启动时任务处理可以自动重新启动。
+
+
+
+https://midwayjs.org/en/docs/2.0.0/extensions/cache
+缓存用户信息，token等到本地机器
+```
+cacheManager.set(key, value, { ttl: 1000 }); // ttl的单位为秒 
+cacheManager.set(key, value, { ttl: null }); //禁止过期
+cacheManager.get(key); //undifined
+cacheManager.del(key);
+cacheManager.reset(); //全部清空
+```

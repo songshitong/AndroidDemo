@@ -17,3 +17,26 @@ console.log(target);
 console.log(returnedTarget === target);
 // Expected output: true
 ```
+
+Object.getOwnPropertyNames()
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyNames
+The Object.getOwnPropertyNames() static method returns an array of all properties (including non-enumerable 
+properties except for those which use Symbol) found directly in a given object.
+```
+console.log(Object.getOwnPropertyNames(window));
+```
+结果：  数组长度有一千多。。。
+```
+[
+    "0",
+    "Object",
+    "Function",
+    "Array",
+    "Number",
+    "parseFloat",
+    "parseInt",
+    "Infinity",
+    "NaN",
+   ....
+]
+```

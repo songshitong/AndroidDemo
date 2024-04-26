@@ -1,0 +1,5 @@
+
+
+
+https://www.liaoxuefeng.com/wiki/1252599548343744/1266265175882464
+Spring Boot是一个基于Spring的套件，它帮我们预组装了Spring的一系列组件，以便以尽可能少的代码和配置来开发基于Spring的Java应用程

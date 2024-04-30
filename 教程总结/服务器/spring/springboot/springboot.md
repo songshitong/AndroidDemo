@@ -109,6 +109,11 @@ FilterRegistrationBean本身不是Filter，它实际上是Filter的工厂。Spri
 再注意到AuthFilterRegistrationBean使用了setOrder(10)，因为Spring Boot支持给多个Filter排序，数字小的在前面，所以，多个Filter的顺序是可以固定的。
 调用setUrlPatterns()传入要过滤的URL列表
 
+
+interceptor
+
+
+
 禁用自动配置
 Spring Boot大量使用自动配置和默认配置，极大地减少了代码，通常只需要加上几个注解，并按照默认规则设定一下必要的配置即可
 对于需要禁用自动配置的场景

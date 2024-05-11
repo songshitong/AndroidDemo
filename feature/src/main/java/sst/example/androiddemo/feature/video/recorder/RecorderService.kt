@@ -111,6 +111,8 @@ class RecorderService : Service() {
     val dm: DisplayMetrics = resources.displayMetrics
 
     //输出大小  maxImages缓存几帧  使用ImageFormat.RGB_565报错   使用ImageFormat.JPEG要求宽高一致，可以取最大值，但是有黑边
+    //给ImageReader设置的输出格式是ImageFormat.YUV_420_888，这种格式是官方建议通用性最好的，但是它只能保证输出是YUV420格式，而YUV420分很多种，
+    // 具体格式不同设备是不同的，可能是YUV420P，也可能是YUV420SP，后面编码还要考虑这个问题。https://www.cnblogs.com/rome753/p/16491436.html
     imageReader = ImageReader.newInstance(dm.widthPixels, dm.heightPixels, PixelFormat.RGBA_8888, 4)
 
     //创建虚拟屏幕，也就是真实屏幕的拷贝 虚拟屏幕的大小，dpi，绘制的surface等

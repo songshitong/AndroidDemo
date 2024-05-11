@@ -201,8 +201,8 @@ public class PathView extends View {
         pm.getMatrix(100,matrix,PathMeasure.POSITION_MATRIX_FLAG);
 
 //        距离Path起始点的长度distance，通过计算返回该长度在Path上的坐标及该坐标的正切值并分别赋值给pos[]、tan[]。
-        float[] pos = new float[5];
-        float[] tan = new float[5];
+        float[] pos = new float[5]; //坐标
+        float[] tan = new float[5]; //角度
         pm.getPosTan(5,pos,tan);
         //tan转为角度
         Math.toDegrees(tan[0]);

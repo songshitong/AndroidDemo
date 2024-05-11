@@ -40,6 +40,26 @@ import sst.example.androiddemo.feature.R
 // //直接开启编码器
 // mEncoder.start();
 
+//可以使用ImageWriter输出内容到surface
+//生成视频思路
+//1 音频流和视频流用MediaCodec编码，然后用MediaMuxer混流合成mp4视频https://www.cnblogs.com/rome753/p/16491436.html
+//2 使用MediaRecorder，设置输入输出
+//  VirtualDisplay 的渲染目标 Surface 设置为 MediaRecorder 的 getSurface
+
+//recorder的创建  prepare调用后会生成surface
+// private fun createVideoRecord(){
+//   // recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//   videoRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+//   videoRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+//   videoRecorder.setOutputFile(filesDir.absolutePath+ File.separator+"record.mp4")
+//   videoRecorder.setVideoSize(1840, 2880)
+//   videoRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+//   // recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+//   videoRecorder.setVideoEncodingBitRate(40 * 1024 * 1024);
+//   videoRecorder.setVideoFrameRate(60);
+//   videoRecorder.prepare()
+// }
+
 class RecorderActivity : AppCompatActivity() {
   private val mRequestCode = 0x123
   var bitmap: Bitmap? = null

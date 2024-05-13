@@ -768,9 +768,9 @@ kernel/sched/core.c
 	alloc_size += 2 * nr_cpu_ids * sizeof(void **);
 #endif
 ```
-CFS https://www.kernel.org/doc/Documentation/scheduler/sched-design-CFS.txt
 
-Both of these options provide two different planning models. As we can read from the documentation, 
+Both of these options provide two different planning models. As we can read from the documentation,
+https://www.kernel.org/doc/Documentation/scheduler/sched-design-CFS.txt
 the current scheduler - CFS or Completely Fair Scheduler use a simple concept. It models process scheduling 
 as if the system has an ideal multitasking processor where each process would receive 1/n processor time,
 where n is the number of the runnable processes. The scheduler uses the special set of rules. 
@@ -797,3 +797,323 @@ If you've read something about the Linux kernel scheduler, you can know that it 
 That means it supports different algorithms to schedule different types of processes. 
 Usually this modularity is called scheduler classes. These modules encapsulate scheduling policy details 
 and are handled by the scheduler core without knowing too much about them.
+
+Now let's get back to the our code and look on the two configuration options: CONFIG_FAIR_GROUP_SCHED and CONFIG_RT_GROUP_SCHED.
+The smallest unit that the scheduler works with is an individual task or thread. However, a process is 
+not the only type of entity that the scheduler can operate with. Both of these options provide support for group scheduling. 
+The first option provides support for group scheduling with the completely fair scheduler policies and the second 
+with the real-time policies respectively.
+
+In simple words, group scheduling is a feature that allows us to schedule a set of tasks as if they were a single task. 
+For example, if you create a group with two tasks on the group, then this group is just like one normal task, 
+from the kernel perspective. After a group is scheduled, the scheduler will pick a task from this group 
+and it will be scheduled inside the group. So, such mechanism allows us to build hierarchies and manage their resources. 
+Although a minimal unit of scheduling is a process, the Linux kernel scheduler does not use task_struct structure under the hood.
+There is special sched_entity structure that is used by the Linux kernel scheduler as scheduling unit.
+hierarchies /ˈhaɪərɑːkiz/  //层次结构
+
+
+So, the current goal is to calculate a space to allocate for a sched_entity(ies) of the root task group and we do it two times with:
+kernel/sched/core.c
+```
+void __init sched_init(void)
+{
+..
+#ifdef CONFIG_FAIR_GROUP_SCHED
+	alloc_size += 2 * nr_cpu_ids * sizeof(void **);
+#endif
+#ifdef CONFIG_RT_GROUP_SCHED
+	alloc_size += 2 * nr_cpu_ids * sizeof(void **);
+#endif
+	if (alloc_size) {
+		ptr = (unsigned long)kzalloc(alloc_size, GFP_NOWAIT);
+..		
+}
+```
+The first is for case when scheduling of task groups is enabled with completely fair scheduler and 
+the second is for the same purpose by in a case of real-time scheduler. So here we calculate size which is 
+equal to size of a pointer multiplied on amount of CPUs in the system and multiplied to 2. 
+We need to multiply this on 2 as we will need to allocate a space for two things:
+1 scheduler entity structure;
+2 runqueue.
+
+After we have calculated size, we allocate a space with the kzalloc function and set pointers of sched_entity and runquques there:
+kernel/sched/core.c
+```
+#ifdef CONFIG_FAIR_GROUP_SCHED
+		root_task_group.se = (struct sched_entity **)ptr;
+		ptr += nr_cpu_ids * sizeof(void **);
+
+		root_task_group.cfs_rq = (struct cfs_rq **)ptr;
+		ptr += nr_cpu_ids * sizeof(void **);
+
+#endif /* CONFIG_FAIR_GROUP_SCHED */
+#ifdef CONFIG_RT_GROUP_SCHED
+		root_task_group.rt_se = (struct sched_rt_entity **)ptr;
+		ptr += nr_cpu_ids * sizeof(void **);
+
+		root_task_group.rt_rq = (struct rt_rq **)ptr;
+		ptr += nr_cpu_ids * sizeof(void **);
+
+#endif /* CONFIG_RT_GROUP_SCHED */
+```
+As I already mentioned, the Linux group scheduling mechanism allows to specify a hierarchy. 
+The root of such hierarchies is the root_runqueuetask_group task group structure. This structure contains many fields, 
+but we are interested in se, rt_se, cfs_rq and rt_rq for this moment:
+The first two are instances of sched_entity structure.
+it used by the scheduler as a unit of scheduling.
+kernel/sched/sched.h
+```
+struct task_group {
+...
+struct sched_entity **se;
+	/* runqueue "owned" by this group on each cpu */
+struct cfs_rq **cfs_rq;
+...	
+struct sched_rt_entity **rt_se;
+struct rt_rq **rt_rq;
+...	
+}
+```
+include/linux/sched.h
+```
+struct sched_entity {
+	/* For load-balancing: */
+	struct load_weight		load;
+	unsigned long			runnable_weight;
+	struct rb_node			run_node;
+	struct list_head		group_node;
+	unsigned int			on_rq;
+
+	u64				exec_start;
+	u64				sum_exec_runtime;
+	u64				vruntime;
+	u64				prev_sum_exec_runtime;
+
+	u64				nr_migrations;
+
+	struct sched_statistics		statistics;
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+	int				depth;
+	struct sched_entity		*parent;
+	/* rq on which this entity is (to be) queued: */
+	struct cfs_rq			*cfs_rq;
+	/* rq "owned" by this entity/group: */
+	struct cfs_rq			*my_q;
+#endif
+...
+};
+```
+The cfs_rq and rt_rq present run queues. A run queue is a special per-cpu structure that is used by the Linux kernel schedu
+ler to store active threads or in other words set of threads which potentially will be picked up by the scheduler to run.
+
+The space is allocated and the next step is to initialize a bandwidth of CPU for real-time and deadline tasks:
+kernel/sched/core.c
+```
+..
+	init_rt_bandwidth(&def_rt_bandwidth, global_rt_period(), global_rt_runtime());
+	init_dl_bandwidth(&def_dl_bandwidth, global_rt_period(), global_rt_runtime());
+..	
+```
+All groups have to be able to rely on the amount of CPU time. The two following structures: def_rt_bandwidth and def_dl_bandwidth 
+represent default values of bandwidths for real-time and deadline tasks. We will not look at definition of these structures 
+as it is not so important for now, but we are interested in two following values:
+sched_rt_period_us;
+sched_rt_runtime_us.
+The first represents a period and the second represents quantum that is allocated for real-time tasks during sched_rt_period_us. 
+You may see global values of these parameters in the:  todo 测试
+```
+$ cat /proc/sys/kernel/sched_rt_period_us 
+1000000
+
+$ cat /proc/sys/kernel/sched_rt_runtime_us 
+950000
+```
+The values related to a group can be configured in <cgroup>/cpu.rt_period_us and <cgroup>/cpu.rt_runtime_us. 
+Due no one filesystem is not mounted yet, the def_rt_bandwidth and the def_dl_bandwidth will be initialzed 
+with default values which will be retuned by the global_rt_period and global_rt_runtime functions.
+
+
+That's all with the bandwiths of real-time and deadline tasks and in the next step, depends on enable of SMP, 
+we make initialization of the root domain:
+```
+#ifdef CONFIG_SMP
+	init_defrootdomain();
+#endif
+```
+https://en.wikipedia.org/wiki/Symmetric_multiprocessing
+Symmetric multiprocessing or shared-memory multiprocessing(SMP) involves a multiprocessor computer hardware 
+and software architecture where two or more identical processors are connected to a single, shared main memory,
+have full access to all input and output devices, and are controlled by a single operating system instance 
+that treats all processors equally, reserving none for special purposes
+
+The real-time scheduler requires global resources to make scheduling decision. But unfortunately scalability bottlenecks 
+appear as the number of CPUs increase. The concept of root domains was introduced for improving scalability and
+avoid such bottlenecks. Instead of bypassing over all run queues, the scheduler gets information about a CPU where/from 
+to push/pull a real-time task from the root_domain structure. This structure is 
+just keeps track of CPUs that can be used to push or pull a process.
+bottlenecks  /ˈbɒtlnɛks/ (尤指工商业发展的)瓶颈，阻碍，障碍；瓶颈路段(常引起交通阻塞)
+
+After root domain initialization, we make initialization of the bandwidth for the real-time tasks of the root task group as 
+we did the same above with the same default values.:
+```
+#ifdef CONFIG_RT_GROUP_SCHED
+	init_rt_bandwidth(&root_task_group.rt_bandwidth,
+			global_rt_period(), global_rt_runtime());
+#endif /* CONFIG_RT_GROUP_SCHED */
+```
+
+In the next step, depends on the CONFIG_CGROUP_SCHED kernel configuration option we allocate slab cache for task_group(s)
+and initialize the siblings and children lists of the root task group. As we can read from the documentation, 
+the CONFIG_CGROUP_SCHED is:  
+https://github.com/torvalds/linux/blob/v2.6.26/init/Kconfig    4.16的注释变了
+```
+This option allows you to create arbitrary task groups using the "cgroup" pseudo
+filesystem and control the cpu bandwidth allocated to each such task group.
+```
+
+As we finished with the lists initialization, we can see the call of the autogroup_init function:
+```
+#ifdef CONFIG_CGROUP_SCHED
+	task_group_cache = KMEM_CACHE(task_group, 0);
+
+	list_add(&root_task_group.list, &task_groups);
+	INIT_LIST_HEAD(&root_task_group.children);
+	INIT_LIST_HEAD(&root_task_group.siblings);
+	autogroup_init(&init_task);
+#endif /* CONFIG_CGROUP_SCHED */
+```
+
+which initializes automatic process group scheduling. The autogroup feature is about automatic creation and 
+population of a new task group during creation of a new session via setsid call.
+https://linux.die.net/man/2/setsid
+setsid() creates a new session if the calling process is not a process group leader. The calling process is the leader of the new session, 
+the process group leader of the new process group, and has no controlling terminal.
+
+After this we are going through the all possible CPUs (you can remember that possible CPUs are stored in 
+the cpu_possible_mask bitmap that can ever be available in the system) and initialize a runqueue for each possible cpu:
+```
+for_each_possible_cpu(i) {
+		struct rq *rq;
+		...
+}
+```
+kernel/sched/sched.h
+```
+struct rq {
+  unsigned int nr_running;
+  ..
+  unsigned int nr_numa_running;
+  ..
+  struct rt_rq rt;
+  struct dl_rq dl;
+..	
+}
+```
+
+As I already mentioned this above, a run queue is a fundamental data structure in a scheduling process.
+The scheduler uses it to determine who will be runned next. As you may see, this structure has many different fields and
+we will not cover all of them here, but we will look on them when they will be directly used.
+
+
+After initialization of per-cpu run queues with default values, we need to setup load weight of the first task in the system:
+kernel/sched/core.c
+```
+set_load_weight(&init_task, false);
+```
+First of all let's try to understand what is it load weight of a process. If you will look at the definition 
+of the sched_entity structure, you will see that it starts from the load field:
+include/linux/sched.h
+```
+struct sched_entity {
+	/* For load-balancing: */
+	struct load_weight		load;
+	...
+```
+represented by the load_weight structure which just contains two fields that represent actual load weight of a scheduler entity 
+and its invariant value:
+include/linux/sched.h
+```
+struct load_weight {
+	unsigned long			weight;
+	u32				inv_weight;
+};
+```
+You already may know that each process in the system has priority. The higher priority allows to get more time to run.
+A load weight of a process is a relation between priority of this process and timeslices of this process. 
+Each process has three following fields related to priority:
+include/linux/sched.h
+```
+struct task_struct {
+...
+    int                prio;
+    int                static_prio;
+    int                normal_prio;
+...
+}
+```
+The first one is dynamic priority which can't be changed during lifetime of a process based on its static priority 
+  and interactivity of the process. 
+The static_prio contains initial priority most likely well-known to you nice value. This value does not changed by the kernel 
+  if a user will not change it. 
+The last one is normal_priority based on the value of the static_prio too, but also it depends on 
+  the scheduling policy of a process.
+
+So the main goal of the set_load_weight function is to initialze load_weight fields for the init task:
+kernel/sched/core.c
+```
+static void set_load_weight(struct task_struct *p, bool update_load)
+{
+	int prio = p->static_prio - MAX_RT_PRIO;
+	struct load_weight *load = &p->se.load;
+
+	if (idle_policy(p->policy)) {
+		load->weight = scale_load(WEIGHT_IDLEPRIO);
+		load->inv_weight = WMULT_IDLEPRIO;
+		return;
+	}
+
+	if (update_load && p->sched_class == &fair_sched_class) {
+		reweight_task(p, prio);
+	} else {
+		load->weight = scale_load(sched_prio_to_weight[prio]);
+		load->inv_weight = sched_prio_to_wmult[prio];
+	}
+}
+```
+As you may see we calculate initial prio from the initial value of the static_prio of the init task and 
+use it as index of sched_prio_to_weight and sched_prio_to_wmult arrays to set weight and inv_weight values. 
+These two arrays contain a load weight depends on priority value. In a case of when a process is idle process,
+we set minimal load weight.
+
+For this moment we came to the end of initialization process of the Linux kernel scheduler. The last steps are: 
+to make current process (it will be the first init process) idle that will be runned when a cpu has no other process to run. 
+Calculating next time period of the next calculation of CPU load and initialization of the fair class:
+kernel/sched/core.c
+```
+..
+init_sched_fair_class();
+..
+```
+kernel/sched/fair.c
+```
+__init void init_sched_fair_class(void)
+{
+#ifdef CONFIG_SMP
+	open_softirq(SCHED_SOFTIRQ, run_rebalance_domains);
+...
+}
+```
+Here we register a soft irq that will call the run_rebalance_domains handler. After the SCHED_SOFTIRQ will be triggered, 
+the run_rebalance will be called to rebalance a run queue on the current CPU.
+
+The last two steps of the sched_init function is to initialization of scheduler statistics and setting scheeduler_running variable:
+kernel/sched/core.c
+```
+scheduler_running = 1;
+```
+
+That's all. Linux kernel scheduler is initialized. Of course, we have skipped many different details and explanations here,
+because we need to know and understand how different concepts (like process and process groups, runqueue, rcu, etc.) works 
+in the linux kernel , but we took a short look on the scheduler initialization process.

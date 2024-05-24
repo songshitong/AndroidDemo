@@ -9,6 +9,8 @@ log4j 还提供了一个MemoryMappedFileAppender，I/O 部分使用MemoryMappedF
 API模块和slf4j相比，提供了更丰富的参数格式化功能。
 使用{}占位符格式化参数
 
+https://imglarger.com/ 记录
+
 
 https://mp.weixin.qq.com/s/iALdbq25hDYXlPunnomQQg
 

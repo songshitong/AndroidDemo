@@ -29,16 +29,33 @@ koa.Framework.getServer();
 export class HomeController {
 
   @Get('/home') //  地址为/app/home
-  async home() {
+  async home(@Query('uid') uid: string) { //query参数
     return 'Hello Midwayjs!';
   }
 
   @Post('/update')//   地址为/app/update
-  async updateData() {
+  async updateData(@Body('uid') uid: string) {//body参数
     return 'This is a post method'
   }
 }
 ```
+
+网络请求 HttpClient
+```
+ const httpclient = new HttpClient({
+            headers: {
+              'Content-Type': 'application/json',
+              'Charset': 'UTF-8',
+              'Authorization': token
+            },
+            timeout: 2000
+          });
+ httpclient.request(url,{ method: 'GET', dataType:'json'})  //请求method  响应数据的格式         
+```
+midway版本3.2.0
+httpclient对于application/x-www-form-urlencoded形式处理有问题，建议使用node自带的request
+urlencoded需要将参数格式化为 "a"="value"，但是httpclient格式化为"a=value" = ""
+
 
 application和Context https://www.midwayjs.org/docs/req_res_app
 Application 是某一个组件中的应用对象，在不同的组件中，可能有着不同的实现。Application 对象上会包含一些统一的方法，这些方法统一来自于 IMidwayApplication 定义。

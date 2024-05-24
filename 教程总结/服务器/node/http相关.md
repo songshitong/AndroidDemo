@@ -68,6 +68,65 @@ const req = http.request(options, (res) => {
 })
 req.end() // end方法结束请求
 ```
+封装为async形式，已x-www-form-urlencoded为例
+```
+//使用x-www-form-urlencoded形式请求  httpclient对于x-www-form-urlencoded形式处理有问题
+  //实现参考HttpClient
+  async requestUrlEncoded(url:string,options:HttpClientOptions,data:object){
+    return new Promise((resolve, reject) => {
+      const req = request(url.toString(), {
+          method:"POST",
+          headers: options.headers
+      }, res => {
+          res.setTimeout(options.timeout, () => {
+              res.destroy(new Error('Response Timeout'));
+          });
+          res.on('error', error => {
+              reject(error);
+          });
+          const chunks = [];
+          res.on('data', chunk => {
+              chunks.push(chunk);
+          });
+          res.on('end', () => {
+              let buffer = Buffer.concat(chunks);
+              let data;
+              if (options.dataType === 'text' || options.dataType === 'json') {
+                data = buffer.toString('utf8');
+              }
+              if (options.dataType === 'json') {
+                  try {
+                    data = JSON.parse(buffer.toString('utf8'));
+                  }
+                  catch (e) {
+                      return reject(new Error('[httpclient] Unable to parse response data'));
+                  }
+              }
+              Object.assign(res, {
+                  status: res.statusCode,
+                  data,
+              });
+              resolve(res);
+          });
+      });
+      req.setTimeout(options.timeout, () => {
+          req.destroy(new CoolCommException('Request Timeout'));
+      });
+      req.on('error', error => {
+          reject(error);
+      });
+      //自己拼接data格式
+      let dataStr = "";
+      for(let key in data){
+        if(!_.isEmpty(dataStr)){
+          dataStr+="&"
+        }
+        dataStr+=`${encodeURI(key)}=${encodeURI(data[key])}`
+      }
+      req.end(dataStr);
+  });
+  }
+```
 
 
 url解析与参数格式化

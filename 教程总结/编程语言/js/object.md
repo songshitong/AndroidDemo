@@ -40,3 +40,43 @@ console.log(Object.getOwnPropertyNames(window));
    ....
 ]
 ```
+
+对象遍历
+```
+for(let i in obj){
+   obj[i]
+}
+
+Object.keys(obj).forEach(function(key){
+
+})
+
+Object.getOwnPropertyNames(obj).forEach(function(key){
+    console.log(key,obj[key]);
+});
+
+Reflect.ownKeys(obj).forEach(function(key){
+console.log(key,obj[key]);
+});
+```
+
+
+https://www.volcengine.com/theme/4782730-T-7-1
+数组转对象
+```
+type ArraytoObject<T> = {
+  [K in keyof T]: T[K] extends { key: infer K2; value: infer V } ? Record<K2, V> : never;
+}[keyof T] & Record<string, unknown>;
+
+function arrayToObject<T extends { key: string; value: any }>(arr: T[]): ArraytoObject<T> {
+  const obj: any = {};
+  arr.forEach(item => {
+    obj[item.key] = item.value;
+  });
+  return obj;
+}
+
+const arr = [{ key: "name", value: "Tom" }, { key: "age", value: 18 }];
+const obj = arrayToObject(arr);
+console.log(obj); // {name: "Tom", age: 18}
+```

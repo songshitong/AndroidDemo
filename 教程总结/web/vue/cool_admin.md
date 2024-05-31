@@ -63,3 +63,22 @@ eps.json 用于生成 service 数据（build 时请确保该文件存在且最�
 ```
 [["/admin/base/comm","",[["/personUpdate","post"],["/uploadMode","get"],["/permmenu","get"],["/person","get"]....
 ```
+例如接口的路径是
+/admin/demo/test/page
+调用方式
+```
+service.demo.test.page().then((res) => {
+	console.log(res);
+});
+```
+
+接口不生成对应的方法，可能出现的问题
+1 path路径包含级，后端生成url的最好只定义一级@GET("/info")
+2 在admin下面的文件才会自动生成  例如publish/admin/app路径下面，自动生成的接口是
+3 server提供了app/base/comm/eps的接口，但是前端并未获取接口信息，也就是只有admin下面的自动生成，app没有
+app/base/comm/eps是收集app目录下的接口地址
+```
+interface PublishApp{ 
+  info():Promise<any>
+}
+```

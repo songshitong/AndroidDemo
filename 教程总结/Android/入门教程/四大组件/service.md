@@ -190,6 +190,7 @@ activity
 前台Service在下拉通知栏有显示通知，但后台Service没有；
 前台Service优先级较高，不会由于系统内存不足而被回收；后台Service优先级较低，当系统出现内存不足情况时，很有可能会被回收
 android12后，前台服务不允许在后台启动(特殊App除外)ForegroundServiceStartNotAllowedException
+android14前台服务可能存在异常，并且推荐WorkManager替代 https://issuetracker.google.com/issues/307329994
 用法很简单，只需要在原有的Service类对onCreate()方法进行稍微修改即可
 ```
 android9.0  声明manifest
@@ -219,7 +220,13 @@ String channelId = "";
           builer.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
          }
         Notification notification = builer.build();//将Builder对象转变成普通的notification
-        startForeground(1, notification);//让Service变成前台Service,并在系统的状态栏显示出来
+        
+        //Android 14不允许后台启动，需要手动check
+        try{ //防止系统异常
+                startForeground(1, notification);//让Service变成前台Service,并在系统的状态栏显示出来
+        }catch(){
+           stopService(); //启动失败
+        }
     }
     
  private String createNotificationChannel(String channelId, String channelName){

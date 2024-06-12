@@ -39,6 +39,24 @@ export class HomeController {
   }
 }
 ```
+从路径获取参数
+```
+//指定装饰器
+ @Get('/:uid')
+  async getUser(@Param('uid') uid: string): Promise<User> {
+    // xxxx
+  }
+  
+//从params获取
+ @Get('/:uid')
+  async getUser(): Promise<User> {
+    const params = this.ctx.params;
+    // {
+    //   uid: '1',
+    // }
+  }  
+```
+
 
 网络请求 HttpClient
 ```

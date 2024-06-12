@@ -82,3 +82,11 @@ interface PublishApp{
   info():Promise<any>
 }
 ```
+
+
+页面路由
+路由是动态添加的，路由菜单会保存在server，同时根据权限决定是否展示  
+https://cool-js.com/admin/vue/router.html
+代码实现参考
+src\cool\router\index.ts
+src\modules\base\store\menu.ts

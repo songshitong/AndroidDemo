@@ -1,10 +1,14 @@
 
+《怪诞行为学》
+《何以为父》  https://mp.weixin.qq.com/s/vV90fUU1FMdt58pdMAKzzA
+
 https://developer.aliyun.com/article/1366701
 零GC（Garbage-free）
 从2.6版本开始（2016年），log4j2 默认就以零GC模式运行了。什么叫零GC呢？就是不会由于log4j2而导致GC。
 log4j2 中各种Message对象，字符串数组，字节数组等全部复用，不重复创建，大大减少了无用对象的创建，从而做到“零GC”。
 更高性能 I/O 写入的支持
-log4j 还提供了一个MemoryMappedFileAppender，I/O 部分使用MemoryMappedFile来实现，可以得到极高的I/O性能。不过在使用MemoryMappedFileAppender之前，得确定你足够了解MemoryMappedFile的相关知识，否则不要轻易使用呦。
+log4j 还提供了一个MemoryMappedFileAppender，I/O 部分使用MemoryMappedFile来实现，可以得到极高的I/O性能。不过在使用MemoryMappedFileAppender之前，
+    得确定你足够了解MemoryMappedFile的相关知识，否则不要轻易使用呦。
 更强大的参数格式化
 API模块和slf4j相比，提供了更丰富的参数格式化功能。
 使用{}占位符格式化参数

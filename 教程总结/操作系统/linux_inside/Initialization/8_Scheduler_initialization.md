@@ -662,6 +662,19 @@ does early initialization of the virtual file system (more about it will be in t
 ```
 vfs_caches_init_early();
 ```
+fs/dcache.c
+```
+void __init vfs_caches_init_early(void)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(in_lookup_hashtable); i++)
+		INIT_HLIST_BL_HEAD(&in_lookup_hashtable[i]);
+
+	dcache_init_early();
+	inode_init_early();
+}
+```
 virtual file system  https://en.wikipedia.org/wiki/Virtual_file_system   todo 有更多章节吗
 A virtual file system (VFS) or virtual filesystem switch is an abstract layer on top of a more concrete file system. 
 The purpose of a VFS is to allow client applications to access different types of concrete file systems in a uniform way. 

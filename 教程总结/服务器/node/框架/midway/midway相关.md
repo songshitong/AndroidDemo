@@ -572,8 +572,42 @@ export class MainConfiguration implements ILifeCycle {
    从而释放面向用户的进程以保持响应。
 提供跨各种服务的可靠通信渠道。例如，您可以在一个进程或服务中排队任务（作业），并在另一个进程或服务中使用它们。在任何流程或服务的作业生命周期中完成、
   错误或其他状态更改时，您都可以收到通知（通过监听状态事件）。当队列生产者或消费者失败时，它们的状态被保留，并且当节点重新启动时任务处理可以自动重新启动。
+midwayjs/task模块从v3.6.0开始废弃，推荐使用midwayjs/cron
+```
+// src/job/sync.job.ts
+import { Job, IJob } from '@midwayjs/cron';
+import { FORMAT } from '@midwayjs/core';
 
-
+@Job({
+  cronTime: FORMAT.CRONTAB.EVERY_PER_30_MINUTE, //执行周期
+  start: true, //是否自动启动任务
+  runOnInit:true,//是否在初始化就执行一次
+})
+export class DataSyncCheckerJob implements IJob {
+  async onTick() {
+    // ...
+  }
+  async onComplete() {
+    // 记录一些数据等等，用处不是很大
+  }
+}
+```
+cron规则
+工具：https://crontab.guru/
+https://en.wikipedia.org/wiki/Cron
+The cron command-line utility is a job scheduler on Unix-like operating systems.
+基本规则
+```
+# ┌───────────── minute (0–59)
+# │ ┌───────────── hour (0–23)
+# │ │ ┌───────────── day of the month (1–31)
+# │ │ │ ┌───────────── month (1–12)
+# │ │ │ │ ┌───────────── day of the week (0–6) (Sunday to Saturday;
+# │ │ │ │ │                                   7 is also Sunday on some systems)
+# │ │ │ │ │
+# │ │ │ │ │
+# * * * * * <command to execute>
+```
 
 https://midwayjs.org/en/docs/2.0.0/extensions/cache
 缓存用户信息，token等到本地机器

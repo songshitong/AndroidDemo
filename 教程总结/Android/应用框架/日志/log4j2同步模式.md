@@ -14,11 +14,17 @@ implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
 implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
 
 用法：
-android初始化xml
+android初始化xml    部分取自https://blog.csdn.net/weixin_37525569/article/details/85123989
+ 模板参考https://juejin.cn/post/6904201366643441678
 xml
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration status="debug" >
+    <properties> //配置properties，下面可以引用
+      <!--配置日志打印在tcs-consumer-log文件夹里，LOG_HOME获取文件夹的当前路径-->
+        <property name="LOG_HOME">${sys:user.dir}</property>
+        <property name="FILE_FOLDER">tcs-consumer-log</property>
+    </properties>
     <appenders>
         <!--这个输出控制台的配置-->
         <console name="Stdout" target="SYSTEM_OUT">
@@ -26,6 +32,7 @@ xml
             <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
             <PatternLayout pattern="%d  [%t] %-5level: %msg%n%throwable"/>
         </console>
+        //<rollingPolicy> 标签用来指定滚动策略， 所谓的滚动策略其实就是对日志文件进行归档
         <RollingFile name="rolling" fileName="mnt/sdcard/rolling.log"
             filePattern="mnt/sdcard/rolling-%d{yyyy-MM-dd}-%i.txt" >
             <MarkerFilter marker="NAME" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -47,7 +54,7 @@ xml
         <Logger name="TestLogger" level="debugr" additivity="false">
             <AppenderRef ref="rolling" />
         </Logger>
-        <root level="debug">
+        <root level="debug"> 
             <AppenderRef ref="rolling"/>
         </root>
     </loggers>

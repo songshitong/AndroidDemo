@@ -2,6 +2,8 @@
 《怪诞行为学》
 《何以为父》  https://mp.weixin.qq.com/s/vV90fUU1FMdt58pdMAKzzA
 
+https://mp.weixin.qq.com/s/gRdF9NzUCvq5TKRe841uQQ
+
 https://developer.aliyun.com/article/1366701
 零GC（Garbage-free）
 从2.6版本开始（2016年），log4j2 默认就以零GC模式运行了。什么叫零GC呢？就是不会由于log4j2而导致GC。

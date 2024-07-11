@@ -252,3 +252,12 @@ registerReceiver(requireContext(), AlarmReceiver(), filter, receiverFlags)
 ```
 android14相册适配
 https://mp.weixin.qq.com/s/qpbHBhmfwZcgq5CLdRj2rQ
+
+
+
+android15
+16KB PAGE SIZE适配
+对so文件检查和适配
+https://developer.android.com/guide/practices/page-sizes
+如何获取page_size
+https://source.android.com/docs/core/architecture/16kb-page-size/getting-page-size

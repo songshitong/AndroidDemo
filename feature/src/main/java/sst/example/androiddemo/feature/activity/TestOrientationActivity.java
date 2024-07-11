@@ -20,6 +20,7 @@ public class TestOrientationActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //切换屏幕会自动加载layout-land目录下的布局   layout/layout-port是竖屏，可以在新建dir->orientation增加
         setContentView(R.layout.activity_normal);
 
         Log.d(TAG," onCreate ==== ");

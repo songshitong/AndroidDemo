@@ -21,7 +21,7 @@ Refusing to load URL as it exceeds 2097152 characters.
     settings.databaseEnabled = true
     settings.loadWithOverviewMode = true
     settings.userAgentString = xxx
-    if(com.autohome.carbooksdk.BuildConfig.DEBUG){
+    if(BuildConfig.DEBUG){
       setWebContentsDebuggingEnabled(true)
     }
 ```

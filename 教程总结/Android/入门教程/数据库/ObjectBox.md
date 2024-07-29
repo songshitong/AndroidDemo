@@ -59,7 +59,7 @@ class RoleConverter : PropertyConverter<Role?, Int?> {
 ```
 
 MyObjectBox以及相关表的生成目录
-build\generated\source\kapt\envTestDebug\com\autohome\module_badge\sql\MyObjectBox.java
+build\generated\source\kapt\envTestDebug\xxx\sql\MyObjectBox.java
 
 生成：Build > Make project
 查看： app > objectbox-models

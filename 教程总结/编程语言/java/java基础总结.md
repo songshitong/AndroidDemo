@@ -19,7 +19,8 @@ boolean	1字节                                             boolean one = true
 引用类型
 String长度限制
 https://mp.weixin.qq.com/s/mv7jC-oV2nNfMf46gCsvCw   todo
-
+StringBuffer是线程安全的,多线程建议使用这个.
+StringBuilder是非线程安全的,单线程使用这个更快.
 
 https://juejin.cn/post/6844904079152381959#heading-23
 Java的char是两个字节，是怎么存Utf-8的字符的？  //todo
@@ -275,6 +276,7 @@ Exception 又分为可检查（checked）异常和不检查（unchecked）异常
 
 不检查异常就是所谓的运行时异常，通常是可以编码避免的逻辑错误，具体根据需要来判断是否需要捕获，并不会在编译期强制要求
 NullPointerException，ArrayIndexOutOfBoundsException  ->RuntimeException->Exception   名字带exception
+//个人：所以新语言中出了各种空安全的语法
 
 异常捕获注意点
 第一，尽量不要捕获类似 Exception 这样的通用异常，而是应该捕获特定异常

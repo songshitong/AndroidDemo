@@ -494,8 +494,11 @@ class MainActivity : AppCompatActivity() {
     ld.observe(this) {
       Log.d(TAG, "ld observe $it")
     }
-    ld.postValue("1")
-    ld.postValue("2")
+//    ld.postValue("1")
+//    ld.postValue("2")
+    ld.setValue("3")
+    ld.setValue("4")
+
 
     getProcessInfo()
 

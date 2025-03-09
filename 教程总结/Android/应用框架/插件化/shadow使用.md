@@ -9,6 +9,8 @@ shadow替换activity为shadowActivity，导致jni的c/c++接口签名对应不�
 可能需要增加前台服务保活  https://github.com/Tencent/Shadow/issues/1038
 
 
+//todo 深度使用  尝试自己写写
+
 参考
 sample\source\sample-plugin\sample-app
 ```

@@ -4,10 +4,10 @@ converter接口
 ```
 public interface Converter<F, T> {
   @Nullable
-  T convert(F value) throws IOException;
+  T convert(F value) throws IOException;  //通过泛型定义输入输出
 
   abstract class Factory {
-    //ResponseBody 是okhttp的
+    //ResponseBody 是okhttp的    //通过泛型定义了具体的转换
     public @Nullable Converter<ResponseBody, ?> responseBodyConverter(
         Type type, Annotation[] annotations, Retrofit retrofit) {
       return null;

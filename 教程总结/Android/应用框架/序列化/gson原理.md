@@ -423,5 +423,3 @@ com/google/gson/stream/JsonReader.java
     return result;
   }
 ```
-
-todo 一段json 序列化，反序列化的流程，不需要流程图

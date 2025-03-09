@@ -5,20 +5,24 @@ androidx.lifecycle:lifecycle-runtime:2.3.1
 原理总结
 ViewModelStore使用HashMap保存ViewModel
 ViewModelStoreOwner持有ViewModelStore，进行ViewModelStore的新建与保存  一般是ComponentActivity.getViewModelStore
+  存储HashMap中，key为DEFAULT_KEY + ":" + canonicalName
 ViewModelProvider.get() 从ViewModelStore获取ViewModel，如果没有使用Factory新建后保存在ViewModelStore
-NewInstanceFactory使用反射modelClass.newInstance构建无参ViewModel
+NewInstanceFactory使用反射modelClass.newInstance构建无参ViewModel  限制了ViewModel的构造参数
 AndroidViewModelFactory使用反射构建需要Application的ViewModel
    modelClass.getConstructor(Application.class).newInstance(mApplication)
 
 保存数据的原理
 使用NonConfigurationInstances保存mViewModelStore，重写了onRetainNonConfigurationInstance方法
+   这个方法可以保存自定义的Object
 当ViewModelStore为null时从getLastNonConfigurationInstance恢复
 onRetainNonConfigurationInstance 与onSaveInstanceState类似，返回一个Object进行状态保存而不是bundle
 类似的getLastNonConfigurationInstance从一个Object恢复状态，而onRestoreInstanceState从bundle恢复状态
 
+
 数据清理
 ComponentActivity通过lifecycle感知生命周期，当销毁时调用ViewModelStore的clear方法进而调用所有ViewModel的clear
 
+//todo 画一个图
 
 1.概述
 ViewModel旨在以生命周期意识的方式存储和管理用户界面相关的数据,它可以用来管理Activity和Fragment中的数据.

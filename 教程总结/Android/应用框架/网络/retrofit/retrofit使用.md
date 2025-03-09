@@ -258,6 +258,7 @@ else if(requestBody is MultipartBody) { //multipart只输出header
 
 
 retrofit多域名  
+0 使用不同的retrofit实例和不同的域名
 1.支持域名切换
 https://github.com/JessYanCoding/RetrofitUrlManager
 2.不同接口不同域名
@@ -352,7 +353,7 @@ public class MoreBaseUrlInterceptor implements Interceptor {
  @Headers(DOMAIN_BASE_URL)
   Observable<LoginEntity> userLogin(@Body Map map);
 ```
-2 使用不同的retrofit实例和不同的域名
+
 
 
 全局header
@@ -428,4 +429,89 @@ class TimeoutInterceptor : Interceptor {
         } ?: chain.proceed(request)
     }
 }
+```
+
+
+
+RxJava3CallAdapterFactory对于超时不走Rxjava的onError问题
+此时okhttp的错误日志
+java.io.InterruptedIOException: timeout  
+java.io.IOException: Canceled
+okhttp\4.9.1\okhttp3\internal\connection\RealCall.kt
+```
+ override fun run() {
+      threadName("OkHttp ${redactedUrl()}") {
+        var signalledCallback = false
+        timeout.enter()
+        try {
+          val response = getResponseWithInterceptorChain()
+          signalledCallback = true
+          responseCallback.onResponse(this@RealCall, response)
+        } catch (e: IOException) {
+          ...
+        } catch (t: Throwable) {
+          cancel() //先取消请求，然后抛出异常
+          if (!signalledCallback) {
+            val canceledException = IOException("canceled due to $t")
+            canceledException.addSuppressed(t)
+            responseCallback.onFailure(this@RealCall, canceledException)
+          }
+          throw t
+        } finally {
+          client.dispatcher.finished(this)
+        }
+      }
+    }
+  }
+```
+adapter-rxjava3\2.9.0\retrofit2\adapter\rxjava3\CallEnqueueObservable.java
+```
+ @Override
+    public void onFailure(Call<T> call, Throwable t) {
+      if (call.isCanceled()) return; //call取消了就不抛出异常
+      try {
+        observer.onError(t);
+      } catch (Throwable inner) {
+        Exceptions.throwIfFatal(inner);
+        RxJavaPlugins.onError(new CompositeException(t, inner));
+      }
+    }
+```
+建议使用RxJava3CallAdapterFactory.createSynchronous()
+RxJava3CallAdapterFactory.create()方法
+默认执行在子线程，subscribeOn(..)无效果   isAsync=false
+RxJava3CallAdapterFactory createSynchronous()
+没有切换线程，subscribeOn(..)才进行线程切换  isAsync=true
+adapter-rxjava3\2.9.0...\retrofit2\adapter\rxjava3\RxJava3CallAdapter.java
+```
+public Object adapt(Call<R> call) {
+    Observable<Response<R>> responseObservable =
+        isAsync ? new CallEnqueueObservable<>(call) : new CallExecuteObservable<>(call);
+...
+```
+retrofit2/adapter/rxjava3/CallExecuteObservable.java
+```
+ protected void subscribeActual(Observer<? super Response<T>> observer) {
+    ...
+    boolean terminated = false;
+    try {
+      //执行okhttp的execute()同步方法
+      Response<T> response = call.execute();
+     ...
+    } catch (Throwable t) {
+     ...
+    }
+  }
+```
+retrofit2/adapter/rxjava3/CallEnqueueObservable.java
+```
+  protected void subscribeActual(Observer<? super Response<T>> observer) {
+    ...
+    CallCallback<T> callback = new CallCallback<>(call, observer);
+    observer.onSubscribe(callback);
+    if (!callback.isDisposed()) {
+      //执行okhttp的enqueue()异步方法
+      call.enqueue(callback);
+    }
+  }
 ```

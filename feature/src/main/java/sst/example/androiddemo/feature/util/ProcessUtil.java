@@ -1,5 +1,7 @@
 package sst.example.androiddemo.feature.util;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
@@ -25,12 +27,12 @@ public class ProcessUtil {
   //判断是否在前台 https://stackoverflow.com/questions/3667022/checking-if-an-android-application-is-running-in-the-background
   //也可以用ProcessLifecycleOwner.get().getLifecycle().getCurrentState() 当前状态判断，优点是不用进城通信
   public static Boolean isForeground(){
-    ActivityManager.RunningAppProcessInfo appProcessInfo =  new RunningAppProcessInfo();
+    ActivityManager.RunningAppProcessInfo appProcessInfo =  new ActivityManager.RunningAppProcessInfo();
     try {
       ActivityManager.getMyMemoryState(appProcessInfo);
     }catch (Exception e){
       //Logger.i("获取前台状态异常，返回false")
-      return false
+      return false;
     }
     return appProcessInfo.importance == IMPORTANCE_FOREGROUND;
   }

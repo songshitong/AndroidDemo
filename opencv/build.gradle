@@ -5,12 +5,12 @@ plugins {
 
 android {
   namespace 'com.example.opencv'
-  compileSdk 33
+  compileSdk 32
 
   defaultConfig {
     applicationId "com.example.opencv"
     minSdk 26
-    targetSdk 33
+    targetSdk 30
     versionCode 1
     versionName "1.0"
 

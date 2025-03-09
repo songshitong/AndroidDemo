@@ -14,7 +14,7 @@ LifecycleRegistry使用WeakReference保存LifecycleOwner，
 LifecycleOwner是有生命周期的，一般是activity,fragment
 ComponentActivity里面存在LifecycleRegistry，ReportFragment通过向activity添加一个空的fragment进行感知生命周期，
   生命周期改变时通过LifecycleRegistry进行事件分发
-
+//todo 结构图来一个
 
 使用
 ```

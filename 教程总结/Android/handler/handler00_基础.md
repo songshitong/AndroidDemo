@@ -86,6 +86,8 @@ Handler 获取当前线程中的 Looper 对象，Looper 用来从存放 Message 
    再交由 Handler 进行 Message 的分发和处理
 handler结构示例.webp
 
+
+如何实现的线程切换
 handler是如何将消息发送到其他线程的
 Looper是每个线程都有的，handler持有当前线程的looper，不同线程之间就可以依靠拿到对方的handler和 Looper 来实现消息的跨线程处理
 
@@ -138,7 +140,7 @@ application启动时，可不止一个main线程，还有其他两个Binder线�
 1 当系统受到因用户操作产生的通知时，会通过 Binder 方式跨进程通知 ApplicationThread;    
 2 它通过Handler机制，往 ActivityThread 的 MessageQueue 中插入消息，唤醒了主线程；
 3 queue.next() 能拿到消息了,然后 dispatchMessage 完成事件分发；
-PS：ActivityThread 中的内部类H中有具体实现   todo ApplicationThread和ActivityManagerProxy是binder线程?   
+PS：ActivityThread 中的内部类H中有具体实现     
 //ActivityManagerProxy应该后来是IActivityManager
 
 

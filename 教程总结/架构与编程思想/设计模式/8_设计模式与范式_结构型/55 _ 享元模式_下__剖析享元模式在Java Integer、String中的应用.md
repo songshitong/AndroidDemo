@@ -106,7 +106,7 @@ private static class IntegerCache {
     private IntegerCache() {}
 }
 
-//todo  Integer 方法的equals方法 判等
+
 
 
 为什么 IntegerCache 只缓存 -128 到 127 之间的整型值呢？

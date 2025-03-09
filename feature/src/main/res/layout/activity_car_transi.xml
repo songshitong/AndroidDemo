@@ -5,17 +5,19 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CarTransiActivity"
+    tools:context=".animation.CarTransiActivity"
     >
+<!--    android:src="@drawable/toast_custom_bg"-->
+
     <ImageView
         app:layout_constraintTop_toTopOf="parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+<!--    android:src="@drawable/slogan"-->
+
     <ImageView
         android:layout_marginTop="150dp"
-        android:src="@drawable/slogan"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -29,10 +31,11 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+<!--        android:src="@drawable/text_bg"-->
+
         <ImageView
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:src="@drawable/text_bg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
@@ -66,12 +69,12 @@
             android:textSize="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+<!--        android:text="@string/app_value_show"-->
+<!--        android:textColor="@color/value_orange"-->
         <TextView
             android:layout_marginBottom="-5dp"
             android:id="@+id/carvalue"
-            android:text="@string/app_value_show"
             android:textStyle="bold"
-            android:textColor="@color/value_orange"
             android:textSize="30dp"
             app:layout_constraintLeft_toRightOf="@id/car_value_prefix"
             app:layout_constraintBottom_toBottomOf="@id/car_value_prefix"
@@ -88,18 +91,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
+<!--    android:src="@drawable/text_bg_icon"-->
     <ImageView
         android:layout_marginBottom="40dp"
         android:layout_marginLeft="250dp"
         app:layout_constraintLeft_toLeftOf="@id/text_layout"
         app:layout_constraintBottom_toBottomOf="@id/text_layout"
-        android:src="@drawable/text_bg_icon"
         android:layout_width="120dp"
         android:layout_height="120dp"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+<!--        android:src="@drawable/car1"-->
         <ImageView
             android:layout_marginTop="480dp"
             android:scaleType="centerInside"
@@ -107,45 +111,46 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:id="@+id/car1"
-            android:src="@drawable/car1"
-            android:layout_width="@dimen/car_size"
-            android:layout_height="@dimen/car_size"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp"/>
+<!--        android:src="@drawable/car2"-->
+
         <ImageView
             android:scaleType="centerInside"
             app:layout_constraintTop_toTopOf="@id/car1"
             android:id="@+id/car2"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:src="@drawable/car2"
-            android:layout_width="@dimen/car_size"
-            android:layout_height="@dimen/car_size"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp"/>
+<!--        android:src="@drawable/car3"-->
         <ImageView
             android:scaleType="centerInside"
             app:layout_constraintTop_toTopOf="@id/car1"
             android:id="@+id/car3"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:src="@drawable/car3"
-            android:layout_width="@dimen/car_size"
-            android:layout_height="@dimen/car_size"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp"/>
+
+<!--        android:src="@drawable/car4"-->
         <ImageView
             android:scaleType="centerInside"
             app:layout_constraintTop_toTopOf="@id/car1"
             android:id="@+id/car4"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:src="@drawable/car4"
-            android:layout_width="@dimen/car_size"
-            android:layout_height="@dimen/car_size"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp"/>
+<!--        android:src="@drawable/car5"-->
         <ImageView
             android:scaleType="centerInside"
             app:layout_constraintTop_toTopOf="@id/car1"
             android:id="@+id/car5"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:src="@drawable/car5"
-            android:layout_width="@dimen/car_size"
-            android:layout_height="@dimen/car_size"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

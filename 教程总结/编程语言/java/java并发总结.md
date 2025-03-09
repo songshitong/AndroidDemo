@@ -1,3 +1,5 @@
+leetcode中关于多线程的题
+https://leetcode.cn/problemset/concurrency/
 
 
 并发编程的三个核心问题：分工、同步、互斥。
@@ -384,8 +386,8 @@ import java.util.concurrent.locks.ReentrantLock;
 class StorageWithAwaitAndSignal {
     private final int                MAX_SIZE = 10;
     private       ReentrantLock      mLock    = new ReentrantLock();
-    private       Condition          mEmpty   = mLock.newCondition();
-    private       Condition          mFull    = mLock.newCondition();
+    private       Condition          mEmpty   = mLock.newCondition(); //需要在空时排队等待
+    private       Condition          mFull    = mLock.newCondition(); //需要在满时排队等待
     private       LinkedList<Object> mList    = new LinkedList<Object>();
     public void produce() {
         mLock.lock();
@@ -488,7 +490,7 @@ getTask()：这首先是一个死循环过程，工作线程循环直到能够�
 firstTask执行完后进行阻塞，阻塞队列添加新任务后唤醒，取出任务继续执行
 线程回收 线程run从阻塞队列WorkQueue取任务超时后返回null，进行线程回收，将worker从HashSet移除
 
-线程池都有哪几种工作队列？   todo
+线程池都有哪几种工作队列？   
 1、ArrayBlockingQueue
 是一个基于数组结构的有界阻塞队列，此队列按 FIFO（先进先出）原则对元素进行排序。
 2、LinkedBlockingQueue
@@ -967,7 +969,7 @@ public class NonReentrantLock implements Lock, Serializable {
 公平锁和非公平锁各有优缺点，适用于不同的场景。
 公平锁的优点在于各个线程公平平等，每个线程等待一段时间后，都有执行的机会，而它的缺点相较于于非公平锁整体执行速度更慢，吞吐量更低。
 同步队列中除第一个线程以外的所有线程都会阻塞，CPU唤醒阻塞线程的开销比非公平锁大。
-而非公平锁非公平锁的优点是可以减少唤起线程的开销，整体的吞吐效率高，因为线程有几率不阻塞直接获得锁，CPU不必唤醒所有线程。
+而非公平锁的优点是可以减少唤起线程的开销，整体的吞吐效率高，因为线程有几率不阻塞直接获得锁，CPU不必唤醒所有线程。
 它的缺点呢也比较明显，即队列中等待的线程可能一直或者长时间获取不到锁。
 
 乐观锁：乐观锁在操作数据时非常乐观，认为别人不会同时修改数据。因此乐观锁不会上锁，只是在执行更新的时候判断一下在此期间别人是否修改了数据：

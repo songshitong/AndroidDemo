@@ -48,5 +48,6 @@ final @Nullable ReturnT invoke(Object[] args) {
 
 
 https://juejin.cn/post/6876968255597051917#heading-28
+评论区
 软件上的很多时都是在做trade-off(交换)，相比编译时注解，运行时注解性能较低，但是比较灵活，实现方便. 并且retrofit虽然使用了反射，
 但是性能上损失并不大，比起网络请求与gson解析的时间可以说是很小的一部分。 综合来看，实用运行时注解是一种兼顾了使用与性能的方式.

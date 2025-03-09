@@ -61,7 +61,7 @@ public static void loop() {
             // 1. 获取消息队列中的消息, 取不到消息会阻塞
             Message msg = queue.next(); // might block
             if (msg == null) { 
-                // 若取到的消息为 null, 这个 Looper 就结束了
+                // 若取到的消息为 null, 这个 Looper 就结束了   todo 发送一个null的msg
                 return;
             }
             ......

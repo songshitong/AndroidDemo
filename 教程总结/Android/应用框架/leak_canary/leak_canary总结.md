@@ -13,22 +13,33 @@ val key = UUID.randomUUID().toString()
 ```
 3 过一会儿之后(默认是5秒)，从ReferenceQueue出队已经回收的对象并从map中移除，如果当前的对象activity或者其他没有进入ReferenceQueue，
    检查是否内存泄露
+
 4 主动触发GC,重复3中的移除对象回收步骤
    此时如果map中还有KeyedWeakReference剩余,那么就是没有入队的,也就是说这些KeyedWeakReference所对应的对象还没被回收.
    这是不合理的,这里就产生了内存泄露.
-5 将这些内存泄露的对象分析引用链,保存数据
+
+5 使用Debug.dumpHprofData()方法保存堆信息文件
+
+6 使用shark的 HeapAnalyzer解析Hprof文件，生成对象分析引用链
 
 
 
 可以监控的对象有四类 
 Activity，Fragment，ViewModel，RootView，Service
+
 对应的watcher是ActivityWatcher
-  注册Application.ActivityLifecycleCallbacks回调，监听onActivityDestroyed后进行检查
+  注册Application.ActivityLifecycleCallbacks回调，onCreate时将activity使用WeakReference保存到map，onActivityDestroyed时进行检查
+
 FragmentAndViewModelWatcher
-   1. 注册FragmentManager.registerFragmentLifecycleCallbacks监听，
+
+   1 注册FragmentManager.registerFragmentLifecycleCallbacks监听，
+
       在onFragmentDestroyed或者onFragmentViewDestroyed时，对fragment或fragment.view进行检测
-   2. 将ViewModelClearedWatcher添加到Fragment的ViewModelStore，然后在其onCleared后进行检测
+
+   2 将ViewModelClearedWatcher添加到Fragment的ViewModelStore，然后在其onCleared后进行检测
+
 RootViewWatcher
+
 ServiceWatcher
  通过hook  ActivityThread.Handler拿到service的消息，在serviceDoneExecuting后进行检查
 

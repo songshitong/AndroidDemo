@@ -13,6 +13,7 @@ class MSelect {
 
     @JvmStatic
     fun main(args:Array<String>){
+      //select 的多路复用   复用多个 await 和 Channel、SelectClause 及使用 Flow
       //select
       //支持的method
       // Receiver  Suspending function   Select clause

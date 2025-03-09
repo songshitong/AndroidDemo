@@ -9,18 +9,70 @@ LiveData利用Lifecycle感知activity/fragment的生命周期，在销毁时移�
 observe 保存观察者到SafeIterableMap  ObserverWrapper对Observer进行功能增强，一种是LifecycleBoundObserver跟随生命周期的，
      一种是AlwaysActiveObserver永久激活的观察者
 setValue  分发value给所有的观察者  连续两次调用，只有第一次生效，第一个正在分发中   setValue只对活跃的观察者通知
+   //todo setvalue没有线程切换，为什么第二个派发失败
+   每次变更mVersion增加，分发时比较observer的version和livedata的version变更才通知
 postValue 通过handler将消息发送到主线程  只有在赋值的时候上锁了，可能在线程切换时，其他线程把值变更了，只保留最新的值
-    还有一种情况在一个线程连续调用两次postValue，只有第一次生效   
-   //连续两次调用，第二次先赋值mPendingData，发现上一次没有分发成功然后就退出了，第一次分发时值mPendingData就变了
+   //连续两次调用，第二次先赋值mPendingData，发现上一次没有分发成功然后就退出了，第一次分发时值mPendingData就变了 
+   解决：使用setValue
+  
+
+解决粘性
+ 1 解决方案，使用SharedFlow替代
+ 2 使用SingleLiveEvent
+https://github.com/android/architecture-samples/blob/dev-todo-mvvm-live/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/SingleLiveEvent.java
+ 3 使用反射  //将新observer记录的version更新为livedata的version
+ 缺点倾入性强，把 LiveData 粘性彻底破坏了。但有的时候，我们还是想利用粘性的
+https://mp.weixin.qq.com/s/txOLO-cLrOR9JwqfktAtnA
+```
+private void hook(Observer<? super T> observer) {
+            try {
+                Class<LiveData> liveDataClass = LiveData.class;
+                Field mObserversField = liveDataClass.getDeclaredField("mObservers");
+                mObserversField.setAccessible(true);
+                Object mObserversObject = mObserversField.get(this);
+                Class<?> mObserversObjectClass = mObserversObject.getClass();
+                //获取到mObservers对象的get方法
+                Method getMethod = mObserversObjectClass.getDeclaredMethod("get", Object.class);
+                getMethod.setAccessible(true);
+                //执行get方法
+                Object invokeEntry = getMethod.invoke(mObserversObject, observer);
+                Object observerWraper = null;
+                if (invokeEntry != null && invokeEntry instanceof Map.Entry) {
+                    observerWraper = ((Map.Entry<?, ?>) invokeEntry).getValue();
+                }
+                if (observerWraper == null) {
+                    throw new NullPointerException("observerWraper 为空");
+                }
+                Class<?> superclass = observerWraper.getClass().getSuperclass();
+                Field mLastVersion = superclass.getDeclaredField("mLastVersion");
+                mLastVersion.setAccessible(true);
+
+                Field mVersion = liveDataClass.getDeclaredField("mVersion");
+                mVersion.setAccessible(true);
+                
+                //将新observer记录的version更新为livedata的version
+                Object mVersionValue = mVersion.get(this);
+                mLastVersion.set(observerWraper, mVersionValue);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+```
+
+//todo 数据倒灌现象
+//多次调用测试结果受ui可见性影响
+https://blog.csdn.net/cpcpcp123/article/details/121960528
 ```
    val ld = MutableLiveData<String>()
         ld.observe(this) {
             Log.d(TAG,"ld observe $it")
         }
         ld.postValue("1")
-        ld.postValue("2")
+        ld.postValue("2")  //结果： ld observe 2
+       
+         //注掉上面测试setValue
+         ld.setValue("3")
+         ld.setValue("4")  //ui不可见时，结果：ld observe 4    
 ```
-结果： ld observe 2
 
 LiveData是一个类,将数据放在它里面我们可以观察数据的变化.它是lifecycle-aware(生命周期感知的).这个特性非常重要,
   我们可以用它来更新UI的数据,当且仅当activity、fragment或者Service是处于活动状态时。

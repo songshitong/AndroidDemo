@@ -19,6 +19,9 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
+import sst.example.androiddemo.feature.R
+import sst.example.androiddemo.feature.util.StatusBarUtil
+import sst.example.androiddemo.feature.video.recorder.RecorderService
 
 data class Item(
   val view: View,
@@ -146,8 +149,8 @@ class CarTransiActivity : AppCompatActivity() {
       valueView.text = valueShow
     }else{
       valueTipView.visibility = View.VISIBLE
-      valueView.text =
-        getString(R.string.app_value_show).replace("$",valueShow )
+//      valueView.text =
+//        getString(R.string.app_value_show).replace("$",valueShow )
     }
     carSeriesView.text = itemList[centerIndex].carSeries
   }

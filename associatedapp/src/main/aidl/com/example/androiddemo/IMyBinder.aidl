@@ -12,3 +12,15 @@ interface IMyBinder {
                double aDouble, String aString);
    oneway void invokeMethodInMyService(String str);
 }
+
+// Requires setting the buildFeatures.aidl to true in the build file
+//高版本androidstudio自动创建aidl需要在gradle开启  https://juejin.cn/post/7240998915942760507
+// buildFeatures {
+//        compose true
+//        // Disable unused AGP features
+//        buildConfig false
+//        aidl true
+//        renderScript false
+//        resValues false
+//        shaders false
+//    }

@@ -908,7 +908,7 @@ static sk_sp<Bitmap> allocateBitmap(SkBitmap* bitmap, AllocPixelRef alloc) {
     if (!Bitmap::computeAllocationSize(rowBytes, bitmap->height(), &size)) {
         return nullptr;
     }
-    //todo 直接alloc分配内存  auto wrapper
+    // 直接alloc分配内存  auto wrapper
     auto wrapper = alloc(size, info, rowBytes);
     if (wrapper) {
         //创建native Bitmap

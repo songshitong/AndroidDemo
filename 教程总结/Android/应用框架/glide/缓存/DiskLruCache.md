@@ -753,7 +753,7 @@ public synchronized boolean remove(String key) throws IOException {
     while (size > maxSize) {
       //lruEntries按访问顺序排序，每次访问元素后该元素将移至链表的尾部  从头部开始淘汰，则是淘汰最老的
       Map.Entry<String, Entry> toEvict = lruEntries.entrySet().iterator().next();
-      //删除文件与对应的记录
+      //删除文件与对应的记录   文件名即md5的key
       remove(toEvict.getKey());
     }
   }

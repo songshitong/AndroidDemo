@@ -99,6 +99,10 @@ https://www.jianshu.com/p/4de87ebf5104
 如果没有使用者也会尝试把这个列表里面的资源全部回收掉。这样就尽量保证了不会出现OOM的情况。
 //被回收了怎么办,下次重新加载  正在显示图片已经上传到GPU了,内存里的被GC回收了
 
+MemoryCache的实现类是LruResourceCache
+LruResourceCache继承LruCache，LruCache利用LinkedHashMap实现LRU功能，最新访问过的放在尾部，淘汰头部最老的
+//什么时候缓存清空？
+onTrimMemory或onLowMemory
 
 磁盘缓存策略
 DiskCacheStrategy.NONE：表示不缓存任何内容。
@@ -126,27 +130,32 @@ DiskCacheStrategy.DATA
 DataCacheKey newOriginalKey = new DataCacheKey(loadData.sourceKey, helper.getSignature());
 ```
 
+
 DiskLruCache   DiskLruCacheWrapper是glide对DiskLruCache包装
-使用LinkedHashMap实现LRU缓存，
-DiskLruCache会对操作保存到journal文件 文件主要保存四种操作和对应的文件key，key一般是url的md5，缓存文件的名字
+代码中使用LinkedHashMap实现LRU缓存，与journal文件对应
+DiskLruCache会对操作保存到journal文件 文件主要保存四种操作和对应的文件key，key一般是url的md5，作为缓存文件的名字
  DIRTY：第六行以DIRTY前缀开始，后面跟着缓存文件的key，表示一个entry正在被写入。   edit()方法
+    表示缓存项正在被创建或者被更新，这时的缓存项应该是不可读的 https://juejin.cn/post/7097204016735584263
  CLEAN：当写入成功，就会写入一条CLEAN记录，后面的数字记录文件的长度，如果一个key可以对应多个文件，那么就会有多个数字   
      调用edit()之后进行commit()
+    表示缓存项成功写入缓存，这时的缓存是可读的
  REMOVE：表示写入失败，或者调用remove(key)方法的时候都会写入一条REMOVE记录
- READ：表示一次读取记录
+ READ：表示一次读取记录  文件读取需要更新
 存储文件目录名image_manager_disk_cache，默认大小250M
   超过250M，后台线程glide-disk-lru-cache-thread会根据journal文件的记录生成的LinkedHashMap<String, Entry>lruEntries
      按照LRU淘汰链表头部也就是最老的。每次访问文件都会把对应的entry移动到链表尾部
 journal文件记录超过2000会进行重建，只记录DIRTY和CLEAN
 触发时机：
-remove(String key)  写入一条REMOVE，删除LinkedHashMap中的entry，开始触发后台清理 
+remove(String key)  写入一条REMOVE，删除LinkedHashMap中的entry，开始触发后台清理
 setMaxSize(long maxSize)   
 get(String key)   新增一条read记录，判断是否journal超出，开始触发后台清理
 提交修改commit()   如果成功，写入一条CLEAN记录,否则，写入一条REMOVE记录，判断是否journal超出，开始触发后台清理
+后台清理
+删除文件与对应的记录，是否需要重建journal
 
 
 Glide做了哪些内存优化
-1 尺寸优化
+1 尺寸优化  下采样的流程
 当装载图片的容器例如ImageView只有100*100，而图片的分辨率为800 * 800，这个时候将图片直接放置在容器上，很容易OOM，
  同时也是对图片和内存资源的一种浪费。当容器的宽高都很小于图片的宽高，其实就需要对图片进行尺寸上的压缩，
   将图片的分辨率调整为ImageView宽高的大小，一方面不会对图片的质量有影响，同时也可以很大程度上减少内存的占用
@@ -180,6 +189,9 @@ inBitmap介绍
 BitmapPool中传入宽高与格式Bitmap.config，得到一个可复用的对象，这样就实现了Bitmap的内存复用
 BitmapPool的实现类LruBitmapPool通过策略模式处理不同版本SizeConfigStrategy(4.4之上)和AttributeStrategy
   都通过按LRU淘汰最老的
+  存储格式GroupedLinkedMap<Key, Bitmap>
+  SizeConfigStrategy通过宽高和格式计算size
+  AttributeStrategy限定宽高的复用
 LruBitmapPool存在默认限制
 
 

@@ -104,8 +104,8 @@ bitmap 无法利用共享内存，只能拷贝到 Binder 映射的缓冲区，�
 //todo https://www.jianshu.com/p/8e8ad414237e
 
 
-Bitmap内存计算  可以看一下BitmapFactory.decodeResource
-Bitmap 所占内存又如何计算呢，一般情况下这样计算：  //todo 一般情况下对不对
+Bitmap内存计算  可以看一下BitmapFactory.decodeResource，会根据density进行缩放
+Bitmap 所占内存又如何计算呢，一般情况下这样计算：  
 
 Bitmap Memory = widthPix * heightPix * 一个像素的大小   可使用 bitmap.getConfig() 获取 Bitmap 的格式然后计算像素，ARGB_8888是32位，也就是4字节
 
@@ -160,7 +160,9 @@ widthPix = 8192/4=2048
 heightPix = 4608 /4 =1152
 bitmap size: 9    2048*1152*4= 9,437,184  大约是9M
 
-inSampleSize的确定
+
+
+inSampleSize的确定  一般要求是2的指数
 1. 直接采样  直接设定inSampleSize，比如inSampleSize=200  提前有预估
 2. 计算采样  根据请求的宽高计算合适的 inSampleSize
 计算方式1
